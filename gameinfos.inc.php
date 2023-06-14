@@ -100,11 +100,11 @@ $gameinfos = [
 'diplomacy' => 2,    
 
 // Colors attributed to players
-  'player_colors' => [// TODO
-    '7c5654',
-    'd6d6d7',
-    'b79d86',
-    '1e2c36',
+  'player_colors' => [
+    'f0db6c',
+    '62bce6',
+    '70c499',
+    'ddbdd7',
   ],
 
 // Favorite colors support : if set to "true", support attribution of favorite colors based on player's preferences (see reattributeColorsBasedOnPreferences PHP method)
