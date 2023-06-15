@@ -974,7 +974,7 @@ body > .card {
   justify-content: center;
   align-items: center;
   font-size: 20pt;
-  font-family: "copperplate-gothic-bold";
+  font-family: "conthrax-sb";
 }
 .player-table .boat {
   position: relative;
@@ -1210,8 +1210,8 @@ body > .card {
   }
 }
 @font-face {
-  font-family: "copperplate-gothic-bold";
-  src: url("img/copperplate-gothic-bold.woff2") format("woff2"), url("img/copperplate-gothic-bold.woff") format("woff");
+  font-family: "conthrax-sb";
+  src: url("img/conthrax-sb.woff2") format("woff2"), url("img/conthrax-sb.woff") format("woff");
   font-weight: normal;
   font-style: normal;
 }
