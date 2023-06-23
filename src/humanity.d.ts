@@ -21,8 +21,26 @@ interface Destination {
     gains: (number | null)[];
 }
 
+interface Objective {
+    id: number;
+    location: string;
+    locationArg: number;
+    type: number;
+    number: number;
+    minimum: number;
+    color?: number;
+    adjacent?: boolean;
+    direction?: number;
+    sameColor?: boolean;
+    baseType?: number;
+    extremity?: number;
+}
+
 interface HumanityPlayer extends Player {
     playerNo: number;
+    objectives: Objective[];
+    
+    // TODO check
     research: number;
     recruit: number;
     bracelet: number;
@@ -46,6 +64,9 @@ interface HumanityGamedatas {
     tablespeed: string;
 
     // Add here variables you set up in getAllDatas
+    tableObjectives: Objective[];
+
+    // TODO check
     cardDeckTop?: Card;
     cardDeckCount: number;
     cardDiscardCount: number;
@@ -53,7 +74,7 @@ interface HumanityGamedatas {
     centerDestinationsDeckTop: { [letter: string]: Destination };
     centerDestinationsDeckCount: { [letter: string]: number };
     centerDestinations: { [letter: string]: Destination[] };
-    artifacts?: number[];
+    objectives?: number[];
     firstPlayerId: number;
     lastTurn: boolean;
 }
@@ -61,7 +82,7 @@ interface HumanityGamedatas {
 interface HumanityGame extends Game {
     cardsManager: CardsManager;
     researchManager: DestinationsManager;
-    artifactsManager: ArtifactsManager;
+    objectivesManager: ObjectivesManager;
 
     getPlayerId(): number;
     getPlayer(playerId: number): HumanityPlayer;

@@ -6,7 +6,7 @@ $playerColors: '7c5654', 'd6d6d7', 'b79d86', '1e2c36';
 @import '../node_modules/bga-cards/bga-cards';
 @import 'cards';
 @import 'research';
-@import 'artifacts';
+@import 'objectives';
 @import 'table-center';
 @import 'playerboards';
 @import 'player-table';
@@ -131,7 +131,7 @@ html, .mode_3d #game_play_area_background {
   }
 }
 
-.artifact-tooltip {
+.objective-tooltip {
   &>div {
     padding: 5px;
 

@@ -32,7 +32,7 @@
         "node_modules/bga-cards/src/card-manager.ts",
         "src/cards.ts",
         "src/research.ts",
-        "src/artifacts.ts",
+        "src/objectives.ts",
         "src/table-center.ts",
         "src/player-table.ts",
         "src/humanity.ts",

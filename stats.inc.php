@@ -206,10 +206,10 @@ $commonStats = [
         "type" => "int"
     ],  
 
-    // artifacts
-    "activatedArtifacts" => [
+    // objectives
+    "activatedObjectives" => [
         "id" => 80,
-        "name" => totranslate("Activated artifacts"),
+        "name" => totranslate("Activated objectives"),
         "type" => "int"
     ],
     

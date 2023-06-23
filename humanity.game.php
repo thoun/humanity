@@ -144,8 +144,9 @@ class Humanity extends Table {
         }
 
         // setup the initial game situation here
-        $this->setupCards(array_keys($players));
-        $this->setupDestinations();
+        //$this->setupTiles(array_keys($players));
+        //$this->setupDestinations();
+        $this->setupObjectives();
 
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
@@ -213,6 +214,8 @@ class Humanity extends Table {
             $result['centerDestinationsDeckCount'][$letter] = intval($this->research->countCardInLocation('deck'.$letter));
             $result['centerDestinations'][$letter] = $this->getDestinationsByLocation('slot'.$letter);
         }
+
+        $result['tableObjectives'] = $this->getObjectivesByLocation('table');        
 
         $result['firstPlayerId'] = $firstPlayerId;
         $result['lastTurn'] = !$isEndScore && boolval($this->getGameStateValue(LAST_TURN));

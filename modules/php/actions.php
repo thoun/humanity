@@ -61,10 +61,10 @@ trait ActionTrait {
 
         $argChooseNewCard = $this->argChooseNewCard();
         if ($argChooseNewCard['allFree']) {
-            self::notifyAllPlayers('log', clienttranslate('${player_name} can recruit any viking for free thanks to ${artifact_name} effect'), [
+            self::notifyAllPlayers('log', clienttranslate('${player_name} can recruit any viking for free thanks to ${objective_name} effect'), [
                 'player_name' => $this->getPlayerName($playerId),
-                'artifact_name' => $this->getArtifactName(ARTIFACT_CAULDRON), // for logs
-                'i18n' => ['artifact_name'],
+                'objective_name' => $this->getObjectiveName(OBJECTIVE_CAULDRON), // for logs
+                'i18n' => ['objective_name'],
             ]);
         }
 
@@ -146,7 +146,7 @@ trait ActionTrait {
         $this->setGameStateValue(RECRUIT_DONE, 1);
         $this->setGameStateValue(EXPLORE_DONE, 1);
 
-        $this->redirectAfterAction($playerId, true);
+        $this->gamestate->nextState('next');
     }
 
     public function takeDestination(int $id) {
@@ -279,7 +279,7 @@ trait ActionTrait {
         $this->setGameStateValue(RECRUIT_DONE, 1);
         $this->setGameStateValue(EXPLORE_DONE, 1);
 
-        $this->redirectAfterAction($playerId, true);
+        $this->gamestate->nextState('next');
     }
 
     public function reserveDestination(int $id) {
@@ -350,7 +350,7 @@ trait ActionTrait {
             'cardDeckCount' => intval($this->tiles->countCardInLocation('deck')) + 1, // to count the new card
         ]);
 
-        $this->redirectAfterAction($playerId, true);
+        $this->gamestate->nextState('next');
     }
 
     public function pass() {
@@ -358,7 +358,7 @@ trait ActionTrait {
 
         $playerId = intval($this->getActivePlayerId());
 
-        $this->redirectAfterAction($playerId, true);
+        $this->gamestate->nextState('next');
     }
 
     public function trade(int $number) {
@@ -411,7 +411,7 @@ trait ActionTrait {
 
     public function endTrade(int $playerId) {
         $this->setGameStateValue(TRADE_DONE, 1);
-        $this->redirectAfterAction($playerId, false);
+        $this->gamestate->nextState('next');
     }
 
     public function cancel() {
@@ -425,7 +425,7 @@ trait ActionTrait {
 
         $playerId = intval($this->getCurrentPlayerId());
 
-        $endTurn = $this->checkEndTurnArtifacts($playerId);
+        $endTurn = $this->checkEndTurnObjectives($playerId);
 
         $this->gamestate->nextState(!$endTurn ? 'next' : 'endTurn');
     }

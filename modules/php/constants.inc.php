@@ -1,50 +1,69 @@
 <?php
 
 /*
- * Destination types
+ * TODO DELETE
  */
 define('A', 'A');
 define('B', 'B');
-
-/*
- * Color
- */
 define('EQUAL', -1);
 define('DIFFERENT', 0);
 define('RED', 1);
 define('YELLOW', 2);
-define('GREEN', 3);
-define('BLUE', 4);
-define('PURPLE', 5);
-
-/*
- * Gain
- */
 define('VP', 1);
 define('BRACELET', 2);
 define('RECRUIT', 3);
 define('RESEARCH', 4);
 define('CARD', 5);
+define('OBJECTIVE_MEAD_CUP', 1);
+define('OBJECTIVE_SILVER_COIN', 2);
+define('OBJECTIVE_CAULDRON', 3);
+define('OBJECTIVE_GOLDEN_BRACELET', 4);
+define('OBJECTIVE_HELMET', 5);
+define('OBJECTIVE_AMULET', 6);
+define('OBJECTIVE_WEATHERVANE', 7);
 
 /*
- * Artifacts
+ * Color
  */
-define('ARTIFACT_MEAD_CUP', 1);
-define('ARTIFACT_SILVER_COIN', 2);
-define('ARTIFACT_CAULDRON', 3);
-define('ARTIFACT_GOLDEN_BRACELET', 4);
-define('ARTIFACT_HELMET', 5);
-define('ARTIFACT_AMULET', 6);
-define('ARTIFACT_WEATHERVANE', 7);
+define('ORANGE', 1);
+define('BLUE', 2);
+define('PURPLE', 3);
+define('GREEN', 4);
+
+/*
+ * Direction
+ */
+define('VERTICAL', 1);
+define('HORIZONTAL', 2);
+define('DIAGONAL', 3);
+
+/*
+ * Base types
+ */
+define('ELECTRICITY', 0);
+define('ICE', 1);
+define('METHAN', 2);
+define('INSECT', 3);
+define('OXYGEN', 11);
+define('AIRCARBON', 12);
+define('PROTEIN', 13);
+
+/*
+ * Extremity
+ */
+define('LEFT', 1);
+define('CENTRAL', 2);
+define('RIGHT', 3);
 
 /*
  * State constants
  */
 define('ST_BGA_GAME_SETUP', 1);
 
-define('ST_SCORE_RESEARCH', 10);
+define('ST_PLAYER_CHOOSE_WORKER', 5);
 
-define('ST_PLAYER_PLAY_ACTION', 20);
+define('ST_PLAYER_PLAY_ACTION', 10);
+
 define('ST_PLAYER_CHOOSE_NEW_CARD', 25);
 define('ST_PLAYER_PAY_DESTINATION', 30);
 
@@ -57,9 +76,11 @@ define('ST_PLAYER_TRADE', 50);
 define('ST_MULTIPLAYER_DISCARD_CARD', 70);
 define('ST_AFTER_DISCARD_CARD', 71);
 
-define('ST_NEXT_PLAYER', 80);
+define('ST_CHECK_OBJECTIVES', 90);
+define('ST_NEXT_PLAYER', 92);
+define('ST_END_YEAR', 95);
 
-define('ST_END_SCORE', 90);
+define('ST_END_SCORE', 98);
 
 define('ST_END_GAME', 99);
 define('END_SCORE', 100);
@@ -86,7 +107,7 @@ define('VARIANT_OPTION', 110);
 /*
  * Global variables
  */
-define('ARTIFACTS', 'Artifacts');
+define('OBJECTIVES', 'Objectives');
 define('REMAINING_CARDS_TO_TAKE', 'RemainingCardsToTake');
 //define('UNDO', 'undo');
 

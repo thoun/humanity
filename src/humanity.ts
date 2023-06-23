@@ -35,7 +35,7 @@ function getVpByResearch(research: number) {
 class Humanity implements HumanityGame {
     public cardsManager: CardsManager;
     public researchManager: DestinationsManager;
-    public artifactsManager: ArtifactsManager;
+    public objectivesManager: ObjectivesManager;
 
     private zoomManager: ZoomManager;
     private animationManager: AnimationManager;
@@ -75,7 +75,7 @@ class Humanity implements HumanityGame {
 
         this.cardsManager = new CardsManager(this);
         this.researchManager = new DestinationsManager(this);        
-        this.artifactsManager = new ArtifactsManager(this);
+        this.objectivesManager = new ObjectivesManager(this);
         this.animationManager = new AnimationManager(this);
         new JumpToManager(this, {
             localStorageFoldedKey: LOCAL_STORAGE_JUMP_TO_FOLDED_KEY,
@@ -575,14 +575,14 @@ class Humanity implements HumanityGame {
                 <div class="help-label">${_("Draw <strong>the first Viking card</strong> from the deck: It is placed in the player’s Crew Zone (without taking any assets).")}</div>
             </div>
 
-            <h1>${_("Powers of the artifacts (variant option)")}</h1>
+            <h1>${_("Powers of the objectives (variant option)")}</h1>
         `;
 
         for (let i = 1; i <=7; i++) {
             html += `
             <div class="help-section">
-                <div id="help-artifact-${i}"></div>
-                <div>${this.artifactsManager.getTooltip(i)}</div>
+                <div id="help-objective-${i}"></div>
+                <div>${this.objectivesManager.getTooltip(i)}</div>
             </div> `;
         }
         html += `</div>`;
@@ -592,7 +592,7 @@ class Humanity implements HumanityGame {
 
     private populateHelp() {
         for (let i = 1; i <=7; i++) {
-            this.artifactsManager.setForHelp(i, `help-artifact-${i}`);
+            this.objectivesManager.setForHelp(i, `help-objective-${i}`);
         }
     }
     
@@ -950,7 +950,7 @@ class Humanity implements HumanityGame {
                 }
 
                 for (const property in args) {
-                    if (['number', 'color', 'card_color', 'card_type', 'artifact_name'].includes(property) && args[property][0] != '<') {
+                    if (['number', 'color', 'card_color', 'card_type', 'objective_name'].includes(property) && args[property][0] != '<') {
                         args[property] = `<strong>${_(args[property])}</strong>`;
                     }
                 }

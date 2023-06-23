@@ -27,24 +27,4 @@
 require_once("modules/php/constants.inc.php");
 
  $game_options = [
-
-    /*VARIANT_OPTION => [
-        'name' => totranslate('Artifact variant'),
-        'values' => [
-            1 => [
-                'name' => totranslate('Disabled'),
-            ],
-            2 => [
-                'name' => totranslate('Enabled (with Mead Cup for 2 players)'),
-                'tmdisplay' => totranslate('Artifact variant (with Mead Cup for 2 players)'),
-                'nobeginner' => true,
-            ],
-            3 => [
-                'name' => totranslate('Enabled'),
-                'tmdisplay' => totranslate('Artifact variant'),
-                'nobeginner' => true,
-            ],
-        ],
-        'default' => 1,
-    ],*/
 ];

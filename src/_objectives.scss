@@ -1,0 +1,34 @@
+.card.objective {
+    display: inline-block;
+    position: relative;
+    width: 221px;
+    height: 120px;
+
+    @for $type from 1 through 3 {
+        &[data-type="#{$type}"] .card-side {
+            background-position-x: #{($type - 1) * 100% / 2};
+        }
+    }
+
+    .card-sides {
+        .card-side {
+            box-shadow: unset;
+
+            &>* {
+                pointer-events: none;
+                user-select: none;
+            }
+
+            &.front {
+                background-size: 300% auto;
+                background-image: url('img/objectives.png');
+
+                @for $number from 1 through 6 {
+                    &[data-number="#{$number}"] {
+                        background-position-y: #{($number - 1) * 100% / 5};
+                    }
+                }
+            }
+        }
+    } 
+}

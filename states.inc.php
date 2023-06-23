@@ -56,7 +56,7 @@ $basicGameStates = [
         "description" => clienttranslate("Game setup"),
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => [ "" => ST_SCORE_RESEARCH ]
+        "transitions" => [ "" => ST_PLAYER_CHOOSE_WORKER ]
     ],
    
     // Final state.
@@ -71,6 +71,21 @@ $basicGameStates = [
 ];
 
 $playerActionsGameStates = [
+
+    ST_PLAYER_CHOOSE_WORKER => [
+        "name" => "chooseWorker",
+        "description" => clienttranslate('${actplayer} must choose a worker'),
+        "descriptionmyturn" => clienttranslate('${you} must choose a worker'),
+        "type" => "activeplayer",    
+        "args" => "argChooseWorker",
+        "action" => "stChooseWorker",
+        "possibleactions" => [ 
+            "chooseWorker",
+        ],
+        "transitions" => [
+            "next" => ST_PLAYER_PLAY_ACTION,
+        ],
+    ],
 
     ST_PLAYER_PLAY_ACTION => [
         "name" => "playAction",
@@ -92,11 +107,11 @@ $playerActionsGameStates = [
             "endTurn",
         ],
         "transitions" => [
-            "next" => ST_PLAYER_PLAY_ACTION,
+            "next" => ST_PLAYER_CHOOSE_WORKER,
             "chooseNewCard" => ST_PLAYER_CHOOSE_NEW_CARD,
             "payDestination" => ST_PLAYER_PAY_DESTINATION,
             "trade" => ST_PLAYER_TRADE,
-            "endTurn" => ST_NEXT_PLAYER,
+            "endTurn" => ST_CHECK_OBJECTIVES,
         ],
     ],
 
@@ -111,11 +126,11 @@ $playerActionsGameStates = [
             "cancel",
         ],
         "transitions" => [
-            "next" => ST_PLAYER_PLAY_ACTION,
+            "next" => ST_PLAYER_CHOOSE_WORKER,
             "discardCardsForDeck" => ST_MULTIPLAYER_DISCARD_CARD,
             "reserve" => ST_PLAYER_RESERVE_DESTINATION,
             "discardTableCard" => ST_PLAYER_DISCARD_TABLE_CARD,
-            "endTurn" => ST_NEXT_PLAYER,
+            "endTurn" => ST_CHECK_OBJECTIVES,
             "cancel" => ST_PLAYER_PLAY_ACTION,
         ]
     ],
@@ -131,11 +146,11 @@ $playerActionsGameStates = [
             "cancel",
         ],
         "transitions" => [
-            "next" => ST_PLAYER_PLAY_ACTION,
+            "next" => ST_PLAYER_CHOOSE_WORKER,
             "discardCardsForDeck" => ST_MULTIPLAYER_DISCARD_CARD,
             "reserve" => ST_PLAYER_RESERVE_DESTINATION,
             "discardTableCard" => ST_PLAYER_DISCARD_TABLE_CARD,
-            "endTurn" => ST_NEXT_PLAYER,
+            "endTurn" => ST_CHECK_OBJECTIVES,
             "cancel" => ST_PLAYER_PLAY_ACTION,
         ]
     ],
@@ -150,8 +165,8 @@ $playerActionsGameStates = [
             "pass",
         ],
         "transitions" => [
-            "next" => ST_PLAYER_PLAY_ACTION,
-            "endTurn" => ST_NEXT_PLAYER,
+            "next" => ST_PLAYER_CHOOSE_WORKER,
+            "endTurn" => ST_CHECK_OBJECTIVES,
         ]
     ],
 
@@ -165,8 +180,8 @@ $playerActionsGameStates = [
             "pass",
         ],
         "transitions" => [
-            "next" => ST_PLAYER_PLAY_ACTION,
-            "endTurn" => ST_NEXT_PLAYER,
+            "next" => ST_PLAYER_CHOOSE_WORKER,
+            "endTurn" => ST_CHECK_OBJECTIVES,
         ]
     ],
 
@@ -181,7 +196,7 @@ $playerActionsGameStates = [
             "cancel",
         ],
         "transitions" => [
-            "next" => ST_PLAYER_PLAY_ACTION,
+            "next" => ST_PLAYER_CHOOSE_WORKER,
             "discardCardsForDeck" => ST_MULTIPLAYER_DISCARD_CARD,
             "endTurn" => ST_NEXT_PLAYER,
             "cancel" => ST_PLAYER_PLAY_ACTION,
@@ -205,28 +220,28 @@ $playerActionsGameStates = [
 
 $gameGameStates = [
 
-    ST_SCORE_RESEARCH => [
-        "name" => "scoreResearch",
-        "description" => clienttranslate('Scoring research points...'),
-        "type" => "game",
-        "action" => "stScoreResearch",
-        "transitions" => [
-            "next" => ST_PLAYER_PLAY_ACTION,
-        ]
-    ],
-
     ST_AFTER_DISCARD_CARD => [
         "name" => "afterDiscardCard",
         "description" => "",
         "type" => "game",
         "action" => "stAfterDiscardCard",
         "transitions" => [
-            "next" => ST_PLAYER_PLAY_ACTION,
+            "next" => ST_PLAYER_CHOOSE_WORKER,
             "discardCardsForDeck" => ST_MULTIPLAYER_DISCARD_CARD,
             "reserve" => ST_PLAYER_RESERVE_DESTINATION,
             "discardTableCard" => ST_PLAYER_DISCARD_TABLE_CARD,
-            "endTurn" => ST_NEXT_PLAYER,
+            "endTurn" => ST_CHECK_OBJECTIVES,
         ],
+    ],
+
+    ST_CHECK_OBJECTIVES => [
+        "name" => "checkObjectives",
+        "description" => clienttranslate('Scoring research points...'),
+        "type" => "game",
+        "action" => "stCheckObjectives",
+        "transitions" => [
+            "next" => ST_NEXT_PLAYER,
+        ]
     ],
 
     ST_NEXT_PLAYER => [
@@ -236,9 +251,20 @@ $gameGameStates = [
         "action" => "stNextPlayer",
         "updateGameProgression" => true,
         "transitions" => [
-            "nextPlayer" => ST_SCORE_RESEARCH,
-            "endScore" => ST_END_SCORE,
+            "nextPlayer" => ST_PLAYER_CHOOSE_WORKER,
+            "endYear" => ST_END_YEAR,
         ],
+    ],
+
+    ST_END_YEAR => [
+        "name" => "endYear",
+        "description" => clienttranslate('Scoring research points...'),
+        "type" => "game",
+        "action" => "stEndYear",
+        "transitions" => [
+            "next" => ST_PLAYER_CHOOSE_WORKER,
+            "endScore" => ST_END_SCORE,
+        ]
     ],
 
     ST_END_SCORE => [

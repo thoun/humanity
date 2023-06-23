@@ -10,7 +10,7 @@ class TableCenter {
     private vp = new Map<number, number>();
     private research = new Map<number, number>(); 
 
-    private artifacts: LineStock<number>;
+    private objectives: LineStock<Objective>;
         
     constructor(private game: HumanityGame, gamedatas: HumanityGamedatas) {
         ['A', 'B'].forEach(letter => {
@@ -71,6 +71,11 @@ class TableCenter {
         });
         this.moveVP();
         this.moveResearch();
+
+        document.getElementById('table-center').insertAdjacentHTML('afterbegin', `<div></div><div id="objectives"></div>`);
+        
+        this.objectives = new LineStock<Objective>(this.game.objectivesManager, document.getElementById(`objectives`));
+        this.objectives.addCards(gamedatas.tableObjectives);
     }
     
     public newTableCard(card: Card): Promise<boolean> {

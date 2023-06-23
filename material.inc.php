@@ -20,8 +20,9 @@
  */
 
 require_once(__DIR__.'/modules/php/constants.inc.php');
-require_once(__DIR__.'/modules/php/objects/research.php');
 require_once(__DIR__.'/modules/php/objects/tile.php');
+require_once(__DIR__.'/modules/php/objects/research.php');
+require_once(__DIR__.'/modules/php/objects/objective.php');
 
 $this->VP_BY_RESEARCH = [
     3 => 1,
@@ -95,4 +96,36 @@ $this->TILES = [
     new TileType(RED, BRACELET, [2 => 2, 3 => 3, 4 => 3]),
     new TileType(RED, RECRUIT, [2 => 1, 3 => 1, 4 => 2]),
     new TileType(RED, RESEARCH, [2 => 0, 3 => 1, 4 => 1]),
+];
+
+$this->OBJECTIVES = [
+    1 => [
+        1 => new ObjectiveTypeA(4, ORANGE, true),
+        2 => new ObjectiveTypeA(3, BLUE, true),
+        3 => new ObjectiveTypeA(3, PURPLE, true), // TODO allow diagonal for PURPLE & adjacent
+
+        4 => new ObjectiveTypeA(6, ORANGE, false),
+        5 => new ObjectiveTypeA(4, BLUE, false),
+        6 => new ObjectiveTypeA(3, PURPLE, false),
+    ],
+
+    2 => [
+        1 => new ObjectiveTypeB(4, VERTICAL, false),
+        2 => new ObjectiveTypeB(5, HORIZONTAL, false),
+        3 => new ObjectiveTypeB(4, DIAGONAL, false),
+
+        4 => new ObjectiveTypeB(3, VERTICAL, true),
+        5 => new ObjectiveTypeB(3, HORIZONTAL, true),
+        6 => new ObjectiveTypeB(3, DIAGONAL, true),
+    ],
+
+    3 => [
+        1 => new ObjectiveTypeC(4, ICE, null),
+        2 => new ObjectiveTypeC(4, METHAN, null),
+        3 => new ObjectiveTypeC(4, INSECT, null),
+
+        4 => new ObjectiveTypeC(3, null, LEFT),
+        5 => new ObjectiveTypeC(3, null, CENTRAL),
+        6 => new ObjectiveTypeC(3, null, RIGHT),
+    ],
 ];

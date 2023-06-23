@@ -1,21 +1,21 @@
-class ObjectivesManager extends CardManager<number> {
+class ObjectivesManager extends CardManager<Objective> {
     constructor (public game: HumanityGame) {
         super(game, {
-            getId: (card) => `objective-${card}`,
-            setupDiv: (card: number, div: HTMLElement) => { 
+            getId: (card) => `objective-${card.id}`,
+            setupDiv: (card: Objective, div: HTMLElement) => { 
                 div.classList.add('objective');
                 game.setTooltip(div.id, this.getTooltip(card));
+                div.dataset.type = ''+card.type;
             },
-            setupFrontDiv: (card: number, div: HTMLElement) => { 
-                div.dataset.number = ''+card;
-
+            setupFrontDiv: (card: Objective, div: HTMLElement) => { 
+                div.dataset.number = ''+card.number;
             },
         });
     }
 
-    private getTooltip(number: number): string {
+    private getTooltip(objective: Objective): string {
         let message = '';
-        switch (number) {
+        switch (objective.number) {
             case 1: message = _("(+2) if you have 1 or 3 orange cards."); break;
             case 2: message = _("(-2) if orange cards are in the scoring column with either value (1) or value (2)."); break;
             case 3: message = _("(+2) if you have 2 or 4 blue cards."); break;
@@ -35,8 +35,6 @@ class ObjectivesManager extends CardManager<number> {
         message = message.replaceAll(/\(([+-]?\d)\)/g, (a, b) => { console.log(a, b); 
             return `<div class="points-circle" data-negative="${Number(b) < 0}">${b}</div>`; 
         });
-        //points-circle
-        console.log(message);
 
         return message;
         

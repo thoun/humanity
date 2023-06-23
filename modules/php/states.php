@@ -10,26 +10,9 @@ trait StateTrait {
         Here, you can create methods defined as "game state actions" (see "action" property in states.inc.php).
         The action method of state X is called everytime the current game state is set to X.
     */
-
-    function stScoreResearch() {
-        /*$playerId = intval($this->getActivePlayerId());
-
-        $player = $this->getPlayer($playerId);
-
-        $inc = 0;
-        foreach ($this->VP_BY_RESEARCH as $min => $points) {
-            if ($player->research >= $min) {
-                $inc = $points;
-            }
-        }
-
-        $this->incPlayerScore($playerId, $inc, clienttranslate('${player_name} scores ${incScore} Victory Point(s) with research'));
-        $this->incStat($inc, 'researchPoints');
-        $this->incStat($inc, 'researchPoints', $playerId);
-
-        $this->setGameStateValue(COMPLETED_LINES, $this->getCompletedLines($playerId));*/
-        
-        $this->gamestate->nextState('next');
+    
+    function stChooseWorker() {
+        // TODO skip if all the same workforce ?
     }
 
     /*function stPlayAction() {
@@ -91,6 +74,27 @@ trait StateTrait {
                 }
             }
         }
+    }
+
+    function stCheckObjectives() {
+        /*$playerId = intval($this->getActivePlayerId());
+
+        $player = $this->getPlayer($playerId);
+
+        $inc = 0;
+        foreach ($this->VP_BY_RESEARCH as $min => $points) {
+            if ($player->research >= $min) {
+                $inc = $points;
+            }
+        }
+
+        $this->incPlayerScore($playerId, $inc, clienttranslate('${player_name} scores ${incScore} Victory Point(s) with research'));
+        $this->incStat($inc, 'researchPoints');
+        $this->incStat($inc, 'researchPoints', $playerId);
+
+        $this->setGameStateValue(COMPLETED_LINES, $this->getCompletedLines($playerId));*/
+        
+        $this->gamestate->nextState('next');
     }
 
     function stNextPlayer() {

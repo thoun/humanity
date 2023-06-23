@@ -11,6 +11,11 @@ trait ArgsTrait {
         These methods function is to return some additional information that is specific to the current
         game state.
     */
+
+    function argChooseWorker() {
+        // TODO
+        return [];
+    }
    
     function argPlayAction() {
         /*$playerId = intval($this->getActivePlayerId());

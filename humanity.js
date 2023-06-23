@@ -2073,60 +2073,76 @@ var DestinationsManager = /** @class */ (function (_super) {
     };
     return DestinationsManager;
 }(CardManager));
-var ArtifactsManager = /** @class */ (function (_super) {
-    __extends(ArtifactsManager, _super);
-    function ArtifactsManager(game) {
+var ObjectivesManager = /** @class */ (function (_super) {
+    __extends(ObjectivesManager, _super);
+    function ObjectivesManager(game) {
         var _this = _super.call(this, game, {
-            getId: function (card) { return "artifact-".concat(card); },
+            getId: function (card) { return "objective-".concat(card.id); },
             setupDiv: function (card, div) {
-                div.classList.add('artifact');
+                div.classList.add('objective');
+                game.setTooltip(div.id, _this.getTooltip(card));
+                div.dataset.type = '' + card.type;
             },
-            setupFrontDiv: function (card, div) { return _this.setupFrontDiv(card, div); },
-            isCardVisible: function () { return true; },
+            setupFrontDiv: function (card, div) {
+                div.dataset.number = '' + card.number;
+            },
         }) || this;
         _this.game = game;
         return _this;
     }
-    ArtifactsManager.prototype.setupFrontDiv = function (card, div, ignoreTooltip) {
-        if (ignoreTooltip === void 0) { ignoreTooltip = false; }
-        div.dataset.number = '' + card;
-        if (!ignoreTooltip) {
-            this.game.setTooltip(div.id, this.getTooltip(card));
+    ObjectivesManager.prototype.getTooltip = function (objective) {
+        var message = '';
+        switch (objective.number) {
+            case 1:
+                message = _("(+2) if you have 1 or 3 orange cards.");
+                break;
+            case 2:
+                message = _("(-2) if orange cards are in the scoring column with either value (1) or value (2).");
+                break;
+            case 3:
+                message = _("(+2) if you have 2 or 4 blue cards.");
+                break;
+            case 4:
+                message = _("(+2) if blue is the colour you have the most cards of (or if blue is tied).");
+                break;
+            case 5:
+                message = _("(-2) if you are the player with the least pink cards (or are tied for the least pink cards).");
+                break;
+            case 6:
+                message = _("(+2) if you are the player with the most pink cards (or are tied for the most pink cards).");
+                break;
+            case 7:
+                message = _("(+2) if no colour is on the right of the green column.");
+                break;
+            case 8:
+                message = _("(+2) if green cards are in the scoring column with either value (4) or value (5).");
+                break;
+            case 9:
+                message = _("(+2) if you have more purple cards than orange cards (or the same number).");
+                break;
+            case 10:
+                message = _("(-2) if you are the player with the most purple cards (or are tied for the most purple cards).");
+                break;
+            case 11:
+                message = _("(+2) if you have cards in all 5 colours.");
+                break;
+            case 12:
+                message = _("(+2) if you have exactly 3 colours.");
+                break;
+            case 13:
+                message = _("(-2) if you have at least 1 colour with exactly 3 cards.");
+                break;
+            case 14:
+                message = _("(+2) if you have at least 1 colour with exactly 4 cards.");
+                break;
         }
+        message = message.replaceAll(/\(([+-]?\d)\)/g, function (a, b) {
+            console.log(a, b);
+            return "<div class=\"points-circle\" data-negative=\"".concat(Number(b) < 0, "\">").concat(b, "</div>");
+        });
+        return message;
     };
-    ArtifactsManager.prototype.getArtifactName = function (number) {
-        switch (number) {
-            case 1: return _("Mead Cup");
-            case 2: return _("Silver coin");
-            case 3: return _("Cauldron");
-            case 4: return _("Golden bracelet");
-            case 5: return _("Helmet");
-            case 6: return _("Amulet");
-            case 7: return _("Weathervane");
-        }
-    };
-    ArtifactsManager.prototype.getArtifactEffect = function (number) {
-        switch (number) {
-            case 1: return _("If a player takes an Explore action, they may discard a viking from the board and replace them with the first card from the deck.");
-            case 2: return _("For each viking of the same color a player Recruits beyond their 3rd viking of that color, they gain 1 Victory Point.");
-            case 3: return _("If a player Recruits a 2nd viking of the same color, they may take the Viking card of their choice instead of the one imposed by the card they played.");
-            case 4: return _("If a player recruits a 3rd viking of the same color, they can reserve a Destination card of their choice. It is taken from the available cards and placed next to their playing area. When that player takes an Explore action, they may choose to Explore a research they have reserved instead of an available research. Each player can have up to 2 reserved Destination cards at a time.");
-            case 5: return _("If a player places a Lands of Influence card which they have just Explored directly onto a Trading Lands card, they may immediately carry out a Recruit action.");
-            case 6: return _("If a player completes a line of vikings with all 5 different colors, they can take 1 silver bracelet and 1 recruit, and gains 1 Research Point.");
-            case 7: return _("If a player completes a line of vikings with all 5 different colors, they can immediately carry out an Explore action. They still have to pay the exploration cost.");
-        }
-    };
-    ArtifactsManager.prototype.getTooltip = function (number) {
-        return "\n            <div class=\"artifact-tooltip\">\n                <div class=\"title\">".concat(this.getArtifactName(number), "</div>\n                <div class=\"effect\">").concat(this.getArtifactEffect(number), "</div>\n            </div>\n        ");
-    };
-    ArtifactsManager.prototype.setForHelp = function (card, divId) {
-        var div = document.getElementById(divId);
-        div.classList.add('card', 'artifact');
-        div.dataset.side = 'front';
-        div.innerHTML = "\n        <div class=\"card-sides\">\n            <div class=\"card-side front\">\n            </div>\n            <div class=\"card-side back\">\n            </div>\n        </div>";
-        this.setupFrontDiv(card, div.querySelector('.front'), true);
-    };
-    return ArtifactsManager;
+    return ObjectivesManager;
 }(CardManager));
 var POINT_CASE_SIZE_LEFT = 38.8;
 var POINT_CASE_SIZE_TOP = 37.6;
@@ -2187,6 +2203,9 @@ var TableCenter = /** @class */ (function () {
         });
         this.moveVP();
         this.moveResearch();
+        document.getElementById('table-center').insertAdjacentHTML('afterbegin', "<div></div><div id=\"objectives\"></div>");
+        this.objectives = new LineStock(this.game.objectivesManager, document.getElementById("objectives"));
+        this.objectives.addCards(gamedatas.tableObjectives);
     }
     TableCenter.prototype.newTableCard = function (card) {
         return this.cards.addCard(card);
@@ -2496,7 +2515,7 @@ var Humanity = /** @class */ (function () {
         log('gamedatas', gamedatas);
         this.cardsManager = new CardsManager(this);
         this.researchManager = new DestinationsManager(this);
-        this.artifactsManager = new ArtifactsManager(this);
+        this.objectivesManager = new ObjectivesManager(this);
         this.animationManager = new AnimationManager(this);
         new JumpToManager(this, {
             localStorageFoldedKey: LOCAL_STORAGE_JUMP_TO_FOLDED_KEY,
@@ -2897,16 +2916,16 @@ var Humanity = /** @class */ (function () {
         return [1, 2, 3, 4, 5].map(function (number) { return "\n            <div class=\"color\" data-color=\"".concat(number, "\"></div>\n            <span class=\"label\"> ").concat(_this.getColor(number), "</span>\n        "); }).join('');
     };
     Humanity.prototype.getHelpHtml = function () {
-        var html = "\n        <div id=\"help-popin\">\n            <h1>".concat(_("Assets"), "</h2>\n            <div class=\"help-section\">\n                <div class=\"icon vp\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Victory Point</strong>. The player moves their token forward 1 space on the Score Track."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon recruit\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Recruit</strong>: The player adds 1 Recruit token to their ship."), " ").concat(_("It is not possible to have more than 3."), " ").concat(_("A recruit allows a player to draw the Viking card of their choice when Recruiting or replaces a Viking card during Exploration."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon bracelet\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Silver Bracelet</strong>: The player adds 1 Silver Bracelet token to their ship."), " ").concat(_("It is not possible to have more than 3."), " ").concat(_("They are used for Trading."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon research\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Research Point</strong>: The player moves their token forward 1 space on the Research Track."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon take-card\"></div>\n                <div class=\"help-label\">").concat(_("Draw <strong>the first Viking card</strong> from the deck: It is placed in the player’s Crew Zone (without taking any assets)."), "</div>\n            </div>\n\n            <h1>").concat(_("Powers of the artifacts (variant option)"), "</h1>\n        ");
+        var html = "\n        <div id=\"help-popin\">\n            <h1>".concat(_("Assets"), "</h2>\n            <div class=\"help-section\">\n                <div class=\"icon vp\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Victory Point</strong>. The player moves their token forward 1 space on the Score Track."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon recruit\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Recruit</strong>: The player adds 1 Recruit token to their ship."), " ").concat(_("It is not possible to have more than 3."), " ").concat(_("A recruit allows a player to draw the Viking card of their choice when Recruiting or replaces a Viking card during Exploration."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon bracelet\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Silver Bracelet</strong>: The player adds 1 Silver Bracelet token to their ship."), " ").concat(_("It is not possible to have more than 3."), " ").concat(_("They are used for Trading."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon research\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Research Point</strong>: The player moves their token forward 1 space on the Research Track."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon take-card\"></div>\n                <div class=\"help-label\">").concat(_("Draw <strong>the first Viking card</strong> from the deck: It is placed in the player’s Crew Zone (without taking any assets)."), "</div>\n            </div>\n\n            <h1>").concat(_("Powers of the objectives (variant option)"), "</h1>\n        ");
         for (var i = 1; i <= 7; i++) {
-            html += "\n            <div class=\"help-section\">\n                <div id=\"help-artifact-".concat(i, "\"></div>\n                <div>").concat(this.artifactsManager.getTooltip(i), "</div>\n            </div> ");
+            html += "\n            <div class=\"help-section\">\n                <div id=\"help-objective-".concat(i, "\"></div>\n                <div>").concat(this.objectivesManager.getTooltip(i), "</div>\n            </div> ");
         }
         html += "</div>";
         return html;
     };
     Humanity.prototype.populateHelp = function () {
         for (var i = 1; i <= 7; i++) {
-            this.artifactsManager.setForHelp(i, "help-artifact-".concat(i));
+            this.objectivesManager.setForHelp(i, "help-objective-".concat(i));
         }
     };
     Humanity.prototype.onTableDestinationClick = function (research) {
@@ -3197,7 +3216,7 @@ var Humanity = /** @class */ (function () {
                     args.gains = entries.length ? entries.map(function (entry) { return "<strong>".concat(entry[1], "</strong> <div class=\"icon\" data-type=\"").concat(entry[0], "\"></div>"); }).join(' ') : "<strong>".concat(_('nothing'), "</strong>");
                 }
                 for (var property in args) {
-                    if (['number', 'color', 'card_color', 'card_type', 'artifact_name'].includes(property) && args[property][0] != '<') {
+                    if (['number', 'color', 'card_color', 'card_type', 'objective_name'].includes(property) && args[property][0] != '<') {
                         args[property] = "<strong>".concat(_(args[property]), "</strong>");
                     }
                 }

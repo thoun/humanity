@@ -748,44 +748,48 @@ body > .card {
     box-shadow: 0 0 5px 3px rgb(255, 212, 131);
   }
 }
-.card.artifact {
+.card.objective {
   display: inline-block;
   position: relative;
   width: 221px;
   height: 120px;
-  border-radius: 8px;
 }
-.card.artifact .card-sides .card-side {
-  border-radius: 8px;
+.card.objective[data-type="1"] .card-side {
+  background-position-x: 0%;
 }
-.card.artifact .card-sides .card-side > * {
+.card.objective[data-type="2"] .card-side {
+  background-position-x: 50%;
+}
+.card.objective[data-type="3"] .card-side {
+  background-position-x: 100%;
+}
+.card.objective .card-sides .card-side {
+  box-shadow: unset;
+}
+.card.objective .card-sides .card-side > * {
   pointer-events: none;
   user-select: none;
 }
-.card.artifact .card-sides .card-side.front {
-  background-size: 100% auto;
-  background-image: url("img/artefacts.jpg");
-  box-shadow: 0px 0px 3px 2px black;
+.card.objective .card-sides .card-side.front {
+  background-size: 300% auto;
+  background-image: url("img/objectives.png");
 }
-.card.artifact .card-sides .card-side.front[data-number="1"] {
+.card.objective .card-sides .card-side.front[data-number="1"] {
   background-position-y: 0%;
 }
-.card.artifact .card-sides .card-side.front[data-number="2"] {
-  background-position-y: 16.6666666667%;
+.card.objective .card-sides .card-side.front[data-number="2"] {
+  background-position-y: 20%;
 }
-.card.artifact .card-sides .card-side.front[data-number="3"] {
-  background-position-y: 33.3333333333%;
+.card.objective .card-sides .card-side.front[data-number="3"] {
+  background-position-y: 40%;
 }
-.card.artifact .card-sides .card-side.front[data-number="4"] {
-  background-position-y: 50%;
+.card.objective .card-sides .card-side.front[data-number="4"] {
+  background-position-y: 60%;
 }
-.card.artifact .card-sides .card-side.front[data-number="5"] {
-  background-position-y: 66.6666666667%;
+.card.objective .card-sides .card-side.front[data-number="5"] {
+  background-position-y: 80%;
 }
-.card.artifact .card-sides .card-side.front[data-number="6"] {
-  background-position-y: 83.3333333333%;
-}
-.card.artifact .card-sides .card-side.front[data-number="7"] {
+.card.objective .card-sides .card-side.front[data-number="6"] {
   background-position-y: 100%;
 }
 
@@ -1317,10 +1321,10 @@ html, .mode_3d #game_play_area_background {
   flex: 1;
 }
 
-.artifact-tooltip > div {
+.objective-tooltip > div {
   padding: 5px;
 }
-.artifact-tooltip > div:not(:last-child) {
+.objective-tooltip > div:not(:last-child) {
   border-bottom: 1px solid gray;
 }
 
