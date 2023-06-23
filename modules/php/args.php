@@ -13,7 +13,7 @@ trait ArgsTrait {
     */
    
     function argPlayAction() {
-        $playerId = intval($this->getActivePlayerId());
+        /*$playerId = intval($this->getActivePlayerId());
         $player = $this->getPlayer($playerId);
 
         $bracelets = $player->bracelet;
@@ -33,14 +33,14 @@ trait ArgsTrait {
                 $this->getDestinationsByLocation('reserved', $playerId),
             );
 
-            $possibleDestinations = array_values(array_filter($possibleDestinations, fn($destination) => $this->canTakeDestination($destination, $playedCardsColors, $recruits, false)));
-        }
+            $possibleDestinations = array_values(array_filter($possibleDestinations, fn($research) => $this->canTakeDestination($research, $playedCardsColors, $recruits, false)));
+        }*/
 
         return [
-            'possibleDestinations' => $possibleDestinations,
+            /*'possibleDestinations' => $possibleDestinations,
             'canRecruit' => !$recruitDone,
             'canExplore' => !$exploreDone,
-            'canTrade' => !$tradeDone && $bracelets > 0,
+            'canTrade' => !$tradeDone && $bracelets > 0,*/
         ];
     }
 
@@ -49,22 +49,9 @@ trait ArgsTrait {
         $player = $this->getPlayer($playerId);
 
         $freeColor = intval($this->getGameStateValue(PLAYED_CARD_COLOR));
-        $centerCards = $this->getCardsByLocation('slot');
+        $centerCards = $this->getTilesByLocation('slot');
 
         $allFree = false;
-        if ($this->getVariantOption() >= 2) {
-            $artifacts = $this->getGlobalVariable(ARTIFACTS, true) ?? [];
-            if (in_array(ARTIFACT_CAULDRON, $artifacts)) {
-                $playedCardColor = intval($this->getGameStateValue(PLAYED_CARD_COLOR));
-                if ($playedCardColor > 0) {
-                    $playedCardsColors = $this->getPlayedCardsColor($playerId);
-                    $allFree = $playedCardsColors[$playedCardColor] == 2;
-
-                    $this->incStat(1, 'activatedArtifacts');
-                    $this->incStat(1, 'activatedArtifacts', $playerId);
-                }
-            }
-        }
 
         return [
             'centerCards' => $centerCards,
@@ -77,7 +64,7 @@ trait ArgsTrait {
     function argPayDestination() {
         $playerId = intval($this->getActivePlayerId());
 
-        $selectedDestination = $this->getDestinationFromDb($this->destinations->getCard(intval($this->getGameStateValue(SELECTED_DESTINATION))));
+        $selectedDestination = $this->getDestinationFromDb($this->research->getCard(intval($this->getGameStateValue(SELECTED_DESTINATION))));
 
         return [
             'selectedDestination' => $selectedDestination,

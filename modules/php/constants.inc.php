@@ -23,7 +23,7 @@ define('PURPLE', 5);
 define('VP', 1);
 define('BRACELET', 2);
 define('RECRUIT', 3);
-define('REPUTATION', 4);
+define('RESEARCH', 4);
 define('CARD', 5);
 
 /*
@@ -42,7 +42,7 @@ define('ARTIFACT_WEATHERVANE', 7);
  */
 define('ST_BGA_GAME_SETUP', 1);
 
-define('ST_SCORE_REPUTATION', 10);
+define('ST_SCORE_RESEARCH', 10);
 
 define('ST_PLAYER_PLAY_ACTION', 20);
 define('ST_PLAYER_CHOOSE_NEW_CARD', 25);

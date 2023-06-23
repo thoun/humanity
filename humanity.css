@@ -594,149 +594,149 @@ body > .card {
     box-shadow: 0 0 5px 3px rgb(255, 212, 131);
   }
 }
-.humanity-destination {
+.humanity-research {
   display: inline-block;
   position: relative;
   width: 221px;
   height: 120px;
   border-radius: 8px;
 }
-.humanity-destination .card-sides .card-side {
+.humanity-research .card-sides .card-side {
   border-radius: 8px;
   background-size: 200% auto;
-  background-image: url("img/destinations.jpg");
+  background-image: url("img/research.jpg");
 }
-.humanity-destination .card-sides .card-side > * {
+.humanity-research .card-sides .card-side > * {
   pointer-events: none;
   user-select: none;
 }
-.humanity-destination.bga-cards_selectable-card:not(.bga-cards_disabled-card):not(.bga-cards_selected-card) {
+.humanity-research.bga-cards_selectable-card:not(.bga-cards_disabled-card):not(.bga-cards_selected-card) {
   animation: selectable-card-animation 1s alternate infinite ease-in-out;
 }
-.humanity-destination.bga-cards_selectable-card:not(.bga-cards_disabled-card) .card-side {
+.humanity-research.bga-cards_selectable-card:not(.bga-cards_disabled-card) .card-side {
   box-shadow: unset;
 }
-.humanity-destination.bga-cards_selected-card:not(.bga-cards_disabled-card) {
+.humanity-research.bga-cards_selected-card:not(.bga-cards_disabled-card) {
   box-shadow: 0 0 5px 5px orange;
 }
-.humanity-destination.bga-cards_selected-card:not(.bga-cards_disabled-card) .card-side {
+.humanity-research.bga-cards_selected-card:not(.bga-cards_disabled-card) .card-side {
   box-shadow: unset;
 }
-.humanity-destination.selected-pay-destination {
+.humanity-research.selected-pay-research {
   outline: 5px solid orange;
 }
-.humanity-destination.selected-pay-destination .card-side {
+.humanity-research.selected-pay-research .card-side {
   box-shadow: unset;
 }
-.humanity-destination[data-type="1"] .card-side {
+.humanity-research[data-type="1"] .card-side {
   background-position-x: 0%;
 }
-.humanity-destination[data-type="2"] .card-side {
+.humanity-research[data-type="2"] .card-side {
   background-position-x: 100%;
 }
-.humanity-destination[data-type="1"] .front[data-number="1"] {
+.humanity-research[data-type="1"] .front[data-number="1"] {
   background-position-y: 5%;
 }
-.humanity-destination[data-type="1"] .front[data-number="2"] {
+.humanity-research[data-type="1"] .front[data-number="2"] {
   background-position-y: 10%;
 }
-.humanity-destination[data-type="1"] .front[data-number="3"] {
+.humanity-research[data-type="1"] .front[data-number="3"] {
   background-position-y: 15%;
 }
-.humanity-destination[data-type="1"] .front[data-number="4"] {
+.humanity-research[data-type="1"] .front[data-number="4"] {
   background-position-y: 20%;
 }
-.humanity-destination[data-type="1"] .front[data-number="5"] {
+.humanity-research[data-type="1"] .front[data-number="5"] {
   background-position-y: 25%;
 }
-.humanity-destination[data-type="1"] .front[data-number="6"] {
+.humanity-research[data-type="1"] .front[data-number="6"] {
   background-position-y: 30%;
 }
-.humanity-destination[data-type="1"] .front[data-number="7"] {
+.humanity-research[data-type="1"] .front[data-number="7"] {
   background-position-y: 35%;
 }
-.humanity-destination[data-type="1"] .front[data-number="8"] {
+.humanity-research[data-type="1"] .front[data-number="8"] {
   background-position-y: 40%;
 }
-.humanity-destination[data-type="1"] .front[data-number="9"] {
+.humanity-research[data-type="1"] .front[data-number="9"] {
   background-position-y: 45%;
 }
-.humanity-destination[data-type="1"] .front[data-number="10"] {
+.humanity-research[data-type="1"] .front[data-number="10"] {
   background-position-y: 50%;
 }
-.humanity-destination[data-type="1"] .front[data-number="11"] {
+.humanity-research[data-type="1"] .front[data-number="11"] {
   background-position-y: 55%;
 }
-.humanity-destination[data-type="1"] .front[data-number="12"] {
+.humanity-research[data-type="1"] .front[data-number="12"] {
   background-position-y: 60%;
 }
-.humanity-destination[data-type="1"] .front[data-number="13"] {
+.humanity-research[data-type="1"] .front[data-number="13"] {
   background-position-y: 65%;
 }
-.humanity-destination[data-type="1"] .front[data-number="14"] {
+.humanity-research[data-type="1"] .front[data-number="14"] {
   background-position-y: 70%;
 }
-.humanity-destination[data-type="1"] .front[data-number="15"] {
+.humanity-research[data-type="1"] .front[data-number="15"] {
   background-position-y: 75%;
 }
-.humanity-destination[data-type="1"] .front[data-number="16"] {
+.humanity-research[data-type="1"] .front[data-number="16"] {
   background-position-y: 80%;
 }
-.humanity-destination[data-type="1"] .front[data-number="17"] {
+.humanity-research[data-type="1"] .front[data-number="17"] {
   background-position-y: 85%;
 }
-.humanity-destination[data-type="1"] .front[data-number="18"] {
+.humanity-research[data-type="1"] .front[data-number="18"] {
   background-position-y: 90%;
 }
-.humanity-destination[data-type="1"] .front[data-number="19"] {
+.humanity-research[data-type="1"] .front[data-number="19"] {
   background-position-y: 95%;
 }
-.humanity-destination[data-type="1"] .front[data-number="20"] {
+.humanity-research[data-type="1"] .front[data-number="20"] {
   background-position-y: 100%;
 }
-.humanity-destination[data-type="2"] .front[data-number="21"] {
+.humanity-research[data-type="2"] .front[data-number="21"] {
   background-position-y: 5%;
 }
-.humanity-destination[data-type="2"] .front[data-number="22"] {
+.humanity-research[data-type="2"] .front[data-number="22"] {
   background-position-y: 10%;
 }
-.humanity-destination[data-type="2"] .front[data-number="23"] {
+.humanity-research[data-type="2"] .front[data-number="23"] {
   background-position-y: 15%;
 }
-.humanity-destination[data-type="2"] .front[data-number="24"] {
+.humanity-research[data-type="2"] .front[data-number="24"] {
   background-position-y: 20%;
 }
-.humanity-destination[data-type="2"] .front[data-number="25"] {
+.humanity-research[data-type="2"] .front[data-number="25"] {
   background-position-y: 25%;
 }
-.humanity-destination[data-type="2"] .front[data-number="26"] {
+.humanity-research[data-type="2"] .front[data-number="26"] {
   background-position-y: 30%;
 }
-.humanity-destination[data-type="2"] .front[data-number="27"] {
+.humanity-research[data-type="2"] .front[data-number="27"] {
   background-position-y: 35%;
 }
-.humanity-destination[data-type="2"] .front[data-number="28"] {
+.humanity-research[data-type="2"] .front[data-number="28"] {
   background-position-y: 40%;
 }
-.humanity-destination[data-type="2"] .front[data-number="29"] {
+.humanity-research[data-type="2"] .front[data-number="29"] {
   background-position-y: 45%;
 }
-.humanity-destination[data-type="2"] .front[data-number="30"] {
+.humanity-research[data-type="2"] .front[data-number="30"] {
   background-position-y: 50%;
 }
-.humanity-destination[data-type="2"] .front[data-number="31"] {
+.humanity-research[data-type="2"] .front[data-number="31"] {
   background-position-y: 55%;
 }
-.humanity-destination[data-type="2"] .front[data-number="32"] {
+.humanity-research[data-type="2"] .front[data-number="32"] {
   background-position-y: 60%;
 }
-.humanity-destination[data-type="2"] .front[data-number="33"] {
+.humanity-research[data-type="2"] .front[data-number="33"] {
   background-position-y: 65%;
 }
-.humanity-destination[data-type="2"] .front[data-number="34"] {
+.humanity-research[data-type="2"] .front[data-number="34"] {
   background-position-y: 70%;
 }
-.humanity-destination[data-type="2"] .front[data-number="35"] {
+.humanity-research[data-type="2"] .front[data-number="35"] {
   background-position-y: 75%;
 }
 
@@ -800,10 +800,10 @@ body > .card {
   grid-template-columns: 120px 690px;
   gap: 8px;
 }
-#table-center .table-destinations-deck {
+#table-center .table-research-deck {
   margin-left: -102px;
 }
-#table-center #table-destinations-A .slot, #table-center #table-destinations-B .slot {
+#table-center #table-research-A .slot, #table-center #table-research-B .slot {
   width: 221px;
   height: 120px;
 }
@@ -832,8 +832,8 @@ body > .card {
 #table-center #board .marker .inner.vp {
   background-image: url("img/vp-pawns.png");
 }
-#table-center #board .marker .inner.reputation {
-  background-image: url("img/reputation-pawns.png");
+#table-center #board .marker .inner.research {
+  background-image: url("img/research-pawns.png");
 }
 #table-center #board .marker[data-color="7c5654"] .inner {
   background-position-x: 0%;
@@ -929,11 +929,11 @@ body > .card {
   background-position: center;
   vertical-align: middle;
 }
-.player-board .reputation-legend {
+.player-board .research-legend {
   font-size: 75%;
   vertical-align: middle;
 }
-.player-board .reputation-legend .icon {
+.player-board .research-legend .icon {
   width: 20px;
   height: 20px;
   margin-right: 2px;
@@ -1133,11 +1133,11 @@ body > .card {
 .player-table .visible-cards .cards .card:not(:first-child) {
   margin-top: calc(-1 * var(--card-overlap));
 }
-.player-table .destinations {
+.player-table .research {
   flex-direction: column-reverse;
   width: 221px;
 }
-.player-table .destinations .card:not(:last-child) {
+.player-table .research .card:not(:last-child) {
   margin-top: calc(-1 * var(--card-overlap));
 }
 .player-table .col {
@@ -1240,7 +1240,7 @@ html, .mode_3d #game_play_area_background {
 .icon.vp, .icon[data-type="1"] {
   background-position-x: 0%;
 }
-.icon.reputation, .icon[data-type="4"] {
+.icon.research, .icon[data-type="4"] {
   background-position-x: 25%;
 }
 .icon.bracelet, .icon[data-type="2"] {

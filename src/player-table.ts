@@ -6,13 +6,13 @@ class PlayerTable {
     public voidStock: VoidStock<Card>;
     public hand?: LineStock<Card>;
     public played: LineStock<Card>[] = [];
-    public destinations: LineStock<Destination>;
+    public research: LineStock<Destination>;
     public reservedDestinations?: LineStock<Destination>;
     public limitSelection: number | null = null;
 
     private currentPlayer: boolean;
 
-    constructor(private game: HumanityGame, player: HumanityPlayer, reservePossible: boolean) {
+    constructor(private game: HumanityGame, player: HumanityPlayer) {
         this.playerId = Number(player.id);
         this.currentPlayer = this.playerId == this.game.getPlayerId();
 
@@ -30,8 +30,8 @@ class PlayerTable {
             </div>`;
         }
         html += `
-            <div id="player-table-${this.playerId}-destinations" class="destinations"></div>
-            <div id="player-table-${this.playerId}-boat" class="boat ${this.game.getBoatSide() == 2 ? 'advanced' : 'normal'}" data-color="${player.color}" data-recruits="${player.recruit}" data-bracelets="${player.bracelet}">`;
+            <div id="player-table-${this.playerId}-research" class="research"></div>
+            <div id="player-table-${this.playerId}-boat" class="boat" data-color="${player.color}" data-recruits="${player.recruit}" data-bracelets="${player.bracelet}">`;
         for (let i = 1; i <= 3; i++) {
             if (this.currentPlayer) {
                 html += `<div id="player-table-${this.playerId}-column${i}" class="column" data-number="${i}"></div>`;
@@ -51,16 +51,6 @@ class PlayerTable {
             }
             html += `
             </div>
-        `;
-
-        if (reservePossible) {
-            html += `
-            <div id="player-table-${this.playerId}-reserved-destinations-wrapper" class="block-with-text hand-wrapper">
-                <div class="block-label">${_('Reserved destinations')}</div>
-                <div id="player-table-${this.playerId}-reserved-destinations"></div>
-            </div>`;
-        }
-        html += `
             </div>
             
             <div class="col col2"></div>
@@ -98,21 +88,13 @@ class PlayerTable {
             playedDiv.style.setProperty('--card-overlap', '195px');
         }
         
-        const destinationsDiv = document.getElementById(`player-table-${this.playerId}-destinations`);
-        this.destinations = new LineStock<Destination>(this.game.destinationsManager, destinationsDiv, {
+        const researchDiv = document.getElementById(`player-table-${this.playerId}-research`);
+        this.research = new LineStock<Destination>(this.game.researchManager, researchDiv, {
             center: false,
         });
-        destinationsDiv.style.setProperty('--card-overlap', '94px');
+        researchDiv.style.setProperty('--card-overlap', '94px');
         
-        this.destinations.addCards(player.destinations);
-
-        if (reservePossible) {
-            this.reservedDestinations = new LineStock<Destination>(this.game.destinationsManager, document.getElementById(`player-table-${this.playerId}-reserved-destinations`), {
-                center: false,
-            });            
-            this.reservedDestinations.addCards(player.reservedDestinations);
-            this.reservedDestinations.onCardClick = (card: Destination) => this.game.onTableDestinationClick(card);
-        }
+        this.research.addCards(player.research);
 
         [document.getElementById(`player-table-${this.playerId}-name`), document.getElementById(`player-table-${this.playerId}-boat`)].forEach(elem => {
             elem.addEventListener('mouseenter', () => this.game.highlightPlayerTokens(this.playerId));
@@ -166,8 +148,8 @@ class PlayerTable {
         return cards;
     }
     
-    public reserveDestination(destination: Destination) {
-        return this.reservedDestinations.addCard(destination);
+    public reserveDestination(research: Destination) {
+        return this.reservedDestinations.addCard(research);
     }
     
     public setDestinationsSelectable(selectable: boolean, selectableCards: Destination[] | null = null) {
@@ -181,7 +163,7 @@ class PlayerTable {
     
     public showColumns(number: number) {
         if (number > 0) {
-            document.getElementById(`player-table-${this.playerId}-boat`).style.setProperty('--column-height', `${35 * (this.destinations.getCards().length + 1)}px`);
+            document.getElementById(`player-table-${this.playerId}-boat`).style.setProperty('--column-height', `${35 * (this.research.getCards().length + 1)}px`);
         }
 
         for (let i = 1; i <= 3; i++) {
@@ -209,19 +191,19 @@ class PlayerTable {
     }
     
     public setDoubleColumn(isDoublePlayerColumn: boolean): void {
-        const destinations = document.getElementById(`player-table-${this.playerId}-destinations`);
+        const research = document.getElementById(`player-table-${this.playerId}-research`);
         const boat = document.getElementById(`player-table-${this.playerId}-boat`);
-        const reservedDestinations = document.getElementById(`player-table-${this.playerId}-reserved-destinations-wrapper`);
+        const reservedDestinations = document.getElementById(`player-table-${this.playerId}-reserved-research-wrapper`);
         if (isDoublePlayerColumn) {
             const col2 = document.getElementById(`player-table-${this.playerId}`).querySelector('.col2');
-            col2.appendChild(destinations);
+            col2.appendChild(research);
             col2.appendChild(boat);
             if (reservedDestinations) {
                 col2.appendChild(reservedDestinations);
             }
         } else {
             const visibleCards = document.getElementById(`player-table-${this.playerId}`).querySelector('.visible-cards');
-            visibleCards.insertAdjacentElement('beforebegin', destinations);
+            visibleCards.insertAdjacentElement('beforebegin', research);
             visibleCards.insertAdjacentElement('beforebegin', boat);
             if (reservedDestinations) {
                 visibleCards.insertAdjacentElement('afterend', reservedDestinations);

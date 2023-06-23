@@ -31,7 +31,7 @@
         "node_modules/bga-cards/src/sort.ts",
         "node_modules/bga-cards/src/card-manager.ts",
         "src/cards.ts",
-        "src/destinations.ts",
+        "src/research.ts",
         "src/artifacts.ts",
         "src/table-center.ts",
         "src/player-table.ts",

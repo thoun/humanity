@@ -20,7 +20,7 @@
 require_once(APP_GAMEMODULE_PATH.'module/table/table.game.php');
 
 require_once('modules/php/objects/card.php');
-require_once('modules/php/objects/destination.php');
+require_once('modules/php/objects/research.php');
 require_once('modules/php/objects/player.php');
 require_once('modules/php/objects/undo.php');
 require_once('modules/php/constants.inc.php');
@@ -61,14 +61,17 @@ class Humanity extends Table {
             VARIANT_OPTION => VARIANT_OPTION,
         ]);   
 		
-        $this->cards = $this->getNew("module.common.deck");
-        $this->cards->init("card");
-        $this->cards->autoreshuffle = true;     
-        $this->cards->autoreshuffle_trigger = ['obj' => $this, 'method' => 'cardDeckAutoReshuffle'];
+        $this->tiles = $this->getNew("module.common.deck");
+        $this->tiles->init("tile");
+        // TODO? $this->tiles->autoreshuffle = true;     
 		
-        $this->destinations = $this->getNew("module.common.deck");
-        $this->destinations->init("destination");
-        $this->destinations->autoreshuffle = false;   
+        $this->research = $this->getNew("module.common.deck");
+        $this->research->init("research");
+        // TODO? $this->research->autoreshuffle = false;    
+		
+        $this->objectives = $this->getNew("module.common.deck");
+        $this->objectives->init("objective");
+        // TODO? $this->objectives->autoreshuffle = false;   
 	}
 	
     protected function getGameName() {
@@ -106,11 +109,6 @@ class Humanity extends Table {
         self::reloadPlayersBasicInfos();
         
         /************ Start the game initialization *****/
-        $variantOption = $this->getVariantOption();
-
-        if ($this->getBoatSideOption() == 3) {
-            $this->setGameStateValue(BOAT_SIDE_OPTION, bga_rand(1, 2));
-        }
 
         // Init global values with their initial values
         $this->setGameStateInitialValue(LAST_TURN, 0);
@@ -126,12 +124,12 @@ class Humanity extends Table {
         $this->initStat('table', 'roundNumber', 0);
         foreach(['table', 'player'] as $type) {
             foreach([
-                "reputationPoints", 
+                "researchPoints", 
                 // cards
                 "playedCards", 
                 "assetsCollectedByPlayedCards", "assetsCollectedByPlayedCards1", "assetsCollectedByPlayedCards2", "assetsCollectedByPlayedCards3", "assetsCollectedByPlayedCards4", 
                 "recruitsUsedToChooseCard", "discardedCards",
-                // destinations
+                // research
                 "discoveredDestinations", "discoveredDestinations1", "discoveredDestinations2",
                 "assetsCollectedByDestination", "assetsCollectedByDestination1", "assetsCollectedByDestination2", "assetsCollectedByDestination3", "assetsCollectedByDestination4", "assetsCollectedByDestination5",
                 "recruitsUsedToPayDestination",
@@ -144,29 +142,16 @@ class Humanity extends Table {
                 $this->initStat($type, $name, 0);
             }
         }
-        if ($variantOption >= 2) {
-            foreach(['table', 'player'] as $type) {
-                foreach([
-                    // artifacts
-                    "activatedArtifacts",
-                ] as $name) {
-                    $this->initStat($type, $name, 0);
-                }
-            }
-        }
 
         // setup the initial game situation here
         $this->setupCards(array_keys($players));
         $this->setupDestinations();
-        if ($variantOption >= 2) {
-            $this->setupArtifacts($variantOption, count($players));
-        }
 
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
 
         // TODO TEMP
-        $this->debugSetup();
+        //$this->debugSetup();
 
         /************ End of the game initialization *****/
     }
@@ -187,21 +172,13 @@ class Humanity extends Table {
     
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
-        $sql = "SELECT player_id id, player_score score, player_no playerNo, player_reputation reputation, player_recruit recruit, player_bracelet bracelet FROM player ";
+        $sql = "SELECT player_id id, player_score score, player_no playerNo, player_research research, player_science science FROM player ";
         $result['players'] = self::getCollectionFromDb( $sql );
   
         // Gather all information about current game situation (visible by player $current_player_id).
 
         $firstPlayerId = null;
         $isEndScore = intval($this->gamestate->state_id()) >= ST_END_SCORE;
-
-        $result['boatSideOption'] = $this->getBoatSideOption();
-        $result['variantOption'] = $this->getVariantOption();
-        $result['reservePossible'] = false;
-        if ($result['variantOption'] >= 2) {
-            $result['artifacts'] = $this->getGlobalVariable(ARTIFACTS, true);
-            $result['reservePossible'] = in_array(ARTIFACT_GOLDEN_BRACELET, $result['artifacts']);
-        }
         
         foreach($result['players'] as $playerId => &$player) {
             $player['playerNo'] = intval($player['playerNo']);
@@ -209,36 +186,31 @@ class Humanity extends Table {
                 $firstPlayerId = $playerId;
             }
 
-            $player['reputation'] = intval($player['reputation']);
-            $player['recruit'] = intval($player['recruit']);
-            $player['bracelet'] = intval($player['bracelet']);
+            $player['research'] = intval($player['research']);
+            $player['science'] = intval($player['science']);
             $player['playedCards'] = [];
             foreach ([1,2,3,4,5] as $color) {
-                $player['playedCards'][$color] = $this->getCardsByLocation('played'.$playerId.'-'.$color);
+                $player['playedCards'][$color] = $this->getTilesByLocation('played'.$playerId.'-'.$color);
             }
-            $player['destinations'] = $this->getDestinationsByLocation('played'.$playerId);
-            //$player['handCount'] = intval($this->cards->countCardInLocation('hand', $playerId));
+            $player['research'] = $this->getDestinationsByLocation('played'.$playerId);
+            //$player['handCount'] = intval($this->tiles->countCardInLocation('hand', $playerId));
 
             if ($currentPlayerId == $playerId) {
-                $player['hand'] = $this->getCardsByLocation('hand', $playerId);
-            }
-
-            if ($result['reservePossible']) {
-                $player['reservedDestinations'] = $this->getDestinationsByLocation('reserved', $playerId);
+                $player['hand'] = $this->getTilesByLocation('hand', $playerId);
             }
         }
 
-        $result['cardDeckTop'] = Card::onlyId($this->getCardFromDb($this->cards->getCardOnTop('deck')));
-        $result['cardDeckCount'] = intval($this->cards->countCardInLocation('deck'));
-        $result['cardDiscardCount'] = intval($this->cards->countCardInLocation('discard'));
-        $result['centerCards'] = $this->getCardsByLocation('slot');
+        $result['cardDeckTop'] = Tile::onlyId($this->getTileFromDb($this->tiles->getCardOnTop('deck')));
+        $result['cardDeckCount'] = intval($this->tiles->countCardInLocation('deck'));
+        $result['cardDiscardCount'] = intval($this->tiles->countCardInLocation('discard'));
+        $result['centerCards'] = $this->getTilesByLocation('slot');
         $result['centerDestinationsDeckTop'] = [];
         $result['centerDestinationsDeckCount'] = [];
         $result['centerDestinations'] = [];
 
         foreach (['A', 'B'] as $letter) {
-            $result['centerDestinationsDeckTop'][$letter] = Destination::onlyId($this->getDestinationFromDb($this->destinations->getCardOnTop('deck'.$letter)));
-            $result['centerDestinationsDeckCount'][$letter] = intval($this->destinations->countCardInLocation('deck'.$letter));
+            $result['centerDestinationsDeckTop'][$letter] = Destination::onlyId($this->getDestinationFromDb($this->research->getCardOnTop('deck'.$letter)));
+            $result['centerDestinationsDeckCount'][$letter] = intval($this->research->countCardInLocation('deck'.$letter));
             $result['centerDestinations'][$letter] = $this->getDestinationsByLocation('slot'.$letter);
         }
 
@@ -326,7 +298,7 @@ class Humanity extends Table {
 
         /*if ($from_version <= 2305241900) {
             // ! important ! Use DBPREFIX_<table_name> for all tables
-            self::applyDbUpgradeToAllDB("ALTER TABLE DBPREFIX_player CHANGE COLUMN `player_fame` `player_reputation` tinyint UNSIGNED NOT NULL DEFAULT 0");
+            self::applyDbUpgradeToAllDB("ALTER TABLE DBPREFIX_player CHANGE COLUMN `player_fame` `player_research` tinyint UNSIGNED NOT NULL DEFAULT 0");
         }*/
     }    
 }

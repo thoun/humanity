@@ -49,9 +49,9 @@
 
 $commonStats = [
     // repuration
-    "reputationPoints" => [
+    "researchPoints" => [
         "id" => 20,
-        "name" => totranslate("Points gained with reputation"),
+        "name" => totranslate("Points gained with research"),
         "type" => "int"
     ],
 
@@ -83,7 +83,7 @@ $commonStats = [
     ],
     "assetsCollectedByPlayedCards4" => [
         "id" => 26,
-        "name" => totranslate("Reputation gained by played cards"),
+        "name" => totranslate("Research gained by played cards"),
         "type" => "int"
     ],
     "recruitsUsedToChooseCard" => [
@@ -97,10 +97,10 @@ $commonStats = [
         "type" => "int"
     ],
     
-    // destinations
+    // research
     "discoveredDestinations" => [
         "id" => 40,
-        "name" => totranslate("Discovered destinations"),
+        "name" => totranslate("Discovered research"),
         "type" => "int"
     ],    
     "discoveredDestinations1" => [
@@ -115,37 +115,37 @@ $commonStats = [
     ],
     "assetsCollectedByDestination" => [
         "id" => 43,
-        "name" => totranslate("Assets gained by destinations"),
+        "name" => totranslate("Assets gained by research"),
         "type" => "int"
     ],
     "assetsCollectedByDestination1" => [
         "id" => 44,
-        "name" => totranslate("Victory points gained by destinations"),
+        "name" => totranslate("Victory points gained by research"),
         "type" => "int"
     ],
     "assetsCollectedByDestination2" => [
         "id" => 45,
-        "name" => totranslate("Bracelets gained by destinations"),
+        "name" => totranslate("Bracelets gained by research"),
         "type" => "int"
     ],
     "assetsCollectedByDestination3" => [
         "id" => 46,
-        "name" => totranslate("Recruits gained by destinations"),
+        "name" => totranslate("Recruits gained by research"),
         "type" => "int"
     ],
     "assetsCollectedByDestination4" => [
         "id" => 47,
-        "name" => totranslate("Reputation gained by destinations"),
+        "name" => totranslate("Research gained by research"),
         "type" => "int"
     ],
     "assetsCollectedByDestination5" => [
         "id" => 48,
-        "name" => totranslate("Cards gained by destinations"),
+        "name" => totranslate("Cards gained by research"),
         "type" => "int"
     ],
     "recruitsUsedToPayDestination" => [
         "id" => 50,
-        "name" => totranslate("Recruits used to take a destination"),
+        "name" => totranslate("Recruits used to take a research"),
         "type" => "int"
     ],
 
@@ -197,7 +197,7 @@ $commonStats = [
     ],
     "assetsCollectedByTrade4" => [
         "id" => 69,
-        "name" => totranslate("Reputation gained by trade"),
+        "name" => totranslate("Research gained by trade"),
         "type" => "int"
     ],
     "assetsCollectedByTrade5" => [

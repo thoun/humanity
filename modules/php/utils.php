@@ -136,26 +136,26 @@ trait UtilTrait {
         ] + $args);
     }
 
-    function getCardFromDb(/*array|null*/ $dbCard) {
+    function getTileFromDb(/*array|null*/ $dbCard) {
         if ($dbCard == null) {
             return null;
         }
-        return new Card($dbCard);
+        return new Tile($dbCard);
     }
 
-    function getCardsFromDb(array $dbCards) {
-        return array_map(fn($dbCard) => $this->getCardFromDb($dbCard), array_values($dbCards));
+    function getTilesFromDb(array $dbCards) {
+        return array_map(fn($dbCard) => $this->getTileFromDb($dbCard), array_values($dbCards));
     }
 
-    function getCardById(int $id) {
-        $sql = "SELECT * FROM `card` WHERE `card_id` = $id";
+    function getTileById(int $id) {
+        $sql = "SELECT * FROM `tile` WHERE `card_id` = $id";
         $dbResults = $this->getCollectionFromDb($sql);
-        $cards = array_map(fn($dbCard) => $this->getCardFromDb($dbCard), array_values($dbResults));
-        return count($cards) > 0 ? $cards[0] : null;
+        $tiles = array_map(fn($dbCard) => $this->getTileFromDb($dbCard), array_values($dbResults));
+        return count($tiles) > 0 ? $tiles[0] : null;
     }
 
-    function getCardsByLocation(string $location, /*int|null*/ $location_arg = null, /*int|null*/ $type = null, /*int|null*/ $number = null) {
-        $sql = "SELECT * FROM `card` WHERE `card_location` = '$location'";
+    function getTilesByLocation(string $location, /*int|null*/ $location_arg = null, /*int|null*/ $type = null, /*int|null*/ $number = null) {
+        $sql = "SELECT * FROM `tile` WHERE `card_location` = '$location'";
         if ($location_arg !== null) {
             $sql .= " AND `card_location_arg` = $location_arg";
         }
@@ -167,33 +167,33 @@ trait UtilTrait {
         }
         $sql .= " ORDER BY `card_location_arg`";
         $dbResults = $this->getCollectionFromDb($sql);
-        return array_map(fn($dbCard) => $this->getCardFromDb($dbCard), array_values($dbResults));
+        return array_map(fn($dbCard) => $this->getTileFromDb($dbCard), array_values($dbResults));
     }
 
     function setupCards(array $playersIds) {
         $playerCount = count($playersIds);
-        foreach ($this->CARDS as $cardType) {
-            $cards[] = [ 'type' => $cardType->color, 'type_arg' => $cardType->gain, 'nbr' => $cardType->number[$playerCount] ];
+        foreach ($this->TILES as $tileType) {
+            $tiles[] = [ 'type' => $tileType->color, 'type_arg' => $tileType->gain, 'nbr' => $tileType->number[$playerCount] ];
         }
-        $this->cards->createCards($cards, 'deck');
-        $this->cards->shuffle('deck');
+        $this->tiles->createCards($tiles, 'deck');
+        $this->tiles->shuffle('deck');
 
         foreach ([1,2,3,4,5] as $slot) {
-            $this->cards->pickCardForLocation('deck', 'slot', $slot);
+            $this->tiles->pickCardForLocation('deck', 'slot', $slot);
         }
 
         foreach ($playersIds as $playerId) {
-            $playedCards = $this->getCardsFromDb($this->cards->pickCardsForLocation(2, 'deck', 'played'.$playerId));
+            $playedCards = $this->getTilesFromDb($this->tiles->pickCardsForLocation(2, 'deck', 'played'.$playerId));
             while ($playedCards[0]->color == $playedCards[1]->color) {
-                $this->cards->moveAllCardsInLocation('played'.$playerId, 'deck');
-                $this->cards->shuffle('deck');
-                $playedCards = $this->getCardsFromDb($this->cards->pickCardsForLocation(2, 'deck', 'played'.$playerId));
+                $this->tiles->moveAllCardsInLocation('played'.$playerId, 'deck');
+                $this->tiles->shuffle('deck');
+                $playedCards = $this->getTilesFromDb($this->tiles->pickCardsForLocation(2, 'deck', 'played'.$playerId));
             }
             foreach ($playedCards as $playedCard) {
-                $this->cards->moveCard($playedCard->id, 'played'.$playerId.'-'.$playedCard->color);
+                $this->tiles->moveCard($playedCard->id, 'played'.$playerId.'-'.$playedCard->color);
             }
 
-            $this->cards->pickCardsForLocation(3, 'deck', 'hand', $playerId);
+            $this->tiles->pickCardsForLocation(3, 'deck', 'hand', $playerId);
         }
     }
 
@@ -201,7 +201,7 @@ trait UtilTrait {
         if ($dbCard == null) {
             return null;
         }
-        return new Destination($dbCard, $this->DESTINATIONS);
+        return new Destination($dbCard, $this->RESEARCH);
     }
 
     function getDestinationsFromDb(array $dbCards) {
@@ -209,7 +209,7 @@ trait UtilTrait {
     }
 
     function getDestinationsByLocation(string $location, /*int|null*/ $location_arg = null, /*int|null*/ $type = null, /*int|null*/ $number = null) {
-        $sql = "SELECT * FROM `destination` WHERE `card_location` = '$location'";
+        $sql = "SELECT * FROM `research` WHERE `card_location` = '$location'";
         if ($location_arg !== null) {
             $sql .= " AND `card_location_arg` = $location_arg";
         }
@@ -225,44 +225,29 @@ trait UtilTrait {
     }
 
     function setupDestinations() {
-        $cards[] = ['A' => [], 'B' => []];
-        foreach ($this->DESTINATIONS as $number => $destinationType) {
-            $cards[$number > 20 ? 'B' : 'A'][] = [ 'type' => $number > 20 ? 2 : 1, 'type_arg' => $number, 'nbr' => 1 ];
+        $tiles[] = ['A' => [], 'B' => []];
+        foreach ($this->RESEARCH as $number => $researchType) {
+            $tiles[$number > 20 ? 'B' : 'A'][] = [ 'type' => $number > 20 ? 2 : 1, 'type_arg' => $number, 'nbr' => 1 ];
         }
         foreach (['A', 'B'] as $type) {
-            $this->destinations->createCards($cards[$type], 'deck'.$type);
-            $this->destinations->shuffle('deck'.$type);
+            $this->research->createCards($tiles[$type], 'deck'.$type);
+            $this->research->shuffle('deck'.$type);
         }
 
         foreach ([1,2,3] as $slot) {
             foreach (['A', 'B'] as $type) {
-                $this->destinations->pickCardForLocation('deck'.$type, 'slot'.$type, $slot);
+                $this->research->pickCardForLocation('deck'.$type, 'slot'.$type, $slot);
             }
         }
     }
-
-    function getBoatSideOption() {
-        return intval($this->getGameStateValue(BOAT_SIDE_OPTION));
-    }
-
-    function getVariantOption() {
-        return intval($this->getGameStateValue(VARIANT_OPTION));
-    }
-
-    function getBoatGain() {
-        return $this->getBoatSideOption() == 2 ? [VP, null, BRACELET] : [null, RECRUIT, null];
-    } 
     
     function redirectAfterAction(int $playerId, bool $checkArtifacts) {
-        if ($checkArtifacts && $this->getVariantOption() >= 2) {
-            $this->checkArtifacts($playerId);
-        }
 
         if (boolval($this->getGameStateValue(GO_RESERVE))) {
             $this->incGameStateValue(GO_RESERVE, -1);
             $reserved = $this->getDestinationsByLocation('reserved', $playerId);
             if (count($reserved) >= 2) {
-                self::notifyAllPlayers('log', clienttranslate('${player_name} cannot reserve a destination because he already has 2'), [
+                self::notifyAllPlayers('log', clienttranslate('${player_name} cannot reserve a research because he already has 2'), [
                     'playerId' => $playerId,
                     'player_name' => $this->getPlayerName($playerId),
                 ]);
@@ -333,9 +318,9 @@ trait UtilTrait {
                         $this->incStat($amount - $effectiveGains[RECRUIT], 'recruitsMissed', $playerId);
                     }
                     break;
-                case REPUTATION:
-                    $effectiveGains[REPUTATION] = min($amount, 14 - $player->reputation);
-                    $this->DbQuery("UPDATE player SET `player_reputation` = `player_reputation` + ".$effectiveGains[REPUTATION]." WHERE player_id = $playerId");
+                case RESEARCH:
+                    $effectiveGains[RESEARCH] = min($amount, 14 - $player->research);
+                    $this->DbQuery("UPDATE player SET `player_research` = `player_research` + ".$effectiveGains[RESEARCH]." WHERE player_id = $playerId");
                     break;
                 case CARD: 
                     $available = $this->getAvailableDeckCards();
@@ -357,10 +342,10 @@ trait UtilTrait {
         return $effectiveGains;
     }
 
-    function canTakeDestination(Destination $destination, array $playedCardsColors, int $recruits, bool $strict) {
+    function canTakeDestination(Destination $research, array $playedCardsColors, int $recruits, bool $strict) {
         $missingCards = 0;
 
-        foreach ($destination->cost as $color => $required) {
+        foreach ($research->cost as $color => $required) {
             $available = 0;
             if ($color == EQUAL) {
                 $available = max($playedCardsColors);
@@ -383,7 +368,7 @@ trait UtilTrait {
             case VP: return clienttranslate("Victory Point");
             case BRACELET: return clienttranslate("Bracelet");
             case RECRUIT: return clienttranslate("Recruit");
-            case REPUTATION: return clienttranslate("Reputation");
+            case RESEARCH: return clienttranslate("Research");
             case CARD: return clienttranslate("Card");
         }
     }
@@ -411,17 +396,17 @@ trait UtilTrait {
     }
 
     function powerTakeCard(int $playerId) {
-        $card = $this->getCardFromDb($this->cards->pickCardForLocation('deck', 'played'));
-        $this->cards->moveCard($card->id, 'played'.$playerId.'-'.$card->color, intval($this->cards->countCardInLocation('played'.$playerId.'-'.$card->color)));
+        $tile = $this->getTileFromDb($this->tiles->pickCardForLocation('deck', 'played'));
+        $this->tiles->moveCard($tile->id, 'played'.$playerId.'-'.$tile->color, intval($this->tiles->countCardInLocation('played'.$playerId.'-'.$tile->color)));
 
         self::notifyAllPlayers('takeDeckCard', clienttranslate('${player_name} takes a ${card_color} ${card_type} card from the deck'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'card' => $card,
-            'cardDeckTop' => Card::onlyId($this->getCardFromDb($this->cards->getCardOnTop('deck'))),
-            'cardDeckCount' => intval($this->cards->countCardInLocation('deck')),
-            'card_type' => $this->getGainName($card->gain), // for logs
-            'card_color' => $this->getColorName($card->color), // for logs
+            'card' => $tile,
+            'cardDeckTop' => Tile::onlyId($this->getTileFromDb($this->tiles->getCardOnTop('deck'))),
+            'cardDeckCount' => intval($this->tiles->countCardInLocation('deck')),
+            'card_type' => $this->getGainName($tile->gain), // for logs
+            'card_color' => $this->getColorName($tile->color), // for logs
         ]);
 
     }
@@ -429,7 +414,7 @@ trait UtilTrait {
     function getPlayedCardsByColor(int $playerId) {
         $playedCardsByColor = [];
         foreach ([1,2,3,4,5] as $color) {
-            $playedCardsByColor[$color] = $this->getCardsByLocation('played'.$playerId.'-'.$color);
+            $playedCardsByColor[$color] = $this->getTilesByLocation('played'.$playerId.'-'.$color);
         }
         return $playedCardsByColor;
     }
@@ -439,9 +424,9 @@ trait UtilTrait {
             $playedCardsByColor = $this->getPlayedCardsByColor($playerId);
         }
         foreach ([1,2,3,4,5] as $color) {
-            $playedCardsByColor[$color] = $this->getCardsByLocation('played'.$playerId.'-'.$color);
+            $playedCardsByColor[$color] = $this->getTilesByLocation('played'.$playerId.'-'.$color);
         }
-        return array_map(fn($cards) => count($cards), $playedCardsByColor);
+        return array_map(fn($tiles) => count($tiles), $playedCardsByColor);
     }
 
     function setupArtifacts(int $option, int $playerCount) {
@@ -541,7 +526,7 @@ trait UtilTrait {
                     $groupGains = [
                         BRACELET => 1,
                         RECRUIT => 1,
-                        REPUTATION => 1,
+                        RESEARCH => 1,
                     ];
                     $effectiveGains = $this->gainResources($playerId, $groupGains, 'artifact:amulet');
 
@@ -581,18 +566,17 @@ trait UtilTrait {
     }
 
     function getAvailableDeckCards() {
-        return intval($this->cards->countCardInLocation('deck')) + intval($this->cards->countCardInLocation('discard'));
+        return intval($this->tiles->countCardInLocation('deck')) + intval($this->tiles->countCardInLocation('discard'));
     }
 
     function getTradeGains(int $playerId, int $bracelets) {
-        $destinations = $this->getDestinationsByLocation('played'.$playerId);
+        $research = $this->getDestinationsByLocation('played'.$playerId);
 
         $gains = [];
 
-        $rows = array_merge(
-            [$this->getBoatGain()],
-            array_map(fn($destination) => $destination->gains, $destinations),
-        );
+        $rows = 
+            array_map(fn($research) => $research->gains, $research)
+        ;
         foreach ($rows as $row) {
             for ($i = 0; $i < $bracelets; $i++) {
                 if ($row[$i] !== null) {
@@ -602,13 +586,5 @@ trait UtilTrait {
         }
 
         return $gains;
-    }
-
-    public function cardDeckAutoReshuffle() {
-        $this->notifyAllPlayers('cardDeckReset', clienttranslate('The card deck has been reshuffled'), [            
-            'cardDeckTop' => Card::onlyId($this->getCardFromDb($this->cards->getCardOnTop('deck'))),
-            'cardDeckCount' => intval($this->cards->countCardInLocation('deck')),
-            'cardDiscardCount' => intval($this->cards->countCardInLocation('discard')),
-        ]);
     }
 }

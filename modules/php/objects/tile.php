@@ -2,7 +2,7 @@
 
 require_once(__DIR__.'/../constants.inc.php');
 
-class CardType {
+class TileType {
     public /*int|null*/ $color;
     public /*int|null*/ $gain;
     public array $number;
@@ -14,7 +14,7 @@ class CardType {
     } 
 }
 
-class Card extends CardType {
+class Tile extends TileType {
 
     public int $id;
     public string $location;
@@ -30,20 +30,20 @@ class Card extends CardType {
         $this->gain = array_key_exists('card_type_arg', $dbCard) || array_key_exists('type_arg', $dbCard) ? intval($dbCard['card_type_arg'] ?? $dbCard['type_arg']) : null;
     } 
 
-    public static function onlyId(?Card $card) {
-        if ($card == null) {
+    public static function onlyId(?Tile $tile) {
+        if ($tile == null) {
             return null;
         }
         
-        return new Card([
-            'card_id' => $card->id,
-            'card_location' => $card->location,
-            'card_location_arg' => $card->locationArg,
+        return new Tile([
+            'card_id' => $tile->id,
+            'card_location' => $tile->location,
+            'card_location_arg' => $tile->locationArg,
         ]);
     }
 
-    public static function onlyIds(array $cards) {
-        return array_map(fn($card) => self::onlyId($card), $cards);
+    public static function onlyIds(array $tiles) {
+        return array_map(fn($tile) => self::onlyId($tile), $tiles);
     }
 }
 

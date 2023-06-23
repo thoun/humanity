@@ -2025,9 +2025,9 @@ var DestinationsManager = /** @class */ (function (_super) {
     __extends(DestinationsManager, _super);
     function DestinationsManager(game) {
         var _this = _super.call(this, game, {
-            getId: function (card) { return "destination-".concat(card.id); },
+            getId: function (card) { return "research-".concat(card.id); },
             setupDiv: function (card, div) {
-                div.classList.add('humanity-destination');
+                div.classList.add('humanity-research');
                 div.dataset.cardId = '' + card.id;
                 div.dataset.type = '' + card.type;
             },
@@ -2067,8 +2067,8 @@ var DestinationsManager = /** @class */ (function (_super) {
             case 2: return _("Lands of Influence");
         }
     };
-    DestinationsManager.prototype.getTooltip = function (destination) {
-        var message = "\n        <strong>".concat(_("Exploration cost:"), "</strong> ").concat(this.getCost(destination.cost), " (recruits can be used as jokers)\n        <br>\n        <strong>").concat(_("Immediate gains:"), "</strong> ").concat(this.getGains(destination.immediateGains), "\n        <br>\n        <strong>").concat(_("Type:"), "</strong> ").concat(this.getType(destination.type), "\n        ");
+    DestinationsManager.prototype.getTooltip = function (research) {
+        var message = "\n        <strong>".concat(_("Exploration cost:"), "</strong> ").concat(this.getCost(research.cost), " (recruits can be used as jokers)\n        <br>\n        <strong>").concat(_("Immediate gains:"), "</strong> ").concat(this.getGains(research.immediateGains), "\n        <br>\n        <strong>").concat(_("Type:"), "</strong> ").concat(this.getType(research.type), "\n        ");
         return message;
     };
     return DestinationsManager;
@@ -2110,9 +2110,9 @@ var ArtifactsManager = /** @class */ (function (_super) {
             case 1: return _("If a player takes an Explore action, they may discard a viking from the board and replace them with the first card from the deck.");
             case 2: return _("For each viking of the same color a player Recruits beyond their 3rd viking of that color, they gain 1 Victory Point.");
             case 3: return _("If a player Recruits a 2nd viking of the same color, they may take the Viking card of their choice instead of the one imposed by the card they played.");
-            case 4: return _("If a player recruits a 3rd viking of the same color, they can reserve a Destination card of their choice. It is taken from the available cards and placed next to their playing area. When that player takes an Explore action, they may choose to Explore a destination they have reserved instead of an available destination. Each player can have up to 2 reserved Destination cards at a time.");
+            case 4: return _("If a player recruits a 3rd viking of the same color, they can reserve a Destination card of their choice. It is taken from the available cards and placed next to their playing area. When that player takes an Explore action, they may choose to Explore a research they have reserved instead of an available research. Each player can have up to 2 reserved Destination cards at a time.");
             case 5: return _("If a player places a Lands of Influence card which they have just Explored directly onto a Trading Lands card, they may immediately carry out a Recruit action.");
-            case 6: return _("If a player completes a line of vikings with all 5 different colors, they can take 1 silver bracelet and 1 recruit, and gains 1 Reputation Point.");
+            case 6: return _("If a player completes a line of vikings with all 5 different colors, they can take 1 silver bracelet and 1 recruit, and gains 1 Research Point.");
             case 7: return _("If a player completes a line of vikings with all 5 different colors, they can immediately carry out an Explore action. They still have to pay the exploration cost.");
         }
     };
@@ -2134,24 +2134,24 @@ var TableCenter = /** @class */ (function () {
     function TableCenter(game, gamedatas) {
         var _this = this;
         this.game = game;
-        this.destinationsDecks = [];
-        this.destinations = [];
+        this.researchDecks = [];
+        this.research = [];
         this.vp = new Map();
-        this.reputation = new Map();
+        this.research = new Map();
         ['A', 'B'].forEach(function (letter) {
-            _this.destinationsDecks[letter] = new Deck(game.destinationsManager, document.getElementById("table-destinations-".concat(letter, "-deck")), {
+            _this.researchDecks[letter] = new Deck(game.researchManager, document.getElementById("table-research-".concat(letter, "-deck")), {
                 cardNumber: gamedatas.centerDestinationsDeckCount[letter],
                 topCard: gamedatas.centerDestinationsDeckTop[letter],
                 counter: {
                     position: 'right',
                 },
             });
-            _this.destinations[letter] = new SlotStock(game.destinationsManager, document.getElementById("table-destinations-".concat(letter)), {
+            _this.research[letter] = new SlotStock(game.researchManager, document.getElementById("table-research-".concat(letter)), {
                 slotsIds: [1, 2, 3],
                 mapCardToSlot: function (card) { return card.locationArg; },
             });
-            _this.destinations[letter].addCards(gamedatas.centerDestinations[letter]);
-            _this.destinations[letter].onCardClick = function (card) { return _this.game.onTableDestinationClick(card); };
+            _this.research[letter].addCards(gamedatas.centerDestinations[letter]);
+            _this.research[letter].onCardClick = function (card) { return _this.game.onTableDestinationClick(card); };
         });
         var cardDeckDiv = document.getElementById("card-deck");
         this.cardDeck = new Deck(game.cardsManager, cardDeckDiv, {
@@ -2178,35 +2178,30 @@ var TableCenter = /** @class */ (function () {
         var html = '';
         // points
         players.forEach(function (player) {
-            return html += "\n            <div id=\"player-".concat(player.id, "-vp-marker\" class=\"marker ").concat(/*this.game.isColorBlindMode() ? 'color-blind' : */ '', "\" data-player-id=\"").concat(player.id, "\" data-player-no=\"").concat(player.playerNo, "\" data-color=\"").concat(player.color, "\"><div class=\"inner vp\"></div></div>\n            <div id=\"player-").concat(player.id, "-reputation-marker\" class=\"marker ").concat(/*this.game.isColorBlindMode() ? 'color-blind' : */ '', "\" data-player-id=\"").concat(player.id, "\" data-player-no=\"").concat(player.playerNo, "\" data-color=\"").concat(player.color, "\"><div class=\"inner reputation\"></div></div>\n            ");
+            return html += "\n            <div id=\"player-".concat(player.id, "-vp-marker\" class=\"marker ").concat(/*this.game.isColorBlindMode() ? 'color-blind' : */ '', "\" data-player-id=\"").concat(player.id, "\" data-player-no=\"").concat(player.playerNo, "\" data-color=\"").concat(player.color, "\"><div class=\"inner vp\"></div></div>\n            <div id=\"player-").concat(player.id, "-research-marker\" class=\"marker ").concat(/*this.game.isColorBlindMode() ? 'color-blind' : */ '', "\" data-player-id=\"").concat(player.id, "\" data-player-no=\"").concat(player.playerNo, "\" data-color=\"").concat(player.color, "\"><div class=\"inner research\"></div></div>\n            ");
         });
         dojo.place(html, 'board');
         players.forEach(function (player) {
             _this.vp.set(Number(player.id), Number(player.score));
-            _this.reputation.set(Number(player.id), Math.min(14, Number(player.reputation)));
+            _this.research.set(Number(player.id), Math.min(14, Number(player.research)));
         });
         this.moveVP();
-        this.moveReputation();
-        if (gamedatas.variantOption >= 2) {
-            document.getElementById('table-center').insertAdjacentHTML('afterbegin', "<div></div><div id=\"artifacts\"></div>");
-            this.artifacts = new LineStock(this.game.artifactsManager, document.getElementById("artifacts"));
-            this.artifacts.addCards(gamedatas.artifacts);
-        }
+        this.moveResearch();
     }
     TableCenter.prototype.newTableCard = function (card) {
         return this.cards.addCard(card);
     };
-    TableCenter.prototype.newTableDestination = function (destination, letter, destinationDeckCount, destinationDeckTop) {
-        var promise = this.destinations[letter].addCard(destination);
-        this.destinationsDecks[letter].setCardNumber(destinationDeckCount, destinationDeckTop);
+    TableCenter.prototype.newTableDestination = function (research, letter, researchDeckCount, researchDeckTop) {
+        var promise = this.research[letter].addCard(research);
+        this.researchDecks[letter].setCardNumber(researchDeckCount, researchDeckTop);
         return promise;
     };
     TableCenter.prototype.setDestinationsSelectable = function (selectable, selectableCards) {
         var _this = this;
         if (selectableCards === void 0) { selectableCards = null; }
         ['A', 'B'].forEach(function (letter) {
-            _this.destinations[letter].setSelectionMode(selectable ? 'single' : 'none');
-            _this.destinations[letter].setSelectableCards(selectableCards);
+            _this.research[letter].setSelectionMode(selectable ? 'single' : 'none');
+            _this.research[letter].setSelectableCards(selectableCards);
         });
     };
     TableCenter.prototype.getVPCoordinates = function (points) {
@@ -2237,22 +2232,22 @@ var TableCenter = /** @class */ (function () {
         this.vp.set(playerId, points);
         this.moveVP();
     };
-    TableCenter.prototype.getReputationCoordinates = function (points) {
+    TableCenter.prototype.getResearchCoordinates = function (points) {
         var cases = points;
         var top = cases % 2 ? -14 : 0;
         var left = cases * 16.9;
         return [368 + left, 123 + top];
     };
-    TableCenter.prototype.moveReputation = function () {
+    TableCenter.prototype.moveResearch = function () {
         var _this = this;
-        this.reputation.forEach(function (points, playerId) {
-            var markerDiv = document.getElementById("player-".concat(playerId, "-reputation-marker"));
-            var coordinates = _this.getReputationCoordinates(points);
+        this.research.forEach(function (points, playerId) {
+            var markerDiv = document.getElementById("player-".concat(playerId, "-research-marker"));
+            var coordinates = _this.getResearchCoordinates(points);
             var left = coordinates[0];
             var top = coordinates[1];
             var topShift = 0;
             var leftShift = 0;
-            _this.reputation.forEach(function (iPoints, iPlayerId) {
+            _this.research.forEach(function (iPoints, iPlayerId) {
                 if (iPoints === points && iPlayerId < playerId) {
                     topShift += 5;
                     //leftShift += 5;
@@ -2261,12 +2256,12 @@ var TableCenter = /** @class */ (function () {
             markerDiv.style.transform = "translateX(".concat(left + leftShift, "px) translateY(").concat(top + topShift, "px)");
         });
     };
-    TableCenter.prototype.setReputation = function (playerId, reputation) {
-        this.reputation.set(playerId, Math.min(14, reputation));
-        this.moveReputation();
+    TableCenter.prototype.setResearch = function (playerId, research) {
+        this.research.set(playerId, Math.min(14, research));
+        this.moveResearch();
     };
-    TableCenter.prototype.getReputation = function (playerId) {
-        return this.reputation.get(playerId);
+    TableCenter.prototype.getResearch = function (playerId) {
+        return this.research.get(playerId);
     };
     TableCenter.prototype.setCardsSelectable = function (selectable, freeColor, recruits) {
         if (freeColor === void 0) { freeColor = null; }
@@ -2278,7 +2273,7 @@ var TableCenter = /** @class */ (function () {
         }
     };
     TableCenter.prototype.getVisibleDestinations = function () {
-        return __spreadArray(__spreadArray([], this.destinations['A'].getCards(), true), this.destinations['B'].getCards(), true);
+        return __spreadArray(__spreadArray([], this.research['A'].getCards(), true), this.research['B'].getCards(), true);
     };
     TableCenter.prototype.highlightPlayerTokens = function (playerId) {
         document.querySelectorAll('#board .marker').forEach(function (elem) { return elem.classList.toggle('highlight', Number(elem.dataset.playerId) === playerId); });
@@ -2293,7 +2288,7 @@ var isDebug = window.location.host == 'studio.boardgamearena.com' || window.loca
 ;
 var log = isDebug ? console.log.bind(window.console) : function () { };
 var PlayerTable = /** @class */ (function () {
-    function PlayerTable(game, player, reservePossible) {
+    function PlayerTable(game, player) {
         var _this = this;
         this.game = game;
         this.played = [];
@@ -2304,7 +2299,7 @@ var PlayerTable = /** @class */ (function () {
         if (this.currentPlayer) {
             html += "\n            <div class=\"block-with-text hand-wrapper\">\n                <div class=\"block-label\">".concat(_('Your hand'), "</div>\n                <div id=\"player-table-").concat(this.playerId, "-hand\" class=\"hand cards\"></div>\n            </div>");
         }
-        html += "\n            <div id=\"player-table-".concat(this.playerId, "-destinations\" class=\"destinations\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-boat\" class=\"boat ").concat(this.game.getBoatSide() == 2 ? 'advanced' : 'normal', "\" data-color=\"").concat(player.color, "\" data-recruits=\"").concat(player.recruit, "\" data-bracelets=\"").concat(player.bracelet, "\">");
+        html += "\n            <div id=\"player-table-".concat(this.playerId, "-research\" class=\"research\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-boat\" class=\"boat\" data-color=\"").concat(player.color, "\" data-recruits=\"").concat(player.recruit, "\" data-bracelets=\"").concat(player.bracelet, "\">");
         for (var i = 1; i <= 3; i++) {
             if (this.currentPlayer) {
                 html += "<div id=\"player-table-".concat(this.playerId, "-column").concat(i, "\" class=\"column\" data-number=\"").concat(i, "\"></div>");
@@ -2315,11 +2310,7 @@ var PlayerTable = /** @class */ (function () {
         for (var i = 1; i <= 5; i++) {
             html += "\n                <div id=\"player-table-".concat(this.playerId, "-played-").concat(i, "\" class=\"cards\"></div>\n                ");
         }
-        html += "\n            </div>\n        ";
-        if (reservePossible) {
-            html += "\n            <div id=\"player-table-".concat(this.playerId, "-reserved-destinations-wrapper\" class=\"block-with-text hand-wrapper\">\n                <div class=\"block-label\">").concat(_('Reserved destinations'), "</div>\n                <div id=\"player-table-").concat(this.playerId, "-reserved-destinations\"></div>\n            </div>");
-        }
-        html += "\n            </div>\n            \n            <div class=\"col col2\"></div>\n            </div>\n        </div>\n        ";
+        html += "\n            </div>\n            </div>\n            \n            <div class=\"col col2\"></div>\n            </div>\n        </div>\n        ";
         dojo.place(html, document.getElementById('tables'));
         if (this.currentPlayer) {
             var handDiv = document.getElementById("player-table-".concat(this.playerId, "-hand"));
@@ -2345,19 +2336,12 @@ var PlayerTable = /** @class */ (function () {
             this.played[i].addCards(player.playedCards[i]);
             playedDiv.style.setProperty('--card-overlap', '195px');
         }
-        var destinationsDiv = document.getElementById("player-table-".concat(this.playerId, "-destinations"));
-        this.destinations = new LineStock(this.game.destinationsManager, destinationsDiv, {
+        var researchDiv = document.getElementById("player-table-".concat(this.playerId, "-research"));
+        this.research = new LineStock(this.game.researchManager, researchDiv, {
             center: false,
         });
-        destinationsDiv.style.setProperty('--card-overlap', '94px');
-        this.destinations.addCards(player.destinations);
-        if (reservePossible) {
-            this.reservedDestinations = new LineStock(this.game.destinationsManager, document.getElementById("player-table-".concat(this.playerId, "-reserved-destinations")), {
-                center: false,
-            });
-            this.reservedDestinations.addCards(player.reservedDestinations);
-            this.reservedDestinations.onCardClick = function (card) { return _this.game.onTableDestinationClick(card); };
-        }
+        researchDiv.style.setProperty('--card-overlap', '94px');
+        this.research.addCards(player.research);
         [document.getElementById("player-table-".concat(this.playerId, "-name")), document.getElementById("player-table-".concat(this.playerId, "-boat"))].forEach(function (elem) {
             elem.addEventListener('mouseenter', function () { return _this.game.highlightPlayerTokens(_this.playerId); });
             elem.addEventListener('mouseleave', function () { return _this.game.highlightPlayerTokens(null); });
@@ -2402,8 +2386,8 @@ var PlayerTable = /** @class */ (function () {
         }
         return cards;
     };
-    PlayerTable.prototype.reserveDestination = function (destination) {
-        return this.reservedDestinations.addCard(destination);
+    PlayerTable.prototype.reserveDestination = function (research) {
+        return this.reservedDestinations.addCard(research);
     };
     PlayerTable.prototype.setDestinationsSelectable = function (selectable, selectableCards) {
         if (selectableCards === void 0) { selectableCards = null; }
@@ -2415,7 +2399,7 @@ var PlayerTable = /** @class */ (function () {
     };
     PlayerTable.prototype.showColumns = function (number) {
         if (number > 0) {
-            document.getElementById("player-table-".concat(this.playerId, "-boat")).style.setProperty('--column-height', "".concat(35 * (this.destinations.getCards().length + 1), "px"));
+            document.getElementById("player-table-".concat(this.playerId, "-boat")).style.setProperty('--column-height', "".concat(35 * (this.research.getCards().length + 1), "px"));
         }
         for (var i = 1; i <= 3; i++) {
             document.getElementById("player-table-".concat(this.playerId, "-column").concat(i)).classList.toggle('highlight', i <= number);
@@ -2441,12 +2425,12 @@ var PlayerTable = /** @class */ (function () {
         }
     };
     PlayerTable.prototype.setDoubleColumn = function (isDoublePlayerColumn) {
-        var destinations = document.getElementById("player-table-".concat(this.playerId, "-destinations"));
+        var research = document.getElementById("player-table-".concat(this.playerId, "-research"));
         var boat = document.getElementById("player-table-".concat(this.playerId, "-boat"));
-        var reservedDestinations = document.getElementById("player-table-".concat(this.playerId, "-reserved-destinations-wrapper"));
+        var reservedDestinations = document.getElementById("player-table-".concat(this.playerId, "-reserved-research-wrapper"));
         if (isDoublePlayerColumn) {
             var col2 = document.getElementById("player-table-".concat(this.playerId)).querySelector('.col2');
-            col2.appendChild(destinations);
+            col2.appendChild(research);
             col2.appendChild(boat);
             if (reservedDestinations) {
                 col2.appendChild(reservedDestinations);
@@ -2454,7 +2438,7 @@ var PlayerTable = /** @class */ (function () {
         }
         else {
             var visibleCards = document.getElementById("player-table-".concat(this.playerId)).querySelector('.visible-cards');
-            visibleCards.insertAdjacentElement('beforebegin', destinations);
+            visibleCards.insertAdjacentElement('beforebegin', research);
             visibleCards.insertAdjacentElement('beforebegin', boat);
             if (reservedDestinations) {
                 visibleCards.insertAdjacentElement('afterend', reservedDestinations);
@@ -2467,7 +2451,7 @@ var ANIMATION_MS = 500;
 var ACTION_TIMER_DURATION = 5;
 var LOCAL_STORAGE_ZOOM_KEY = 'Humanity-zoom';
 var LOCAL_STORAGE_JUMP_TO_FOLDED_KEY = 'Humanity-jump-to-folded';
-var VP_BY_REPUTATION = {
+var VP_BY_RESEARCH = {
     0: 0,
     3: 1,
     6: 2,
@@ -2479,16 +2463,16 @@ var DIFFERENT = 0;
 var VP = 1;
 var BRACELET = 2;
 var RECRUIT = 3;
-var REPUTATION = 4;
+var RESEARCH = 4;
 var CARD = 5;
-function getVpByReputation(reputation) {
-    return Object.entries(VP_BY_REPUTATION).findLast(function (entry) { return reputation >= Number(entry[0]); })[1];
+function getVpByResearch(research) {
+    return Object.entries(VP_BY_RESEARCH).findLast(function (entry) { return research >= Number(entry[0]); })[1];
 }
 var Humanity = /** @class */ (function () {
     function Humanity() {
         this.playersTables = [];
         //private handCounters: Counter[] = [];
-        this.reputationCounters = [];
+        this.researchCounters = [];
         this.recruitCounters = [];
         this.braceletCounters = [];
         this.TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
@@ -2507,20 +2491,11 @@ var Humanity = /** @class */ (function () {
     */
     Humanity.prototype.setup = function (gamedatas) {
         var _this = this;
-        if (!gamedatas.variantOption) {
-            this.dontPreloadImage('artefacts.jpg');
-        }
-        if (gamedatas.boatSideOption == 2) {
-            this.dontPreloadImage('boats-normal.png');
-        }
-        else {
-            this.dontPreloadImage('boats-advanced.png');
-        }
         log("Starting game setup");
         this.gamedatas = gamedatas;
         log('gamedatas', gamedatas);
         this.cardsManager = new CardsManager(this);
-        this.destinationsManager = new DestinationsManager(this);
+        this.researchManager = new DestinationsManager(this);
         this.artifactsManager = new ArtifactsManager(this);
         this.animationManager = new AnimationManager(this);
         new JumpToManager(this, {
@@ -2648,8 +2623,8 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.onEnteringPayDestination = function (args) {
         var _a;
-        var selectedCardDiv = this.destinationsManager.getCardElement(args.selectedDestination);
-        selectedCardDiv.classList.add('selected-pay-destination');
+        var selectedCardDiv = this.researchManager.getCardElement(args.selectedDestination);
+        selectedCardDiv.classList.add('selected-pay-research');
         if (this.isCurrentPlayerActive()) {
             (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setCardsSelectable(true, args.selectedDestination.cost);
         }
@@ -2693,7 +2668,7 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.onLeavingPayDestination = function () {
         var _a;
-        document.querySelectorAll('.selected-pay-destination').forEach(function (elem) { return elem.classList.remove('selected-pay-destination'); });
+        document.querySelectorAll('.selected-pay-research').forEach(function (elem) { return elem.classList.remove('selected-pay-research'); });
         (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setCardsSelectable(false);
     };
     Humanity.prototype.onLeavingDiscardTableCard = function () {
@@ -2805,12 +2780,6 @@ var Humanity = /** @class */ (function () {
         var _this = this;
         return this.playersTables.find(function (playerTable) { return playerTable.playerId === _this.getPlayerId(); });
     };
-    Humanity.prototype.getBoatSide = function () {
-        return this.gamedatas.boatSideOption;
-    };
-    Humanity.prototype.getVariantOption = function () {
-        return this.gamedatas.variantOption;
-    };
     Humanity.prototype.getGameStateName = function () {
         return this.gamedatas.gamestate.name;
     };
@@ -2849,15 +2818,15 @@ var Humanity = /** @class */ (function () {
                     <div class="player-hand-card"></div>
                     <span id="playerhand-counter-${player.id}"></span>
                 </div>*/
-            var html = "<div class=\"counters\">\n            \n                <div id=\"reputation-counter-wrapper-".concat(player.id, "\" class=\"reputation-counter\">\n                    <div class=\"reputation icon\"></div>\n                    <span id=\"reputation-counter-").concat(player.id, "\"></span> <span class=\"reputation-legend\"><div class=\"vp icon\"></div> / ").concat(_('round'), "</span>\n                </div>\n\n            </div><div class=\"counters\">\n            \n                <div id=\"recruit-counter-wrapper-").concat(player.id, "\" class=\"recruit-counter\">\n                    <div class=\"recruit icon\"></div>\n                    <span id=\"recruit-counter-").concat(player.id, "\"></span>\n                </div>\n            \n                <div id=\"bracelet-counter-wrapper-").concat(player.id, "\" class=\"bracelet-counter\">\n                    <div class=\"bracelet icon\"></div>\n                    <span id=\"bracelet-counter-").concat(player.id, "\"></span>\n                </div>\n                \n            </div>\n            <div>").concat(playerId == gamedatas.firstPlayerId ? "<div id=\"first-player\">".concat(_('First player'), "</div>") : '', "</div>");
+            var html = "<div class=\"counters\">\n            \n                <div id=\"research-counter-wrapper-".concat(player.id, "\" class=\"research-counter\">\n                    <div class=\"research icon\"></div>\n                    <span id=\"research-counter-").concat(player.id, "\"></span> <span class=\"research-legend\"><div class=\"vp icon\"></div> / ").concat(_('round'), "</span>\n                </div>\n\n            </div><div class=\"counters\">\n            \n                <div id=\"recruit-counter-wrapper-").concat(player.id, "\" class=\"recruit-counter\">\n                    <div class=\"recruit icon\"></div>\n                    <span id=\"recruit-counter-").concat(player.id, "\"></span>\n                </div>\n            \n                <div id=\"bracelet-counter-wrapper-").concat(player.id, "\" class=\"bracelet-counter\">\n                    <div class=\"bracelet icon\"></div>\n                    <span id=\"bracelet-counter-").concat(player.id, "\"></span>\n                </div>\n                \n            </div>\n            <div>").concat(playerId == gamedatas.firstPlayerId ? "<div id=\"first-player\">".concat(_('First player'), "</div>") : '', "</div>");
             dojo.place(html, "player_board_".concat(player.id));
             /*const handCounter = new ebg.counter();
             handCounter.create(`playerhand-counter-${playerId}`);
             handCounter.setValue(player.handCount);
             this.handCounters[playerId] = handCounter;*/
-            _this.reputationCounters[playerId] = new ebg.counter();
-            _this.reputationCounters[playerId].create("reputation-counter-".concat(playerId));
-            _this.reputationCounters[playerId].setValue(getVpByReputation(player.reputation));
+            _this.researchCounters[playerId] = new ebg.counter();
+            _this.researchCounters[playerId].create("research-counter-".concat(playerId));
+            _this.researchCounters[playerId].setValue(getVpByResearch(player.research));
             _this.recruitCounters[playerId] = new ebg.counter();
             _this.recruitCounters[playerId].create("recruit-counter-".concat(playerId));
             _this.recruitCounters[playerId].setValue(player.recruit);
@@ -2865,7 +2834,7 @@ var Humanity = /** @class */ (function () {
             _this.braceletCounters[playerId].create("bracelet-counter-".concat(playerId));
             _this.braceletCounters[playerId].setValue(player.bracelet);
         });
-        this.setTooltipToClass('reputation-counter', _('Reputation'));
+        this.setTooltipToClass('research-counter', _('Research'));
         this.setTooltipToClass('recruit-counter', _('Recruits'));
         this.setTooltipToClass('bracelet-counter', _('Bracelets'));
     };
@@ -2877,7 +2846,7 @@ var Humanity = /** @class */ (function () {
         });
     };
     Humanity.prototype.createPlayerTable = function (gamedatas, playerId) {
-        var table = new PlayerTable(this, gamedatas.players[playerId], gamedatas.reservePossible);
+        var table = new PlayerTable(this, gamedatas.players[playerId]);
         this.playersTables.push(table);
     };
     Humanity.prototype.updateGains = function (playerId, gains) {
@@ -2896,8 +2865,8 @@ var Humanity = /** @class */ (function () {
                     case RECRUIT:
                         _this.setRecruits(playerId, _this.recruitCounters[playerId].getValue() + amount);
                         break;
-                    case REPUTATION:
-                        _this.setReputation(playerId, _this.tableCenter.getReputation(playerId) + amount);
+                    case RESEARCH:
+                        _this.setResearch(playerId, _this.tableCenter.getResearch(playerId) + amount);
                         break;
                 }
             }
@@ -2908,9 +2877,9 @@ var Humanity = /** @class */ (function () {
         (_a = this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.toValue(score);
         this.tableCenter.setScore(playerId, score);
     };
-    Humanity.prototype.setReputation = function (playerId, count) {
-        this.reputationCounters[playerId].toValue(getVpByReputation(count));
-        this.tableCenter.setReputation(playerId, count);
+    Humanity.prototype.setResearch = function (playerId, count) {
+        this.researchCounters[playerId].toValue(getVpByResearch(count));
+        this.tableCenter.setResearch(playerId, count);
     };
     Humanity.prototype.setRecruits = function (playerId, count) {
         this.recruitCounters[playerId].toValue(count);
@@ -2928,7 +2897,7 @@ var Humanity = /** @class */ (function () {
         return [1, 2, 3, 4, 5].map(function (number) { return "\n            <div class=\"color\" data-color=\"".concat(number, "\"></div>\n            <span class=\"label\"> ").concat(_this.getColor(number), "</span>\n        "); }).join('');
     };
     Humanity.prototype.getHelpHtml = function () {
-        var html = "\n        <div id=\"help-popin\">\n            <h1>".concat(_("Assets"), "</h2>\n            <div class=\"help-section\">\n                <div class=\"icon vp\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Victory Point</strong>. The player moves their token forward 1 space on the Score Track."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon recruit\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Recruit</strong>: The player adds 1 Recruit token to their ship."), " ").concat(_("It is not possible to have more than 3."), " ").concat(_("A recruit allows a player to draw the Viking card of their choice when Recruiting or replaces a Viking card during Exploration."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon bracelet\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Silver Bracelet</strong>: The player adds 1 Silver Bracelet token to their ship."), " ").concat(_("It is not possible to have more than 3."), " ").concat(_("They are used for Trading."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon reputation\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Reputation Point</strong>: The player moves their token forward 1 space on the Reputation Track."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon take-card\"></div>\n                <div class=\"help-label\">").concat(_("Draw <strong>the first Viking card</strong> from the deck: It is placed in the player’s Crew Zone (without taking any assets)."), "</div>\n            </div>\n\n            <h1>").concat(_("Powers of the artifacts (variant option)"), "</h1>\n        ");
+        var html = "\n        <div id=\"help-popin\">\n            <h1>".concat(_("Assets"), "</h2>\n            <div class=\"help-section\">\n                <div class=\"icon vp\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Victory Point</strong>. The player moves their token forward 1 space on the Score Track."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon recruit\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Recruit</strong>: The player adds 1 Recruit token to their ship."), " ").concat(_("It is not possible to have more than 3."), " ").concat(_("A recruit allows a player to draw the Viking card of their choice when Recruiting or replaces a Viking card during Exploration."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon bracelet\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Silver Bracelet</strong>: The player adds 1 Silver Bracelet token to their ship."), " ").concat(_("It is not possible to have more than 3."), " ").concat(_("They are used for Trading."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon research\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Research Point</strong>: The player moves their token forward 1 space on the Research Track."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon take-card\"></div>\n                <div class=\"help-label\">").concat(_("Draw <strong>the first Viking card</strong> from the deck: It is placed in the player’s Crew Zone (without taking any assets)."), "</div>\n            </div>\n\n            <h1>").concat(_("Powers of the artifacts (variant option)"), "</h1>\n        ");
         for (var i = 1; i <= 7; i++) {
             html += "\n            <div class=\"help-section\">\n                <div id=\"help-artifact-".concat(i, "\"></div>\n                <div>").concat(this.artifactsManager.getTooltip(i), "</div>\n            </div> ");
         }
@@ -2940,12 +2909,12 @@ var Humanity = /** @class */ (function () {
             this.artifactsManager.setForHelp(i, "help-artifact-".concat(i));
         }
     };
-    Humanity.prototype.onTableDestinationClick = function (destination) {
+    Humanity.prototype.onTableDestinationClick = function (research) {
         if (this.gamedatas.gamestate.name == 'reserveDestination') {
-            this.reserveDestination(destination.id);
+            this.reserveDestination(research.id);
         }
         else {
-            this.takeDestination(destination.id);
+            this.takeDestination(research.id);
         }
     };
     Humanity.prototype.onHandCardClick = function (card) {
@@ -3143,7 +3112,7 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.notif_takeDestination = function (args) {
         var playerId = args.playerId;
-        var promise = this.getPlayerTable(playerId).destinations.addCard(args.destination);
+        var promise = this.getPlayerTable(playerId).research.addCard(args.research);
         this.updateGains(playerId, args.effectiveGains);
         return promise;
     };
@@ -3152,7 +3121,7 @@ var Humanity = /** @class */ (function () {
         return this.tableCenter.cardDiscard.addCards(args.cards, undefined, undefined, 50).then(function () { return _this.tableCenter.setDiscardCount(args.cardDiscardCount); });
     };
     Humanity.prototype.notif_newTableDestination = function (args) {
-        return this.tableCenter.newTableDestination(args.destination, args.letter, args.destinationDeckCount, args.destinationDeckTop);
+        return this.tableCenter.newTableDestination(args.research, args.letter, args.researchDeckCount, args.researchDeckTop);
     };
     Humanity.prototype.notif_score = function (args) {
         this.setScore(args.playerId, +args.newScore);
@@ -3180,7 +3149,7 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_reserveDestination = function (args) {
         var playerId = args.playerId;
         var playerTable = this.getPlayerTable(playerId);
-        return playerTable.reserveDestination(args.destination);
+        return playerTable.reserveDestination(args.research);
     };
     Humanity.prototype.notif_cardDeckReset = function (args) {
         this.tableCenter.cardDeck.setCardNumber(args.cardDeckCount, args.cardDeckTop);
@@ -3199,7 +3168,7 @@ var Humanity = /** @class */ (function () {
             case 1: return _("Victory Point");
             case 2: return _("Bracelet");
             case 3: return _("Recruit");
-            case 4: return _("Reputation");
+            case 4: return _("Research");
             case 5: return _("Card");
         }
     };

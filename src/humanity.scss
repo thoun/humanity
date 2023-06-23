@@ -5,7 +5,7 @@ $playerColors: '7c5654', 'd6d6d7', 'b79d86', '1e2c36';
 @import '../node_modules/bga-jump-to/bga-jump-to';
 @import '../node_modules/bga-cards/bga-cards';
 @import 'cards';
-@import 'destinations';
+@import 'research';
 @import 'artifacts';
 @import 'table-center';
 @import 'playerboards';
@@ -54,7 +54,7 @@ html, .mode_3d #game_play_area_background {
   &.vp, &[data-type="1"] {
     background-position-x: #{0 * 100% / 4};
   }  
-  &.reputation, &[data-type="4"] {
+  &.research, &[data-type="4"] {
     background-position-x: #{1 * 100% / 4};
   }  
   &.bracelet, &[data-type="2"] {

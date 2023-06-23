@@ -13,12 +13,12 @@ trait DebugUtilTrait {
 
         //$this->debugSetPlayerScore(2343492, 10);
         //$this->debugSetScore(39);
-        //$this->debugSetReputation(8);
+        //$this->debugSetResearch(8);
 
         //$this->debugAddDestinations(2343492, 'A', 15);
         //$this->debugAddDestinations(2343492, 'B', 10);
 
-        //$this->cards->pickCardsForLocation(13, 'deck', 'void');
+        //$this->tiles->pickCardsForLocation(13, 'deck', 'void');
         $this->setGlobalVariable(ARTIFACTS, [1, 6, 7]);
         
         //$this->debugLastTurn();
@@ -32,12 +32,12 @@ trait DebugUtilTrait {
 		$this->DbQuery("UPDATE player SET `player_score` = $score WHERE player_id = $playerId");
     }
 
-    function debugSetReputation($score) {
-		$this->DbQuery("UPDATE player SET `player_reputation` = $score");
+    function debugSetResearch($score) {
+		$this->DbQuery("UPDATE player SET `player_research` = $score");
     }
     
-    function debugSetPlayerReputation($playerId, $score) {
-		$this->DbQuery("UPDATE player SET `player_reputation` = $score WHERE player_id = $playerId");
+    function debugSetPlayerResearch($playerId, $score) {
+		$this->DbQuery("UPDATE player SET `player_research` = $score WHERE player_id = $playerId");
     }
 
     function debugLastTurn() {
@@ -45,14 +45,14 @@ trait DebugUtilTrait {
     }
     
     function debugEmpty() {
-		$this->cards->moveAllCardsInLocation('deck', 'void');
-        $this->cards->moveAllCardsInLocation('discard', 'void');
+		$this->tiles->moveAllCardsInLocation('deck', 'void');
+        $this->tiles->moveAllCardsInLocation('discard', 'void');
     }
 
     function debugAddDestinations($playerId, $letter, $number) {
         for ($i = 0; $i < $number; $i++) {
-            $destinationIndex = intval($this->destinations->countCardInLocation('played'.$playerId));
-            $this->destinations->pickCardForLocation('deck'.$letter, 'played'.$playerId, $destinationIndex);
+            $researchIndex = intval($this->research->countCardInLocation('played'.$playerId));
+            $this->research->pickCardForLocation('deck'.$letter, 'played'.$playerId, $researchIndex);
         }
     }
 
@@ -78,10 +78,10 @@ trait DebugUtilTrait {
 
 			// 'other' game specific tables. example:
 			// tables specific to your schema that use player_ids
-			$this->DbQuery("UPDATE card SET card_location_arg=$sid WHERE card_location_arg = $id" );
-			foreach ([1,2,3,4,5] as $i) { $this->DbQuery("UPDATE card SET card_location='played$sid-$i' WHERE card_location='played$id-$i'" ); }
-			$this->DbQuery("UPDATE destination SET card_location='played$sid' WHERE card_location='played$id'" );
-			$this->DbQuery("UPDATE destination SET card_location_arg=$sid WHERE card_location_arg = $id" );
+			$this->DbQuery("UPDATE tile SET card_location_arg=$sid WHERE card_location_arg = $id" );
+			foreach ([1,2,3,4,5] as $i) { $this->DbQuery("UPDATE tile SET card_location='played$sid-$i' WHERE card_location='played$id-$i'" ); }
+			$this->DbQuery("UPDATE research SET card_location='played$sid' WHERE card_location='played$id'" );
+			$this->DbQuery("UPDATE research SET card_location_arg=$sid WHERE card_location_arg = $id" );
 
             
 			++$sid;

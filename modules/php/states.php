@@ -11,23 +11,23 @@ trait StateTrait {
         The action method of state X is called everytime the current game state is set to X.
     */
 
-    function stScoreReputation() {
-        $playerId = intval($this->getActivePlayerId());
+    function stScoreResearch() {
+        /*$playerId = intval($this->getActivePlayerId());
 
         $player = $this->getPlayer($playerId);
 
         $inc = 0;
-        foreach ($this->VP_BY_REPUTATION as $min => $points) {
-            if ($player->reputation >= $min) {
+        foreach ($this->VP_BY_RESEARCH as $min => $points) {
+            if ($player->research >= $min) {
                 $inc = $points;
             }
         }
 
-        $this->incPlayerScore($playerId, $inc, clienttranslate('${player_name} scores ${incScore} Victory Point(s) with reputation'));
-        $this->incStat($inc, 'reputationPoints');
-        $this->incStat($inc, 'reputationPoints', $playerId);
+        $this->incPlayerScore($playerId, $inc, clienttranslate('${player_name} scores ${incScore} Victory Point(s) with research'));
+        $this->incStat($inc, 'researchPoints');
+        $this->incStat($inc, 'researchPoints', $playerId);
 
-        $this->setGameStateValue(COMPLETED_LINES, $this->getCompletedLines($playerId));
+        $this->setGameStateValue(COMPLETED_LINES, $this->getCompletedLines($playerId));*/
         
         $this->gamestate->nextState('next');
     }
@@ -47,7 +47,7 @@ trait StateTrait {
         $maxPlayersIds = [];
 
         foreach ($playersIds as $playerId) {
-            $playerCardCount = intval($this->getUniqueValueFromDB("SELECT count(*) FROM card WHERE card_location LIKE 'played$playerId%'"));
+            $playerCardCount = intval($this->getUniqueValueFromDB("SELECT count(*) FROM tile WHERE card_location LIKE 'played$playerId%'"));
             if ($playerCardCount > $max) {
                 $max = $playerCardCount;
                 $maxPlayersIds = [$playerId];
@@ -82,7 +82,7 @@ trait StateTrait {
                     $this->incStat($effectiveGain, 'assetsCollectedByDestination5');
                     $this->incStat($effectiveGain, 'assetsCollectedByDestination5', $playerId);
 
-                    $this->endExplore($playerId, $remainingCardsToTake->fromReserve, $remainingCardsToTake->destination, $remainingCardsToTake->destinationIndex);
+                    $this->endExplore($playerId, $remainingCardsToTake->fromReserve, $remainingCardsToTake->research, $remainingCardsToTake->researchIndex);
                 } else if ($remainingCardsToTake->phase == 'trade') {
                     $this->incStat($effectiveGain, 'assetsCollectedByTrade5');
                     $this->incStat($effectiveGain, 'assetsCollectedByTrade5', $playerId);

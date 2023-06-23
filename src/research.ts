@@ -1,9 +1,9 @@
 class DestinationsManager extends CardManager<Destination> {
     constructor (public game: HumanityGame) {
         super(game, {
-            getId: (card) => `destination-${card.id}`,
+            getId: (card) => `research-${card.id}`,
             setupDiv: (card: Destination, div: HTMLElement) => {
-                div.classList.add('humanity-destination');
+                div.classList.add('humanity-research');
                 div.dataset.cardId = ''+card.id;
                 div.dataset.type = ''+card.type;
             },
@@ -41,13 +41,13 @@ class DestinationsManager extends CardManager<Destination> {
         }
     }
 
-    private getTooltip(destination: Destination): string {
+    private getTooltip(research: Destination): string {
         let message = `
-        <strong>${_("Exploration cost:")}</strong> ${this.getCost(destination.cost)} (recruits can be used as jokers)
+        <strong>${_("Exploration cost:")}</strong> ${this.getCost(research.cost)} (recruits can be used as jokers)
         <br>
-        <strong>${_("Immediate gains:")}</strong> ${this.getGains(destination.immediateGains)}
+        <strong>${_("Immediate gains:")}</strong> ${this.getGains(research.immediateGains)}
         <br>
-        <strong>${_("Type:")}</strong> ${this.getType(destination.type)}
+        <strong>${_("Type:")}</strong> ${this.getType(research.type)}
         `;
  
         return message;

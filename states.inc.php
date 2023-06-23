@@ -56,7 +56,7 @@ $basicGameStates = [
         "description" => clienttranslate("Game setup"),
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => [ "" => ST_SCORE_REPUTATION ]
+        "transitions" => [ "" => ST_SCORE_RESEARCH ]
     ],
    
     // Final state.
@@ -74,12 +74,12 @@ $playerActionsGameStates = [
 
     ST_PLAYER_PLAY_ACTION => [
         "name" => "playAction",
-        "description" => clienttranslate('${actplayer} must recruit (play a card) or explore (take a destination)'),
-        "descriptionmyturn" => clienttranslate('${you} must recruit (play a card) or explore (take a destination)'),
+        "description" => clienttranslate('${actplayer} must recruit (play a card) or explore (take a research)'),
+        "descriptionmyturn" => clienttranslate('${you} must recruit (play a card) or explore (take a research)'),
         "descriptionRecruitOnly" => clienttranslate('${actplayer} can recruit (play a card)'),
         "descriptionmyturnRecruitOnly" => clienttranslate('${you} can recruit (play a card)'),
-        "descriptionExploreOnly" => clienttranslate('${actplayer} can explore (take a destination)'),
-        "descriptionmyturnExploreOnly" => clienttranslate('${you} can explore (take a destination)'),
+        "descriptionExploreOnly" => clienttranslate('${actplayer} can explore (take a research)'),
+        "descriptionmyturnExploreOnly" => clienttranslate('${you} can explore (take a research)'),
         "descriptionTradeOnly" => clienttranslate('${actplayer} can trade'),
         "descriptionmyturnTradeOnly" => clienttranslate('${you} can trade'),
         "type" => "activeplayer",    
@@ -122,8 +122,8 @@ $playerActionsGameStates = [
 
     ST_PLAYER_PAY_DESTINATION => [
         "name" => "payDestination",
-        "description" => clienttranslate('${actplayer} must choose the cards to pay for the selected destination'),
-        "descriptionmyturn" => clienttranslate('${you} must choose the cards to pay for the selected destination'),
+        "description" => clienttranslate('${actplayer} must choose the cards to pay for the selected research'),
+        "descriptionmyturn" => clienttranslate('${you} must choose the cards to pay for the selected research'),
         "type" => "activeplayer",
         "args" => "argPayDestination",
         "possibleactions" => [ 
@@ -142,8 +142,8 @@ $playerActionsGameStates = [
 
     ST_PLAYER_RESERVE_DESTINATION => [
         "name" => "reserveDestination",
-        "description" => clienttranslate('${actplayer} can reserve a destination'),
-        "descriptionmyturn" => clienttranslate('${you} can reserve a destination'),
+        "description" => clienttranslate('${actplayer} can reserve a research'),
+        "descriptionmyturn" => clienttranslate('${you} can reserve a research'),
         "type" => "activeplayer",
         "possibleactions" => [ 
             "reserveDestination",
@@ -205,11 +205,11 @@ $playerActionsGameStates = [
 
 $gameGameStates = [
 
-    ST_SCORE_REPUTATION => [
-        "name" => "scoreReputation",
-        "description" => clienttranslate('Scoring reputation points...'),
+    ST_SCORE_RESEARCH => [
+        "name" => "scoreResearch",
+        "description" => clienttranslate('Scoring research points...'),
         "type" => "game",
-        "action" => "stScoreReputation",
+        "action" => "stScoreResearch",
         "transitions" => [
             "next" => ST_PLAYER_PLAY_ACTION,
         ]
@@ -236,7 +236,7 @@ $gameGameStates = [
         "action" => "stNextPlayer",
         "updateGameProgression" => true,
         "transitions" => [
-            "nextPlayer" => ST_SCORE_REPUTATION,
+            "nextPlayer" => ST_SCORE_RESEARCH,
             "endScore" => ST_END_SCORE,
         ],
     ],

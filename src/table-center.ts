@@ -2,19 +2,19 @@ const POINT_CASE_SIZE_LEFT = 38.8;
 const POINT_CASE_SIZE_TOP = 37.6;
 
 class TableCenter {
-    public destinationsDecks: Deck<Destination>[] = [];
+    public researchDecks: Deck<Destination>[] = [];
     public cardDeck: Deck<Card>;
     public cardDiscard: VoidStock<Card>;
-    public destinations: SlotStock<Destination>[] = [];
+    public research: SlotStock<Destination>[] = [];
     public cards: SlotStock<Card>;
     private vp = new Map<number, number>();
-    private reputation = new Map<number, number>(); 
+    private research = new Map<number, number>(); 
 
     private artifacts: LineStock<number>;
         
     constructor(private game: HumanityGame, gamedatas: HumanityGamedatas) {
         ['A', 'B'].forEach(letter => {
-            this.destinationsDecks[letter] = new Deck<Destination>(game.destinationsManager, document.getElementById(`table-destinations-${letter}-deck`), {
+            this.researchDecks[letter] = new Deck<Destination>(game.researchManager, document.getElementById(`table-research-${letter}-deck`), {
                 cardNumber: gamedatas.centerDestinationsDeckCount[letter],
                 topCard: gamedatas.centerDestinationsDeckTop[letter],
                 counter: {
@@ -22,12 +22,12 @@ class TableCenter {
                 },
             });
 
-            this.destinations[letter] = new SlotStock<Destination>(game.destinationsManager, document.getElementById(`table-destinations-${letter}`), {
+            this.research[letter] = new SlotStock<Destination>(game.researchManager, document.getElementById(`table-research-${letter}`), {
                 slotsIds: [1, 2, 3],
                 mapCardToSlot: card => card.locationArg,
             });
-            this.destinations[letter].addCards(gamedatas.centerDestinations[letter]);
-            this.destinations[letter].onCardClick = (card: Destination) => this.game.onTableDestinationClick(card);
+            this.research[letter].addCards(gamedatas.centerDestinations[letter]);
+            this.research[letter].onCardClick = (card: Destination) => this.game.onTableDestinationClick(card);
         })
 
         const cardDeckDiv = document.getElementById(`card-deck`);
@@ -61,39 +61,32 @@ class TableCenter {
         players.forEach(player =>
             html += `
             <div id="player-${player.id}-vp-marker" class="marker ${/*this.game.isColorBlindMode() ? 'color-blind' : */''}" data-player-id="${player.id}" data-player-no="${player.playerNo}" data-color="${player.color}"><div class="inner vp"></div></div>
-            <div id="player-${player.id}-reputation-marker" class="marker ${/*this.game.isColorBlindMode() ? 'color-blind' : */''}" data-player-id="${player.id}" data-player-no="${player.playerNo}" data-color="${player.color}"><div class="inner reputation"></div></div>
+            <div id="player-${player.id}-research-marker" class="marker ${/*this.game.isColorBlindMode() ? 'color-blind' : */''}" data-player-id="${player.id}" data-player-no="${player.playerNo}" data-color="${player.color}"><div class="inner research"></div></div>
             `
         );
         dojo.place(html, 'board');
         players.forEach(player => {
             this.vp.set(Number(player.id), Number(player.score));
-            this.reputation.set(Number(player.id), Math.min(14, Number(player.reputation)));
+            this.research.set(Number(player.id), Math.min(14, Number(player.research)));
         });
         this.moveVP();
-        this.moveReputation();
-
-        if (gamedatas.variantOption >= 2) {
-            document.getElementById('table-center').insertAdjacentHTML('afterbegin', `<div></div><div id="artifacts"></div>`);
-        
-            this.artifacts = new LineStock<number>(this.game.artifactsManager, document.getElementById(`artifacts`));
-            this.artifacts.addCards(gamedatas.artifacts);
-        }
+        this.moveResearch();
     }
     
     public newTableCard(card: Card): Promise<boolean> {
         return this.cards.addCard(card);
     }
     
-    public newTableDestination(destination: Destination, letter: string, destinationDeckCount: number, destinationDeckTop?: Destination): Promise<boolean> {
-        const promise = this.destinations[letter].addCard(destination);
-        this.destinationsDecks[letter].setCardNumber(destinationDeckCount, destinationDeckTop);
+    public newTableDestination(research: Destination, letter: string, researchDeckCount: number, researchDeckTop?: Destination): Promise<boolean> {
+        const promise = this.research[letter].addCard(research);
+        this.researchDecks[letter].setCardNumber(researchDeckCount, researchDeckTop);
         return promise;
     } 
     
     public setDestinationsSelectable(selectable: boolean, selectableCards: Destination[] | null = null) {
         ['A', 'B'].forEach(letter => {
-            this.destinations[letter].setSelectionMode(selectable ? 'single' : 'none');
-            this.destinations[letter].setSelectableCards(selectableCards);
+            this.research[letter].setSelectionMode(selectable ? 'single' : 'none');
+            this.research[letter].setSelectableCards(selectableCards);
         });
     }
 
@@ -132,7 +125,7 @@ class TableCenter {
         this.moveVP();
     }
 
-    private getReputationCoordinates(points: number) {
+    private getResearchCoordinates(points: number) {
         const cases = points;
 
         const top = cases % 2 ? -14 : 0;
@@ -141,17 +134,17 @@ class TableCenter {
         return [368 + left, 123 + top];
     }
 
-    private moveReputation() {
-        this.reputation.forEach((points, playerId) => {
-            const markerDiv = document.getElementById(`player-${playerId}-reputation-marker`);
+    private moveResearch() {
+        this.research.forEach((points, playerId) => {
+            const markerDiv = document.getElementById(`player-${playerId}-research-marker`);
 
-            const coordinates = this.getReputationCoordinates(points);
+            const coordinates = this.getResearchCoordinates(points);
             const left = coordinates[0];
             const top = coordinates[1];
     
             let topShift = 0;
             let leftShift = 0;
-            this.reputation.forEach((iPoints, iPlayerId) => {
+            this.research.forEach((iPoints, iPlayerId) => {
                 if (iPoints === points && iPlayerId < playerId) {
                     topShift += 5;
                     //leftShift += 5;
@@ -162,13 +155,13 @@ class TableCenter {
         });
     }
     
-    public setReputation(playerId: number, reputation: number) {
-        this.reputation.set(playerId, Math.min(14, reputation));
-        this.moveReputation();
+    public setResearch(playerId: number, research: number) {
+        this.research.set(playerId, Math.min(14, research));
+        this.moveResearch();
     }
     
-    public getReputation(playerId: number): number {
-        return this.reputation.get(playerId);
+    public getResearch(playerId: number): number {
+        return this.research.get(playerId);
     }
 
     public setCardsSelectable(selectable: boolean, freeColor: number | null = null, recruits: number | null = null) {
@@ -181,8 +174,8 @@ class TableCenter {
     
     public getVisibleDestinations(): Destination[] {
         return [
-            ...this.destinations['A'].getCards(),
-            ...this.destinations['B'].getCards(),
+            ...this.research['A'].getCards(),
+            ...this.research['B'].getCards(),
         ];
     }
 

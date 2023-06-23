@@ -11,7 +11,7 @@ const ACTION_TIMER_DURATION = 5;
 const LOCAL_STORAGE_ZOOM_KEY = 'Humanity-zoom';
 const LOCAL_STORAGE_JUMP_TO_FOLDED_KEY = 'Humanity-jump-to-folded';
 
-const VP_BY_REPUTATION = {
+const VP_BY_RESEARCH = {
     0: 0,
     3: 1,
     6: 2,
@@ -25,16 +25,16 @@ const DIFFERENT = 0;
 const VP = 1;
 const BRACELET = 2;
 const RECRUIT = 3;
-const REPUTATION = 4;
+const RESEARCH = 4;
 const CARD = 5;
 
-function getVpByReputation(reputation: number) {
-    return Object.entries(VP_BY_REPUTATION).findLast(entry => reputation >= Number(entry[0]))[1];
+function getVpByResearch(research: number) {
+    return Object.entries(VP_BY_RESEARCH).findLast(entry => research >= Number(entry[0]))[1];
 }
 
 class Humanity implements HumanityGame {
     public cardsManager: CardsManager;
-    public destinationsManager: DestinationsManager;
+    public researchManager: DestinationsManager;
     public artifactsManager: ArtifactsManager;
 
     private zoomManager: ZoomManager;
@@ -43,7 +43,7 @@ class Humanity implements HumanityGame {
     private tableCenter: TableCenter;
     private playersTables: PlayerTable[] = [];
     //private handCounters: Counter[] = [];
-    private reputationCounters: Counter[] = [];
+    private researchCounters: Counter[] = [];
     private recruitCounters: Counter[] = [];
     private braceletCounters: Counter[] = [];
     
@@ -66,15 +66,6 @@ class Humanity implements HumanityGame {
     */
 
     public setup(gamedatas: HumanityGamedatas) {
-        if (!gamedatas.variantOption) {
-            (this as any).dontPreloadImage('artefacts.jpg');
-        }
-        if (gamedatas.boatSideOption == 2) {
-            (this as any).dontPreloadImage('boats-normal.png');
-        } else {
-            (this as any).dontPreloadImage('boats-advanced.png');
-        }
-
         log( "Starting game setup" );
         
         this.gamedatas = gamedatas;
@@ -83,7 +74,7 @@ class Humanity implements HumanityGame {
 
 
         this.cardsManager = new CardsManager(this);
-        this.destinationsManager = new DestinationsManager(this);        
+        this.researchManager = new DestinationsManager(this);        
         this.artifactsManager = new ArtifactsManager(this);
         this.animationManager = new AnimationManager(this);
         new JumpToManager(this, {
@@ -220,8 +211,8 @@ class Humanity implements HumanityGame {
     }
 
     private onEnteringPayDestination(args: EnteringPayDestinationArgs) {
-        const selectedCardDiv = this.destinationsManager.getCardElement(args.selectedDestination);
-        selectedCardDiv.classList.add('selected-pay-destination');
+        const selectedCardDiv = this.researchManager.getCardElement(args.selectedDestination);
+        selectedCardDiv.classList.add('selected-pay-research');
 
         if ((this as any).isCurrentPlayerActive()) {
             this.getCurrentPlayerTable()?.setCardsSelectable(true, args.selectedDestination.cost);
@@ -270,7 +261,7 @@ class Humanity implements HumanityGame {
     }
 
     private onLeavingPayDestination() {
-        document.querySelectorAll('.selected-pay-destination').forEach(elem => elem.classList.remove('selected-pay-destination'));
+        document.querySelectorAll('.selected-pay-research').forEach(elem => elem.classList.remove('selected-pay-research'));
         this.getCurrentPlayerTable()?.setCardsSelectable(false);
     }
     
@@ -398,14 +389,6 @@ class Humanity implements HumanityGame {
         return this.playersTables.find(playerTable => playerTable.playerId === this.getPlayerId());
     }
 
-    public getBoatSide(): number {
-        return this.gamedatas.boatSideOption;
-    }
-
-    public getVariantOption(): number {
-        return this.gamedatas.variantOption;
-    }
-
     public getGameStateName(): string {
         return this.gamedatas.gamestate.name;
     }
@@ -454,9 +437,9 @@ class Humanity implements HumanityGame {
                 </div>*/
             let html = `<div class="counters">
             
-                <div id="reputation-counter-wrapper-${player.id}" class="reputation-counter">
-                    <div class="reputation icon"></div>
-                    <span id="reputation-counter-${player.id}"></span> <span class="reputation-legend"><div class="vp icon"></div> / ${_('round')}</span>
+                <div id="research-counter-wrapper-${player.id}" class="research-counter">
+                    <div class="research icon"></div>
+                    <span id="research-counter-${player.id}"></span> <span class="research-legend"><div class="vp icon"></div> / ${_('round')}</span>
                 </div>
 
             </div><div class="counters">
@@ -481,9 +464,9 @@ class Humanity implements HumanityGame {
             handCounter.setValue(player.handCount);
             this.handCounters[playerId] = handCounter;*/
 
-            this.reputationCounters[playerId] = new ebg.counter();
-            this.reputationCounters[playerId].create(`reputation-counter-${playerId}`);
-            this.reputationCounters[playerId].setValue(getVpByReputation(player.reputation));
+            this.researchCounters[playerId] = new ebg.counter();
+            this.researchCounters[playerId].create(`research-counter-${playerId}`);
+            this.researchCounters[playerId].setValue(getVpByResearch(player.research));
 
             this.recruitCounters[playerId] = new ebg.counter();
             this.recruitCounters[playerId].create(`recruit-counter-${playerId}`);
@@ -494,7 +477,7 @@ class Humanity implements HumanityGame {
             this.braceletCounters[playerId].setValue(player.bracelet);
         });
 
-        this.setTooltipToClass('reputation-counter', _('Reputation'));
+        this.setTooltipToClass('research-counter', _('Research'));
         this.setTooltipToClass('recruit-counter', _('Recruits'));
         this.setTooltipToClass('bracelet-counter', _('Bracelets'));
     }
@@ -508,7 +491,7 @@ class Humanity implements HumanityGame {
     }
 
     private createPlayerTable(gamedatas: HumanityGamedatas, playerId: number) {
-        const table = new PlayerTable(this, gamedatas.players[playerId], gamedatas.reservePossible);
+        const table = new PlayerTable(this, gamedatas.players[playerId]);
         this.playersTables.push(table);
     }
 
@@ -528,8 +511,8 @@ class Humanity implements HumanityGame {
                     case RECRUIT:
                         this.setRecruits(playerId, this.recruitCounters[playerId].getValue() + amount);
                         break;
-                    case REPUTATION:
-                        this.setReputation(playerId, this.tableCenter.getReputation(playerId) + amount);
+                    case RESEARCH:
+                        this.setResearch(playerId, this.tableCenter.getResearch(playerId) + amount);
                         break;
                 }
             }
@@ -541,9 +524,9 @@ class Humanity implements HumanityGame {
         this.tableCenter.setScore(playerId, score);
     }
 
-    private setReputation(playerId: number, count: number) {
-        this.reputationCounters[playerId].toValue(getVpByReputation(count));
-        this.tableCenter.setReputation(playerId, count);
+    private setResearch(playerId: number, count: number) {
+        this.researchCounters[playerId].toValue(getVpByResearch(count));
+        this.tableCenter.setResearch(playerId, count);
     }
 
     private setRecruits(playerId: number, count: number) {
@@ -584,8 +567,8 @@ class Humanity implements HumanityGame {
                 <div class="help-label">${_("Gain 1 <strong>Silver Bracelet</strong>: The player adds 1 Silver Bracelet token to their ship.")} ${_("It is not possible to have more than 3.")} ${_("They are used for Trading.")}</div>
             </div>
             <div class="help-section">
-                <div class="icon reputation"></div>
-                <div class="help-label">${_("Gain 1 <strong>Reputation Point</strong>: The player moves their token forward 1 space on the Reputation Track.")}</div>
+                <div class="icon research"></div>
+                <div class="help-label">${_("Gain 1 <strong>Research Point</strong>: The player moves their token forward 1 space on the Research Track.")}</div>
             </div>
             <div class="help-section">
                 <div class="icon take-card"></div>
@@ -613,11 +596,11 @@ class Humanity implements HumanityGame {
         }
     }
     
-    public onTableDestinationClick(destination: Destination): void {
+    public onTableDestinationClick(research: Destination): void {
         if (this.gamedatas.gamestate.name == 'reserveDestination') {
-            this.reserveDestination(destination.id);
+            this.reserveDestination(research.id);
         } else {
-            this.takeDestination(destination.id);
+            this.takeDestination(research.id);
         }
     }
 
@@ -855,7 +838,7 @@ class Humanity implements HumanityGame {
 
     notif_takeDestination(args: NotifTakeDestinationArgs) {
         const playerId = args.playerId;
-        const promise = this.getPlayerTable(playerId).destinations.addCard(args.destination);
+        const promise = this.getPlayerTable(playerId).research.addCard(args.research);
 
         this.updateGains(playerId, args.effectiveGains);
 
@@ -869,7 +852,7 @@ class Humanity implements HumanityGame {
     }
 
     notif_newTableDestination(args: NotifNewTableDestinationArgs) {
-        return this.tableCenter.newTableDestination(args.destination, args.letter, args.destinationDeckCount, args.destinationDeckTop);
+        return this.tableCenter.newTableDestination(args.research, args.letter, args.researchDeckCount, args.researchDeckTop);
     }
 
     notif_score(args: NotifScoreArgs) {
@@ -909,7 +892,7 @@ class Humanity implements HumanityGame {
         const playerId = args.playerId;
         const playerTable = this.getPlayerTable(playerId);
 
-        return playerTable.reserveDestination(args.destination);
+        return playerTable.reserveDestination(args.research);
     }
 
     notif_cardDeckReset(args: NotifCardDeckResetArgs) {
@@ -933,7 +916,7 @@ class Humanity implements HumanityGame {
             case 1: return _("Victory Point");
             case 2: return _("Bracelet");
             case 3: return _("Recruit");
-            case 4: return _("Reputation");
+            case 4: return _("Research");
             case 5: return _("Card");
         }
     }

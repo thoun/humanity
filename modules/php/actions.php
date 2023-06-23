@@ -33,31 +33,31 @@ trait ActionTrait {
         $playerId = intval($this->getActivePlayerId());
             
 
-        $hand = $this->getCardsByLocation('hand', $playerId);
-        $card = $this->array_find($hand, fn($c) => $c->id == $id);
+        $hand = $this->getTilesByLocation('hand', $playerId);
+        $tile = $this->array_find($hand, fn($c) => $c->id == $id);
 
-        if ($card == null || $card->location != 'hand' || $card->locationArg != $playerId) {
+        if ($tile == null || $tile->location != 'hand' || $tile->locationArg != $playerId) {
             throw new BgaUserException("You can't play this card");
         }
 
-        $this->cards->moveCard($card->id, 'played'.$playerId.'-'.$card->color, intval($this->destinations->countCardInLocation('played'.$playerId.'-'.$card->color)));
+        $this->tiles->moveCard($tile->id, 'played'.$playerId.'-'.$tile->color, intval($this->research->countCardInLocation('played'.$playerId.'-'.$tile->color)));
 
-        $cardsOfColor = $this->getCardsByLocation('played'.$playerId.'-'.$card->color);
-        $gains = array_map(fn($card) => $card->gain, $cardsOfColor);
+        $tilesOfColor = $this->getTilesByLocation('played'.$playerId.'-'.$tile->color);
+        $gains = array_map(fn($tile) => $tile->gain, $tilesOfColor);
         $groupGains = $this->groupGains($gains);
         $effectiveGains = $this->gainResources($playerId, $groupGains, 'recruit');
 
         self::notifyAllPlayers('playCard', clienttranslate('${player_name} plays a ${card_color} ${card_type} card from their hand and gains ${gains}'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'card' => $card,
+            'card' => $tile,
             'effectiveGains' => $effectiveGains,
             'gains' => $effectiveGains, // for logs
-            'card_type' => $this->getGainName($card->gain), // for logs
-            'card_color' => $this->getColorName($card->color), // for logs
+            'card_type' => $this->getGainName($tile->gain), // for logs
+            'card_color' => $this->getColorName($tile->color), // for logs
         ]);
 
-        $this->setGameStateValue(PLAYED_CARD_COLOR, $card->color);
+        $this->setGameStateValue(PLAYED_CARD_COLOR, $tile->color);
 
         $argChooseNewCard = $this->argChooseNewCard();
         if ($argChooseNewCard['allFree']) {
@@ -90,12 +90,12 @@ trait ActionTrait {
         $playerId = intval($this->getActivePlayerId());
 
         $args = $this->argChooseNewCard();
-        $card = $this->array_find($args['centerCards'], fn($card) => $card->id == $id);
+        $tile = $this->array_find($args['centerCards'], fn($tile) => $tile->id == $id);
 
-        if ($card == null || $card->location != 'slot') {
+        if ($tile == null || $tile->location != 'slot') {
             throw new BgaUserException("You can't play this card");
         }
-        $slotColor = $card->locationArg;
+        $slotColor = $tile->locationArg;
 
         if ($slotColor != $args['freeColor'] && !$args['allFree']) {
             if ($args['recruits'] < 1) {
@@ -108,15 +108,15 @@ trait ActionTrait {
             }
         }
         
-        $this->cards->moveCard($card->id, 'hand', $playerId);
+        $this->tiles->moveCard($tile->id, 'hand', $playerId);
 
         self::notifyAllPlayers('takeCard', clienttranslate('${player_name} takes the ${card_color} ${card_type} card from the table (${color} column)'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'card' => $card,
+            'card' => $tile,
             'color' => $this->getColorName($slotColor), // for logs
-            'card_type' => $this->getGainName($card->gain), // for logs
-            'card_color' => $this->getColorName($card->color), // for logs
+            'card_type' => $this->getGainName($tile->gain), // for logs
+            'card_color' => $this->getColorName($tile->color), // for logs
         ]);
 
         if ($this->getAvailableDeckCards() >= 1) {
@@ -133,14 +133,14 @@ trait ActionTrait {
     }
 
     public function endOfRecruit(int $playerId, int $slotColor) {
-        $newTableCard = $this->getCardFromDb($this->cards->pickCardForLocation('deck', 'slot', $slotColor));
+        $newTableCard = $this->getTileFromDb($this->tiles->pickCardForLocation('deck', 'slot', $slotColor));
         $newTableCard->location = 'slot';
         $newTableCard->locationArg = $slotColor;
 
         self::notifyAllPlayers('newTableCard', '', [
             'card' => $newTableCard,
-            'cardDeckTop' => Card::onlyId($this->getCardFromDb($this->cards->getCardOnTop('deck'))),
-            'cardDeckCount' => intval($this->cards->countCardInLocation('deck')) + 1, // to count the new card
+            'cardDeckTop' => Tile::onlyId($this->getTileFromDb($this->tiles->getCardOnTop('deck'))),
+            'cardDeckCount' => intval($this->tiles->countCardInLocation('deck')) + 1, // to count the new card
         ]);
 
         $this->setGameStateValue(RECRUIT_DONE, 1);
@@ -157,10 +157,10 @@ trait ActionTrait {
         }
 
         $args = $this->argPlayAction();
-        $destination = $this->array_find($args['possibleDestinations'], fn($c) => $c->id == $id);
+        $research = $this->array_find($args['possibleDestinations'], fn($c) => $c->id == $id);
 
-        if ($destination == null) {
-            throw new BgaUserException("You can't take this destination");
+        if ($research == null) {
+            throw new BgaUserException("You can't take this research");
         }
 
         $this->setGameStateValue(SELECTED_DESTINATION, $id);
@@ -177,57 +177,57 @@ trait ActionTrait {
             throw new BgaUserException("Not enough recruits");
         }
 
-        $destination = $this->getDestinationFromDb($this->destinations->getCard($this->getGameStateValue(SELECTED_DESTINATION)));
-        $fromReserve = $destination->location == 'reserved';
+        $research = $this->getDestinationFromDb($this->research->getCard($this->getGameStateValue(SELECTED_DESTINATION)));
+        $fromReserve = $research->location == 'reserved';
         
         // will contain only selected cards of player
         $playedCardsByColor = [];
         $selectedPlayedCardsColors = [];
-        $cardsToDiscard = [];
+        $tilesToDiscard = [];
         if (count($ids) > 0) {
             $playedCardsByColor = $this->getPlayedCardsByColor($playerId);
             foreach ([1,2,3,4,5] as $color) {
-                $playedCardsByColor[$color] = array_values(array_filter($playedCardsByColor[$color], fn($card) => in_array($card->id, $ids)));
+                $playedCardsByColor[$color] = array_values(array_filter($playedCardsByColor[$color], fn($tile) => in_array($tile->id, $ids)));
                 $selectedPlayedCardsColors[$color] = count($playedCardsByColor[$color]);
-                $cardsToDiscard = array_merge($cardsToDiscard, $playedCardsByColor[$color]);
+                $tilesToDiscard = array_merge($tilesToDiscard, $playedCardsByColor[$color]);
             }
         }
 
-        $valid = $this->canTakeDestination($destination, $selectedPlayedCardsColors, $recruits, true);
+        $valid = $this->canTakeDestination($research, $selectedPlayedCardsColors, $recruits, true);
         if (!$valid) {
-            throw new BgaUserException("Invalid payment for this destination");
+            throw new BgaUserException("Invalid payment for this research");
         }
 
         if ($recruits > 0) {
-            $this->incPlayerRecruit($playerId, -$recruits, clienttranslate('${player_name} pays ${number} recruit(s) for the selected destination'), [
+            $this->incPlayerRecruit($playerId, -$recruits, clienttranslate('${player_name} pays ${number} recruit(s) for the selected research'), [
                 'number' => $recruits, // for logs
             ]);
             $this->incStat($recruits, 'recruitsUsedToPayDestination');
             $this->incStat($recruits, 'recruitsUsedToPayDestination', $playerId);
         }
 
-        if (count($cardsToDiscard)) {
-            $this->cards->moveCards(array_map(fn($card) => $card->id, $cardsToDiscard), 'discard');
+        if (count($tilesToDiscard)) {
+            $this->tiles->moveCards(array_map(fn($tile) => $tile->id, $tilesToDiscard), 'discard');
 
-            self::notifyAllPlayers('discardCards', clienttranslate('${player_name} discards ${number} cards(s) for the selected destination'), [
+            self::notifyAllPlayers('discardCards', clienttranslate('${player_name} discards ${number} cards(s) for the selected research'), [
                 'playerId' => $playerId,
                 'player_name' => $this->getPlayerName($playerId),
-                'cards' => $cardsToDiscard,
+                'cards' => $tilesToDiscard,
                 'number' => $recruits, // for logs
-                'cardDiscardCount' => intval($this->cards->countCardInLocation('discard')),
+                'cardDiscardCount' => intval($this->tiles->countCardInLocation('discard')),
             ]);
         }
 
-        $destinationIndex = intval($this->destinations->countCardInLocation('played'.$playerId));
-        $this->destinations->moveCard($destination->id, 'played'.$playerId, $destinationIndex);
+        $researchIndex = intval($this->research->countCardInLocation('played'.$playerId));
+        $this->research->moveCard($research->id, 'played'.$playerId, $researchIndex);
 
-        $effectiveGains = $this->gainResources($playerId, $destination->immediateGains, 'explore');
-        $type = $destination->type == 2 ? 'B' : 'A';
+        $effectiveGains = $this->gainResources($playerId, $research->immediateGains, 'explore');
+        $type = $research->type == 2 ? 'B' : 'A';
 
-        self::notifyAllPlayers('takeDestination', clienttranslate('${player_name} takes a destination from line ${letter} and gains ${gains}'), [
+        self::notifyAllPlayers('takeDestination', clienttranslate('${player_name} takes a research from line ${letter} and gains ${gains}'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'destination' => $destination,
+            'research' => $research,
             'effectiveGains' => $effectiveGains,
             'gains' => $effectiveGains, // for logs
             'letter' => $type, // for logs
@@ -235,8 +235,8 @@ trait ActionTrait {
                     
         $this->incStat(1, 'discoveredDestinations');
         $this->incStat(1, 'discoveredDestinations', $playerId);
-        $this->incStat(1, 'discoveredDestinations'.$destination->type);
-        $this->incStat(1, 'discoveredDestinations'.$destination->type, $playerId);
+        $this->incStat(1, 'discoveredDestinations'.$research->type);
+        $this->incStat(1, 'discoveredDestinations'.$research->type, $playerId);
 
         $allGains = array_reduce($effectiveGains, fn($a, $b) => $a + $b, 0);
         $this->incStat($allGains, 'assetsCollectedByDestination');
@@ -251,58 +251,33 @@ trait ActionTrait {
         $remainingCardsToTake = $this->getGlobalVariable(REMAINING_CARDS_TO_TAKE);
         if ($remainingCardsToTake != null) {
             $remainingCardsToTake->fromReserve = $fromReserve;
-            $remainingCardsToTake->destination = $destination;
-            $remainingCardsToTake->destinationIndex = $destinationIndex;
+            $remainingCardsToTake->research = $research;
+            $remainingCardsToTake->researchIndex = $researchIndex;
             $this->setGlobalVariable(REMAINING_CARDS_TO_TAKE, $remainingCardsToTake);
 
             $this->gamestate->nextState('discardCardsForDeck');
         } else {
-            $this->endExplore($playerId, $fromReserve, $destination, $destinationIndex);
+            $this->endExplore($playerId, $fromReserve, $research, $researchIndex);
         }
     }
 
-    public function endExplore(int $playerId, bool $fromReserve, object $destination, int $destinationIndex) {
+    public function endExplore(int $playerId, bool $fromReserve, object $research, int $researchIndex) {
         if (!$fromReserve) {
-            $type = $destination->type == 2 ? 'B' : 'A';
-            $newDestination = $this->getDestinationFromDb($this->destinations->pickCardForLocation('deck'.$type, 'slot'.$type, $destination->locationArg));
+            $type = $research->type == 2 ? 'B' : 'A';
+            $newDestination = $this->getDestinationFromDb($this->research->pickCardForLocation('deck'.$type, 'slot'.$type, $research->locationArg));
             $newDestination->location = 'slot'.$type;
-            $newDestination->locationArg = $destination->locationArg;
+            $newDestination->locationArg = $research->locationArg;
 
             self::notifyAllPlayers('newTableDestination', '', [
-                'destination' => $newDestination,
+                'research' => $newDestination,
                 'letter' => $type,
-                'destinationDeckTop' => Destination::onlyId($this->getDestinationFromDb($this->destinations->getCardOnTop('deck'.$type))),
-                'destinationDeckCount' => intval($this->destinations->countCardInLocation('deck'.$type)),
+                'researchDeckTop' => Destination::onlyId($this->getDestinationFromDb($this->research->getCardOnTop('deck'.$type))),
+                'researchDeckCount' => intval($this->research->countCardInLocation('deck'.$type)),
             ]);
         }
 
         $this->setGameStateValue(RECRUIT_DONE, 1);
         $this->setGameStateValue(EXPLORE_DONE, 1);
-
-        if ($this->getVariantOption() >= 2) {
-            $artifacts = $this->getGlobalVariable(ARTIFACTS, true) ?? [];
-            if (in_array(ARTIFACT_HELMET, $artifacts) && $destinationIndex > 0 && $destination->type == 2) {
-                $previousDestination = $this->getDestinationsByLocation('played'.$playerId)[$destinationIndex - 1];
-                if ($previousDestination->type == 1) {
-                    $this->setGameStateValue(RECRUIT_DONE, 0);
-                    self::notifyAllPlayers('log', clienttranslate('${player_name} can do the recruit action thanks to ${artifact_name} effect'), [
-                        'player_name' => $this->getPlayerName($playerId),
-                        'artifact_name' => $this->getArtifactName(ARTIFACT_HELMET), // for logs
-                        'i18n' => ['artifact_name'],
-                    ]);
-
-                    $this->incStat(1, 'activatedArtifacts');
-                    $this->incStat(1, 'activatedArtifacts', $playerId);
-                }
-            }
-
-            if (in_array(ARTIFACT_MEAD_CUP, $artifacts)) {
-                $this->setGameStateValue(GO_DISCARD_TABLE_CARD, 1);
-
-                $this->incStat(1, 'activatedArtifacts');
-                $this->incStat(1, 'activatedArtifacts', $playerId);
-            }
-        }
 
         $this->redirectAfterAction($playerId, true);
     }
@@ -312,31 +287,31 @@ trait ActionTrait {
 
         $playerId = intval($this->getActivePlayerId());
 
-        $destination = $this->getDestinationFromDb($this->destinations->getCard($id));
+        $research = $this->getDestinationFromDb($this->research->getCard($id));
 
-        if ($destination == null || !in_array($destination->location, ['slotA', 'slotB'])) {
-            throw new BgaUserException("You can't reserve this destination");
+        if ($research == null || !in_array($research->location, ['slotA', 'slotB'])) {
+            throw new BgaUserException("You can't reserve this research");
         }
 
-        $this->destinations->moveCard($destination->id, 'reserved', $playerId);
-        $type = $destination->type == 2 ? 'B' : 'A';
+        $this->research->moveCard($research->id, 'reserved', $playerId);
+        $type = $research->type == 2 ? 'B' : 'A';
 
-        self::notifyAllPlayers('reserveDestination', clienttranslate('${player_name} takes a destination from line ${letter}'), [
+        self::notifyAllPlayers('reserveDestination', clienttranslate('${player_name} takes a research from line ${letter}'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'destination' => $destination,
+            'research' => $research,
             'letter' => $type, // for logs
         ]);
 
-        $newDestination = $this->getDestinationFromDb($this->destinations->pickCardForLocation('deck'.$type, 'slot'.$type, $destination->locationArg));
+        $newDestination = $this->getDestinationFromDb($this->research->pickCardForLocation('deck'.$type, 'slot'.$type, $research->locationArg));
         $newDestination->location = 'slot'.$type;
-        $newDestination->locationArg = $destination->locationArg;
+        $newDestination->locationArg = $research->locationArg;
 
         self::notifyAllPlayers('newTableDestination', '', [
-            'destination' => $newDestination,
+            'research' => $newDestination,
             'letter' => $type,
-            'destinationDeckTop' => Destination::onlyId($this->getDestinationFromDb($this->destinations->getCardOnTop('deck'.$type))),
-            'destinationDeckCount' => intval($this->destinations->countCardInLocation('deck'.$type)),
+            'researchDeckTop' => Destination::onlyId($this->getDestinationFromDb($this->research->getCardOnTop('deck'.$type))),
+            'researchDeckCount' => intval($this->research->countCardInLocation('deck'.$type)),
         ]);
 
         $this->gamestate->nextState('next');
@@ -347,32 +322,32 @@ trait ActionTrait {
 
         $playerId = intval($this->getActivePlayerId());
 
-        $card = $this->getCardFromDb($this->cards->getCard($id));
+        $tile = $this->getTileFromDb($this->tiles->getCard($id));
 
-        if ($card == null || $card->location != 'slot') {
+        if ($tile == null || $tile->location != 'slot') {
             throw new BgaUserException("You can't discard this card");
         }
-        $slotColor = $card->locationArg;
+        $slotColor = $tile->locationArg;
         
-        $this->cards->moveCard($card->id, 'discard');
+        $this->tiles->moveCard($tile->id, 'discard');
 
         self::notifyAllPlayers('discardTableCard', clienttranslate('${player_name} discards ${card_color} ${card_type} card from the table (${color} column)'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'card' => $card,
+            'card' => $tile,
             'color' => $this->getColorName($slotColor), // for logs
-            'card_type' => $this->getGainName($card->gain), // for logs
-            'card_color' => $this->getColorName($card->color), // for logs
+            'card_type' => $this->getGainName($tile->gain), // for logs
+            'card_color' => $this->getColorName($tile->color), // for logs
         ]);
 
-        $newTableCard = $this->getCardFromDb($this->cards->pickCardForLocation('deck', 'slot', $slotColor));
+        $newTableCard = $this->getTileFromDb($this->tiles->pickCardForLocation('deck', 'slot', $slotColor));
         $newTableCard->location = 'slot';
         $newTableCard->locationArg = $slotColor;
 
         self::notifyAllPlayers('newTableCard', '', [
             'card' => $newTableCard,
-            'cardDeckTop' => Card::onlyId($this->getCardFromDb($this->cards->getCardOnTop('deck'))),
-            'cardDeckCount' => intval($this->cards->countCardInLocation('deck')) + 1, // to count the new card
+            'cardDeckTop' => Tile::onlyId($this->getTileFromDb($this->tiles->getCardOnTop('deck'))),
+            'cardDeckCount' => intval($this->tiles->countCardInLocation('deck')) + 1, // to count the new card
         ]);
 
         $this->redirectAfterAction($playerId, true);
@@ -460,19 +435,19 @@ trait ActionTrait {
 
         $playerId = intval($this->getCurrentPlayerId());
 
-        $card = $this->getCardFromDb($this->cards->getCard($id));
+        $tile = $this->getTileFromDb($this->tiles->getCard($id));
 
-        if ($card == null || !str_starts_with($card->location, "played$playerId")) {
+        if ($tile == null || !str_starts_with($tile->location, "played$playerId")) {
             throw new BgaUserException("You must choose a card in front of you");
         }
 
-        $this->cards->moveCard($card->id, 'discard');
+        $this->tiles->moveCard($tile->id, 'discard');
 
         self::notifyAllPlayers('discardCards', clienttranslate('${player_name} discards a cards to refill the deck'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'cards' => [$card],
-            'cardDiscardCount' => intval($this->cards->countCardInLocation('discard')),
+            'cards' => [$tile],
+            'cardDiscardCount' => intval($this->tiles->countCardInLocation('discard')),
         ]);
 
         $this->incStat(1, 'discardedCards');

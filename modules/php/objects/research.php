@@ -30,28 +30,28 @@ class Destination extends DestinationType {
         $this->number = array_key_exists('card_type_arg', $dbCard) || array_key_exists('type_arg', $dbCard) ? intval($dbCard['card_type_arg'] ?? $dbCard['type_arg']) : null;
 
         if ($this->number !== null) {
-            $cardType = $DESTINATIONS[$this->number];
-            $this->cost = $cardType->cost;
-            $this->immediateGains = $cardType->immediateGains;
-            $this->gains = $cardType->gains;
+            $tileType = $DESTINATIONS[$this->number];
+            $this->cost = $tileType->cost;
+            $this->immediateGains = $tileType->immediateGains;
+            $this->gains = $tileType->gains;
         }
     } 
 
-    public static function onlyId(?Destination $card) {
-        if ($card == null) {
+    public static function onlyId(?Destination $tile) {
+        if ($tile == null) {
             return null;
         }
         
         return new Destination([
-            'card_id' => $card->id,
-            'card_location' => $card->location,
-            'card_location_arg' => $card->locationArg,
-            'card_type' => $card->type,
+            'card_id' => $tile->id,
+            'card_location' => $tile->location,
+            'card_location_arg' => $tile->locationArg,
+            'card_type' => $tile->type,
         ], null);
     }
 
-    public static function onlyIds(array $cards) {
-        return array_map(fn($card) => self::onlyId($card), $cards);
+    public static function onlyIds(array $tiles) {
+        return array_map(fn($tile) => self::onlyId($tile), $tiles);
     }
 }
 

@@ -23,13 +23,13 @@ interface Destination {
 
 interface HumanityPlayer extends Player {
     playerNo: number;
-    reputation: number;
+    research: number;
     recruit: number;
     bracelet: number;
     //handCount: number;
     hand?: Card[];
     playedCards: { [color: number]: Card[] };
-    destinations: Destination[];
+    research: Destination[];
     reservedDestinations?: Destination[];
 }
 
@@ -53,17 +53,14 @@ interface HumanityGamedatas {
     centerDestinationsDeckTop: { [letter: string]: Destination };
     centerDestinationsDeckCount: { [letter: string]: number };
     centerDestinations: { [letter: string]: Destination[] };
-    boatSideOption: number;
-    variantOption: number;
     artifacts?: number[];
     firstPlayerId: number;
     lastTurn: boolean;
-    reservePossible: boolean;
 }
 
 interface HumanityGame extends Game {
     cardsManager: CardsManager;
-    destinationsManager: DestinationsManager;
+    researchManager: DestinationsManager;
     artifactsManager: ArtifactsManager;
 
     getPlayerId(): number;
@@ -72,14 +69,12 @@ interface HumanityGame extends Game {
     //getColor(color: number): string;
     getTooltipGain(type: number): string;
     getTooltipColor(color: number): string;
-    getBoatSide(): number;
-    getVariantOption(): number;
     getGameStateName(): string;
     getCurrentPlayerTable(): PlayerTable | null;
 
     setTooltip(id: string, html: string): void;
     highlightPlayerTokens(playerId: number | null): void;
-    onTableDestinationClick(destination: Destination): void;
+    onTableDestinationClick(research: Destination): void;
     onHandCardClick(card: Card): void;
     onTableCardClick(card: Card): void;
     onPlayedCardClick(card: Card): void;
@@ -128,16 +123,16 @@ interface NotifNewCardArgs {
 // takeDestination
 interface NotifTakeDestinationArgs {
     playerId: number;
-    destination: Destination;
+    research: Destination;
     effectiveGains: { [type: number]: number };
 }
 
 // newTableDestination
 interface NotifNewTableDestinationArgs {
-    destination: Destination;
+    research: Destination;
     letter: string;    
-    destinationDeckTop?: Destination;
-    destinationDeckCount: number;
+    researchDeckTop?: Destination;
+    researchDeckCount: number;
 }
 
 // trade
@@ -161,7 +156,7 @@ interface NotifDiscardTableCardArgs {
 // reserveDestination
 interface NotifReserveDestinationArgs {
     playerId: number;
-    destination: Destination;
+    research: Destination;
 }
 
 // score

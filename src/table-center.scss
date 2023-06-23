@@ -10,11 +10,11 @@
   grid-template-columns: 120px 690px;
   gap: 8px;
 
-  .table-destinations-deck {
+  .table-research-deck {
     margin-left: -102px;
   }
 
-  #table-destinations-A, #table-destinations-B {
+  #table-research-A, #table-research-B {
     .slot {      
       width: 221px;
       height: 120px;
@@ -46,8 +46,8 @@
         &.vp {
           background-image: url('img/vp-pawns.png');
         }
-        &.reputation {
-          background-image: url('img/reputation-pawns.png');
+        &.research {
+          background-image: url('img/research-pawns.png');
         }
       }
         
