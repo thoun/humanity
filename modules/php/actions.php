@@ -63,7 +63,7 @@ trait ActionTrait {
         if ($argChooseNewCard['allFree']) {
             self::notifyAllPlayers('log', clienttranslate('${player_name} can recruit any viking for free thanks to ${objective_name} effect'), [
                 'player_name' => $this->getPlayerName($playerId),
-                'objective_name' => $this->getObjectiveName(OBJECTIVE_CAULDRON), // for logs
+                'objective_name' => '', // for logs
                 'i18n' => ['objective_name'],
             ]);
         }
@@ -271,7 +271,7 @@ trait ActionTrait {
             self::notifyAllPlayers('newTableDestination', '', [
                 'research' => $newDestination,
                 'letter' => $type,
-                'researchDeckTop' => Destination::onlyId($this->getDestinationFromDb($this->research->getCardOnTop('deck'.$type))),
+                'researchDeckTop' => Research::onlyId($this->getDestinationFromDb($this->research->getCardOnTop('deck'.$type))),
                 'researchDeckCount' => intval($this->research->countCardInLocation('deck'.$type)),
             ]);
         }
@@ -310,7 +310,7 @@ trait ActionTrait {
         self::notifyAllPlayers('newTableDestination', '', [
             'research' => $newDestination,
             'letter' => $type,
-            'researchDeckTop' => Destination::onlyId($this->getDestinationFromDb($this->research->getCardOnTop('deck'.$type))),
+            'researchDeckTop' => Research::onlyId($this->getDestinationFromDb($this->research->getCardOnTop('deck'.$type))),
             'researchDeckCount' => intval($this->research->countCardInLocation('deck'.$type)),
         ]);
 

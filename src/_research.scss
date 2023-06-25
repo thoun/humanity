@@ -1,15 +1,26 @@
-.humanity-research {
+.card.research {
   display: inline-block;
   position: relative;
   width: 221px;
   height: 120px;
   border-radius: 8px;
 
+  @for $year from 1 through 3 {
+      &[data-year="#{$year}"] .front {
+        background-image: url('img/research-age#{$year}.png');
+      }
+  }
+
   .card-sides {
       .card-side {
           border-radius: 8px;
-          background-size: 200% auto;
-          background-image: url('img/research.jpg');
+          background-size: auto 100%;
+
+          @for $number from 1 through 9 {
+              &[data-number="#{$number}"] {
+                  background-position-y: #{($number - 1) * 100% / 8};
+              }
+          }
 
           &>* {
               pointer-events: none;

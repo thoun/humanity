@@ -201,7 +201,7 @@ trait UtilTrait {
         if ($dbCard == null) {
             return null;
         }
-        return new Destination($dbCard, $this->RESEARCH);
+        return new Research($dbCard, $this->RESEARCH);
     }
 
     function getDestinationsFromDb(array $dbCards) {
@@ -224,20 +224,19 @@ trait UtilTrait {
         return array_map(fn($dbCard) => $this->getDestinationFromDb($dbCard), array_values($dbResults));
     }
 
-    function setupDestinations() {
-        $tiles[] = ['A' => [], 'B' => []];
-        foreach ($this->RESEARCH as $number => $researchType) {
-            $tiles[$number > 20 ? 'B' : 'A'][] = [ 'type' => $number > 20 ? 2 : 1, 'type_arg' => $number, 'nbr' => 1 ];
-        }
-        foreach (['A', 'B'] as $type) {
-            $this->research->createCards($tiles[$type], 'deck'.$type);
-            $this->research->shuffle('deck'.$type);
+    function setupResearches() {
+        $tiles[] = [1 => [], 2 => [], 3 => []];
+        foreach ([1, 2, 3] as $year) {
+            foreach ($this->RESEARCH[$year] as $number => $researchType) {
+                $tiles[$year][] = [ 'type' => $year, 'type_arg' => $number, 'nbr' => 1 ];
+            }
+
+            $this->research->createCards($tiles[$year], 'deck'.$year);
+            $this->research->shuffle('deck'.$year);
         }
 
-        foreach ([1,2,3] as $slot) {
-            foreach (['A', 'B'] as $type) {
-                $this->research->pickCardForLocation('deck'.$type, 'slot'.$type, $slot);
-            }
+        for ($place = 1; $place <= 7; $place++) {
+            $this->research->pickCardForLocation('deck1', 'table', $place);
         }
     }
 
@@ -366,7 +365,7 @@ trait UtilTrait {
         return $effectiveGains;
     }
 
-    function canTakeDestination(Destination $research, array $playedCardsColors, int $recruits, bool $strict) {
+    function canTakeDestination(Research $research, array $playedCardsColors, int $recruits, bool $strict) {
         $missingCards = 0;
 
         foreach ($research->cost as $color => $required) {
@@ -408,15 +407,7 @@ trait UtilTrait {
     }
 
     function getObjectiveName(int $objective) {
-        switch ($objective) {
-            case OBJECTIVE_MEAD_CUP: return clienttranslate("Mead Cup");
-            case OBJECTIVE_SILVER_COIN: return clienttranslate("Silver coin");
-            case OBJECTIVE_CAULDRON: return clienttranslate("Cauldron");
-            case OBJECTIVE_GOLDEN_BRACELET: return clienttranslate("Golden bracelet");
-            case OBJECTIVE_HELMET: return clienttranslate("Helmet");
-            case OBJECTIVE_AMULET: return clienttranslate("Amulet");
-            case OBJECTIVE_WEATHERVANE: return clienttranslate("Weathervane");
-        }
+        return '';
     }
 
     function powerTakeCard(int $playerId) {
@@ -487,91 +478,10 @@ trait UtilTrait {
     }
 
     function checkObjective(int $playerId, int $objective) {
-        switch ($objective) {
-            case OBJECTIVE_SILVER_COIN:
-                $playedCardColor = intval($this->getGameStateValue(PLAYED_CARD_COLOR));
-                if ($playedCardColor > 0) {
-                    $playedCardsColors = $this->getPlayedCardsColor($playerId);
-                    if ($playedCardsColors[$playedCardColor] > 3) {
-                        $groupGains = [
-                            VP => 1,
-                        ];
-                        $effectiveGains = $this->gainResources($playerId, $groupGains, 'objective:silver-coins');
-    
-                        self::notifyAllPlayers('trade', clienttranslate('${player_name} gains ${gains} with objective ${objective_name} effect'), [
-                            'playerId' => $playerId,
-                            'player_name' => $this->getPlayerName($playerId),
-                            'effectiveGains' => $effectiveGains,
-                            'gains' => $effectiveGains, // for logs
-                            'objective_name' => $this->getObjectiveName($objective), // for logs
-                            'i18n' => ['objective_name'],
-                        ]);
-
-                        $this->incStat(1, 'activatedObjectives');
-                        $this->incStat(1, 'activatedObjectives', $playerId);
-                    }
-                }
-                break;
-            case OBJECTIVE_GOLDEN_BRACELET:
-                $playedCardColor = intval($this->getGameStateValue(PLAYED_CARD_COLOR));
-                if ($playedCardColor > 0) {
-                    $playedCardsColors = $this->getPlayedCardsColor($playerId);
-                    if ($playedCardsColors[$playedCardColor] == 3) {
-                        $this->setGameStateValue(GO_RESERVE, 1);
-
-                        $this->incStat(1, 'activatedObjectives');
-                        $this->incStat(1, 'activatedObjectives', $playerId);
-                    }
-                }
-                break;
-        }
     }
 
     function checkEndTurnObjective(int $playerId, int $objective) {
-        $endTurn = true;
-        switch ($objective) {
-            case OBJECTIVE_AMULET:
-                if ($this->completedAPlayedLine($playerId)) {
-                    $groupGains = [
-                        BRACELET => 1,
-                        RECRUIT => 1,
-                        RESEARCH => 1,
-                    ];
-                    $effectiveGains = $this->gainResources($playerId, $groupGains, 'objective:amulet');
-
-                    self::notifyAllPlayers('trade', clienttranslate('${player_name} gains ${gains} with objective ${objective_name} effect'), [
-                        'playerId' => $playerId,
-                        'player_name' => $this->getPlayerName($playerId),
-                        'effectiveGains' => $effectiveGains,
-                        'gains' => $effectiveGains, // for logs
-                        'objective_name' => $this->getObjectiveName($objective), // for logs
-                        'i18n' => ['objective_name'],
-                    ]);
-
-                    $this->incStat(1, 'activatedObjectives');
-                    $this->incStat(1, 'activatedObjectives', $playerId);
-                }
-                break;
-            case OBJECTIVE_WEATHERVANE:
-                if ($this->completedAPlayedLine($playerId)) {
-                    $this->setGameStateValue(EXPLORE_DONE, 0);
-                    $this->setGameStateValue(COMPLETED_LINES, 999); // make sure the bonus turn doesn't retrigger the effect
-
-                    self::notifyAllPlayers('log', clienttranslate('${player_name} can explore with objective ${objective_name} effect'), [
-                        'playerId' => $playerId,
-                        'player_name' => $this->getPlayerName($playerId),
-                        'objective_name' => $this->getObjectiveName($objective), // for logs
-                        'i18n' => ['objective_name'],
-                    ]);
-
-                    $this->incStat(1, 'activatedObjectives');
-                    $this->incStat(1, 'activatedObjectives', $playerId);
-                    
-                    $endTurn = false;
-                }
-                break;
-        }
-        return $endTurn;
+        return false;
     }
 
     function getAvailableDeckCards() {

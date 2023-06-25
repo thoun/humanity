@@ -594,149 +594,184 @@ body > .card {
     box-shadow: 0 0 5px 3px rgb(255, 212, 131);
   }
 }
-.humanity-research {
+.card.research {
   display: inline-block;
   position: relative;
   width: 221px;
   height: 120px;
   border-radius: 8px;
 }
-.humanity-research .card-sides .card-side {
-  border-radius: 8px;
-  background-size: 200% auto;
-  background-image: url("img/research.jpg");
+.card.research[data-year="1"] .front {
+  background-image: url("img/research-age1.png");
 }
-.humanity-research .card-sides .card-side > * {
+.card.research[data-year="2"] .front {
+  background-image: url("img/research-age2.png");
+}
+.card.research[data-year="3"] .front {
+  background-image: url("img/research-age3.png");
+}
+.card.research .card-sides .card-side {
+  border-radius: 8px;
+  background-size: auto 100%;
+}
+.card.research .card-sides .card-side[data-number="1"] {
+  background-position-y: 0%;
+}
+.card.research .card-sides .card-side[data-number="2"] {
+  background-position-y: 12.5%;
+}
+.card.research .card-sides .card-side[data-number="3"] {
+  background-position-y: 25%;
+}
+.card.research .card-sides .card-side[data-number="4"] {
+  background-position-y: 37.5%;
+}
+.card.research .card-sides .card-side[data-number="5"] {
+  background-position-y: 50%;
+}
+.card.research .card-sides .card-side[data-number="6"] {
+  background-position-y: 62.5%;
+}
+.card.research .card-sides .card-side[data-number="7"] {
+  background-position-y: 75%;
+}
+.card.research .card-sides .card-side[data-number="8"] {
+  background-position-y: 87.5%;
+}
+.card.research .card-sides .card-side[data-number="9"] {
+  background-position-y: 100%;
+}
+.card.research .card-sides .card-side > * {
   pointer-events: none;
   user-select: none;
 }
-.humanity-research.bga-cards_selectable-card:not(.bga-cards_disabled-card):not(.bga-cards_selected-card) {
+.card.research.bga-cards_selectable-card:not(.bga-cards_disabled-card):not(.bga-cards_selected-card) {
   animation: selectable-card-animation 1s alternate infinite ease-in-out;
 }
-.humanity-research.bga-cards_selectable-card:not(.bga-cards_disabled-card) .card-side {
+.card.research.bga-cards_selectable-card:not(.bga-cards_disabled-card) .card-side {
   box-shadow: unset;
 }
-.humanity-research.bga-cards_selected-card:not(.bga-cards_disabled-card) {
+.card.research.bga-cards_selected-card:not(.bga-cards_disabled-card) {
   box-shadow: 0 0 5px 5px orange;
 }
-.humanity-research.bga-cards_selected-card:not(.bga-cards_disabled-card) .card-side {
+.card.research.bga-cards_selected-card:not(.bga-cards_disabled-card) .card-side {
   box-shadow: unset;
 }
-.humanity-research.selected-pay-research {
+.card.research.selected-pay-research {
   outline: 5px solid orange;
 }
-.humanity-research.selected-pay-research .card-side {
+.card.research.selected-pay-research .card-side {
   box-shadow: unset;
 }
-.humanity-research[data-type="1"] .card-side {
+.card.research[data-type="1"] .card-side {
   background-position-x: 0%;
 }
-.humanity-research[data-type="2"] .card-side {
+.card.research[data-type="2"] .card-side {
   background-position-x: 100%;
 }
-.humanity-research[data-type="1"] .front[data-number="1"] {
+.card.research[data-type="1"] .front[data-number="1"] {
   background-position-y: 5%;
 }
-.humanity-research[data-type="1"] .front[data-number="2"] {
+.card.research[data-type="1"] .front[data-number="2"] {
   background-position-y: 10%;
 }
-.humanity-research[data-type="1"] .front[data-number="3"] {
+.card.research[data-type="1"] .front[data-number="3"] {
   background-position-y: 15%;
 }
-.humanity-research[data-type="1"] .front[data-number="4"] {
+.card.research[data-type="1"] .front[data-number="4"] {
   background-position-y: 20%;
 }
-.humanity-research[data-type="1"] .front[data-number="5"] {
+.card.research[data-type="1"] .front[data-number="5"] {
   background-position-y: 25%;
 }
-.humanity-research[data-type="1"] .front[data-number="6"] {
+.card.research[data-type="1"] .front[data-number="6"] {
   background-position-y: 30%;
 }
-.humanity-research[data-type="1"] .front[data-number="7"] {
+.card.research[data-type="1"] .front[data-number="7"] {
   background-position-y: 35%;
 }
-.humanity-research[data-type="1"] .front[data-number="8"] {
+.card.research[data-type="1"] .front[data-number="8"] {
   background-position-y: 40%;
 }
-.humanity-research[data-type="1"] .front[data-number="9"] {
+.card.research[data-type="1"] .front[data-number="9"] {
   background-position-y: 45%;
 }
-.humanity-research[data-type="1"] .front[data-number="10"] {
+.card.research[data-type="1"] .front[data-number="10"] {
   background-position-y: 50%;
 }
-.humanity-research[data-type="1"] .front[data-number="11"] {
+.card.research[data-type="1"] .front[data-number="11"] {
   background-position-y: 55%;
 }
-.humanity-research[data-type="1"] .front[data-number="12"] {
+.card.research[data-type="1"] .front[data-number="12"] {
   background-position-y: 60%;
 }
-.humanity-research[data-type="1"] .front[data-number="13"] {
+.card.research[data-type="1"] .front[data-number="13"] {
   background-position-y: 65%;
 }
-.humanity-research[data-type="1"] .front[data-number="14"] {
+.card.research[data-type="1"] .front[data-number="14"] {
   background-position-y: 70%;
 }
-.humanity-research[data-type="1"] .front[data-number="15"] {
+.card.research[data-type="1"] .front[data-number="15"] {
   background-position-y: 75%;
 }
-.humanity-research[data-type="1"] .front[data-number="16"] {
+.card.research[data-type="1"] .front[data-number="16"] {
   background-position-y: 80%;
 }
-.humanity-research[data-type="1"] .front[data-number="17"] {
+.card.research[data-type="1"] .front[data-number="17"] {
   background-position-y: 85%;
 }
-.humanity-research[data-type="1"] .front[data-number="18"] {
+.card.research[data-type="1"] .front[data-number="18"] {
   background-position-y: 90%;
 }
-.humanity-research[data-type="1"] .front[data-number="19"] {
+.card.research[data-type="1"] .front[data-number="19"] {
   background-position-y: 95%;
 }
-.humanity-research[data-type="1"] .front[data-number="20"] {
+.card.research[data-type="1"] .front[data-number="20"] {
   background-position-y: 100%;
 }
-.humanity-research[data-type="2"] .front[data-number="21"] {
+.card.research[data-type="2"] .front[data-number="21"] {
   background-position-y: 5%;
 }
-.humanity-research[data-type="2"] .front[data-number="22"] {
+.card.research[data-type="2"] .front[data-number="22"] {
   background-position-y: 10%;
 }
-.humanity-research[data-type="2"] .front[data-number="23"] {
+.card.research[data-type="2"] .front[data-number="23"] {
   background-position-y: 15%;
 }
-.humanity-research[data-type="2"] .front[data-number="24"] {
+.card.research[data-type="2"] .front[data-number="24"] {
   background-position-y: 20%;
 }
-.humanity-research[data-type="2"] .front[data-number="25"] {
+.card.research[data-type="2"] .front[data-number="25"] {
   background-position-y: 25%;
 }
-.humanity-research[data-type="2"] .front[data-number="26"] {
+.card.research[data-type="2"] .front[data-number="26"] {
   background-position-y: 30%;
 }
-.humanity-research[data-type="2"] .front[data-number="27"] {
+.card.research[data-type="2"] .front[data-number="27"] {
   background-position-y: 35%;
 }
-.humanity-research[data-type="2"] .front[data-number="28"] {
+.card.research[data-type="2"] .front[data-number="28"] {
   background-position-y: 40%;
 }
-.humanity-research[data-type="2"] .front[data-number="29"] {
+.card.research[data-type="2"] .front[data-number="29"] {
   background-position-y: 45%;
 }
-.humanity-research[data-type="2"] .front[data-number="30"] {
+.card.research[data-type="2"] .front[data-number="30"] {
   background-position-y: 50%;
 }
-.humanity-research[data-type="2"] .front[data-number="31"] {
+.card.research[data-type="2"] .front[data-number="31"] {
   background-position-y: 55%;
 }
-.humanity-research[data-type="2"] .front[data-number="32"] {
+.card.research[data-type="2"] .front[data-number="32"] {
   background-position-y: 60%;
 }
-.humanity-research[data-type="2"] .front[data-number="33"] {
+.card.research[data-type="2"] .front[data-number="33"] {
   background-position-y: 65%;
 }
-.humanity-research[data-type="2"] .front[data-number="34"] {
+.card.research[data-type="2"] .front[data-number="34"] {
   background-position-y: 70%;
 }
-.humanity-research[data-type="2"] .front[data-number="35"] {
+.card.research[data-type="2"] .front[data-number="35"] {
   background-position-y: 75%;
 }
 

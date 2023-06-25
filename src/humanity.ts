@@ -596,7 +596,7 @@ class Humanity implements HumanityGame {
         }
     }
     
-    public onTableDestinationClick(research: Destination): void {
+    public onTableDestinationClick(research: Research): void {
         if (this.gamedatas.gamestate.name == 'reserveDestination') {
             this.reserveDestination(research.id);
         } else {

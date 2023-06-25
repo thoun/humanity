@@ -145,7 +145,7 @@ class Humanity extends Table {
 
         // setup the initial game situation here
         //$this->setupTiles(array_keys($players));
-        //$this->setupDestinations();
+        $this->setupResearches();
         $this->setupObjectives();
 
         // Activate first player (which is in general a good idea :) )
@@ -209,11 +209,9 @@ class Humanity extends Table {
         $result['centerDestinationsDeckCount'] = [];
         $result['centerDestinations'] = [];
 
-        foreach (['A', 'B'] as $letter) {
-            $result['centerDestinationsDeckTop'][$letter] = Destination::onlyId($this->getDestinationFromDb($this->research->getCardOnTop('deck'.$letter)));
-            $result['centerDestinationsDeckCount'][$letter] = intval($this->research->countCardInLocation('deck'.$letter));
-            $result['centerDestinations'][$letter] = $this->getDestinationsByLocation('slot'.$letter);
-        }
+        //$result['centerDestinationsDeckTop'] = Research::onlyId($this->getDestinationFromDb($this->research->getCardOnTop('deck'.$letter)));
+        //$result['centerDestinationsDeckCount'] = intval($this->research->countCardInLocation('deck'.$letter));
+        $result['tableResearch'] = $this->getDestinationsByLocation('table');
 
         $result['tableObjectives'] = $this->getObjectivesByLocation('table');        
 

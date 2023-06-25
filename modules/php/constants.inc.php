@@ -14,13 +14,6 @@ define('BRACELET', 2);
 define('RECRUIT', 3);
 define('RESEARCH', 4);
 define('CARD', 5);
-define('OBJECTIVE_MEAD_CUP', 1);
-define('OBJECTIVE_SILVER_COIN', 2);
-define('OBJECTIVE_CAULDRON', 3);
-define('OBJECTIVE_GOLDEN_BRACELET', 4);
-define('OBJECTIVE_HELMET', 5);
-define('OBJECTIVE_AMULET', 6);
-define('OBJECTIVE_WEATHERVANE', 7);
 
 /*
  * Color
@@ -54,6 +47,12 @@ define('PROTEIN', 13);
 define('LEFT', 1);
 define('CENTRAL', 2);
 define('RIGHT', 3);
+
+/*
+ * RESEARCH POWERS
+ */
+const RESEARCH_POWER_REACTIVATE = 1;
+const RESEARCH_POWER_TIME = 2;
 
 /*
  * State constants

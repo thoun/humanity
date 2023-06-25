@@ -3,8 +3,7 @@
     <div id="tables-and-center">
         <div id="table-center-wrapper">
             <div id="table-center">
-                <div id="table-research-B-deck" class="table-research-deck"></div> <div id="table-research-B"></div>
-                <div id="table-research-A-deck" class="table-research-deck"></div> <div id="table-research-A"></div>
+                <div id="table-research-deck" class="table-research-deck"></div> <div id="table-research"></div>
                 <div></div> <div id="board"></div>
                 <div id="card-deck"></div> <div id="table-cards"></div>
             </div>

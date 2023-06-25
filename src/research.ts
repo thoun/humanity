@@ -1,13 +1,13 @@
-class DestinationsManager extends CardManager<Destination> {
+class DestinationsManager extends CardManager<Research> {
     constructor (public game: HumanityGame) {
         super(game, {
             getId: (card) => `research-${card.id}`,
-            setupDiv: (card: Destination, div: HTMLElement) => {
-                div.classList.add('humanity-research');
+            setupDiv: (card: Research, div: HTMLElement) => {
+                div.classList.add('research');
                 div.dataset.cardId = ''+card.id;
-                div.dataset.type = ''+card.type;
+                div.dataset.year = ''+card.year;
             },
-            setupFrontDiv: (card: Destination, div: HTMLElement) => { 
+            setupFrontDiv: (card: Research, div: HTMLElement) => { 
                 div.dataset.number = ''+card.number;
                 if (card.number) {
                     game.setTooltip(div.id, this.getTooltip(card));
@@ -41,14 +41,14 @@ class DestinationsManager extends CardManager<Destination> {
         }
     }
 
-    private getTooltip(research: Destination): string {
-        let message = `
+    private getTooltip(research: Research): string {
+        let message = `TODO`;/*
         <strong>${_("Exploration cost:")}</strong> ${this.getCost(research.cost)} (recruits can be used as jokers)
         <br>
         <strong>${_("Immediate gains:")}</strong> ${this.getGains(research.immediateGains)}
         <br>
         <strong>${_("Type:")}</strong> ${this.getType(research.type)}
-        `;
+        `;*/
  
         return message;
     }

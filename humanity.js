@@ -2027,9 +2027,9 @@ var DestinationsManager = /** @class */ (function (_super) {
         var _this = _super.call(this, game, {
             getId: function (card) { return "research-".concat(card.id); },
             setupDiv: function (card, div) {
-                div.classList.add('humanity-research');
+                div.classList.add('research');
                 div.dataset.cardId = '' + card.id;
-                div.dataset.type = '' + card.type;
+                div.dataset.year = '' + card.year;
             },
             setupFrontDiv: function (card, div) {
                 div.dataset.number = '' + card.number;
@@ -2068,7 +2068,13 @@ var DestinationsManager = /** @class */ (function (_super) {
         }
     };
     DestinationsManager.prototype.getTooltip = function (research) {
-        var message = "\n        <strong>".concat(_("Exploration cost:"), "</strong> ").concat(this.getCost(research.cost), " (recruits can be used as jokers)\n        <br>\n        <strong>").concat(_("Immediate gains:"), "</strong> ").concat(this.getGains(research.immediateGains), "\n        <br>\n        <strong>").concat(_("Type:"), "</strong> ").concat(this.getType(research.type), "\n        ");
+        var message = "TODO"; /*
+        <strong>${_("Exploration cost:")}</strong> ${this.getCost(research.cost)} (recruits can be used as jokers)
+        <br>
+        <strong>${_("Immediate gains:")}</strong> ${this.getGains(research.immediateGains)}
+        <br>
+        <strong>${_("Type:")}</strong> ${this.getType(research.type)}
+        `;*/
         return message;
     };
     return DestinationsManager;
@@ -2150,25 +2156,21 @@ var TableCenter = /** @class */ (function () {
     function TableCenter(game, gamedatas) {
         var _this = this;
         this.game = game;
-        this.researchDecks = [];
-        this.research = [];
         this.vp = new Map();
-        this.research = new Map();
-        ['A', 'B'].forEach(function (letter) {
-            _this.researchDecks[letter] = new Deck(game.researchManager, document.getElementById("table-research-".concat(letter, "-deck")), {
-                cardNumber: gamedatas.centerDestinationsDeckCount[letter],
-                topCard: gamedatas.centerDestinationsDeckTop[letter],
-                counter: {
-                    position: 'right',
-                },
-            });
-            _this.research[letter] = new SlotStock(game.researchManager, document.getElementById("table-research-".concat(letter)), {
-                slotsIds: [1, 2, 3],
-                mapCardToSlot: function (card) { return card.locationArg; },
-            });
-            _this.research[letter].addCards(gamedatas.centerDestinations[letter]);
-            _this.research[letter].onCardClick = function (card) { return _this.game.onTableDestinationClick(card); };
+        this.researchPoints = new Map();
+        /*this.researchDecks = new Deck<Destination>(game.researchManager, document.getElementById(`table-research-${letter}-deck`), {
+            cardNumber: gamedatas.centerDestinationsDeckCount,
+            topCard: gamedatas.centerDestinationsDeckTop,
+            counter: {
+                position: 'right',
+            },
+        });*/
+        this.research = new SlotStock(game.researchManager, document.getElementById("table-research"), {
+            slotsIds: [1, 2, 3, 4, 5, 6, 7],
+            mapCardToSlot: function (card) { return card.locationArg; },
         });
+        this.research.addCards(gamedatas.tableResearch);
+        this.research.onCardClick = function (card) { return _this.game.onTableDestinationClick(card); };
         var cardDeckDiv = document.getElementById("card-deck");
         this.cardDeck = new Deck(game.cardsManager, cardDeckDiv, {
             cardNumber: gamedatas.cardDeckCount,
@@ -2199,7 +2201,7 @@ var TableCenter = /** @class */ (function () {
         dojo.place(html, 'board');
         players.forEach(function (player) {
             _this.vp.set(Number(player.id), Number(player.score));
-            _this.research.set(Number(player.id), Math.min(14, Number(player.research)));
+            _this.researchPoints.set(Number(player.id), Math.min(14, Number(player.research)));
         });
         this.moveVP();
         this.moveResearch();
@@ -2211,16 +2213,16 @@ var TableCenter = /** @class */ (function () {
         return this.cards.addCard(card);
     };
     TableCenter.prototype.newTableDestination = function (research, letter, researchDeckCount, researchDeckTop) {
-        var promise = this.research[letter].addCard(research);
-        this.researchDecks[letter].setCardNumber(researchDeckCount, researchDeckTop);
+        var promise = this.research.addCard(research);
+        //this.researchDecks.setCardNumber(researchDeckCount, researchDeckTop);
         return promise;
     };
     TableCenter.prototype.setDestinationsSelectable = function (selectable, selectableCards) {
         var _this = this;
         if (selectableCards === void 0) { selectableCards = null; }
         ['A', 'B'].forEach(function (letter) {
-            _this.research[letter].setSelectionMode(selectable ? 'single' : 'none');
-            _this.research[letter].setSelectableCards(selectableCards);
+            _this.research.setSelectionMode(selectable ? 'single' : 'none');
+            _this.research.setSelectableCards(selectableCards);
         });
     };
     TableCenter.prototype.getVPCoordinates = function (points) {
@@ -2259,14 +2261,14 @@ var TableCenter = /** @class */ (function () {
     };
     TableCenter.prototype.moveResearch = function () {
         var _this = this;
-        this.research.forEach(function (points, playerId) {
+        this.researchPoints.forEach(function (points, playerId) {
             var markerDiv = document.getElementById("player-".concat(playerId, "-research-marker"));
             var coordinates = _this.getResearchCoordinates(points);
             var left = coordinates[0];
             var top = coordinates[1];
             var topShift = 0;
             var leftShift = 0;
-            _this.research.forEach(function (iPoints, iPlayerId) {
+            _this.researchPoints.forEach(function (iPoints, iPlayerId) {
                 if (iPoints === points && iPlayerId < playerId) {
                     topShift += 5;
                     //leftShift += 5;
@@ -2276,11 +2278,11 @@ var TableCenter = /** @class */ (function () {
         });
     };
     TableCenter.prototype.setResearch = function (playerId, research) {
-        this.research.set(playerId, Math.min(14, research));
+        this.researchPoints.set(playerId, Math.min(14, research));
         this.moveResearch();
     };
     TableCenter.prototype.getResearch = function (playerId) {
-        return this.research.get(playerId);
+        return this.researchPoints.get(playerId);
     };
     TableCenter.prototype.setCardsSelectable = function (selectable, freeColor, recruits) {
         if (freeColor === void 0) { freeColor = null; }

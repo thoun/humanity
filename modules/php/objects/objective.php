@@ -46,7 +46,7 @@ class Objective extends ObjectiveType {
     public string $location;
     public int $locationArg;
     public ?int $type; // A, B, C
-    public ?int $number; // 1..9
+    public ?int $number; // 1..6
 
     public function __construct($dbCard, $OBJECTIVES) {
         $this->id = intval($dbCard['card_id'] ?? $dbCard['id']);

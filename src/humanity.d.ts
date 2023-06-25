@@ -10,15 +10,17 @@ interface Card {
     gain: number;
 }
 
-interface Destination {
+interface Research {
     id: number;
     location: string;
     locationArg: number;
-    type: number;
+    year: number;
     number: number;
-    cost: { [color: number]: number };
-    immediateGains: { [type: number]: number };
-    gains: (number | null)[];
+    extremity: number;
+    cost: number[];
+    researchPoints: number;
+    effect?: number;
+    points: number;
 }
 
 interface Objective {
@@ -47,8 +49,8 @@ interface HumanityPlayer extends Player {
     //handCount: number;
     hand?: Card[];
     playedCards: { [color: number]: Card[] };
-    research: Destination[];
-    reservedDestinations?: Destination[];
+    research: Research[];
+    reservedDestinations?: Research[];
 }
 
 interface HumanityGamedatas {
@@ -71,9 +73,9 @@ interface HumanityGamedatas {
     cardDeckCount: number;
     cardDiscardCount: number;
     centerCards: Card[];
-    centerDestinationsDeckTop: { [letter: string]: Destination };
-    centerDestinationsDeckCount: { [letter: string]: number };
-    centerDestinations: { [letter: string]: Destination[] };
+    //centerDestinationsDeckTop: { [letter: string]: Research };
+    //centerDestinationsDeckCount: { [letter: string]: number };
+    tableResearch: Research[];
     objectives?: number[];
     firstPlayerId: number;
     lastTurn: boolean;
@@ -95,7 +97,7 @@ interface HumanityGame extends Game {
 
     setTooltip(id: string, html: string): void;
     highlightPlayerTokens(playerId: number | null): void;
-    onTableDestinationClick(research: Destination): void;
+    onTableDestinationClick(research: Research): void;
     onHandCardClick(card: Card): void;
     onTableCardClick(card: Card): void;
     onPlayedCardClick(card: Card): void;
@@ -105,7 +107,7 @@ interface EnteringPlayActionArgs {
     canRecruit: boolean;
     canExplore: boolean;
     canTrade: boolean;
-    possibleDestinations: Destination[];
+    possibleDestinations: Research[];
 }
 
 interface EnteringChooseNewCardArgs {
@@ -116,7 +118,7 @@ interface EnteringChooseNewCardArgs {
 }
 
 interface EnteringPayDestinationArgs {
-    selectedDestination: Destination;
+    selectedDestination: Research;
     recruits: number;
 }
 
@@ -144,15 +146,15 @@ interface NotifNewCardArgs {
 // takeDestination
 interface NotifTakeDestinationArgs {
     playerId: number;
-    research: Destination;
+    research: Research;
     effectiveGains: { [type: number]: number };
 }
 
 // newTableDestination
 interface NotifNewTableDestinationArgs {
-    research: Destination;
+    research: Research;
     letter: string;    
-    researchDeckTop?: Destination;
+    researchDeckTop?: Research;
     researchDeckCount: number;
 }
 
@@ -177,7 +179,7 @@ interface NotifDiscardTableCardArgs {
 // reserveDestination
 interface NotifReserveDestinationArgs {
     playerId: number;
-    research: Destination;
+    research: Research;
 }
 
 // score

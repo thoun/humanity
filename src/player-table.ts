@@ -6,8 +6,8 @@ class PlayerTable {
     public voidStock: VoidStock<Card>;
     public hand?: LineStock<Card>;
     public played: LineStock<Card>[] = [];
-    public research: LineStock<Destination>;
-    public reservedDestinations?: LineStock<Destination>;
+    public research: LineStock<Research>;
+    public reservedDestinations?: LineStock<Research>;
     public limitSelection: number | null = null;
 
     private currentPlayer: boolean;
@@ -89,7 +89,7 @@ class PlayerTable {
         }
         
         const researchDiv = document.getElementById(`player-table-${this.playerId}-research`);
-        this.research = new LineStock<Destination>(this.game.researchManager, researchDiv, {
+        this.research = new LineStock<Research>(this.game.researchManager, researchDiv, {
             center: false,
         });
         researchDiv.style.setProperty('--card-overlap', '94px');
@@ -148,11 +148,11 @@ class PlayerTable {
         return cards;
     }
     
-    public reserveDestination(research: Destination) {
+    public reserveDestination(research: Research) {
         return this.reservedDestinations.addCard(research);
     }
     
-    public setDestinationsSelectable(selectable: boolean, selectableCards: Destination[] | null = null) {
+    public setDestinationsSelectable(selectable: boolean, selectableCards: Research[] | null = null) {
         if (!this.reservedDestinations) {
             return;
         }
