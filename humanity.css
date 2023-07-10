@@ -615,31 +615,31 @@ body > .card {
   background-size: auto 100%;
 }
 .card.research .card-sides .card-side[data-number="1"] {
-  background-position-y: 0%;
+  background-position-x: 0%;
 }
 .card.research .card-sides .card-side[data-number="2"] {
-  background-position-y: 12.5%;
+  background-position-x: 12.5%;
 }
 .card.research .card-sides .card-side[data-number="3"] {
-  background-position-y: 25%;
+  background-position-x: 25%;
 }
 .card.research .card-sides .card-side[data-number="4"] {
-  background-position-y: 37.5%;
+  background-position-x: 37.5%;
 }
 .card.research .card-sides .card-side[data-number="5"] {
-  background-position-y: 50%;
+  background-position-x: 50%;
 }
 .card.research .card-sides .card-side[data-number="6"] {
-  background-position-y: 62.5%;
+  background-position-x: 62.5%;
 }
 .card.research .card-sides .card-side[data-number="7"] {
-  background-position-y: 75%;
+  background-position-x: 75%;
 }
 .card.research .card-sides .card-side[data-number="8"] {
-  background-position-y: 87.5%;
+  background-position-x: 87.5%;
 }
 .card.research .card-sides .card-side[data-number="9"] {
-  background-position-y: 100%;
+  background-position-x: 100%;
 }
 .card.research .card-sides .card-side > * {
   pointer-events: none;

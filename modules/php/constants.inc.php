@@ -18,6 +18,8 @@ define('CARD', 5);
 /*
  * Color
  */
+define('ANY_COLOR', 0);
+define('BLUE_OR_ORANGE', 0);
 define('ORANGE', 1);
 define('BLUE', 2);
 define('PURPLE', 3);
@@ -47,6 +49,14 @@ define('PROTEIN', 13);
 define('LEFT', 1);
 define('CENTRAL', 2);
 define('RIGHT', 3);
+
+/*
+ * Green shapes
+ */
+const SHAPE_JOKER = 3;
+const SHAPE_ROUND = 1;
+const SHAPE_RECTANGULAR = 2;
+const SHAPE_OCTOGONAL = 3;
 
 /*
  * RESEARCH POWERS

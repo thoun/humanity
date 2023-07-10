@@ -18,7 +18,7 @@
 
           @for $number from 1 through 9 {
               &[data-number="#{$number}"] {
-                  background-position-y: #{($number - 1) * 100% / 8};
+                  background-position-x: #{($number - 1) * 100% / 8};
               }
           }
 

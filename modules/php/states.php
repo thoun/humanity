@@ -12,7 +12,7 @@ trait StateTrait {
     */
     
     function stChooseWorker() {
-        // TODO skip if all the same workforce ?
+        // TODO skip if one available worker ?
     }
 
     /*function stPlayAction() {

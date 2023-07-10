@@ -69,31 +69,81 @@ $this->RESEARCH = [
     ],
 ];
 
-$this->TILES = [    
-    new TileType(BLUE, VP, [2 => 2, 3 => 3, 4 => 4]),
-    new TileType(BLUE, BRACELET, [2 => 1, 3 => 2, 4 => 2]),
-    new TileType(BLUE, RECRUIT, [2 => 1, 3 => 1, 4 => 1]),
-    new TileType(BLUE, RESEARCH, [2 => 2, 3 => 2, 4 => 3]),
 
-    new TileType(YELLOW, VP, [2 => 3, 3 => 4, 4 => 5]),
-    new TileType(YELLOW, BRACELET, [2 => 1, 3 => 1, 4 => 2]),
-    new TileType(YELLOW, RECRUIT, [2 => 0, 3 => 1, 4 => 1]),
-    new TileType(YELLOW, RESEARCH, [2 => 2, 3 => 2, 4 => 2]),
 
-    new TileType(PURPLE, VP, [2 => 1, 3 => 2, 4 => 4]),
-    new TileType(PURPLE, BRACELET, [2 => 2, 3 => 2, 4 => 2]),
-    new TileType(PURPLE, RECRUIT, [2 => 2, 3 => 2, 4 => 2]),
-    new TileType(PURPLE, RESEARCH, [2 => 1, 3 => 2, 4 => 2]),
+$this->TILES = [ //public int $type; // 0 start, 1..3 year, 8 communication, 9 obstacle
+    0 => [ // start
+        1 => new OrangeTileType([], 1, [[ICE => 1], [ICE => 2], [ICE => 3], []]),
+        2 => new OrangeTileType([], 1, [[INSECT => 1], [INSECT => 2], [INSECT => 3], []]),
+        3 => new OrangeTileType([], 1, [[METHAN => 1], [METHAN => 2], [METHAN => 3], []]),
+        4 => new BlueTileType([], 2, [[ELECTRICITY => 1], [ELECTRICITY => 2], [ELECTRICITY => 3], []]),
+    ],
 
-    new TileType(GREEN, VP, [2 => 2, 3 => 3, 4 => 4]),
-    new TileType(GREEN, BRACELET, [2 => 1, 3 => 1, 4 => 2]),
-    new TileType(GREEN, RECRUIT, [2 => 2, 3 => 3, 4 => 3]),
-    new TileType(GREEN, RESEARCH, [2 => 1, 3 => 1, 4 => 1]),
+    1 => [
+        1 => new TileType(BLUE_OR_ORANGE, [INSECT => 1, ICE => 1, METHAN => 1], null, null, null, 3),
+        2 => new OrangeTileType([INSECT => 1, ICE => 1, METHAN => 1], null, null), // TODO power ? RESEARCH_POWER_TIME
+        3 => new OrangeTileType([ICE => 2], 1, [[INSECT => 1, METHAN => 1], [INSECT => 2, METHAN => 2], [INSECT => 3, METHAN => 3], []]),
+        4 => new OrangeTileType([METHAN => 2], 1, [[INSECT => 1, ICE => 1], [INSECT => 2, ICE => 2], [INSECT => 3, ICE => 3], []]),
+        5 => new OrangeTileType([INSECT => 2], 1, [[METHAN => 1, ICE => 1], [METHAN => 2, ICE => 2], [METHAN => 3, ICE => 3], []]),
+        6 => new BlueTileType([ICE => 3], 2, [[OXYGEN => 1], [OXYGEN => 2], [OXYGEN => 3], []]),
+        7 => new BlueTileType([METHAN => 3], 2, [[AIRCARBON => 1], [AIRCARBON => 2], [AIRCARBON => 3], []]),
+        8 => new BlueTileType([INSECT => 3], 2, [[PROTEIN => 1], [PROTEIN => 2], [PROTEIN => 3], []]),
+        9 => new PurpleTileType([ELECTRICITY => 1, METHAN => 1], 3, 2, GREEN),
+        10 => new PurpleTileType([ELECTRICITY => 1, ICE => 1], 3, 2, BLUE),
+        11 => new PurpleTileType([ELECTRICITY => 1, INSECT => 1], 3, 2, ORANGE),
+        12 => new GreenTileType([ICE => 2], SHAPE_OCTOGONAL),
+        13 => new GreenTileType([METHAN => 2], SHAPE_RECTANGULAR),
+        14 => new GreenTileType([INSECT => 2], SHAPE_ROUND),
+    ],
 
-    new TileType(RED, VP, [2 => 3, 3 => 3, 4 => 4]),
-    new TileType(RED, BRACELET, [2 => 2, 3 => 3, 4 => 3]),
-    new TileType(RED, RECRUIT, [2 => 1, 3 => 1, 4 => 2]),
-    new TileType(RED, RESEARCH, [2 => 0, 3 => 1, 4 => 1]),
+    2 => [
+        1 => new TileType(BLUE_OR_ORANGE, [OXYGEN => 1, ICE => 1, METHAN => 1], null, null, null, 4),
+        2 => new TileType(BLUE_OR_ORANGE, [PROTEIN => 1, INSECT => 1, METHAN => 1], null, null, null, 4),
+        3 => new OrangeTileType([PROTEIN => 1, ICE => 1, METHAN => 1], null, null), // TODO power ? RESEARCH_POWER_TIME
+        4 => new OrangeTileType([INSECT => 1, OXYGEN => 1], 1, [[ELECTRICITY => 1], [ELECTRICITY => 2], [ELECTRICITY => 3], []]),
+        5 => new OrangeTileType([INSECT => 1, AIRCARBON => 1], 1, [[ELECTRICITY => 1], [ELECTRICITY => 2], [ELECTRICITY => 3], []]),
+        6 => new BlueTileType([INSECT => 2, ICE => 2], 2, [[PROTEIN => 1, OXYGEN => 1], [PROTEIN => 2, OXYGEN => 2], [PROTEIN => 3, OXYGEN => 3], []]),
+        7 => new BlueTileType([ICE => 2, METHAN => 2], 2, [[AIRCARBON => 1, OXYGEN => 1], [AIRCARBON => 2, OXYGEN => 2], [AIRCARBON => 3, OXYGEN => 3], []]),
+        8 => new BlueTileType([INSECT => 2, METHAN => 2], 2, [[PROTEIN => 1, AIRCARBON => 1], [PROTEIN => 2, AIRCARBON => 2], [PROTEIN => 3, AIRCARBON => 3], []]),
+        9 => new PurpleTileType([ELECTRICITY => 1, PROTEIN => 1], 4, 1, ORANGE),
+        10 => new PurpleTileType([ELECTRICITY => 1, INSECT => 1, ICE => 1, METHAN => 1], 3, 2, ANY_COLOR),
+        11 => new PurpleTileType([ELECTRICITY => 1, AIRCARBON => 1], 4, 1, GREEN),
+        12 => new PurpleTileType([ELECTRICITY => 1, OXYGEN => 1], 4, 1, BLUE),
+        13 => new GreenTileType([PROTEIN => 1], SHAPE_ROUND),
+        14 => new GreenTileType([OXYGEN => 1], SHAPE_OCTOGONAL),
+        15 => new GreenTileType([AIRCARBON => 1], SHAPE_RECTANGULAR),
+    ],
+
+    3 => [
+        1 => new TileType(BLUE_OR_ORANGE, [INSECT => 1, OXYGEN => 1, METHAN => 1], null, null, null, 5),
+        2 => new OrangeTileType([PROTEIN => 1, ICE => 1]), // TODO 1 point for theses colors
+        3 => new OrangeTileType([OXYGEN => 1, METHAN => 1]),
+        4 => new OrangeTileType([INSECT => 1, AIRCARBON => 1]),
+        5 => new BlueTileType([INSECT => 1, OXYGEN => 1]), // TODO 1 point for theses colors
+        6 => new BlueTileType([ICE => 1, AIRCARBON => 1]),
+        7 => new BlueTileType([PROTEIN => 1, METHAN => 1]),
+        8 => new PurpleTileType([ELECTRICITY => 1, OXYGEN => 1, METHAN => 1], 5, 0, BLUE),
+        9 => new PurpleTileType([ELECTRICITY => 1, PROTEIN => 1, ICE => 1], 5, 0, ORANGE),
+        10 => new PurpleTileType([ELECTRICITY => 1, INSECT => 1, AIRCARBON => 1], 5, 0, GREEN),
+        11 => new PurpleTileType([ELECTRICITY => 1, PROTEIN => 1, METHAN => 1], 4, 1, ANY_COLOR),
+        12 => new GreenTileType([OXYGEN => 1, ICE => 1], SHAPE_OCTOGONAL), // TODO 1 point for theses colors
+        13 => new GreenTileType([AIRCARBON => 1, METHAN => 1], SHAPE_RECTANGULAR),
+        14 => new GreenTileType([PROTEIN => 1, INSECT => 1], SHAPE_ROUND),
+        15 => new GreenTileType([ELECTRICITY => 1, ICE => 1, AIRCARBON => 1], SHAPE_JOKER),
+    ],
+
+    8 => [
+        1 => new TileType(ORANGE, [], null, null, null, 3),
+        2 => new TileType(ORANGE, [], null, null, null, 4),
+        3 => new TileType(ORANGE, [], null, null, null, 5),
+        4 => new TileType(BLUE, [], null, null, null, 3),
+        5 => new TileType(BLUE, [], null, null, null, 4),
+        6 => new TileType(BLUE, [], null, null, null, 5),
+    ],
+
+    9 => [
+        0 => new TileType(0, []),
+    ],
 ];
 
 $this->OBJECTIVES = [
