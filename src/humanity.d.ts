@@ -2,12 +2,22 @@
  * Your game interfaces
  */
 
-interface Card {
+interface Tile {
     id: number;
     location: string;
     locationArg: number;
+    type: number;
+    number: number;
+    x: number;
+    y: number;
+    r: number;
     color: number;
-    gain: number;
+    cost: { [type: number]:number };
+    workforce?: number;
+    production: { [type: number]:number }[];
+    adjacentPoints: number;
+    points: number;
+    matchType: number;
 }
 
 interface Research {
@@ -46,9 +56,7 @@ interface HumanityPlayer extends Player {
     research: number;
     recruit: number;
     bracelet: number;
-    //handCount: number;
-    hand?: Card[];
-    playedCards: { [color: number]: Card[] };
+    tiles: Tile[];
     research: Research[];
     reservedDestinations?: Research[];
 }
@@ -69,10 +77,10 @@ interface HumanityGamedatas {
     tableObjectives: Objective[];
 
     // TODO check
-    cardDeckTop?: Card;
+    cardDeckTop?: Tile;
     cardDeckCount: number;
     cardDiscardCount: number;
-    centerCards: Card[];
+    centerCards: Tile[];
     //centerDestinationsDeckTop: { [letter: string]: Research };
     //centerDestinationsDeckCount: { [letter: string]: number };
     tableResearch: Research[];
@@ -82,7 +90,7 @@ interface HumanityGamedatas {
 }
 
 interface HumanityGame extends Game {
-    cardsManager: CardsManager;
+    tilesManager: TilesManager;
     researchManager: DestinationsManager;
     objectivesManager: ObjectivesManager;
 
@@ -98,9 +106,9 @@ interface HumanityGame extends Game {
     setTooltip(id: string, html: string): void;
     highlightPlayerTokens(playerId: number | null): void;
     onTableDestinationClick(research: Research): void;
-    onHandCardClick(card: Card): void;
-    onTableCardClick(card: Card): void;
-    onPlayedCardClick(card: Card): void;
+    onPlayerTileClick(card: Tile): void;
+    onTableCardClick(card: Tile): void;
+    onPlayedCardClick(card: Tile): void;
 }
 
 interface EnteringPlayActionArgs {
@@ -111,7 +119,7 @@ interface EnteringPlayActionArgs {
 }
 
 interface EnteringChooseNewCardArgs {
-    centerCards: Card[];
+    centerCards: Tile[];
     freeColor: number;
     recruits: number;
     allFree: boolean;
@@ -130,16 +138,16 @@ interface EnteringTradeArgs {
 // playCard
 interface NotifPlayCardArgs {
     playerId: number;
-    card: Card;
-    newHandCard: Card;
+    card: Tile;
+    newHandCard: Tile;
     effectiveGains: { [type: number]: number };
 }
 
 // card
 interface NotifNewCardArgs {
     playerId: number;
-    card: Card;
-    cardDeckTop?: Card;
+    card: Tile;
+    cardDeckTop?: Tile;
     cardDeckCount: number;
 }
 
@@ -167,13 +175,13 @@ interface NotifTradeArgs {
 // discardCards
 interface NotifDiscardCardsArgs {
     playerId: number;
-    cards: Card[];
+    cards: Tile[];
     cardDiscardCount: number;
 }
 
 // discardTableCard
 interface NotifDiscardTableCardArgs {
-    card: Card;
+    card: Tile;
 }
 
 // reserveDestination
@@ -191,7 +199,7 @@ interface NotifScoreArgs {
 
 // cardDeckReset
 interface NotifCardDeckResetArgs {  
-    cardDeckTop?: Card;
+    cardDeckTop?: Tile;
     cardDeckCount: number;
     cardDiscardCount: number;
 }

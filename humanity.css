@@ -497,92 +497,304 @@ body > .card {
   top: calc((var(--height) + var(--shift)) * var(--order));
 }
 
-.humanity-card {
+.tile {
   display: inline-block;
   position: relative;
   width: 120px;
-  height: 221px;
-  border-radius: 8px;
+  height: 120px;
 }
-.humanity-card .card-sides .card-side {
-  border-radius: 8px;
+.tile[data-r="0"] .front {
+  transform: rotate(0deg);
+}
+.tile[data-r="1"] .front {
+  transform: rotate(90deg);
+}
+.tile[data-r="2"] .front {
+  transform: rotate(180deg);
+}
+.tile[data-r="3"] .front {
+  transform: rotate(270deg);
+}
+.tile .card-sides .card-side {
   background-size: auto 100%;
-  background-image: url("img/cards.jpg");
+  box-shadow: none;
 }
-.humanity-card .card-sides .card-side > * {
+.tile .card-sides .card-side > * {
   pointer-events: none;
   user-select: none;
 }
-.humanity-card.bga-cards_selectable-card:not(.bga-cards_disabled-card):not(.bga-cards_selected-card) {
-  animation: selectable-card-animation 1s alternate infinite ease-in-out;
+.tile .card-sides .card-side .front {
+  transition: transform 0.5s;
 }
-.humanity-card.bga-cards_selectable-card:not(.bga-cards_disabled-card) .card-side {
-  box-shadow: unset;
+.tile[data-type="0"] .front {
+  background-image: url("img/tiles-starting.png");
 }
-.humanity-card.bga-cards_selected-card:not(.bga-cards_disabled-card) {
-  box-shadow: 0 0 5px 5px orange;
+.tile[data-type="0"] .front[data-number="1"] {
+  background-position-x: 0%;
 }
-.humanity-card.bga-cards_selected-card:not(.bga-cards_disabled-card) .card-side {
-  box-shadow: unset;
+.tile[data-type="0"] .front[data-number="2"] {
+  background-position-x: 33.3333333333%;
 }
-.humanity-card .front[data-color="1"][data-gain="1"] {
-  background-position-x: 5%;
+.tile[data-type="0"] .front[data-number="3"] {
+  background-position-x: 66.6666666667%;
 }
-.humanity-card .front[data-color="1"][data-gain="2"] {
-  background-position-x: 10%;
+.tile[data-type="0"] .front[data-number="4"] {
+  background-position-x: 100%;
 }
-.humanity-card .front[data-color="1"][data-gain="3"] {
-  background-position-x: 15%;
+.tile[data-type="1"] .front {
+  background-image: url("img/tiles-ages.png");
+  background-position-y: 0%;
 }
-.humanity-card .front[data-color="1"][data-gain="4"] {
-  background-position-x: 20%;
+.tile[data-type="1"] .front[data-number="1"] {
+  background-position-x: 0%;
 }
-.humanity-card .front[data-color="2"][data-gain="1"] {
-  background-position-x: 25%;
+.tile[data-type="1"] .front[data-number="2"] {
+  background-position-x: 7.1428571429%;
 }
-.humanity-card .front[data-color="2"][data-gain="2"] {
-  background-position-x: 30%;
+.tile[data-type="1"] .front[data-number="3"] {
+  background-position-x: 14.2857142857%;
 }
-.humanity-card .front[data-color="2"][data-gain="3"] {
-  background-position-x: 35%;
+.tile[data-type="1"] .front[data-number="4"] {
+  background-position-x: 21.4285714286%;
 }
-.humanity-card .front[data-color="2"][data-gain="4"] {
-  background-position-x: 40%;
+.tile[data-type="1"] .front[data-number="5"] {
+  background-position-x: 28.5714285714%;
 }
-.humanity-card .front[data-color="3"][data-gain="1"] {
-  background-position-x: 45%;
+.tile[data-type="1"] .front[data-number="6"] {
+  background-position-x: 35.7142857143%;
 }
-.humanity-card .front[data-color="3"][data-gain="2"] {
+.tile[data-type="1"] .front[data-number="7"] {
+  background-position-x: 42.8571428571%;
+}
+.tile[data-type="1"] .front[data-number="8"] {
   background-position-x: 50%;
 }
-.humanity-card .front[data-color="3"][data-gain="3"] {
+.tile[data-type="1"] .front[data-number="9"] {
+  background-position-x: 57.1428571429%;
+}
+.tile[data-type="1"] .front[data-number="10"] {
+  background-position-x: 64.2857142857%;
+}
+.tile[data-type="1"] .front[data-number="11"] {
+  background-position-x: 71.4285714286%;
+}
+.tile[data-type="1"] .front[data-number="12"] {
+  background-position-x: 78.5714285714%;
+}
+.tile[data-type="1"] .front[data-number="13"] {
+  background-position-x: 85.7142857143%;
+}
+.tile[data-type="1"] .front[data-number="14"] {
+  background-position-x: 92.8571428571%;
+}
+.tile[data-type="1"] .front[data-number="15"] {
+  background-position-x: 100%;
+}
+.tile[data-type="2"] .front {
+  background-image: url("img/tiles-ages.png");
+  background-position-y: 50%;
+}
+.tile[data-type="2"] .front[data-number="1"] {
+  background-position-x: 0%;
+}
+.tile[data-type="2"] .front[data-number="2"] {
+  background-position-x: 7.1428571429%;
+}
+.tile[data-type="2"] .front[data-number="3"] {
+  background-position-x: 14.2857142857%;
+}
+.tile[data-type="2"] .front[data-number="4"] {
+  background-position-x: 21.4285714286%;
+}
+.tile[data-type="2"] .front[data-number="5"] {
+  background-position-x: 28.5714285714%;
+}
+.tile[data-type="2"] .front[data-number="6"] {
+  background-position-x: 35.7142857143%;
+}
+.tile[data-type="2"] .front[data-number="7"] {
+  background-position-x: 42.8571428571%;
+}
+.tile[data-type="2"] .front[data-number="8"] {
+  background-position-x: 50%;
+}
+.tile[data-type="2"] .front[data-number="9"] {
+  background-position-x: 57.1428571429%;
+}
+.tile[data-type="2"] .front[data-number="10"] {
+  background-position-x: 64.2857142857%;
+}
+.tile[data-type="2"] .front[data-number="11"] {
+  background-position-x: 71.4285714286%;
+}
+.tile[data-type="2"] .front[data-number="12"] {
+  background-position-x: 78.5714285714%;
+}
+.tile[data-type="2"] .front[data-number="13"] {
+  background-position-x: 85.7142857143%;
+}
+.tile[data-type="2"] .front[data-number="14"] {
+  background-position-x: 92.8571428571%;
+}
+.tile[data-type="2"] .front[data-number="15"] {
+  background-position-x: 100%;
+}
+.tile[data-type="3"] .front {
+  background-image: url("img/tiles-ages.png");
+  background-position-y: 100%;
+}
+.tile[data-type="3"] .front[data-number="1"] {
+  background-position-x: 0%;
+}
+.tile[data-type="3"] .front[data-number="2"] {
+  background-position-x: 7.1428571429%;
+}
+.tile[data-type="3"] .front[data-number="3"] {
+  background-position-x: 14.2857142857%;
+}
+.tile[data-type="3"] .front[data-number="4"] {
+  background-position-x: 21.4285714286%;
+}
+.tile[data-type="3"] .front[data-number="5"] {
+  background-position-x: 28.5714285714%;
+}
+.tile[data-type="3"] .front[data-number="6"] {
+  background-position-x: 35.7142857143%;
+}
+.tile[data-type="3"] .front[data-number="7"] {
+  background-position-x: 42.8571428571%;
+}
+.tile[data-type="3"] .front[data-number="8"] {
+  background-position-x: 50%;
+}
+.tile[data-type="3"] .front[data-number="9"] {
+  background-position-x: 57.1428571429%;
+}
+.tile[data-type="3"] .front[data-number="10"] {
+  background-position-x: 64.2857142857%;
+}
+.tile[data-type="3"] .front[data-number="11"] {
+  background-position-x: 71.4285714286%;
+}
+.tile[data-type="3"] .front[data-number="12"] {
+  background-position-x: 78.5714285714%;
+}
+.tile[data-type="3"] .front[data-number="13"] {
+  background-position-x: 85.7142857143%;
+}
+.tile[data-type="3"] .front[data-number="14"] {
+  background-position-x: 92.8571428571%;
+}
+.tile[data-type="3"] .front[data-number="15"] {
+  background-position-x: 100%;
+}
+.tile[data-type="8"] .front {
+  background-image: url("img/tiles-radar.png");
+  background-size: auto 200%;
+}
+.tile[data-type="8"] .front[data-number="1"] {
+  background-position: 0% 0%;
+}
+.tile[data-type="8"] .front[data-number="2"] {
+  background-position: 50% 0%;
+}
+.tile[data-type="8"] .front[data-number="3"] {
+  background-position: 100% 0%;
+}
+.tile[data-type="8"] .front[data-number="4"] {
+  background-position: 0% 100%;
+}
+.tile[data-type="8"] .front[data-number="5"] {
+  background-position: 50% 100%;
+}
+.tile[data-type="8"] .front[data-number="6"] {
+  background-position: 100% 100%;
+}
+.tile[data-type="9"] .front {
+  background-image: url("img/obstacles.png");
+}
+.tile[data-type="9"][data-color=f0db6c] .front {
+  background-position-x: 0%;
+}
+.tile[data-type="9"][data-color="62bce6"] .front {
+  background-position-x: 33.3333333333%;
+}
+.tile[data-type="9"][data-color="70c499"] .front {
+  background-position-x: 66.6666666667%;
+}
+.tile[data-type="9"][data-color=ddbdd7] .front {
+  background-position-x: 100%;
+}
+.tile.bga-cards_selectable-card:not(.bga-cards_disabled-card):not(.bga-cards_selected-card) {
+  animation: selectable-card-animation 1s alternate infinite ease-in-out;
+}
+.tile.bga-cards_selectable-card:not(.bga-cards_disabled-card) .card-side {
+  box-shadow: unset;
+}
+.tile.bga-cards_selected-card:not(.bga-cards_disabled-card) {
+  box-shadow: 0 0 5px 5px orange;
+}
+.tile.bga-cards_selected-card:not(.bga-cards_disabled-card) .card-side {
+  box-shadow: unset;
+}
+.tile .front[data-color="1"][data-gain="1"] {
+  background-position-x: 5%;
+}
+.tile .front[data-color="1"][data-gain="2"] {
+  background-position-x: 10%;
+}
+.tile .front[data-color="1"][data-gain="3"] {
+  background-position-x: 15%;
+}
+.tile .front[data-color="1"][data-gain="4"] {
+  background-position-x: 20%;
+}
+.tile .front[data-color="2"][data-gain="1"] {
+  background-position-x: 25%;
+}
+.tile .front[data-color="2"][data-gain="2"] {
+  background-position-x: 30%;
+}
+.tile .front[data-color="2"][data-gain="3"] {
+  background-position-x: 35%;
+}
+.tile .front[data-color="2"][data-gain="4"] {
+  background-position-x: 40%;
+}
+.tile .front[data-color="3"][data-gain="1"] {
+  background-position-x: 45%;
+}
+.tile .front[data-color="3"][data-gain="2"] {
+  background-position-x: 50%;
+}
+.tile .front[data-color="3"][data-gain="3"] {
   background-position-x: 55%;
 }
-.humanity-card .front[data-color="3"][data-gain="4"] {
+.tile .front[data-color="3"][data-gain="4"] {
   background-position-x: 60%;
 }
-.humanity-card .front[data-color="4"][data-gain="1"] {
+.tile .front[data-color="4"][data-gain="1"] {
   background-position-x: 65%;
 }
-.humanity-card .front[data-color="4"][data-gain="2"] {
+.tile .front[data-color="4"][data-gain="2"] {
   background-position-x: 70%;
 }
-.humanity-card .front[data-color="4"][data-gain="3"] {
+.tile .front[data-color="4"][data-gain="3"] {
   background-position-x: 75%;
 }
-.humanity-card .front[data-color="4"][data-gain="4"] {
+.tile .front[data-color="4"][data-gain="4"] {
   background-position-x: 80%;
 }
-.humanity-card .front[data-color="5"][data-gain="1"] {
+.tile .front[data-color="5"][data-gain="1"] {
   background-position-x: 85%;
 }
-.humanity-card .front[data-color="5"][data-gain="2"] {
+.tile .front[data-color="5"][data-gain="2"] {
   background-position-x: 90%;
 }
-.humanity-card .front[data-color="5"][data-gain="3"] {
+.tile .front[data-color="5"][data-gain="3"] {
   background-position-x: 95%;
 }
-.humanity-card .front[data-color="5"][data-gain="4"] {
+.tile .front[data-color="5"][data-gain="4"] {
   background-position-x: 100%;
 }
 
@@ -874,16 +1086,16 @@ body > .card {
 #table-center #board .marker .inner.research {
   background-image: url("img/research-pawns.png");
 }
-#table-center #board .marker[data-color="7c5654"] .inner {
+#table-center #board .marker[data-color=f0db6c] .inner {
   background-position-x: 0%;
 }
-#table-center #board .marker[data-color=d6d6d7] .inner {
+#table-center #board .marker[data-color="62bce6"] .inner {
   background-position-x: 33.3333333333%;
 }
-#table-center #board .marker[data-color=b79d86] .inner {
+#table-center #board .marker[data-color="70c499"] .inner {
   background-position-x: 66.6666666667%;
 }
-#table-center #board .marker[data-color="1e2c36"] .inner {
+#table-center #board .marker[data-color=ddbdd7] .inner {
   background-position-x: 100%;
 }
 #table-center #board .marker.color-blind .inner::after {
@@ -1015,150 +1227,10 @@ body > .card {
   font-size: 20pt;
   font-family: "conthrax-sb";
 }
-.player-table .boat {
-  position: relative;
-  width: 309px;
-  height: 149px;
-  background-size: 100% auto;
-  margin-top: -4px;
-}
-.player-table .boat.normal {
-  background-image: url("img/boats-normal.png");
-}
-.player-table .boat.advanced {
-  background-image: url("img/boats-advanced.png");
-}
-.player-table .boat[data-color="7c5654"] {
-  background-position-y: 0%;
-}
-.player-table .boat[data-color=d6d6d7] {
-  background-position-y: 33.3333333333%;
-}
-.player-table .boat[data-color=b79d86] {
-  background-position-y: 66.6666666667%;
-}
-.player-table .boat[data-color="1e2c36"] {
-  background-position-y: 100%;
-}
-.player-table .boat[data-recruits="0"] .icon.recruit[data-number="1"] {
-  top: 108px;
-  left: 50px;
-}
-.player-table .boat[data-recruits="0"] .icon.recruit[data-number="2"] {
-  top: 108px;
-  left: 55px;
-}
-.player-table .boat[data-recruits="0"] .icon.recruit[data-number="3"] {
-  top: 108px;
-  left: 60px;
-}
-.player-table .boat[data-recruits="1"] .icon.recruit[data-number="2"] {
-  top: 108px;
-  left: 55px;
-}
-.player-table .boat[data-recruits="1"] .icon.recruit[data-number="3"] {
-  top: 108px;
-  left: 60px;
-}
-.player-table .boat[data-recruits="2"] .icon.recruit[data-number="3"] {
-  top: 108px;
-  left: 60px;
-}
-.player-table .boat[data-bracelets="0"] .icon.bracelet[data-number="1"] {
-  top: 108px;
-  right: 50px;
-}
-.player-table .boat[data-bracelets="0"] .icon.bracelet[data-number="2"] {
-  top: 108px;
-  right: 55px;
-}
-.player-table .boat[data-bracelets="0"] .icon.bracelet[data-number="3"] {
-  top: 108px;
-  right: 60px;
-}
-.player-table .boat[data-bracelets="1"] .icon.bracelet[data-number="2"] {
-  top: 108px;
-  right: 55px;
-}
-.player-table .boat[data-bracelets="1"] .icon.bracelet[data-number="3"] {
-  top: 108px;
-  right: 60px;
-}
-.player-table .boat[data-bracelets="2"] .icon.bracelet[data-number="3"] {
-  top: 108px;
-  right: 60px;
-}
-.player-table .boat .icon {
-  position: absolute;
-  box-shadow: 0 0 2px 1px black;
-  transition: left 0.5s, right 0.5s, top 0.5s;
-}
-.player-table .boat .icon[data-number="3"] {
-  top: 13px;
-}
-.player-table .boat .icon[data-number="3"].recruit {
-  left: 20px;
-}
-.player-table .boat .icon[data-number="3"].bracelet {
-  right: 20px;
-}
-.player-table .boat .icon[data-number="2"] {
-  top: 53px;
-}
-.player-table .boat .icon[data-number="2"].recruit {
-  left: 11px;
-}
-.player-table .boat .icon[data-number="2"].bracelet {
-  right: 11px;
-}
-.player-table .boat .icon[data-number="1"] {
-  top: 92px;
-}
-.player-table .boat .icon[data-number="1"].recruit {
-  left: 2px;
-}
-.player-table .boat .icon[data-number="1"].bracelet {
-  right: 2px;
-}
-.player-table .boat .column {
-  position: absolute;
-  bottom: 110px;
-  width: 28px;
-  height: var(--column-height);
-}
-.player-table .boat .column[data-number="1"] {
-  left: 112px;
-}
-.player-table .boat .column[data-number="2"] {
-  left: 141px;
-}
-.player-table .boat .column[data-number="3"] {
-  left: 170px;
-}
-.player-table .boat .column.highlight {
-  box-shadow: 0 0 2px 3px orange;
-}
-.player-table .block-with-text {
-  display: flex;
-}
-.player-table .block-with-text .block-label {
-  text-shadow: 0 0 1px black, 0 0 2px black, 0 0 3px black, 0 0 4px black;
-  text-align: center;
-  writing-mode: vertical-lr;
-  transform: rotate(180deg);
-  padding: 5px;
-  text-overflow: ellipsis;
-}
-.player-table .block-with-text > div:not(.block-label) {
-  flex: 1;
-  min-height: 221px;
-}
-.player-table .hand-wrapper {
-  margin: 5px;
-  background: rgba(255, 255, 255, 0.5333333333);
-  border-radius: 10px;
-  align-self: stretch;
-  margin-bottom: 10px;
+.player-table .tiles {
+  display: grid;
+  grid-template-rows: repeat(var(--rows), 120px);
+  grid-template-columns: repeat(var(--columns), 120px);
 }
 .player-table .visible-cards {
   display: flex;

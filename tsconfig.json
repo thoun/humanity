@@ -30,7 +30,7 @@
         "node_modules/bga-cards/src/stocks/void-stock.ts",
         "node_modules/bga-cards/src/sort.ts",
         "node_modules/bga-cards/src/card-manager.ts",
-        "src/cards.ts",
+        "src/tiles.ts",
         "src/research.ts",
         "src/objectives.ts",
         "src/table-center.ts",

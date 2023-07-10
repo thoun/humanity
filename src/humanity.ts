@@ -33,7 +33,7 @@ function getVpByResearch(research: number) {
 }
 
 class Humanity implements HumanityGame {
-    public cardsManager: CardsManager;
+    public tilesManager: TilesManager;
     public researchManager: DestinationsManager;
     public objectivesManager: ObjectivesManager;
 
@@ -42,7 +42,6 @@ class Humanity implements HumanityGame {
     private gamedatas: HumanityGamedatas;
     private tableCenter: TableCenter;
     private playersTables: PlayerTable[] = [];
-    //private handCounters: Counter[] = [];
     private researchCounters: Counter[] = [];
     private recruitCounters: Counter[] = [];
     private braceletCounters: Counter[] = [];
@@ -72,17 +71,16 @@ class Humanity implements HumanityGame {
 
         log('gamedatas', gamedatas);
 
-
-        this.cardsManager = new CardsManager(this);
+        this.tilesManager = new TilesManager(this);
         this.researchManager = new DestinationsManager(this);        
         this.objectivesManager = new ObjectivesManager(this);
         this.animationManager = new AnimationManager(this);
         new JumpToManager(this, {
             localStorageFoldedKey: LOCAL_STORAGE_JUMP_TO_FOLDED_KEY,
             topEntries: [
-                new JumpToEntry(_('Main board'), 'table-center', { 'color': '#224757' })
+                new JumpToEntry(_('Main board TODO rename'), 'table-center', { 'color': '#224757' })
             ],
-            entryClasses: 'triangle-point',
+            entryClasses: 'hexa-point',
             defaultFolded: true,
         });
 
@@ -430,11 +428,6 @@ class Humanity implements HumanityGame {
             document.getElementById(`player_score_${player.id}`).insertAdjacentHTML('beforebegin', `<div class="vp icon"></div>`);
             document.getElementById(`icon_point_${player.id}`).remove();
 
-            /*
-                <div id="playerhand-counter-wrapper-${player.id}" class="playerhand-counter">
-                    <div class="player-hand-card"></div> 
-                    <span id="playerhand-counter-${player.id}"></span>
-                </div>*/
             let html = `<div class="counters">
             
                 <div id="research-counter-wrapper-${player.id}" class="research-counter">
@@ -458,11 +451,6 @@ class Humanity implements HumanityGame {
             <div>${playerId == gamedatas.firstPlayerId ? `<div id="first-player">${_('First player')}</div>` : ''}</div>`;
 
             dojo.place(html, `player_board_${player.id}`);
-
-            /*const handCounter = new ebg.counter();
-            handCounter.create(`playerhand-counter-${playerId}`);
-            handCounter.setValue(player.handCount);
-            this.handCounters[playerId] = handCounter;*/
 
             this.researchCounters[playerId] = new ebg.counter();
             this.researchCounters[playerId].create(`research-counter-${playerId}`);
@@ -604,11 +592,11 @@ class Humanity implements HumanityGame {
         }
     }
 
-    public onHandCardClick(card: Card): void {
+    public onPlayerTileClick(card: Tile): void {
         this.playCard(card.id);
     }
 
-    public onTableCardClick(card: Card): void {
+    public onTableCardClick(card: Tile): void {
         if (this.gamedatas.gamestate.name == 'discardTableCard') {
             this.discardTableCard(card.id);
         } else {
@@ -616,7 +604,7 @@ class Humanity implements HumanityGame {
         }
     }
 
-    public onPlayedCardClick(card: Card): void {
+    public onPlayedCardClick(card: Tile): void {
         if (this.gamedatas.gamestate.name == 'discardCard') {
             this.discardCard(card.id);
         } else {
@@ -828,7 +816,7 @@ class Humanity implements HumanityGame {
         const currentPlayer = this.getPlayerId() == playerId;
         const playerTable = this.getPlayerTable(playerId);
         
-        return (currentPlayer ? playerTable.hand : playerTable.voidStock).addCard(args.card);
+        return (currentPlayer ? playerTable.tiles : playerTable.voidStock).addCard(args.card);
     }
 
     notif_newTableCard(args: NotifNewCardArgs) {

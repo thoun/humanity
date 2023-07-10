@@ -3,9 +3,9 @@ const log = isDebug ? console.log.bind(window.console) : function () { };
 
 class PlayerTable {
     public playerId: number;
-    public voidStock: VoidStock<Card>;
-    public hand?: LineStock<Card>;
-    public played: LineStock<Card>[] = [];
+    public voidStock: VoidStock<Tile>;
+    public tiles: SlotStock<Tile>;
+    public played: LineStock<Tile>[] = [];
     public research: LineStock<Research>;
     public reservedDestinations?: LineStock<Research>;
     public limitSelection: number | null = null;
@@ -21,15 +21,7 @@ class PlayerTable {
             <div id="player-table-${this.playerId}-name" class="name-wrapper">${player.name}</div>
             <div class="cols">
             <div class="col col1">
-        `;
-        if (this.currentPlayer) {
-            html += `
-            <div class="block-with-text hand-wrapper">
-                <div class="block-label">${_('Your hand')}</div>
-                <div id="player-table-${this.playerId}-hand" class="hand cards"></div>
-            </div>`;
-        }
-        html += `
+            <div id="player-table-${this.playerId}-tiles" class="tiles"></div>
             <div id="player-table-${this.playerId}-research" class="research"></div>
             <div id="player-table-${this.playerId}-boat" class="boat" data-color="${player.color}" data-recruits="${player.recruit}" data-bracelets="${player.bracelet}">`;
         for (let i = 1; i <= 3; i++) {
@@ -60,33 +52,31 @@ class PlayerTable {
 
         dojo.place(html, document.getElementById('tables'));
 
-        if (this.currentPlayer) {
-            const handDiv = document.getElementById(`player-table-${this.playerId}-hand`);
-            this.hand = new LineStock<Card>(this.game.cardsManager, handDiv, {
-                sort: (a: Card, b: Card) => a.color == b.color ? a.gain - b.gain : a.color - b.color,
-            });
-            this.hand.onCardClick = (card: Card) => this.game.onHandCardClick(card);
-            
-            this.hand.addCards(player.hand);
-
-        }
-        this.voidStock = new VoidStock<Card>(this.game.cardsManager, document.getElementById(`player-table-${this.playerId}-name`));
-                
-        for (let i = 1; i <= 5; i++) {
-            const playedDiv = document.getElementById(`player-table-${this.playerId}-played-${i}`);
-            this.played[i] = new LineStock<Card>(this.game.cardsManager, playedDiv, {
-                direction: 'column',
-                center: false,
-            });
-            this.played[i].onCardClick = card => {
-                this.game.onPlayedCardClick(card);
-                if (this.limitSelection !== null) {
-                    this.updateSelectable();
-                }
+        const slotsIds = [];
+        const xs = player.tiles.map(tile => tile.x);
+        const ys = player.tiles.map(tile => tile.y);
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+        const minY = Math.min(...ys);
+        const maxY = Math.max(...ys);
+        for (let y = minY; y <= maxY; y++) {
+            for (let x = minX; x <= maxX; x++) {
+                slotsIds.push(`${x}_${y}`);
             }
-            this.played[i].addCards(player.playedCards[i]);
-            playedDiv.style.setProperty('--card-overlap', '195px');
         }
+        const tilesDiv = document.getElementById(`player-table-${this.playerId}-tiles`);
+        tilesDiv.style.setProperty('--rows', `${maxX - minX + 1}`);
+        tilesDiv.style.setProperty('--columns', `${maxY - minY + 1}`);
+        this.tiles = new SlotStock<Tile>(this.game.tilesManager, tilesDiv, {
+            slotsIds,
+            mapCardToSlot: tile => `${tile.x}_${tile.y}`,
+        });
+        this.tiles.onCardClick = (card: Tile) => this.game.onPlayerTileClick(card);
+        
+        this.tiles.addCards(player.tiles);
+        player.tiles.filter(tile => tile.type == 9).forEach(tile => this.game.tilesManager.getCardElement(tile).dataset.playerColor = player.color);
+
+        this.voidStock = new VoidStock<Tile>(this.game.tilesManager, document.getElementById(`player-table-${this.playerId}-name`));
         
         const researchDiv = document.getElementById(`player-table-${this.playerId}-research`);
         this.research = new LineStock<Research>(this.game.researchManager, researchDiv, {
@@ -106,14 +96,14 @@ class PlayerTable {
         document.getElementById(`player-table-${this.playerId}-boat`).dataset[type] = ''+count;
     }
 
-    public playCard(card: Card, fromElement?: HTMLElement): Promise<boolean> {
+    public playCard(card: Tile, fromElement?: HTMLElement): Promise<boolean> {
         return this.played[card.color].addCard(card, {
             fromElement
         });
     }
 
     public setHandSelectable(selectable: boolean) {
-        this.hand.setSelectionMode(selectable ? 'single' : 'none');
+        this.tiles.setSelectionMode(selectable ? 'single' : 'none');
     }
 
     public setCardsSelectable(selectable: boolean, cost: { [color: number]: number } | null = null) {
@@ -138,7 +128,7 @@ class PlayerTable {
         }
     }
 
-    public getSelectedCards(): Card[] {
+    public getSelectedCards(): Tile[] {
         const cards = [];
 
         for (let i = 1; i <= 5; i++) {

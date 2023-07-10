@@ -26,6 +26,9 @@ CREATE TABLE IF NOT EXISTS `tile` (
    `card_type_arg` tinyint(1) NOT NULL,
    `card_location` varchar(16) NOT NULL,
    `card_location_arg` int(11) NOT NULL,
+   `x` smallint(2) NULL,
+   `y` smallint(2) NULL,
+   `r` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
    PRIMARY KEY (`card_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 

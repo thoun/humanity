@@ -1994,32 +1994,36 @@ var CardManager = /** @class */ (function () {
     };
     return CardManager;
 }());
-var CardsManager = /** @class */ (function (_super) {
-    __extends(CardsManager, _super);
-    function CardsManager(game) {
+var TilesManager = /** @class */ (function (_super) {
+    __extends(TilesManager, _super);
+    function TilesManager(game) {
         var _this = _super.call(this, game, {
-            getId: function (card) { return "card-".concat(card.id); },
+            getId: function (card) { return "tile-".concat(card.id); },
             setupDiv: function (card, div) {
-                div.classList.add('humanity-card');
-                div.dataset.cardId = '' + card.id;
+                div.classList.add('tile');
+                div.dataset.type = '' + card.type;
+                div.dataset.r = '' + card.r;
             },
             setupFrontDiv: function (card, div) {
-                div.dataset.color = '' + card.color;
-                div.dataset.gain = '' + card.gain;
+                div.dataset.number = '' + card.number;
                 game.setTooltip(div.id, _this.getTooltip(card));
             },
-            isCardVisible: function (card) { return Boolean(card.color); },
+            isCardVisible: function (card) { return Boolean(card.number) || [0, 8, 9].includes(card.type); },
             cardWidth: 120,
-            cardHeight: 221,
+            cardHeight: 120,
         }) || this;
         _this.game = game;
         return _this;
     }
-    CardsManager.prototype.getTooltip = function (card) {
-        var message = "\n        <strong>".concat(_("Color:"), "</strong> ").concat(this.game.getTooltipColor(card.color), "\n        <br>\n        <strong>").concat(_("Gain:"), "</strong> <strong>1</strong> ").concat(this.game.getTooltipGain(card.gain), "\n        ");
+    TilesManager.prototype.getTooltip = function (card) {
+        var message = "x ".concat(card.x, "<br>\n        y ").concat(card.y); /*
+        <strong>${_("Color:")}</strong> ${this.game.getTooltipColor(card.color)}
+        <br>
+        <strong>${_("Gain:")}</strong> <strong>1</strong> ${this.game.getTooltipGain(card.gain)}
+        `;*/
         return message;
     };
-    return CardsManager;
+    return TilesManager;
 }(CardManager));
 var DestinationsManager = /** @class */ (function (_super) {
     __extends(DestinationsManager, _super);
@@ -2172,7 +2176,7 @@ var TableCenter = /** @class */ (function () {
         this.research.addCards(gamedatas.tableResearch);
         this.research.onCardClick = function (card) { return _this.game.onTableDestinationClick(card); };
         var cardDeckDiv = document.getElementById("card-deck");
-        this.cardDeck = new Deck(game.cardsManager, cardDeckDiv, {
+        this.cardDeck = new Deck(game.tilesManager, cardDeckDiv, {
             cardNumber: gamedatas.cardDeckCount,
             topCard: gamedatas.cardDeckTop,
             counter: {
@@ -2184,8 +2188,8 @@ var TableCenter = /** @class */ (function () {
         var discardCounterDiv = document.getElementById('discard-counter');
         this.game.setTooltip(deckCounterDiv.id, _('Deck size'));
         this.game.setTooltip(discardCounterDiv.id, _('Discard size'));
-        this.cardDiscard = new VoidStock(game.cardsManager, discardCounterDiv);
-        this.cards = new SlotStock(game.cardsManager, document.getElementById("table-cards"), {
+        this.cardDiscard = new VoidStock(game.tilesManager, discardCounterDiv);
+        this.cards = new SlotStock(game.tilesManager, document.getElementById("table-cards"), {
             slotsIds: [1, 2, 3, 4, 5],
             mapCardToSlot: function (card) { return card.locationArg; },
             gap: '12px',
@@ -2316,11 +2320,7 @@ var PlayerTable = /** @class */ (function () {
         this.limitSelection = null;
         this.playerId = Number(player.id);
         this.currentPlayer = this.playerId == this.game.getPlayerId();
-        var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div class=\"cols\">\n            <div class=\"col col1\">\n        ");
-        if (this.currentPlayer) {
-            html += "\n            <div class=\"block-with-text hand-wrapper\">\n                <div class=\"block-label\">".concat(_('Your hand'), "</div>\n                <div id=\"player-table-").concat(this.playerId, "-hand\" class=\"hand cards\"></div>\n            </div>");
-        }
-        html += "\n            <div id=\"player-table-".concat(this.playerId, "-research\" class=\"research\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-boat\" class=\"boat\" data-color=\"").concat(player.color, "\" data-recruits=\"").concat(player.recruit, "\" data-bracelets=\"").concat(player.bracelet, "\">");
+        var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div class=\"cols\">\n            <div class=\"col col1\">\n            <div id=\"player-table-").concat(this.playerId, "-tiles\" class=\"tiles\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-research\" class=\"research\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-boat\" class=\"boat\" data-color=\"").concat(player.color, "\" data-recruits=\"").concat(player.recruit, "\" data-bracelets=\"").concat(player.bracelet, "\">");
         for (var i = 1; i <= 3; i++) {
             if (this.currentPlayer) {
                 html += "<div id=\"player-table-".concat(this.playerId, "-column").concat(i, "\" class=\"column\" data-number=\"").concat(i, "\"></div>");
@@ -2333,30 +2333,29 @@ var PlayerTable = /** @class */ (function () {
         }
         html += "\n            </div>\n            </div>\n            \n            <div class=\"col col2\"></div>\n            </div>\n        </div>\n        ";
         dojo.place(html, document.getElementById('tables'));
-        if (this.currentPlayer) {
-            var handDiv = document.getElementById("player-table-".concat(this.playerId, "-hand"));
-            this.hand = new LineStock(this.game.cardsManager, handDiv, {
-                sort: function (a, b) { return a.color == b.color ? a.gain - b.gain : a.color - b.color; },
-            });
-            this.hand.onCardClick = function (card) { return _this.game.onHandCardClick(card); };
-            this.hand.addCards(player.hand);
+        var slotsIds = [];
+        var xs = player.tiles.map(function (tile) { return tile.x; });
+        var ys = player.tiles.map(function (tile) { return tile.y; });
+        var minX = Math.min.apply(Math, xs);
+        var maxX = Math.max.apply(Math, xs);
+        var minY = Math.min.apply(Math, ys);
+        var maxY = Math.max.apply(Math, ys);
+        for (var y = minY; y <= maxY; y++) {
+            for (var x = minX; x <= maxX; x++) {
+                slotsIds.push("".concat(x, "_").concat(y));
+            }
         }
-        this.voidStock = new VoidStock(this.game.cardsManager, document.getElementById("player-table-".concat(this.playerId, "-name")));
-        for (var i = 1; i <= 5; i++) {
-            var playedDiv = document.getElementById("player-table-".concat(this.playerId, "-played-").concat(i));
-            this.played[i] = new LineStock(this.game.cardsManager, playedDiv, {
-                direction: 'column',
-                center: false,
-            });
-            this.played[i].onCardClick = function (card) {
-                _this.game.onPlayedCardClick(card);
-                if (_this.limitSelection !== null) {
-                    _this.updateSelectable();
-                }
-            };
-            this.played[i].addCards(player.playedCards[i]);
-            playedDiv.style.setProperty('--card-overlap', '195px');
-        }
+        var tilesDiv = document.getElementById("player-table-".concat(this.playerId, "-tiles"));
+        tilesDiv.style.setProperty('--rows', "".concat(maxX - minX + 1));
+        tilesDiv.style.setProperty('--columns', "".concat(maxY - minY + 1));
+        this.tiles = new SlotStock(this.game.tilesManager, tilesDiv, {
+            slotsIds: slotsIds,
+            mapCardToSlot: function (tile) { return "".concat(tile.x, "_").concat(tile.y); },
+        });
+        this.tiles.onCardClick = function (card) { return _this.game.onPlayerTileClick(card); };
+        this.tiles.addCards(player.tiles);
+        player.tiles.filter(function (tile) { return tile.type == 9; }).forEach(function (tile) { return _this.game.tilesManager.getCardElement(tile).dataset.playerColor = player.color; });
+        this.voidStock = new VoidStock(this.game.tilesManager, document.getElementById("player-table-".concat(this.playerId, "-name")));
         var researchDiv = document.getElementById("player-table-".concat(this.playerId, "-research"));
         this.research = new LineStock(this.game.researchManager, researchDiv, {
             center: false,
@@ -2377,7 +2376,7 @@ var PlayerTable = /** @class */ (function () {
         });
     };
     PlayerTable.prototype.setHandSelectable = function (selectable) {
-        this.hand.setSelectionMode(selectable ? 'single' : 'none');
+        this.tiles.setSelectionMode(selectable ? 'single' : 'none');
     };
     PlayerTable.prototype.setCardsSelectable = function (selectable, cost) {
         if (cost === void 0) { cost = null; }
@@ -2492,7 +2491,6 @@ function getVpByResearch(research) {
 var Humanity = /** @class */ (function () {
     function Humanity() {
         this.playersTables = [];
-        //private handCounters: Counter[] = [];
         this.researchCounters = [];
         this.recruitCounters = [];
         this.braceletCounters = [];
@@ -2515,16 +2513,16 @@ var Humanity = /** @class */ (function () {
         log("Starting game setup");
         this.gamedatas = gamedatas;
         log('gamedatas', gamedatas);
-        this.cardsManager = new CardsManager(this);
+        this.tilesManager = new TilesManager(this);
         this.researchManager = new DestinationsManager(this);
         this.objectivesManager = new ObjectivesManager(this);
         this.animationManager = new AnimationManager(this);
         new JumpToManager(this, {
             localStorageFoldedKey: LOCAL_STORAGE_JUMP_TO_FOLDED_KEY,
             topEntries: [
-                new JumpToEntry(_('Main board'), 'table-center', { 'color': '#224757' })
+                new JumpToEntry(_('Main board TODO rename'), 'table-center', { 'color': '#224757' })
             ],
-            entryClasses: 'triangle-point',
+            entryClasses: 'hexa-point',
             defaultFolded: true,
         });
         this.tableCenter = new TableCenter(this, gamedatas);
@@ -2834,17 +2832,8 @@ var Humanity = /** @class */ (function () {
             var playerId = Number(player.id);
             document.getElementById("player_score_".concat(player.id)).insertAdjacentHTML('beforebegin', "<div class=\"vp icon\"></div>");
             document.getElementById("icon_point_".concat(player.id)).remove();
-            /*
-                <div id="playerhand-counter-wrapper-${player.id}" class="playerhand-counter">
-                    <div class="player-hand-card"></div>
-                    <span id="playerhand-counter-${player.id}"></span>
-                </div>*/
             var html = "<div class=\"counters\">\n            \n                <div id=\"research-counter-wrapper-".concat(player.id, "\" class=\"research-counter\">\n                    <div class=\"research icon\"></div>\n                    <span id=\"research-counter-").concat(player.id, "\"></span> <span class=\"research-legend\"><div class=\"vp icon\"></div> / ").concat(_('round'), "</span>\n                </div>\n\n            </div><div class=\"counters\">\n            \n                <div id=\"recruit-counter-wrapper-").concat(player.id, "\" class=\"recruit-counter\">\n                    <div class=\"recruit icon\"></div>\n                    <span id=\"recruit-counter-").concat(player.id, "\"></span>\n                </div>\n            \n                <div id=\"bracelet-counter-wrapper-").concat(player.id, "\" class=\"bracelet-counter\">\n                    <div class=\"bracelet icon\"></div>\n                    <span id=\"bracelet-counter-").concat(player.id, "\"></span>\n                </div>\n                \n            </div>\n            <div>").concat(playerId == gamedatas.firstPlayerId ? "<div id=\"first-player\">".concat(_('First player'), "</div>") : '', "</div>");
             dojo.place(html, "player_board_".concat(player.id));
-            /*const handCounter = new ebg.counter();
-            handCounter.create(`playerhand-counter-${playerId}`);
-            handCounter.setValue(player.handCount);
-            this.handCounters[playerId] = handCounter;*/
             _this.researchCounters[playerId] = new ebg.counter();
             _this.researchCounters[playerId].create("research-counter-".concat(playerId));
             _this.researchCounters[playerId].setValue(getVpByResearch(player.research));
@@ -2938,7 +2927,7 @@ var Humanity = /** @class */ (function () {
             this.takeDestination(research.id);
         }
     };
-    Humanity.prototype.onHandCardClick = function (card) {
+    Humanity.prototype.onPlayerTileClick = function (card) {
         this.playCard(card.id);
     };
     Humanity.prototype.onTableCardClick = function (card) {
@@ -3125,7 +3114,7 @@ var Humanity = /** @class */ (function () {
         var playerId = args.playerId;
         var currentPlayer = this.getPlayerId() == playerId;
         var playerTable = this.getPlayerTable(playerId);
-        return (currentPlayer ? playerTable.hand : playerTable.voidStock).addCard(args.card);
+        return (currentPlayer ? playerTable.tiles : playerTable.voidStock).addCard(args.card);
     };
     Humanity.prototype.notif_newTableCard = function (args) {
         this.tableCenter.cardDeck.setCardNumber(args.cardDeckCount, args.cardDeckTop);

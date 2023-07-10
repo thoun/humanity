@@ -24,6 +24,19 @@ require_once(__DIR__.'/modules/php/objects/tile.php');
 require_once(__DIR__.'/modules/php/objects/research.php');
 require_once(__DIR__.'/modules/php/objects/objective.php');
 
+$this->STARTING_TILE_POSITIONS = [
+    1 => [-1, 0],
+    2 => [0, 1],
+    3 => [1, 0],
+    4 => [0, 0],
+];
+
+$this->OBSTACLE_POSITIONS = [
+    0 => [-1, 1],
+    1 => [0, -1],
+    2 => [1, 1],
+];
+
 $this->VP_BY_RESEARCH = [
     3 => 1,
     6 => 2,
@@ -68,8 +81,6 @@ $this->RESEARCH = [
         9 => new ResearchType(RIGHT, [PROTEIN, ICE], 4, RESEARCH_POWER_TIME, 1),
     ],
 ];
-
-
 
 $this->TILES = [ //public int $type; // 0 start, 1..3 year, 8 communication, 9 obstacle
     0 => [ // start

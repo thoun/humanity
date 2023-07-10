@@ -140,7 +140,7 @@ trait UtilTrait {
         if ($dbCard == null) {
             return null;
         }
-        return new Tile($dbCard);
+        return new Tile($dbCard, $this->TILES);
     }
 
     function getTilesFromDb(array $dbCards) {
@@ -170,30 +170,36 @@ trait UtilTrait {
         return array_map(fn($dbCard) => $this->getTileFromDb($dbCard), array_values($dbResults));
     }
 
-    function setupTiles(array $playersIds) {
-        $playerCount = count($playersIds);
-        foreach ($this->TILES as $tileType) {
-            $tiles[] = [ 'type' => $tileType->color, 'type_arg' => $tileType->gain, 'nbr' => $tileType->number[$playerCount] ];
-        }
-        $this->tiles->createCards($tiles, 'deck');
-        $this->tiles->shuffle('deck');
-
-        foreach ([1,2,3,4,5] as $slot) {
-            $this->tiles->pickCardForLocation('deck', 'slot', $slot);
+    function setupTiles(array $players) {
+        foreach ([1, 2, 3] as $age => $tilesType) {
+            $tiles = [];
+            foreach ($this->TILES[$age] as $subType => $tileType) {
+                $tiles[] = [ 'type' => $age, 'type_arg' => $subType, 'nbr' => 1 ];
+            }
+            $this->tiles->createCards($tiles, 'deck'.$age);
+            $this->tiles->shuffle('deck'.$age);
         }
 
-        foreach ($playersIds as $playerId) {
-            $playedCards = $this->getTilesFromDb($this->tiles->pickCardsForLocation(2, 'deck', 'played'.$playerId));
-            while ($playedCards[0]->color == $playedCards[1]->color) {
-                $this->tiles->moveAllCardsInLocation('played'.$playerId, 'deck');
-                $this->tiles->shuffle('deck');
-                $playedCards = $this->getTilesFromDb($this->tiles->pickCardsForLocation(2, 'deck', 'played'.$playerId));
+        foreach ($players as $playerId => $player) {
+            $tiles = [];
+            foreach ($this->TILES[0] as $subType => $tileType) {
+                $this->tiles->createCards([[ 'type' => 0, 'type_arg' => $subType, 'nbr' => 1 ]], 'temp');
+                $cardId = $this->getTilesByLocation('temp')[0]->id;
+                $position = $this->STARTING_TILE_POSITIONS[$subType];
+                $x = $position[0];
+                $y = $position[1];
+                $this->DbQuery("UPDATE `tile` SET `card_location` = 'player', `card_location_arg` = $playerId, `x` = $x, `y` = $y WHERE card_id = $cardId");
             }
-            foreach ($playedCards as $playedCard) {
-                $this->tiles->moveCard($playedCard->id, 'played'.$playerId.'-'.$playedCard->color);
+            
+            $this->tiles->createCards([[ 'type' => 9, 'type_arg' => 0, 'nbr' => 3 ]], 'temp');
+            $obstacles = $this->getTilesByLocation('temp');
+            foreach ($obstacles as $index => $obstacle) {
+                $cardId = $obstacle->id;
+                $position = $this->OBSTACLE_POSITIONS[$index];
+                $x = $position[0];
+                $y = $position[1];
+                $this->DbQuery("UPDATE `tile` SET `card_location` = 'player', `card_location_arg` = $playerId, `x` = $x, `y` = $y WHERE card_id = $cardId");
             }
-
-            $this->tiles->pickCardsForLocation(3, 'deck', 'hand', $playerId);
         }
     }
 

@@ -144,7 +144,7 @@ class Humanity extends Table {
         }
 
         // setup the initial game situation here
-        //$this->setupTiles(array_keys($players));
+        $this->setupTiles($players);
         $this->setupResearches();
         $this->setupObjectives();
 
@@ -189,12 +189,8 @@ class Humanity extends Table {
 
             $player['research'] = intval($player['research']);
             $player['science'] = intval($player['science']);
-            $player['playedCards'] = [];
-            foreach ([1,2,3,4,5] as $color) {
-                $player['playedCards'][$color] = $this->getTilesByLocation('played'.$playerId.'-'.$color);
-            }
+            $player['tiles'] = $this->getTilesByLocation('player', $playerId);
             $player['research'] = $this->getDestinationsByLocation('played'.$playerId);
-            //$player['handCount'] = intval($this->tiles->countCardInLocation('hand', $playerId));
 
             if ($currentPlayerId == $playerId) {
                 $player['hand'] = $this->getTilesByLocation('hand', $playerId);

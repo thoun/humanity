@@ -53,6 +53,9 @@ class Tile extends TileType {
     public int $locationArg;
     public int $type; // 0 start, 1..3 year, 8 communication, 9 obstacle
     public ?int $number;
+    public ?int $x;
+    public ?int $y;
+    public ?int $r;
 
     public function __construct($dbCard, $TILES) {
         $this->id = intval($dbCard['card_id'] ?? $dbCard['id']);
@@ -60,10 +63,12 @@ class Tile extends TileType {
         $this->locationArg = intval($dbCard['card_location_arg'] ?? $dbCard['location_arg']);
         $this->type = array_key_exists('card_type', $dbCard) || array_key_exists('type', $dbCard) ? intval($dbCard['card_type'] ?? $dbCard['type']) : null;
         $this->number = array_key_exists('card_type_arg', $dbCard) || array_key_exists('type_arg', $dbCard) ? intval($dbCard['card_type_arg'] ?? $dbCard['type_arg']) : null;
+        $this->x = array_key_exists('x', $dbCard) ? intval($dbCard['x']) : null;
+        $this->y = array_key_exists('y', $dbCard) ? intval($dbCard['y']) : null;
+        $this->r = array_key_exists('r', $dbCard) ? intval($dbCard['r']) : null;
 
         if ($this->number !== null) {
-            $objectiveType = $TILES[$this->type][$this->number];  
-            $this->type = $objectiveType->type;
+            $objectiveType = $TILES[$this->type][$this->number];
             $this->color = $objectiveType->color;      
             $this->cost = $objectiveType->cost;
             $this->workforce = $objectiveType->workforce;

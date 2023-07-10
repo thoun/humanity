@@ -3,10 +3,10 @@ const POINT_CASE_SIZE_TOP = 37.6;
 
 class TableCenter {
     //public researchDecks: Deck<Destination>[] = [];
-    public cardDeck: Deck<Card>;
-    public cardDiscard: VoidStock<Card>;
+    public cardDeck: Deck<Tile>;
+    public cardDiscard: VoidStock<Tile>;
     public research: SlotStock<Research>;
-    public cards: SlotStock<Card>;
+    public cards: SlotStock<Tile>;
     private vp = new Map<number, number>();
     private researchPoints = new Map<number, number>(); 
 
@@ -28,7 +28,7 @@ class TableCenter {
         this.research.onCardClick = (card: Research) => this.game.onTableDestinationClick(card);
 
         const cardDeckDiv = document.getElementById(`card-deck`);
-        this.cardDeck = new Deck<Card>(game.cardsManager, cardDeckDiv, {
+        this.cardDeck = new Deck<Tile>(game.tilesManager, cardDeckDiv, {
             cardNumber: gamedatas.cardDeckCount,
             topCard: gamedatas.cardDeckTop,
             counter: {
@@ -42,9 +42,9 @@ class TableCenter {
         const discardCounterDiv = document.getElementById('discard-counter');
         this.game.setTooltip(deckCounterDiv.id, _('Deck size'));
         this.game.setTooltip(discardCounterDiv.id, _('Discard size'));
-        this.cardDiscard = new VoidStock<Card>(game.cardsManager, discardCounterDiv);
+        this.cardDiscard = new VoidStock<Tile>(game.tilesManager, discardCounterDiv);
 
-        this.cards = new SlotStock<Card>(game.cardsManager, document.getElementById(`table-cards`), {
+        this.cards = new SlotStock<Tile>(game.tilesManager, document.getElementById(`table-cards`), {
             slotsIds: [1, 2, 3, 4, 5],
             mapCardToSlot: card => card.locationArg,
             gap: '12px',
@@ -75,7 +75,7 @@ class TableCenter {
         this.objectives.addCards(gamedatas.tableObjectives);
     }
     
-    public newTableCard(card: Card): Promise<boolean> {
+    public newTableCard(card: Tile): Promise<boolean> {
         return this.cards.addCard(card);
     }
     
