@@ -2182,37 +2182,9 @@ var TableCenter = /** @class */ (function () {
             return tableWorkers.querySelector(".slot[data-slot-id=\"".concat(worker.spot, "\"]")).appendChild(_this.game.createWorker(worker));
         }); });
     }
-    TableCenter.prototype.newTableCard = function (card) {
-        return this.tiles.addCard(card);
-    };
-    TableCenter.prototype.newTableDestination = function (research, letter, researchDeckCount, researchDeckTop) {
-        var promise = this.research.addCard(research);
-        //this.researchDecks.setCardNumber(researchDeckCount, researchDeckTop);
-        return promise;
-    };
-    TableCenter.prototype.setDestinationsSelectable = function (selectable, selectableCards) {
-        var _this = this;
-        if (selectableCards === void 0) { selectableCards = null; }
-        ['A', 'B'].forEach(function (letter) {
-            _this.research.setSelectionMode(selectable ? 'single' : 'none');
-            _this.research.setSelectableCards(selectableCards);
-        });
-    };
-    TableCenter.prototype.setCardsSelectable = function (selectable, freeColor, recruits) {
-        if (freeColor === void 0) { freeColor = null; }
-        if (recruits === void 0) { recruits = null; }
-        this.tiles.setSelectionMode(selectable ? 'single' : 'none');
-        if (selectable) {
-            var selectableCards = this.tiles.getCards().filter(function (card) { return freeColor === null || card.locationArg == freeColor || recruits >= 1; });
-            this.tiles.setSelectableCards(selectableCards);
-        }
-    };
-    TableCenter.prototype.getVisibleDestinations = function () {
-        return __spreadArray(__spreadArray([], this.research['A'].getCards(), true), this.research['B'].getCards(), true);
-    };
-    TableCenter.prototype.setDiscardCount = function (cardDiscardCount) {
-        var discardCounterDiv = document.getElementById('discard-counter');
-        discardCounterDiv.innerHTML = '' + cardDiscardCount;
+    TableCenter.prototype.moveWorker = function (worker) {
+        var tableWorkers = document.getElementById('table-workers');
+        tableWorkers.querySelector(".slot[data-slot-id=\"".concat(worker.spot, "\"]")).appendChild(document.getElementById("worker-".concat(worker.id)));
     };
     return TableCenter;
 }());
@@ -2412,6 +2384,13 @@ var PlayerTable = /** @class */ (function () {
         document.getElementById("player-table-".concat(this.playerId, "-tiles")).querySelectorAll('.worker').forEach(function (worker) {
             return worker.classList.toggle('selectable', workers.some(function (w) { return w.id == Number(worker.dataset.id); }));
         });
+    };
+    PlayerTable.prototype.activateTile = function (tile) {
+        var tileDiv = this.game.tilesManager.getCardElement(tile);
+        tileDiv.dataset.r = "".concat(tile.r);
+    };
+    PlayerTable.prototype.removeTile = function (tile) {
+        this.tiles.removeCard(tile);
     };
     return PlayerTable;
 }());
@@ -2942,21 +2921,10 @@ var Humanity = /** @class */ (function () {
         var _this = this;
         var notifs = [
             ['firstPlayerToken', undefined],
-            ['activateTile', undefined],
-            ['takeCard', undefined],
-            ['newTableCard', undefined],
-            ['takeDestination', undefined],
-            ['discardCards', undefined],
-            ['newTableDestination', undefined],
-            ['trade', ANIMATION_MS],
-            ['takeDeckCard', undefined],
-            ['discardTableCard', undefined],
-            ['reserveDestination', undefined],
-            ['score', ANIMATION_MS],
-            ['bracelet', ANIMATION_MS],
-            ['recruit', ANIMATION_MS],
-            ['cardDeckReset', undefined],
-            ['lastTurn', 1],
+            ['activateTile', ANIMATION_MS],
+            ['removeTile', ANIMATION_MS],
+            ['disableWorker', ANIMATION_MS],
+            ['gainTimeUnit', ANIMATION_MS],
         ];
         notifs.forEach(function (notif) {
             dojo.subscribe(notif[0], _this, function (notifDetails) {
@@ -2986,72 +2954,23 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_activateTile = function (args) {
         var playerId = args.playerId;
         var playerTable = this.getPlayerTable(playerId);
-        var promise = playerTable.activateTile(args.card);
-        this.updateGains(playerId, args.effectiveGains);
-        return promise;
+        playerTable.activateTile(args.tile);
     };
-    Humanity.prototype.notif_takeCard = function (args) {
+    Humanity.prototype.notif_removeTile = function (args) {
         var playerId = args.playerId;
-        var currentPlayer = this.getPlayerId() == playerId;
         var playerTable = this.getPlayerTable(playerId);
-        return (currentPlayer ? playerTable.tiles : playerTable.voidStock).addCard(args.card);
+        playerTable.removeTile(args.tile);
     };
-    Humanity.prototype.notif_newTableCard = function (args) {
-        this.tableCenter.cardDeck.setCardNumber(args.cardDeckCount, args.cardDeckTop);
-        return this.tableCenter.newTableCard(args.card);
+    Humanity.prototype.notif_disableWorker = function (args) {
+        this.setWorkerDisabled(args.worker, true);
     };
-    Humanity.prototype.notif_takeDestination = function (args) {
-        var playerId = args.playerId;
-        var promise = this.getPlayerTable(playerId).research.addCard(args.research);
-        this.updateGains(playerId, args.effectiveGains);
-        return promise;
-    };
-    Humanity.prototype.notif_discardCards = function (args) {
+    Humanity.prototype.notif_gainTimeUnit = function (args) {
         var _this = this;
-        return this.tableCenter.cardDiscard.addCards(args.cards, undefined, undefined, 50).then(function () { return _this.tableCenter.setDiscardCount(args.cardDiscardCount); });
+        var workers = args.workers;
+        workers.forEach(function (worker) { return _this.tableCenter.moveWorker(worker); });
     };
-    Humanity.prototype.notif_newTableDestination = function (args) {
-        return this.tableCenter.newTableDestination(args.research, args.letter, args.researchDeckCount, args.researchDeckTop);
-    };
-    Humanity.prototype.notif_score = function (args) {
-        this.setScore(args.playerId, +args.newScore);
-    };
-    Humanity.prototype.notif_bracelet = function (args) {
-        this.setBracelets(args.playerId, +args.newScore);
-    };
-    Humanity.prototype.notif_recruit = function (args) {
-        this.setRecruits(args.playerId, +args.newScore);
-    };
-    Humanity.prototype.notif_trade = function (args) {
-        var playerId = args.playerId;
-        this.updateGains(playerId, args.effectiveGains);
-    };
-    Humanity.prototype.notif_takeDeckCard = function (args) {
-        var playerId = args.playerId;
-        var playerTable = this.getPlayerTable(playerId);
-        var promise = playerTable.activateTile(args.card, document.getElementById('research-board'));
-        this.tableCenter.cardDeck.setCardNumber(args.cardDeckCount, args.cardDeckTop);
-        return promise;
-    };
-    Humanity.prototype.notif_discardTableCard = function (args) {
-        return this.tableCenter.cardDiscard.addCard(args.card);
-    };
-    Humanity.prototype.notif_reserveDestination = function (args) {
-        var playerId = args.playerId;
-        var playerTable = this.getPlayerTable(playerId);
-        return playerTable.reserveDestination(args.research);
-    };
-    Humanity.prototype.notif_cardDeckReset = function (args) {
-        this.tableCenter.cardDeck.setCardNumber(args.cardDeckCount, args.cardDeckTop);
-        this.tableCenter.setDiscardCount(args.cardDiscardCount);
-        return this.tableCenter.cardDeck.shuffle();
-    };
-    /**
-     * Show last turn banner.
-     */
-    Humanity.prototype.notif_lastTurn = function (animate) {
-        if (animate === void 0) { animate = true; }
-        dojo.place("<div id=\"last-round\">\n            <span class=\"last-round-text ".concat(animate ? 'animate' : '', "\">").concat(_("This is the final round!"), "</span>\n        </div>"), 'page-title');
+    Humanity.prototype.setWorkerDisabled = function (worker, disabled) {
+        document.getElementById("worker-".concat(worker.id)).classList.toggle('disabled-worker', disabled);
     };
     Humanity.prototype.getGain = function (type) {
         switch (type) {

@@ -154,7 +154,7 @@ $this->TILES = [ //public int $type; // 0 start, 1..3 year, 8 communication, 9 o
     ],
 
     9 => [
-        0 => new TileType(0, []),
+        0 => new TileType(0, [], 1),
     ],
 ];
 

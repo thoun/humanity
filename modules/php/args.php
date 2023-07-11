@@ -21,36 +21,25 @@ trait ArgsTrait {
             'workers' => $workers,
         ];
     }
-   
-    function argPlayAction() {
-        /*$playerId = intval($this->getActivePlayerId());
-        $player = $this->getPlayer($playerId);
 
-        $bracelets = $player->bracelet;
-        $recruits = $player->recruit;
+    function argActivateTile(int $playerId) {
+        $playerTiles = $this->getTilesByLocation('player', $playerId);
 
-        $playedCardsColors = $this->getPlayedCardsColor($playerId);
-
-        $recruitDone = boolval($this->getGameStateValue(RECRUIT_DONE));
-        $exploreDone = boolval($this->getGameStateValue(EXPLORE_DONE));
-        $tradeDone = boolval($this->getGameStateValue(TRADE_DONE));
-
-        $possibleDestinations = [];
-        if (!$exploreDone) {
-            $possibleDestinations = array_merge(
-                $this->getResearchsByLocation('slotA'),
-                $this->getResearchsByLocation('slotB'),
-                $this->getResearchsByLocation('reserved', $playerId),
-            );
-
-            $possibleDestinations = array_values(array_filter($possibleDestinations, fn($research) => $this->canTakeDestination($research, $playedCardsColors, $recruits, false)));
-        }*/
+        $activatableTiles = array_values(array_filter($playerTiles, fn($tile) => $tile->workforce != null && $tile->r < 3));
 
         return [
-            /*'possibleDestinations' => $possibleDestinations,
-            'canRecruit' => !$recruitDone,
-            'canExplore' => !$exploreDone,
-            'canTrade' => !$tradeDone && $bracelets > 0,*/
+            'activatableTiles' => $activatableTiles,
         ];
+    }
+   
+    function argPlayAction() {
+        $playerId = intval($this->getActivePlayerId());
+
+        $worker = $this->getSelectedWorker();
+        $argActivateTile = $this->argActivateTile($playerId);
+
+        return [
+            'worker' => $worker,
+        ] + $argActivateTile;
     }
 } 

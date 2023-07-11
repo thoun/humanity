@@ -504,6 +504,7 @@ body > .card {
   height: 100px;
   background-image: url("img/workers.png");
   background-size: auto 100%;
+  transition: transform 0.5s;
 }
 .worker[data-player-color=f0db6c], .worker[data-player-color=f0db6c] .workforce {
   background-position-x: 0%;
@@ -519,6 +520,9 @@ body > .card {
 }
 .worker.selectable {
   cursor: pointer;
+}
+.worker.disabled-worker {
+  transform: rotate(180deg);
 }
 .worker .workforce {
   position: absolute;
@@ -566,7 +570,7 @@ body > .card {
   pointer-events: none;
   user-select: none;
 }
-.tile .card-sides .card-side .front {
+.tile .card-sides .card-side.front {
   transition: transform 0.5s;
 }
 .tile[data-type="0"] .front {

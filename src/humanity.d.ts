@@ -131,68 +131,23 @@ interface NotifFirstPlayerTokenArgs {
 // activateTile
 interface NotifActivateTileArgs {
     playerId: number;
-    card: Tile;
-    newHandCard: Tile;
-    effectiveGains: { [type: number]: number };
+    tile: Tile;
 }
 
-// card
-interface NotifNewCardArgs {
+// removeTile
+interface NotifRemoveTileArgs {
     playerId: number;
-    card: Tile;
-    cardDeckTop?: Tile;
-    cardDeckCount: number;
+    tile: Tile;
 }
 
-// takeDestination
-interface NotifTakeDestinationArgs {
+// disableWorker
+interface NotifDisableWorkerArgs {
     playerId: number;
-    research: Research;
-    effectiveGains: { [type: number]: number };
+    worker: Worker;
 }
 
-// newTableDestination
-interface NotifNewTableDestinationArgs {
-    research: Research;
-    letter: string;    
-    researchDeckTop?: Research;
-    researchDeckCount: number;
-}
-
-// trade
-interface NotifTradeArgs {
+// gainTimeUnit
+interface NotifGainTimeUnitArgs {
     playerId: number;
-    effectiveGains: { [type: number]: number };
-}
-
-// discardCards
-interface NotifDiscardCardsArgs {
-    playerId: number;
-    cards: Tile[];
-    cardDiscardCount: number;
-}
-
-// discardTableCard
-interface NotifDiscardTableCardArgs {
-    card: Tile;
-}
-
-// reserveDestination
-interface NotifReserveDestinationArgs {
-    playerId: number;
-    research: Research;
-}
-
-// score
-interface NotifScoreArgs {
-    playerId: number;
-    newScore: number;
-    incScore: number;
-}
-
-// cardDeckReset
-interface NotifCardDeckResetArgs {  
-    cardDeckTop?: Tile;
-    cardDeckCount: number;
-    cardDiscardCount: number;
+    workers: Worker[];
 }

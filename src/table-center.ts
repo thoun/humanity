@@ -35,40 +35,10 @@ class TableCenter {
         ));
     }
     
-    public newTableCard(card: Tile): Promise<boolean> {
-        return this.tiles.addCard(card);
-    }
-    
-    public newTableDestination(research: Research, letter: string, researchDeckCount: number, researchDeckTop?: Research): Promise<boolean> {
-        const promise = this.research.addCard(research);
-        //this.researchDecks.setCardNumber(researchDeckCount, researchDeckTop);
-        return promise;
-    } 
-    
-    public setDestinationsSelectable(selectable: boolean, selectableCards: Research[] | null = null) {
-        ['A', 'B'].forEach(letter => {
-            this.research.setSelectionMode(selectable ? 'single' : 'none');
-            this.research.setSelectableCards(selectableCards);
-        });
-    }
-
-    public setCardsSelectable(selectable: boolean, freeColor: number | null = null, recruits: number | null = null) {
-        this.tiles.setSelectionMode(selectable ? 'single' : 'none');
-        if (selectable) {
-            const selectableCards = this.tiles.getCards().filter(card => freeColor === null || card.locationArg == freeColor || recruits >= 1);
-            this.tiles.setSelectableCards(selectableCards);
-        }
-    }
-    
-    public getVisibleDestinations(): Research[] {
-        return [
-            ...this.research['A'].getCards(),
-            ...this.research['B'].getCards(),
-        ];
-    }
-    
-    public setDiscardCount(cardDiscardCount: number) {
-        const discardCounterDiv = document.getElementById('discard-counter');
-        discardCounterDiv.innerHTML = ''+cardDiscardCount;
+    public moveWorker(worker: Worker): void {
+        const tableWorkers = document.getElementById('table-workers');
+        tableWorkers.querySelector(`.slot[data-slot-id="${worker.spot}"]`).appendChild(
+            document.getElementById(`worker-${worker.id}`)
+        );
     }
 }

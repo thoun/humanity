@@ -690,22 +690,10 @@ class Humanity implements HumanityGame {
 
         const notifs = [
             ['firstPlayerToken', undefined],
-
-            ['activateTile', undefined],
-            ['takeCard', undefined],
-            ['newTableCard', undefined],
-            ['takeDestination', undefined],
-            ['discardCards', undefined],
-            ['newTableDestination', undefined],
-            ['trade', ANIMATION_MS],
-            ['takeDeckCard', undefined],
-            ['discardTableCard', undefined],
-            ['reserveDestination', undefined],
-            ['score', ANIMATION_MS],
-            ['bracelet', ANIMATION_MS],
-            ['recruit', ANIMATION_MS],
-            ['cardDeckReset', undefined],
-            ['lastTurn', 1],
+            ['activateTile', ANIMATION_MS],
+            ['removeTile', ANIMATION_MS],
+            ['disableWorker', ANIMATION_MS],
+            ['gainTimeUnit', ANIMATION_MS],
         ];
     
         notifs.forEach((notif) => {
@@ -743,99 +731,27 @@ class Humanity implements HumanityGame {
         const playerId = args.playerId;
         const playerTable = this.getPlayerTable(playerId);
 
-        const promise = playerTable.activateTile(args.card);
-
-        this.updateGains(playerId, args.effectiveGains);
-
-        return promise;
+        playerTable.activateTile(args.tile);
     }
 
-    notif_takeCard(args: NotifNewCardArgs) {
-        const playerId = args.playerId;
-        const currentPlayer = this.getPlayerId() == playerId;
-        const playerTable = this.getPlayerTable(playerId);
-        
-        return (currentPlayer ? playerTable.tiles : playerTable.voidStock).addCard(args.card);
-    }
-
-    notif_newTableCard(args: NotifNewCardArgs) {
-        this.tableCenter.cardDeck.setCardNumber(args.cardDeckCount, args.cardDeckTop);
-        return this.tableCenter.newTableCard(args.card);
-    }
-
-    notif_takeDestination(args: NotifTakeDestinationArgs) {
-        const playerId = args.playerId;
-        const promise = this.getPlayerTable(playerId).research.addCard(args.research);
-
-        this.updateGains(playerId, args.effectiveGains);
-
-        return promise;
-    }
-
-    notif_discardCards(args: NotifDiscardCardsArgs) {
-        return this.tableCenter.cardDiscard.addCards(args.cards, undefined, undefined, 50).then(
-            () => this.tableCenter.setDiscardCount(args.cardDiscardCount)
-        );
-    }
-
-    notif_newTableDestination(args: NotifNewTableDestinationArgs) {
-        return this.tableCenter.newTableDestination(args.research, args.letter, args.researchDeckCount, args.researchDeckTop);
-    }
-
-    notif_score(args: NotifScoreArgs) {
-        this.setScore(args.playerId, +args.newScore);
-    }
-
-    notif_bracelet(args: NotifScoreArgs) {
-        this.setBracelets(args.playerId, +args.newScore);
-    }
-
-    notif_recruit(args: NotifScoreArgs) {
-        this.setRecruits(args.playerId, +args.newScore);
-    }
-
-    notif_trade(args: NotifTradeArgs) {
-        const playerId = args.playerId;
-
-        this.updateGains(playerId, args.effectiveGains);
-    }
-
-    notif_takeDeckCard(args: NotifNewCardArgs) {
+    notif_removeTile(args: NotifRemoveTileArgs) {
         const playerId = args.playerId;
         const playerTable = this.getPlayerTable(playerId);
 
-        const promise = playerTable.activateTile(args.card, document.getElementById('research-board'));
-
-        this.tableCenter.cardDeck.setCardNumber(args.cardDeckCount, args.cardDeckTop);
-
-        return promise;
+        playerTable.removeTile(args.tile);
     }
 
-    notif_discardTableCard(args: NotifDiscardTableCardArgs) {
-        return this.tableCenter.cardDiscard.addCard(args.card);
+    notif_disableWorker(args: NotifDisableWorkerArgs) {
+        this.setWorkerDisabled(args.worker, true);
     }
 
-    notif_reserveDestination(args: NotifReserveDestinationArgs) {
-        const playerId = args.playerId;
-        const playerTable = this.getPlayerTable(playerId);
-
-        return playerTable.reserveDestination(args.research);
+    notif_gainTimeUnit(args: NotifGainTimeUnitArgs) {
+        const { workers } = args;
+        workers.forEach(worker => this.tableCenter.moveWorker(worker));
     }
 
-    notif_cardDeckReset(args: NotifCardDeckResetArgs) {
-        this.tableCenter.cardDeck.setCardNumber(args.cardDeckCount, args.cardDeckTop);
-        this.tableCenter.setDiscardCount(args.cardDiscardCount);
-
-        return this.tableCenter.cardDeck.shuffle();
-    }
-    
-    /** 
-     * Show last turn banner.
-     */ 
-    notif_lastTurn(animate: boolean = true) {
-        dojo.place(`<div id="last-round">
-            <span class="last-round-text ${animate ? 'animate' : ''}">${_("This is the final round!")}</span>
-        </div>`, 'page-title');
+    private setWorkerDisabled(worker: Worker, disabled: boolean) {
+        document.getElementById(`worker-${worker.id}`).classList.toggle('disabled-worker', disabled);
     }
 
     public getGain(type: number): string {

@@ -95,29 +95,9 @@ define('ST_END_GAME', 99);
 define('END_SCORE', 100);
 
 /*
- * Constants
- */
-define('LAST_TURN', 10);
-define('RECRUIT_DONE', 11);
-define('EXPLORE_DONE', 12);
-define('TRADE_DONE', 15);
-define('GO_DISCARD_TABLE_CARD', 16);
-define('GO_RESERVE', 17);
-define('SELECTED_WORKER', 20);
-define('SELECTED_DESTINATION', 21);
-define('COMPLETED_LINES', 22);
-
-/*
- * Options
- */
-define('BOAT_SIDE_OPTION', 100);
-define('VARIANT_OPTION', 110);
-
-/*
  * Global variables
  */
-define('OBJECTIVES', 'Objectives');
-define('REMAINING_CARDS_TO_TAKE', 'RemainingCardsToTake');
-//define('UNDO', 'undo');
+define('SELECTED_WORKER', 'SELECTED_WORKER');
+define('ARM', 'ARM');
 
 ?>

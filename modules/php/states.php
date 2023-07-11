@@ -101,21 +101,16 @@ trait StateTrait {
         $playerId = intval($this->getActivePlayerId());
 
         //$this->deleteGlobalVariables([UNDO, POWER_PAY_ONE_LESS]);
-        $this->setGameStateValue(RECRUIT_DONE, 0);
-        $this->setGameStateValue(EXPLORE_DONE, 0);
-        $this->setGameStateValue(TRADE_DONE, 0);
-        $this->setGameStateValue(SELECTED_WORKER, 0);
-        $this->setGameStateValue(GO_DISCARD_TABLE_CARD, 0);
-        $this->setGameStateValue(GO_RESERVE, 0);
+        $this->deleteGlobalVariable(SELECTED_WORKER);
 
-        if (!boolval($this->getGameStateValue(LAST_TURN)) && $this->getPlayer($playerId)->score >= 40) {
+        /*if (!boolval($this->getGameStateValue(LAST_TURN)) && $this->getPlayer($playerId)->score >= 40) {
             $this->setGameStateValue(LAST_TURN, 1);
 
             self::notifyAllPlayers('lastTurn', clienttranslate('${player_name} reached 40 Victory Points, triggering the end of the game !'), [
                 'playerId' => $playerId,
                 'player_name' => $this->getPlayerName($playerId),
             ]);
-        }
+        }*/
 
         $this->activeNextPlayer();
         $playerId = $this->getActivePlayerId();
@@ -125,9 +120,9 @@ trait StateTrait {
         $endGame = false;
         if ($this->getPlayer($playerId)->no == 1) {
             $this->incStat(1, 'roundNumber');
-            if (boolval($this->getGameStateValue(LAST_TURN))) {
+            /*if (boolval($this->getGameStateValue(LAST_TURN))) {
                 $endGame = true;
-            }
+            }*/
         }
 
         $this->gamestate->nextState($endGame ? 'endScore' : 'nextPlayer');

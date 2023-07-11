@@ -47,20 +47,7 @@ class Humanity extends Table {
         // Note: afterwards, you can get/set the global variables with getGameStateValue/setGameStateInitialValue/setGameStateValue
         parent::__construct();
         
-        self::initGameStateLabels([
-            LAST_TURN => LAST_TURN,
-            RECRUIT_DONE => RECRUIT_DONE,
-            EXPLORE_DONE => EXPLORE_DONE,
-            TRADE_DONE => TRADE_DONE,
-            GO_DISCARD_TABLE_CARD => GO_DISCARD_TABLE_CARD,
-            GO_RESERVE => GO_RESERVE,
-            SELECTED_WORKER => SELECTED_WORKER,
-            SELECTED_DESTINATION => SELECTED_DESTINATION,
-            COMPLETED_LINES => COMPLETED_LINES,
-
-            BOAT_SIDE_OPTION => BOAT_SIDE_OPTION,
-            VARIANT_OPTION => VARIANT_OPTION,
-        ]);   
+        self::initGameStateLabels([]);   
 		
         $this->tiles = $this->getNew("module.common.deck");
         $this->tiles->init("tile");
@@ -112,13 +99,6 @@ class Humanity extends Table {
         /************ Start the game initialization *****/
 
         // Init global values with their initial values
-        $this->setGameStateInitialValue(LAST_TURN, 0);
-        $this->setGameStateInitialValue(RECRUIT_DONE, 0);
-        $this->setGameStateInitialValue(EXPLORE_DONE, 0);
-        $this->setGameStateInitialValue(TRADE_DONE, 0);
-        $this->setGameStateInitialValue(SELECTED_WORKER, 0);
-        $this->setGameStateInitialValue(GO_DISCARD_TABLE_CARD, 0);
-        $this->setGameStateInitialValue(GO_RESERVE, 0);
         
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -203,7 +183,7 @@ class Humanity extends Table {
         $result['tableObjectives'] = $this->getObjectivesByLocation('table');      
 
         $result['firstPlayerId'] = $firstPlayerId;
-        $result['lastTurn'] = !$isEndScore && boolval($this->getGameStateValue(LAST_TURN));
+        //$result['lastTurn'] = !$isEndScore && boolval($this->getGameStateValue(LAST_TURN));
   
         return $result;
     }

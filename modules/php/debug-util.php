@@ -41,7 +41,7 @@ trait DebugUtilTrait {
     }
 
     function debugLastTurn() {
-        $this->setGameStateValue(LAST_TURN, 1);
+        //$this->setGameStateValue(LAST_TURN, 1);
     }
     
     function debugEmpty() {

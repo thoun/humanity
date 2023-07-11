@@ -83,10 +83,6 @@ trait UtilTrait {
         return array_keys($this->loadPlayersBasicInfos());
     }
 
-    function getRoundCardCount() {
-        return count($this->getPlayersIds()) + 2;
-    }
-
     function getPlayerName(int $playerId) {
         return self::getUniqueValueFromDB("SELECT player_name FROM player WHERE player_id = $playerId");
     }
@@ -110,32 +106,6 @@ trait UtilTrait {
         ] + $args);
     }
 
-    function incPlayerRecruit(int $playerId, int $amount, $message = '', $args = []) {
-        if ($amount != 0) {
-            $this->DbQuery("UPDATE player SET `player_recruit` = `player_recruit` + $amount WHERE player_id = $playerId");
-        }
-
-        $this->notifyAllPlayers('recruit', $message, [
-            'playerId' => $playerId,
-            'player_name' => $this->getPlayerName($playerId),
-            'newScore' => $this->getPlayer($playerId)->recruit,
-            'incScore' => $amount,
-        ] + $args);
-    }
-
-    function incPlayerBracelet(int $playerId, int $amount, $message = '', $args = []) {
-        if ($amount != 0) {
-            $this->DbQuery("UPDATE player SET `player_bracelet` = `player_bracelet` + $amount WHERE player_id = $playerId");
-        }
-
-        $this->notifyAllPlayers('bracelet', $message, [
-            'playerId' => $playerId,
-            'player_name' => $this->getPlayerName($playerId),
-            'newScore' => $this->getPlayer($playerId)->bracelet,
-            'incScore' => $amount,
-        ] + $args);
-    }
-
     function setupWorkers(array $playersIds) {
         $sql = "INSERT INTO worker (`player_id`, `location`, `x`, `y`, `spot`) VALUES ";
         $values = [];
@@ -149,6 +119,12 @@ trait UtilTrait {
         $sql .= implode(',', $values);
         $this->DbQuery($sql);
     } 
+
+    function getWorkerById(int $id) {
+        $sql = "SELECT * FROM worker WHERE `id` = $id";
+        $dbWorkers = $this->getCollectionFromDB($sql);
+        return array_map(fn($dbWorker) => new Worker($dbWorker), array_values($dbWorkers))[0];
+    }
 
     function getPlayerWorkers(int $playerId, ?string $location = null, bool $filterRemainingWorkforce = false) {
         $sql = "SELECT * FROM worker WHERE `player_id` = $playerId";
@@ -311,10 +287,6 @@ trait UtilTrait {
         $sql .= " ORDER BY `card_location_arg`";
         $dbResults = $this->getCollectionFromDb($sql);
 
-        self::notifyAllPlayers('log', clienttranslate('objectives = ${objectives}'), [
-            'objectives' => json_encode($dbResults),
-        ]);
-
         return array_map(fn($dbCard) => $this->getObjectiveFromDb($dbCard), array_values($dbResults));
     }
 
@@ -333,213 +305,36 @@ trait UtilTrait {
             $this->objectives->pickCardForLocation('deck'.$letter, 'table', $index + 1);
         }
     }
-    
-    function groupGains(array $gains) {
-        $groupGains = [];
 
-        foreach ($gains as $gain) {
-            if (array_key_exists($gain, $groupGains)) {
-                $groupGains[$gain] += 1;
-            } else {
-                $groupGains[$gain] = 1;
+    function getSelectedWorker() {
+        return $this->getWorkerById($this->getGlobalVariable(SELECTED_WORKER));
+    }
+
+    function getArm() {
+        return $this->getGlobalVariable(ARM) ?? 0;
+    }
+
+    function gainTimeUnit(int $playerId, int $amount) { // TODO test
+        $workers = $this->getPlayerWorkers($playerId, 'table');
+        $arm = $this->getArm();
+        $movedWorkers = [];
+
+        foreach ($workers as $worker) {
+            if ($worker->spot - 1 > $arm) { // TODO handle % if $arm >= $worker
+
+                $moved = min($amount, $worker->spot - 1 - $arm);
+                $worker->spot -= $moved;
+                $this->DbQuery("UPDATE worker SET `spot` = $worker->spot WHERE `id` = $worker->id");
+
+                $movedWorkers = $worker;
             }
         }
 
-        return $groupGains;
-    }
-    
-    function gainResources(int $playerId, array $groupGains, string $phase) {
-        $player = $this->getPlayer($playerId);
-
-        $effectiveGains = [];
-
-        foreach ($groupGains as $type => $amount) {
-            switch ($type) {
-                case VP: 
-                    $effectiveGains[VP] = $amount;
-                    $this->DbQuery("UPDATE player SET `player_score` = `player_score` + ".$effectiveGains[VP]." WHERE player_id = $playerId");
-                    break;
-                case BRACELET: 
-                    $effectiveGains[BRACELET] = min($amount, 3 - $player->bracelet);
-                    $this->DbQuery("UPDATE player SET `player_bracelet` = `player_bracelet` + ".$effectiveGains[BRACELET]." WHERE player_id = $playerId");
-
-                    if ($effectiveGains[BRACELET] < $amount) {
-                        $this->incStat($amount - $effectiveGains[BRACELET], 'braceletsMissed');
-                        $this->incStat($amount - $effectiveGains[BRACELET], 'braceletsMissed', $playerId);
-                    }
-                    break;
-                case RECRUIT:
-                    $effectiveGains[RECRUIT] = min($amount, 3 - $player->recruit);
-                    $this->DbQuery("UPDATE player SET `player_recruit` = `player_recruit` + ".$effectiveGains[RECRUIT]." WHERE player_id = $playerId");
-
-                    if ($effectiveGains[RECRUIT] < $amount) {
-                        $this->incStat($amount - $effectiveGains[RECRUIT], 'recruitsMissed');
-                        $this->incStat($amount - $effectiveGains[RECRUIT], 'recruitsMissed', $playerId);
-                    }
-                    break;
-                case RESEARCH:
-                    $effectiveGains[RESEARCH] = min($amount, 14 - $player->research);
-                    $this->DbQuery("UPDATE player SET `player_research` = `player_research` + ".$effectiveGains[RESEARCH]." WHERE player_id = $playerId");
-                    break;
-                case CARD: 
-                    $available = $this->getAvailableDeckCards();
-                    $effectiveGains[CARD] = min($amount, $available);
-                    for ($i = 0; $i < $effectiveGains[CARD]; $i++) {
-                        $this->powerTakeCard($playerId);
-                    }
-                    if ($effectiveGains[CARD] < $amount) {
-                        $this->setGlobalVariable(REMAINING_CARDS_TO_TAKE, [
-                            'playerId' => $playerId,
-                            'phase' => $phase,
-                            'remaining' => $amount - $effectiveGains[CARD],
-                        ]);
-                    }
-                    break;
-            }
-        }
-
-        return $effectiveGains;
-    }
-
-    function canTakeDestination(Research $research, array $playedCardsColors, int $recruits, bool $strict) {
-        $missingCards = 0;
-
-        foreach ($research->cost as $color => $required) {
-            $available = 0;
-            if ($color == EQUAL) {
-                $available = max($playedCardsColors);
-            } else if ($color == DIFFERENT) {
-                $available = count(array_filter($playedCardsColors, fn($count) => $count > 0));
-            } else {
-                $available = $playedCardsColors[$color]; 
-            }
-
-            if ($available < $required) {
-                $missingCards += ($required - $available);
-            }
-        }
-
-        return $strict ? $recruits == $missingCards : $recruits >= $missingCards;
-    }
-
-    function getGainName(int $gain) {
-        switch ($gain) {
-            case VP: return clienttranslate("Victory Point");
-            case BRACELET: return clienttranslate("Bracelet");
-            case RECRUIT: return clienttranslate("Recruit");
-            case RESEARCH: return clienttranslate("Research");
-            case CARD: return clienttranslate("Card");
-        }
-    }
-
-    function getColorName(int $color) {
-        switch ($color) {
-            case BLUE: return clienttranslate("Blue");
-            case YELLOW: return clienttranslate("Yellow");
-            case GREEN: return clienttranslate("Green");
-            case RED: return clienttranslate("Red");
-            case PURPLE: return clienttranslate("Purple");
-        }
-    }
-
-    function getObjectiveName(int $objective) {
-        return '';
-    }
-
-    function powerTakeCard(int $playerId) {
-        $tile = $this->getTileFromDb($this->tiles->pickCardForLocation('deck', 'played'));
-        $this->tiles->moveCard($tile->id, 'played'.$playerId.'-'.$tile->color, intval($this->tiles->countCardInLocation('played'.$playerId.'-'.$tile->color)));
-
-        self::notifyAllPlayers('takeDeckCard', clienttranslate('${player_name} takes a ${card_color} ${card_type} card from the deck'), [
+        self::notifyAllPlayers('gainTimeUnit', clienttranslate('${player_name} gains ${amount} time unit and shift its table workers'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'card' => $tile,
-            'cardDeckTop' => Tile::onlyId($this->getTileFromDb($this->tiles->getCardOnTop('deck'))),
-            'cardDeckCount' => intval($this->tiles->countCardInLocation('deck')),
-            'card_type' => $this->getGainName($tile->gain), // for logs
-            'card_color' => $this->getColorName($tile->color), // for logs
+            'workers' => $movedWorkers,
+            'amount' => $amount, // for logs
         ]);
-
-    }
-
-    function getPlayedCardsByColor(int $playerId) {
-        $playedCardsByColor = [];
-        foreach ([1,2,3,4,5] as $color) {
-            $playedCardsByColor[$color] = $this->getTilesByLocation('played'.$playerId.'-'.$color);
-        }
-        return $playedCardsByColor;
-    }
-
-    function getPlayedCardsColor(int $playerId, /*array | null*/ $playedCardsByColor = null) {
-        if ($playedCardsByColor === null) {
-            $playedCardsByColor = $this->getPlayedCardsByColor($playerId);
-        }
-        foreach ([1,2,3,4,5] as $color) {
-            $playedCardsByColor[$color] = $this->getTilesByLocation('played'.$playerId.'-'.$color);
-        }
-        return array_map(fn($tiles) => count($tiles), $playedCardsByColor);
-    }
-
-    function checkObjectives(int $playerId) {
-        $objectives = $this->getGlobalVariable(OBJECTIVES, true) ?? [];
-
-        foreach ($objectives as $objective) {
-            $this->checkObjective($playerId, $objective);
-        }
-    }
-
-    function checkEndTurnObjectives(int $playerId) {
-        $objectives = $this->getGlobalVariable(OBJECTIVES, true) ?? [];
-
-        $endTurn = true;
-
-        foreach ($objectives as $objective) {
-            $result = $this->checkEndTurnObjective($playerId, $objective);
-            if (!$result) {
-                $endTurn = false;
-            }
-        }
-
-        return $endTurn;
-    }
-
-    function getCompletedLines(int $playerId) {
-        $playedCardsColors = $this->getPlayedCardsColor($playerId);
-        return min($playedCardsColors);
-    }
-
-    function completedAPlayedLine(int $playerId) {
-        $completedLines = intval($this->getGameStateValue(COMPLETED_LINES));
-        return $this->getCompletedLines($playerId) > $completedLines; // completed a line during the turn
-    }
-
-    function checkObjective(int $playerId, int $objective) {
-    }
-
-    function checkEndTurnObjective(int $playerId, int $objective) {
-        return false;
-    }
-
-    function getAvailableDeckCards() {
-        return intval($this->tiles->countCardInLocation('deck')) + intval($this->tiles->countCardInLocation('discard'));
-    }
-
-    function getTradeGains(int $playerId, int $bracelets) {
-        $research = $this->getResearchsByLocation('played'.$playerId);
-
-        $gains = [];
-
-        $rows = 
-            array_map(fn($research) => $research->gains, $research)
-        ;
-        foreach ($rows as $row) {
-            for ($i = 0; $i < $bracelets; $i++) {
-                if ($row[$i] !== null) {
-                    $gains[] = $row[$i];
-                }
-            }
-        }
-
-        return $gains;
     }
 }

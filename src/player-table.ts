@@ -67,4 +67,13 @@ class PlayerTable {
             worker.classList.toggle('selectable', workers.some(w => w.id == Number(worker.dataset.id)))
         );
     }
+    
+    public activateTile(tile: Tile) {
+        const tileDiv = this.game.tilesManager.getCardElement(tile);
+        tileDiv.dataset.r = `${tile.r}`;
+    }
+    
+    public removeTile(tile: Tile) {
+        this.tiles.removeCard(tile);
+    }
 }

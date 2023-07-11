@@ -101,10 +101,7 @@ $playerActionsGameStates = [
             "endTurn",
         ],
         "transitions" => [
-            "next" => ST_PLAYER_CHOOSE_WORKER,
-            "chooseNewCard" => ST_PLAYER_CHOOSE_NEW_CARD,
-            "payDestination" => ST_PLAYER_PAY_DESTINATION,
-            "trade" => ST_PLAYER_TRADE,
+            "stay" => ST_PLAYER_PLAY_ACTION,
             "endTurn" => ST_CHECK_OBJECTIVES,
         ],
     ],
