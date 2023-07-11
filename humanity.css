@@ -1196,9 +1196,16 @@ body > .card {
   bottom: 0;
   right: 0;
   background: var(--color);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: auto 65%;
 }
 #research-board .marker .inner.vp {
   clip-path: polygon(0% 25%, 0% 75%, 50% 100%, 100% 75%, 100% 25%, 50% 0%);
+  background-image: url("img/score.svg");
+}
+#research-board .marker .inner.research {
+  background-image: url("img/research.svg");
 }
 #research-board .marker[data-color=f0db6c] .inner {
   background-position-x: 0%;

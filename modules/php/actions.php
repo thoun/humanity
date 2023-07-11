@@ -29,7 +29,7 @@ trait ActionTrait {
 
         /*$playerId = intval($this->getActivePlayerId());
 
-        self::notifyAllPlayers('playCard', clienttranslate('${player_name} plays a ${card_color} ${card_type} card from their hand and gains ${gains}'), [
+        self::notifyAllPlayers('activateTile', clienttranslate('${player_name} plays a ${card_color} ${card_type} card from their hand and gains ${gains}'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
             'card' => $tile,

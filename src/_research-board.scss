@@ -32,12 +32,16 @@
       right: 0;
       
       background: var(--color);
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: auto 65%;
+
       &.vp {
         clip-path: polygon(0% 25%, 0% 75%, 50% 100%,100% 75% ,100% 25% ,50% 0% );
-        //background-image: url('img/vp-pawns.png');
+        background-image: url('img/score.svg');
       }
       &.research {
-        //background-image: url('img/reputation-pawns.png');
+        background-image: url('img/research.svg');
       }
     }
       

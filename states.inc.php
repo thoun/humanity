@@ -95,7 +95,7 @@ $playerActionsGameStates = [
         "args" => "argPlayAction",
         //"action" => "stPlayAction",
         "possibleactions" => [ 
-            "playCard",
+            "activateTile",
             "takeDestination",
             "goTrade",
             "endTurn",

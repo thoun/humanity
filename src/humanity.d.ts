@@ -128,8 +128,8 @@ interface NotifFirstPlayerTokenArgs {
     playerId: number;
 }
 
-// playCard
-interface NotifPlayCardArgs {
+// activateTile
+interface NotifActivateTileArgs {
     playerId: number;
     card: Tile;
     newHandCard: Tile;

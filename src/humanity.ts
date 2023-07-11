@@ -510,7 +510,7 @@ class Humanity implements HumanityGame {
     }
 
     public onPlayerTileClick(card: Tile): void {
-        this.playCard(card.id);
+        this.activateTile(card.id);
     }
 
     public onTableCardClick(card: Tile): void {
@@ -553,12 +553,12 @@ class Humanity implements HumanityGame {
         this.takeAction('goTrade');
     }
   	
-    public playCard(id: number) {
-        if(!(this as any).checkAction('playCard')) {
+    public activateTile(id: number) {
+        if(!(this as any).checkAction('activateTile')) {
             return;
         }
 
-        this.takeAction('playCard', {
+        this.takeAction('activateTile', {
             id
         });
     }
@@ -691,7 +691,7 @@ class Humanity implements HumanityGame {
         const notifs = [
             ['firstPlayerToken', undefined],
 
-            ['playCard', undefined],
+            ['activateTile', undefined],
             ['takeCard', undefined],
             ['newTableCard', undefined],
             ['takeDestination', undefined],
@@ -739,11 +739,11 @@ class Humanity implements HumanityGame {
         return this.placeFirstPlayerToken(notif.args.playerId);
     }
 
-    notif_playCard(args: NotifPlayCardArgs) {
+    notif_activateTile(args: NotifActivateTileArgs) {
         const playerId = args.playerId;
         const playerTable = this.getPlayerTable(playerId);
 
-        const promise = playerTable.playCard(args.card);
+        const promise = playerTable.activateTile(args.card);
 
         this.updateGains(playerId, args.effectiveGains);
 
@@ -804,7 +804,7 @@ class Humanity implements HumanityGame {
         const playerId = args.playerId;
         const playerTable = this.getPlayerTable(playerId);
 
-        const promise = playerTable.playCard(args.card, document.getElementById('research-board'));
+        const promise = playerTable.activateTile(args.card, document.getElementById('research-board'));
 
         this.tableCenter.cardDeck.setCardNumber(args.cardDeckCount, args.cardDeckTop);
 

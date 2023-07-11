@@ -2791,7 +2791,7 @@ var Humanity = /** @class */ (function () {
         }
     };
     Humanity.prototype.onPlayerTileClick = function (card) {
-        this.playCard(card.id);
+        this.activateTile(card.id);
     };
     Humanity.prototype.onTableCardClick = function (card) {
         if (this.gamedatas.gamestate.name == 'discardTableCard') {
@@ -2828,11 +2828,11 @@ var Humanity = /** @class */ (function () {
         }
         this.takeAction('goTrade');
     };
-    Humanity.prototype.playCard = function (id) {
-        if (!this.checkAction('playCard')) {
+    Humanity.prototype.activateTile = function (id) {
+        if (!this.checkAction('activateTile')) {
             return;
         }
-        this.takeAction('playCard', {
+        this.takeAction('activateTile', {
             id: id
         });
     };
@@ -2942,7 +2942,7 @@ var Humanity = /** @class */ (function () {
         var _this = this;
         var notifs = [
             ['firstPlayerToken', undefined],
-            ['playCard', undefined],
+            ['activateTile', undefined],
             ['takeCard', undefined],
             ['newTableCard', undefined],
             ['takeDestination', undefined],
@@ -2983,10 +2983,10 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_firstPlayerToken = function (notif) {
         return this.placeFirstPlayerToken(notif.args.playerId);
     };
-    Humanity.prototype.notif_playCard = function (args) {
+    Humanity.prototype.notif_activateTile = function (args) {
         var playerId = args.playerId;
         var playerTable = this.getPlayerTable(playerId);
-        var promise = playerTable.playCard(args.card);
+        var promise = playerTable.activateTile(args.card);
         this.updateGains(playerId, args.effectiveGains);
         return promise;
     };
@@ -3029,7 +3029,7 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_takeDeckCard = function (args) {
         var playerId = args.playerId;
         var playerTable = this.getPlayerTable(playerId);
-        var promise = playerTable.playCard(args.card, document.getElementById('research-board'));
+        var promise = playerTable.activateTile(args.card, document.getElementById('research-board'));
         this.tableCenter.cardDeck.setCardNumber(args.cardDeckCount, args.cardDeckTop);
         return promise;
     };
