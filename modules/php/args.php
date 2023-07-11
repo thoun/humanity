@@ -38,9 +38,9 @@ trait ArgsTrait {
         $possibleDestinations = [];
         if (!$exploreDone) {
             $possibleDestinations = array_merge(
-                $this->getDestinationsByLocation('slotA'),
-                $this->getDestinationsByLocation('slotB'),
-                $this->getDestinationsByLocation('reserved', $playerId),
+                $this->getResearchsByLocation('slotA'),
+                $this->getResearchsByLocation('slotB'),
+                $this->getResearchsByLocation('reserved', $playerId),
             );
 
             $possibleDestinations = array_values(array_filter($possibleDestinations, fn($research) => $this->canTakeDestination($research, $playedCardsColors, $recruits, false)));

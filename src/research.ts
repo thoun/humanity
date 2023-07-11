@@ -14,8 +14,8 @@ class DestinationsManager extends CardManager<Research> {
                 }
             },
             isCardVisible: card => Boolean(card.number),
-            cardWidth: 221,
-            cardHeight: 120,
+            cardWidth: 150,
+            cardHeight: 100,
         });
     }
 

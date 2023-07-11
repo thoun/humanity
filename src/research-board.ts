@@ -1,7 +1,11 @@
-const POINT_CASE_SIZE_LEFT = 38.8;
-const POINT_CASE_SIZE_TOP = 37.6;
+const POINT_CASE_HALF_WIDTH = 20.82;
+const POINT_CASE_TWO_THIRD_HEIGHT = 36.25;
+
+const RESEARCH_CASE_WIDTH = 40.71;
+const RESEARCH_CASE_HEIGHT = 33.5;
 
 class ResearchBoard {
+    private objectives: SlotStock<Objective>;
     private vp = new Map<number, number>();
     private researchPoints = new Map<number, number>(); 
         
@@ -11,26 +15,54 @@ class ResearchBoard {
         // points
         players.forEach(player =>
             html += `
-            <div id="player-${player.id}-vp-marker" class="marker ${/*this.game.isColorBlindMode() ? 'color-blind' : */''}" data-player-id="${player.id}" data-player-no="${player.playerNo}" data-color="${player.color}"><div class="inner vp"></div></div>
-            <div id="player-${player.id}-research-marker" class="marker ${/*this.game.isColorBlindMode() ? 'color-blind' : */''}" data-player-id="${player.id}" data-player-no="${player.playerNo}" data-color="${player.color}"><div class="inner research"></div></div>
+            <div id="player-${player.id}-vp-marker" class="vp marker ${/*this.game.isColorBlindMode() ? 'color-blind' : */''}" data-player-id="${player.id}" data-player-no="${player.playerNo}" style="--color: #${player.color};"><div class="inner vp"></div></div>
+            <div id="player-${player.id}-research-marker" class="research marker ${/*this.game.isColorBlindMode() ? 'color-blind' : */''}" data-player-id="${player.id}" data-player-no="${player.playerNo}" style="--color: #${player.color};"><div class="inner research"></div></div>
             `
         );
         dojo.place(html, 'research-board');
         players.forEach(player => {
             this.vp.set(Number(player.id), Number(player.score));
-            this.researchPoints.set(Number(player.id), Math.min(14, Number(player.research)));
+            this.researchPoints.set(Number(player.id), Math.min(14, Number(player.researchSpot)));
         });
         this.moveVP();
         this.moveResearch();
+        
+        this.objectives = new SlotStock<Objective>(this.game.objectivesManager, document.getElementById(`objectives`), {
+            slotsIds: [1, 2, 3],
+            mapCardToSlot: card => card.locationArg,
+        });
+        this.objectives.addCards(gamedatas.tableObjectives);
     }
 
     private getVPCoordinates(points: number) {
-        const cases = points % 40;
+        const cases = Math.min(points, 40);
 
-        const top = cases >= 16 ? (cases > 36 ? (40 - cases) : Math.min(4, cases - 16)) * POINT_CASE_SIZE_TOP : 0;
-        const left = cases > 20 ? (36 - Math.min(cases, 36)) * POINT_CASE_SIZE_LEFT : Math.min(16, cases) * POINT_CASE_SIZE_LEFT;
+        let top = 0;
+        let left = 0;
 
-        return [22 + left, 39 + top];
+        if (cases > 0 && cases < 12) {
+            left = POINT_CASE_HALF_WIDTH * 2 * cases;
+        } else if (cases == 12) {
+            top = POINT_CASE_TWO_THIRD_HEIGHT;
+            left = POINT_CASE_HALF_WIDTH * 23;
+        } else if (cases > 12 && cases < 25) {
+            top = 2 * POINT_CASE_TWO_THIRD_HEIGHT;
+            left = POINT_CASE_HALF_WIDTH * 2 * (24 - cases);
+        } else if (cases == 25) {
+            top = 3 * POINT_CASE_TWO_THIRD_HEIGHT;
+            left = POINT_CASE_HALF_WIDTH * -1;
+        } else if (cases > 25 && cases < 39) {
+            top = 4 * POINT_CASE_TWO_THIRD_HEIGHT;
+            left = POINT_CASE_HALF_WIDTH * 2 * (cases - 26);
+        } else if (cases == 39) {
+            top = 3 * POINT_CASE_TWO_THIRD_HEIGHT;
+            left = POINT_CASE_HALF_WIDTH * 25;
+        } else if (cases == 40) {
+            top = 2 * POINT_CASE_TWO_THIRD_HEIGHT;
+            left = POINT_CASE_HALF_WIDTH * 26;
+        }
+
+        return [40 + left, 27 + top];
     }
 
     private moveVP() {
@@ -60,12 +92,34 @@ class ResearchBoard {
     }
 
     private getResearchCoordinates(points: number) {
-        const cases = points;
+        const cases = Math.min(points, 50);
 
-        const top = cases % 2 ? -14 : 0;
-        const left = cases * 16.9;
+        let top = 0;
+        let left = RESEARCH_CASE_WIDTH * 7;
 
-        return [368 + left, 123 + top];
+        if (cases > 0 && cases < 8) {
+            left = RESEARCH_CASE_WIDTH * (cases + 7);
+        } else if (cases == 8) {
+            top = RESEARCH_CASE_HEIGHT;
+            left = RESEARCH_CASE_WIDTH * 14;
+        } else if (cases > 8 && cases < 23) {
+            top = 2 * RESEARCH_CASE_HEIGHT;
+            left = RESEARCH_CASE_WIDTH * (23 - cases);
+        } else if (cases == 23) {
+            top = 3 * RESEARCH_CASE_HEIGHT;
+            left = RESEARCH_CASE_WIDTH;
+        } else if (cases > 23 && cases < 38) {
+            top = 4 * RESEARCH_CASE_HEIGHT;
+            left = RESEARCH_CASE_WIDTH * (cases - 23);
+        } else if (cases == 38) {
+            top = 5 * RESEARCH_CASE_HEIGHT;
+            left = RESEARCH_CASE_WIDTH * 14;
+        } else if (cases > 38) {
+            top = 6 * RESEARCH_CASE_HEIGHT;
+            left = RESEARCH_CASE_WIDTH * (53 - cases);
+        }
+
+        return [-10 + left, 253 + top];
     }
 
     private moveResearch() {
@@ -89,12 +143,12 @@ class ResearchBoard {
         });
     }
     
-    public setResearch(playerId: number, research: number) {
-        this.researchPoints.set(playerId, Math.min(14, research));
+    public setResearchSpot(playerId: number, researchSpot: number) {
+        this.researchPoints.set(playerId, researchSpot);
         this.moveResearch();
     }
     
-    public getResearch(playerId: number): number {
+    public getResearchSpot(playerId: number): number {
         return this.researchPoints.get(playerId);
     }
 

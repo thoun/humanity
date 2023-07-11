@@ -137,7 +137,7 @@ trait ActionTrait {
             throw new BgaUserException("Not enough recruits");
         }
 
-        $research = $this->getDestinationFromDb($this->research->getCard($this->getGameStateValue(SELECTED_DESTINATION)));
+        $research = $this->getResearchFromDb($this->research->getCard($this->getGameStateValue(SELECTED_DESTINATION)));
         $fromReserve = $research->location == 'reserved';
         
         // will contain only selected cards of player
@@ -224,14 +224,14 @@ trait ActionTrait {
     public function endExplore(int $playerId, bool $fromReserve, object $research, int $researchIndex) {
         if (!$fromReserve) {
             $type = $research->type == 2 ? 'B' : 'A';
-            $newDestination = $this->getDestinationFromDb($this->research->pickCardForLocation('deck'.$type, 'slot'.$type, $research->locationArg));
+            $newDestination = $this->getResearchFromDb($this->research->pickCardForLocation('deck'.$type, 'slot'.$type, $research->locationArg));
             $newDestination->location = 'slot'.$type;
             $newDestination->locationArg = $research->locationArg;
 
             self::notifyAllPlayers('newTableDestination', '', [
                 'research' => $newDestination,
                 'letter' => $type,
-                'researchDeckTop' => Research::onlyId($this->getDestinationFromDb($this->research->getCardOnTop('deck'.$type))),
+                'researchDeckTop' => Research::onlyId($this->getResearchFromDb($this->research->getCardOnTop('deck'.$type))),
                 'researchDeckCount' => intval($this->research->countCardInLocation('deck'.$type)),
             ]);
         }
@@ -247,7 +247,7 @@ trait ActionTrait {
 
         $playerId = intval($this->getActivePlayerId());
 
-        $research = $this->getDestinationFromDb($this->research->getCard($id));
+        $research = $this->getResearchFromDb($this->research->getCard($id));
 
         if ($research == null || !in_array($research->location, ['slotA', 'slotB'])) {
             throw new BgaUserException("You can't reserve this research");
@@ -263,14 +263,14 @@ trait ActionTrait {
             'letter' => $type, // for logs
         ]);
 
-        $newDestination = $this->getDestinationFromDb($this->research->pickCardForLocation('deck'.$type, 'slot'.$type, $research->locationArg));
+        $newDestination = $this->getResearchFromDb($this->research->pickCardForLocation('deck'.$type, 'slot'.$type, $research->locationArg));
         $newDestination->location = 'slot'.$type;
         $newDestination->locationArg = $research->locationArg;
 
         self::notifyAllPlayers('newTableDestination', '', [
             'research' => $newDestination,
             'letter' => $type,
-            'researchDeckTop' => Research::onlyId($this->getDestinationFromDb($this->research->getCardOnTop('deck'.$type))),
+            'researchDeckTop' => Research::onlyId($this->getResearchFromDb($this->research->getCardOnTop('deck'.$type))),
             'researchDeckCount' => intval($this->research->countCardInLocation('deck'.$type)),
         ]);
 

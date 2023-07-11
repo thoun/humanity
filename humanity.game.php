@@ -175,7 +175,7 @@ class Humanity extends Table {
     
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
-        $sql = "SELECT player_id id, player_score score, player_no playerNo, player_research research, player_science science FROM player ";
+        $sql = "SELECT player_id id, player_score score, player_no playerNo, player_research_spot researchSpot, player_research_points researchPoints, player_science science FROM player ";
         $result['players'] = self::getCollectionFromDb( $sql );
   
         // Gather all information about current game situation (visible by player $current_player_id).
@@ -185,14 +185,13 @@ class Humanity extends Table {
         
         foreach($result['players'] as $playerId => &$player) {
             $player['playerNo'] = intval($player['playerNo']);
-            if ($player['playerNo'] == 1) {
-                $firstPlayerId = $playerId;
-            }
+            
             $player['workers'] = $this->getPlayerWorkers($playerId);
-            $player['research'] = intval($player['research']);
+            $player['researchSpot'] = intval($player['researchSpot']);
+            $player['researchPoints'] = $isEndScore || $playerId == $currentPlayerId ? intval($player['researchPoints']) : null;
             $player['science'] = intval($player['science']);
             $player['tiles'] = $this->getTilesByLocation('player', $playerId);
-            $player['research'] = $this->getDestinationsByLocation('played'.$playerId);
+            $player['research'] = $this->getResearchsByLocation('played'.$playerId);
 
             if ($currentPlayerId == $playerId) {
                 $player['hand'] = $this->getTilesByLocation('hand', $playerId);
@@ -200,20 +199,8 @@ class Humanity extends Table {
         }
 
         $result['tableTiles'] = $this->getTilesByLocation('table');
-
-        $result['cardDeckTop'] = Tile::onlyId($this->getTileFromDb($this->tiles->getCardOnTop('deck')));
-        $result['cardDeckCount'] = intval($this->tiles->countCardInLocation('deck'));
-        $result['cardDiscardCount'] = intval($this->tiles->countCardInLocation('discard'));
-        $result['centerCards'] = $this->getTilesByLocation('slot');
-        $result['centerDestinationsDeckTop'] = [];
-        $result['centerDestinationsDeckCount'] = [];
-        $result['centerDestinations'] = [];
-
-        //$result['centerDestinationsDeckTop'] = Research::onlyId($this->getDestinationFromDb($this->research->getCardOnTop('deck'.$letter)));
-        //$result['centerDestinationsDeckCount'] = intval($this->research->countCardInLocation('deck'.$letter));
-        $result['tableResearch'] = $this->getDestinationsByLocation('table');
-
-        $result['tableObjectives'] = $this->getObjectivesByLocation('table');        
+        $result['tableResearch'] = $this->getResearchsByLocation('table');
+        $result['tableObjectives'] = $this->getObjectivesByLocation('table');      
 
         $result['firstPlayerId'] = $firstPlayerId;
         $result['lastTurn'] = !$isEndScore && boolval($this->getGameStateValue(LAST_TURN));

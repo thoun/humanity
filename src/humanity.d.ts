@@ -63,13 +63,10 @@ interface HumanityPlayer extends Player {
     objectives: Objective[];
     
     workers: Worker[];
-    // TODO check
-    research: number;
-    recruit: number;
-    bracelet: number;
     tiles: Tile[];
     research: Research[];
-    reservedDestinations?: Research[];
+    researchSpot: number;
+    researchPoints?: number;
 }
 
 interface HumanityGamedatas {

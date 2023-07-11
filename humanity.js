@@ -2042,8 +2042,8 @@ var DestinationsManager = /** @class */ (function (_super) {
                 }
             },
             isCardVisible: function (card) { return Boolean(card.number); },
-            cardWidth: 221,
-            cardHeight: 120,
+            cardWidth: 150,
+            cardHeight: 100,
         }) || this;
         _this.game = game;
         return _this;
@@ -2096,6 +2096,8 @@ var ObjectivesManager = /** @class */ (function (_super) {
             setupFrontDiv: function (card, div) {
                 div.dataset.number = '' + card.number;
             },
+            cardWidth: 206,
+            cardHeight: 110,
         }) || this;
         _this.game = game;
         return _this;
@@ -2162,25 +2164,11 @@ var TableCenter = /** @class */ (function () {
             },
         });*/
         this.research = new SlotStock(game.researchManager, document.getElementById("table-research"), {
-            slotsIds: [1, 2, 3, 4, 5, 6, 7],
+            slotsIds: [0, 1, 2, 3, 4, 5, 6, 7],
             mapCardToSlot: function (card) { return card.locationArg; },
         });
         this.research.addCards(gamedatas.tableResearch);
         this.research.onCardClick = function (card) { return _this.game.onTableDestinationClick(card); };
-        var cardDeckDiv = document.getElementById("card-deck");
-        this.cardDeck = new Deck(game.tilesManager, cardDeckDiv, {
-            cardNumber: gamedatas.cardDeckCount,
-            topCard: gamedatas.cardDeckTop,
-            counter: {
-                counterId: 'deck-counter',
-            },
-        });
-        cardDeckDiv.insertAdjacentHTML('beforeend', "\n            <div id=\"discard-counter\" class=\"bga-cards_deck-counter round\">".concat(gamedatas.cardDiscardCount, "</div>\n        "));
-        var deckCounterDiv = document.getElementById('deck-counter');
-        var discardCounterDiv = document.getElementById('discard-counter');
-        this.game.setTooltip(deckCounterDiv.id, _('Deck size'));
-        this.game.setTooltip(discardCounterDiv.id, _('Discard size'));
-        this.cardDiscard = new VoidStock(game.tilesManager, discardCounterDiv);
         this.tiles = new SlotStock(game.tilesManager, document.getElementById("table-tiles"), {
             slotsIds: [0, 1, 2, 3, 4, 5, 6, 7],
             mapCardToSlot: function (card) { return card.locationArg; },
@@ -2188,9 +2176,11 @@ var TableCenter = /** @class */ (function () {
         });
         this.tiles.onCardClick = function (card) { return _this.game.onTableCardClick(card); };
         this.tiles.addCards(gamedatas.tableTiles);
-        document.getElementById('table-center').insertAdjacentHTML('afterbegin', "<div></div><div id=\"objectives\"></div>");
-        this.objectives = new LineStock(this.game.objectivesManager, document.getElementById("objectives"));
-        this.objectives.addCards(gamedatas.tableObjectives);
+        var tableWorkers = document.getElementById('table-workers');
+        tableWorkers.insertAdjacentHTML('beforeend', [0, 1, 2, 3, 4, 5, 6, 7].map(function (spot) { return "<div></div><div class=\"slot\" data-slot-id=\"".concat(spot, "\"></div>"); }).join(''));
+        Object.values(gamedatas.players).forEach(function (player) { return player.workers.filter(function (worker) { return worker.location == 'table'; }).forEach(function (worker) {
+            return tableWorkers.querySelector(".slot[data-slot-id=\"".concat(worker.spot, "\"]")).appendChild(_this.game.createWorker(worker));
+        }); });
     }
     TableCenter.prototype.newTableCard = function (card) {
         return this.tiles.addCard(card);
@@ -2226,8 +2216,10 @@ var TableCenter = /** @class */ (function () {
     };
     return TableCenter;
 }());
-var POINT_CASE_SIZE_LEFT = 38.8;
-var POINT_CASE_SIZE_TOP = 37.6;
+var POINT_CASE_HALF_WIDTH = 20.82;
+var POINT_CASE_TWO_THIRD_HEIGHT = 36.25;
+var RESEARCH_CASE_WIDTH = 40.71;
+var RESEARCH_CASE_HEIGHT = 33.5;
 var ResearchBoard = /** @class */ (function () {
     function ResearchBoard(game, gamedatas) {
         var _this = this;
@@ -2238,21 +2230,53 @@ var ResearchBoard = /** @class */ (function () {
         var html = '';
         // points
         players.forEach(function (player) {
-            return html += "\n            <div id=\"player-".concat(player.id, "-vp-marker\" class=\"marker ").concat(/*this.game.isColorBlindMode() ? 'color-blind' : */ '', "\" data-player-id=\"").concat(player.id, "\" data-player-no=\"").concat(player.playerNo, "\" data-color=\"").concat(player.color, "\"><div class=\"inner vp\"></div></div>\n            <div id=\"player-").concat(player.id, "-research-marker\" class=\"marker ").concat(/*this.game.isColorBlindMode() ? 'color-blind' : */ '', "\" data-player-id=\"").concat(player.id, "\" data-player-no=\"").concat(player.playerNo, "\" data-color=\"").concat(player.color, "\"><div class=\"inner research\"></div></div>\n            ");
+            return html += "\n            <div id=\"player-".concat(player.id, "-vp-marker\" class=\"vp marker ").concat(/*this.game.isColorBlindMode() ? 'color-blind' : */ '', "\" data-player-id=\"").concat(player.id, "\" data-player-no=\"").concat(player.playerNo, "\" style=\"--color: #").concat(player.color, ";\"><div class=\"inner vp\"></div></div>\n            <div id=\"player-").concat(player.id, "-research-marker\" class=\"research marker ").concat(/*this.game.isColorBlindMode() ? 'color-blind' : */ '', "\" data-player-id=\"").concat(player.id, "\" data-player-no=\"").concat(player.playerNo, "\" style=\"--color: #").concat(player.color, ";\"><div class=\"inner research\"></div></div>\n            ");
         });
         dojo.place(html, 'research-board');
         players.forEach(function (player) {
             _this.vp.set(Number(player.id), Number(player.score));
-            _this.researchPoints.set(Number(player.id), Math.min(14, Number(player.research)));
+            _this.researchPoints.set(Number(player.id), Math.min(14, Number(player.researchSpot)));
         });
         this.moveVP();
         this.moveResearch();
+        this.objectives = new SlotStock(this.game.objectivesManager, document.getElementById("objectives"), {
+            slotsIds: [1, 2, 3],
+            mapCardToSlot: function (card) { return card.locationArg; },
+        });
+        this.objectives.addCards(gamedatas.tableObjectives);
     }
     ResearchBoard.prototype.getVPCoordinates = function (points) {
-        var cases = points % 40;
-        var top = cases >= 16 ? (cases > 36 ? (40 - cases) : Math.min(4, cases - 16)) * POINT_CASE_SIZE_TOP : 0;
-        var left = cases > 20 ? (36 - Math.min(cases, 36)) * POINT_CASE_SIZE_LEFT : Math.min(16, cases) * POINT_CASE_SIZE_LEFT;
-        return [22 + left, 39 + top];
+        var cases = Math.min(points, 40);
+        var top = 0;
+        var left = 0;
+        if (cases > 0 && cases < 12) {
+            left = POINT_CASE_HALF_WIDTH * 2 * cases;
+        }
+        else if (cases == 12) {
+            top = POINT_CASE_TWO_THIRD_HEIGHT;
+            left = POINT_CASE_HALF_WIDTH * 23;
+        }
+        else if (cases > 12 && cases < 25) {
+            top = 2 * POINT_CASE_TWO_THIRD_HEIGHT;
+            left = POINT_CASE_HALF_WIDTH * 2 * (24 - cases);
+        }
+        else if (cases == 25) {
+            top = 3 * POINT_CASE_TWO_THIRD_HEIGHT;
+            left = POINT_CASE_HALF_WIDTH * -1;
+        }
+        else if (cases > 25 && cases < 39) {
+            top = 4 * POINT_CASE_TWO_THIRD_HEIGHT;
+            left = POINT_CASE_HALF_WIDTH * 2 * (cases - 26);
+        }
+        else if (cases == 39) {
+            top = 3 * POINT_CASE_TWO_THIRD_HEIGHT;
+            left = POINT_CASE_HALF_WIDTH * 25;
+        }
+        else if (cases == 40) {
+            top = 2 * POINT_CASE_TWO_THIRD_HEIGHT;
+            left = POINT_CASE_HALF_WIDTH * 26;
+        }
+        return [40 + left, 27 + top];
     };
     ResearchBoard.prototype.moveVP = function () {
         var _this = this;
@@ -2277,10 +2301,37 @@ var ResearchBoard = /** @class */ (function () {
         this.moveVP();
     };
     ResearchBoard.prototype.getResearchCoordinates = function (points) {
-        var cases = points;
-        var top = cases % 2 ? -14 : 0;
-        var left = cases * 16.9;
-        return [368 + left, 123 + top];
+        var cases = Math.min(points, 50);
+        var top = 0;
+        var left = RESEARCH_CASE_WIDTH * 7;
+        if (cases > 0 && cases < 8) {
+            left = RESEARCH_CASE_WIDTH * (cases + 7);
+        }
+        else if (cases == 8) {
+            top = RESEARCH_CASE_HEIGHT;
+            left = RESEARCH_CASE_WIDTH * 14;
+        }
+        else if (cases > 8 && cases < 23) {
+            top = 2 * RESEARCH_CASE_HEIGHT;
+            left = RESEARCH_CASE_WIDTH * (23 - cases);
+        }
+        else if (cases == 23) {
+            top = 3 * RESEARCH_CASE_HEIGHT;
+            left = RESEARCH_CASE_WIDTH;
+        }
+        else if (cases > 23 && cases < 38) {
+            top = 4 * RESEARCH_CASE_HEIGHT;
+            left = RESEARCH_CASE_WIDTH * (cases - 23);
+        }
+        else if (cases == 38) {
+            top = 5 * RESEARCH_CASE_HEIGHT;
+            left = RESEARCH_CASE_WIDTH * 14;
+        }
+        else if (cases > 38) {
+            top = 6 * RESEARCH_CASE_HEIGHT;
+            left = RESEARCH_CASE_WIDTH * (53 - cases);
+        }
+        return [-10 + left, 253 + top];
     };
     ResearchBoard.prototype.moveResearch = function () {
         var _this = this;
@@ -2300,11 +2351,11 @@ var ResearchBoard = /** @class */ (function () {
             markerDiv.style.transform = "translateX(".concat(left + leftShift, "px) translateY(").concat(top + topShift, "px)");
         });
     };
-    ResearchBoard.prototype.setResearch = function (playerId, research) {
-        this.researchPoints.set(playerId, Math.min(14, research));
+    ResearchBoard.prototype.setResearchSpot = function (playerId, researchSpot) {
+        this.researchPoints.set(playerId, researchSpot);
         this.moveResearch();
     };
-    ResearchBoard.prototype.getResearch = function (playerId) {
+    ResearchBoard.prototype.getResearchSpot = function (playerId) {
         return this.researchPoints.get(playerId);
     };
     // TODO keep?
@@ -2436,7 +2487,11 @@ var Humanity = /** @class */ (function () {
             onDimensionsChange: function () {
                 var tablesAndCenter = document.getElementById('tables-and-center');
                 var clientWidth = tablesAndCenter.clientWidth;
-                tablesAndCenter.classList.toggle('double-column', clientWidth > 1641); // 981 + 20 + 640
+                var tablesWidth = Math.max(640 /*, document.getElementById('tables').clientWidth*/);
+                tablesAndCenter.classList.toggle('double-column', clientWidth > 1201 + tablesWidth); // 1181 + 20 + tablesWidth
+                /*const centerWrapper = document.getElementById('table-center-wrapper');
+                const centerClientWidth = centerWrapper.clientWidth;
+                centerWrapper.classList.toggle('double-column', centerClientWidth > 2033); // 1181 + 852      */
             },
         });
         if (gamedatas.lastTurn) {
@@ -2684,7 +2739,7 @@ var Humanity = /** @class */ (function () {
                         _this.setRecruits(playerId, _this.recruitCounters[playerId].getValue() + amount);
                         break;
                     case RESEARCH:
-                        _this.setResearch(playerId, _this.tableCenter.getResearch(playerId) + amount);
+                        _this.setResearchSpot(playerId, _this.tableCenter.getResearch(playerId) + amount);
                         break;
                 }
             }
@@ -2693,11 +2748,14 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.setScore = function (playerId, score) {
         var _a;
         (_a = this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.toValue(score);
-        this.tableCenter.setScore(playerId, score);
+        this.researchBoard.setScore(playerId, score);
     };
-    Humanity.prototype.setResearch = function (playerId, count) {
-        this.researchCounters[playerId].toValue(getVpByResearch(count));
-        this.tableCenter.setResearch(playerId, count);
+    Humanity.prototype.setResearchPoints = function (playerId, count) {
+        this.researchCounters[playerId].toValue(count);
+        this.researchBoard.setResearchSpot(playerId, count);
+    };
+    Humanity.prototype.setResearchSpot = function (playerId, count) {
+        this.researchBoard.setResearchSpot(playerId, count);
     };
     Humanity.prototype.setRecruits = function (playerId, count) {
         this.recruitCounters[playerId].toValue(count);

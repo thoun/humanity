@@ -1,9 +1,8 @@
 .card.research {
   display: inline-block;
   position: relative;
-  width: 221px;
-  height: 150px;
-  border-radius: 8px;
+  width: 150px;
+  height: 100px;
 
   @for $year from 1 through 3 {
       &[data-year="#{$year}"] .front {
@@ -13,12 +12,12 @@
 
   .card-sides {
       .card-side {
-          border-radius: 8px;
+        box-shadow: none;
           background-size: auto 100%;
 
           @for $number from 1 through 9 {
               &[data-number="#{$number}"] {
-                  background-position-x: #{($number - 1) * 100% / 8};
+                  background-position-x: #{$number * 100% / 9};
               }
           }
 

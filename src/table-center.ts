@@ -1,11 +1,6 @@
 class TableCenter {
-    //public researchDecks: Deck<Destination>[] = [];
-    public cardDeck: Deck<Tile>;
-    public cardDiscard: VoidStock<Tile>;
     public research: SlotStock<Research>;
     public tiles: SlotStock<Tile>;
-
-    private objectives: LineStock<Objective>;
         
     constructor(private game: HumanityGame, gamedatas: HumanityGamedatas) {
         /*this.researchDecks = new Deck<Destination>(game.researchManager, document.getElementById(`table-research-${letter}-deck`), {
@@ -16,28 +11,11 @@ class TableCenter {
             },
         });*/
         this.research = new SlotStock<Research>(game.researchManager, document.getElementById(`table-research`), {
-            slotsIds: [1, 2, 3, 4, 5, 6, 7],
+            slotsIds: [0, 1, 2, 3, 4, 5, 6, 7],
             mapCardToSlot: card => card.locationArg,
         });
         this.research.addCards(gamedatas.tableResearch);
         this.research.onCardClick = (card: Research) => this.game.onTableDestinationClick(card);
-
-        const cardDeckDiv = document.getElementById(`card-deck`);
-        this.cardDeck = new Deck<Tile>(game.tilesManager, cardDeckDiv, {
-            cardNumber: gamedatas.cardDeckCount,
-            topCard: gamedatas.cardDeckTop,
-            counter: {
-                counterId: 'deck-counter',
-            },
-        });
-        cardDeckDiv.insertAdjacentHTML('beforeend', `
-            <div id="discard-counter" class="bga-cards_deck-counter round">${gamedatas.cardDiscardCount}</div>
-        `);
-        const deckCounterDiv = document.getElementById('deck-counter');
-        const discardCounterDiv = document.getElementById('discard-counter');
-        this.game.setTooltip(deckCounterDiv.id, _('Deck size'));
-        this.game.setTooltip(discardCounterDiv.id, _('Discard size'));
-        this.cardDiscard = new VoidStock<Tile>(game.tilesManager, discardCounterDiv);
 
         this.tiles = new SlotStock<Tile>(game.tilesManager, document.getElementById(`table-tiles`), {
             slotsIds: [0, 1, 2, 3, 4, 5, 6, 7],
@@ -47,10 +25,14 @@ class TableCenter {
         this.tiles.onCardClick = card => this.game.onTableCardClick(card);
         this.tiles.addCards(gamedatas.tableTiles);
 
-        document.getElementById('table-center').insertAdjacentHTML('afterbegin', `<div></div><div id="objectives"></div>`);
-        
-        this.objectives = new LineStock<Objective>(this.game.objectivesManager, document.getElementById(`objectives`));
-        this.objectives.addCards(gamedatas.tableObjectives);
+        const tableWorkers = document.getElementById('table-workers');
+        tableWorkers.insertAdjacentHTML('beforeend', 
+            [0, 1, 2, 3, 4, 5, 6, 7].map(spot => `<div></div><div class="slot" data-slot-id="${spot}"></div>`).join('')
+        );
+
+        Object.values(gamedatas.players).forEach(player => player.workers.filter(worker => worker.location == 'table').forEach(worker => 
+            tableWorkers.querySelector(`.slot[data-slot-id="${worker.spot}"]`).appendChild(this.game.createWorker(worker))
+        ));
     }
     
     public newTableCard(card: Tile): Promise<boolean> {

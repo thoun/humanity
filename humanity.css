@@ -795,9 +795,8 @@ body > .card {
 .card.research {
   display: inline-block;
   position: relative;
-  width: 221px;
-  height: 150px;
-  border-radius: 8px;
+  width: 150px;
+  height: 100px;
 }
 .card.research[data-year="1"] .front {
   background-image: url("img/research-age1.png");
@@ -809,32 +808,32 @@ body > .card {
   background-image: url("img/research-age3.png");
 }
 .card.research .card-sides .card-side {
-  border-radius: 8px;
+  box-shadow: none;
   background-size: auto 100%;
 }
 .card.research .card-sides .card-side[data-number="1"] {
-  background-position-x: 0%;
+  background-position-x: 11.1111111111%;
 }
 .card.research .card-sides .card-side[data-number="2"] {
-  background-position-x: 12.5%;
+  background-position-x: 22.2222222222%;
 }
 .card.research .card-sides .card-side[data-number="3"] {
-  background-position-x: 25%;
+  background-position-x: 33.3333333333%;
 }
 .card.research .card-sides .card-side[data-number="4"] {
-  background-position-x: 37.5%;
+  background-position-x: 44.4444444444%;
 }
 .card.research .card-sides .card-side[data-number="5"] {
-  background-position-x: 50%;
+  background-position-x: 55.5555555556%;
 }
 .card.research .card-sides .card-side[data-number="6"] {
-  background-position-x: 62.5%;
+  background-position-x: 66.6666666667%;
 }
 .card.research .card-sides .card-side[data-number="7"] {
-  background-position-x: 75%;
+  background-position-x: 77.7777777778%;
 }
 .card.research .card-sides .card-side[data-number="8"] {
-  background-position-x: 87.5%;
+  background-position-x: 88.8888888889%;
 }
 .card.research .card-sides .card-side[data-number="9"] {
   background-position-x: 100%;
@@ -984,8 +983,8 @@ body > .card {
 .card.objective {
   display: inline-block;
   position: relative;
-  width: 221px;
-  height: 150px;
+  width: 206px;
+  height: 110px;
 }
 .card.objective[data-type="1"] .card-side {
   background-position-x: 0%;
@@ -997,7 +996,7 @@ body > .card {
   background-position-x: 100%;
 }
 .card.objective .card-sides .card-side {
-  box-shadow: unset;
+  box-shadow: none;
 }
 .card.objective .card-sides .card-side > * {
   pointer-events: none;
@@ -1027,30 +1026,24 @@ body > .card {
 }
 
 #table-center-wrapper {
+  min-width: 1118px;
   display: flex;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+#table-center-wrapper.double-column {
+  flex-direction: row;
 }
 
-#table-center {
-  min-width: 818px;
-  display: grid;
-  grid-template-columns: 150px 690px;
-  gap: 8px;
-}
-#table-center .table-research-deck {
-  margin-left: -102px;
-}
-#table-center #table-research-A .slot, #table-center #table-research-B .slot {
-  width: 221px;
-  height: 150px;
-}
-#table-center #board-1 {
+#board-1 {
   position: relative;
   width: 981px;
   height: 981px;
+  margin: 100px;
   background: url("img/board-1.png");
 }
-#table-center #board-1 #board-2 {
+#board-1 #board-2 {
   position: absolute;
   left: 200px;
   top: 200px;
@@ -1061,63 +1054,123 @@ body > .card {
   transition: transform 0.5s;
   transform: rotate(calc(var(--r) * 45deg));
 }
-#table-center #board-1 #table-tiles {
+#board-1 #board-2 #table-research {
+  position: absolute;
+  left: 221px;
+  top: 235px;
+  width: 150px;
+  height: 100px;
+}
+#board-1 #board-2 #table-research .slot {
+  position: absolute;
+  width: 150px;
+  height: 100px;
+}
+#board-1 #board-2 #table-research .slot[data-slot-id="0"] {
+  transform: rotate(0deg) translateY(191px) rotate(-90deg);
+}
+#board-1 #board-2 #table-research .slot[data-slot-id="1"] {
+  transform: rotate(45deg) translateY(191px) rotate(-90deg);
+}
+#board-1 #board-2 #table-research .slot[data-slot-id="2"] {
+  transform: rotate(90deg) translateY(191px) rotate(-90deg);
+}
+#board-1 #board-2 #table-research .slot[data-slot-id="3"] {
+  transform: rotate(135deg) translateY(191px) rotate(-90deg);
+}
+#board-1 #board-2 #table-research .slot[data-slot-id="4"] {
+  transform: rotate(180deg) translateY(191px) rotate(-90deg);
+}
+#board-1 #board-2 #table-research .slot[data-slot-id="5"] {
+  transform: rotate(225deg) translateY(191px) rotate(-90deg);
+}
+#board-1 #board-2 #table-research .slot[data-slot-id="6"] {
+  transform: rotate(270deg) translateY(191px) rotate(-90deg);
+}
+#board-1 #board-2 #table-research .slot[data-slot-id="7"] {
+  transform: rotate(315deg) translateY(191px) rotate(-90deg);
+}
+#board-1 #table-tiles {
   position: absolute;
   left: 415px;
   top: 415px;
   width: 150px;
   height: 150px;
 }
-#table-center #board-1 #table-tiles .slot {
+#board-1 #table-tiles .slot {
   position: absolute;
   width: 150px;
   height: 150px;
 }
-#table-center #board-1 #table-tiles .slot[data-slot-id="0"] .front {
+#board-1 #table-tiles .slot[data-slot-id="0"] {
   transform: rotate(0deg) translateY(380px);
 }
-#table-center #board-1 #table-tiles .slot[data-slot-id="1"] .front {
+#board-1 #table-tiles .slot[data-slot-id="1"] {
   transform: rotate(45deg) translateY(380px);
 }
-#table-center #board-1 #table-tiles .slot[data-slot-id="2"] .front {
+#board-1 #table-tiles .slot[data-slot-id="2"] {
   transform: rotate(90deg) translateY(380px);
 }
-#table-center #board-1 #table-tiles .slot[data-slot-id="3"] .front {
+#board-1 #table-tiles .slot[data-slot-id="3"] {
   transform: rotate(135deg) translateY(380px);
 }
-#table-center #board-1 #table-tiles .slot[data-slot-id="4"] .front {
+#board-1 #table-tiles .slot[data-slot-id="4"] {
   transform: rotate(180deg) translateY(380px);
 }
-#table-center #board-1 #table-tiles .slot[data-slot-id="5"] .front {
+#board-1 #table-tiles .slot[data-slot-id="5"] {
   transform: rotate(225deg) translateY(380px);
 }
-#table-center #board-1 #table-tiles .slot[data-slot-id="6"] .front {
+#board-1 #table-tiles .slot[data-slot-id="6"] {
   transform: rotate(270deg) translateY(380px);
 }
-#table-center #board-1 #table-tiles .slot[data-slot-id="7"] .front {
+#board-1 #table-tiles .slot[data-slot-id="7"] {
   transform: rotate(315deg) translateY(380px);
 }
-#table-center #card-deck[data-empty=true] {
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 8px;
+#board-1 #table-workers {
+  position: absolute;
+  left: 390px;
+  top: 440px;
+  width: 200px;
+  height: 100px;
 }
-#table-center .bga-cards_deck-counter {
-  pointer-events: all;
+#board-1 #table-workers .slot {
+  position: absolute;
+  width: 200px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
 }
-#table-center .bga-cards_deck-counter#deck-counter {
-  --bga-cards-deck-left: 25%;
+#board-1 #table-workers .slot[data-slot-id="0"] {
+  transform: rotate(0deg) translateY(540px) rotate(180deg);
 }
-#table-center .bga-cards_deck-counter#discard-counter {
-  background-color: #aaaaaa;
-  --bga-cards-deck-left: 75%;
+#board-1 #table-workers .slot[data-slot-id="1"] {
+  transform: rotate(45deg) translateY(540px) rotate(180deg);
+}
+#board-1 #table-workers .slot[data-slot-id="2"] {
+  transform: rotate(90deg) translateY(540px) rotate(180deg);
+}
+#board-1 #table-workers .slot[data-slot-id="3"] {
+  transform: rotate(135deg) translateY(540px) rotate(180deg);
+}
+#board-1 #table-workers .slot[data-slot-id="4"] {
+  transform: rotate(180deg) translateY(540px) rotate(180deg);
+}
+#board-1 #table-workers .slot[data-slot-id="5"] {
+  transform: rotate(225deg) translateY(540px) rotate(180deg);
+}
+#board-1 #table-workers .slot[data-slot-id="6"] {
+  transform: rotate(270deg) translateY(540px) rotate(180deg);
+}
+#board-1 #table-workers .slot[data-slot-id="7"] {
+  transform: rotate(315deg) translateY(540px) rotate(180deg);
 }
 
 #research-board {
   position: relative;
-  width: 690px;
-  height: 518px;
+  width: 682px;
+  height: 512px;
+  margin-right: 170px;
   background: url("img/research-board.png");
-  background-size: cover;
 }
 #research-board .marker {
   position: absolute;
@@ -1128,18 +1181,24 @@ body > .card {
   transition: transform 0.5s;
   pointer-events: none;
 }
+#research-board .marker.vp {
+  width: 39px;
+  height: 45px;
+}
+#research-board .marker.research {
+  width: 35px;
+  height: 28px;
+}
 #research-board .marker .inner {
   position: absolute;
   top: 0;
   left: 0;
   bottom: 0;
   right: 0;
+  background: var(--color);
 }
 #research-board .marker .inner.vp {
-  background-image: url("img/vp-pawns.png");
-}
-#research-board .marker .inner.reputation {
-  background-image: url("img/reputation-pawns.png");
+  clip-path: polygon(0% 25%, 0% 75%, 50% 100%, 100% 75%, 100% 25%, 50% 0%);
 }
 #research-board .marker[data-color=f0db6c] .inner {
   background-position-x: 0%;
@@ -1182,6 +1241,23 @@ body > .card {
   background: orange;
   border-radius: 50%;
   box-shadow: 0 0 5px 5px orange;
+}
+#research-board #objectives {
+  position: absolute;
+  left: 645px;
+}
+#research-board #objectives .slot {
+  position: absolute;
+  left: 0;
+}
+#research-board #objectives .slot[data-slot-id="1"] {
+  top: 64px;
+}
+#research-board #objectives .slot[data-slot-id="2"] {
+  top: 200px;
+}
+#research-board #objectives .slot[data-slot-id="3"] {
+  top: 336px;
 }
 
 .player-board {

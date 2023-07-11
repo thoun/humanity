@@ -1,8 +1,8 @@
 .card.objective {
     display: inline-block;
     position: relative;
-    width: 221px;
-    height: 150px;
+    width: 206px;
+    height: 110px;
 
     @for $type from 1 through 3 {
         &[data-type="#{$type}"] .card-side {
@@ -12,7 +12,7 @@
 
     .card-sides {
         .card-side {
-            box-shadow: unset;
+            box-shadow: none;
 
             &>* {
                 pointer-events: none;

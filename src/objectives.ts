@@ -10,6 +10,8 @@ class ObjectivesManager extends CardManager<Objective> {
             setupFrontDiv: (card: Objective, div: HTMLElement) => { 
                 div.dataset.number = ''+card.number;
             },
+            cardWidth: 206,
+            cardHeight: 110,
         });
     }
 

@@ -233,18 +233,18 @@ trait UtilTrait {
         }
     }
 
-    function getDestinationFromDb(/*array|null*/ $dbCard) {
+    function getResearchFromDb(/*array|null*/ $dbCard) {
         if ($dbCard == null) {
             return null;
         }
         return new Research($dbCard, $this->RESEARCH);
     }
 
-    function getDestinationsFromDb(array $dbCards) {
-        return array_map(fn($dbCard) => $this->getDestinationFromDb($dbCard), array_values($dbCards));
+    function getResearchsFromDb(array $dbCards) {
+        return array_map(fn($dbCard) => $this->getResearchFromDb($dbCard), array_values($dbCards));
     }
 
-    function getDestinationsByLocation(string $location, /*int|null*/ $location_arg = null, /*int|null*/ $type = null, /*int|null*/ $number = null) {
+    function getResearchsByLocation(string $location, /*int|null*/ $location_arg = null, /*int|null*/ $type = null, /*int|null*/ $number = null) {
         $sql = "SELECT * FROM `research` WHERE `card_location` = '$location'";
         if ($location_arg !== null) {
             $sql .= " AND `card_location_arg` = $location_arg";
@@ -257,7 +257,7 @@ trait UtilTrait {
         }
         $sql .= " ORDER BY `card_location_arg`";
         $dbResults = $this->getCollectionFromDb($sql);
-        return array_map(fn($dbCard) => $this->getDestinationFromDb($dbCard), array_values($dbResults));
+        return array_map(fn($dbCard) => $this->getResearchFromDb($dbCard), array_values($dbResults));
     }
 
     function setupResearches() {
@@ -271,8 +271,8 @@ trait UtilTrait {
             $this->research->shuffle('deck'.$year);
         }
 
-        for ($place = 1; $place <= 7; $place++) {
-            $this->research->pickCardForLocation('deck1', 'table', $place);
+        foreach ([1, 2, 3, 4, 5, 6, 7] as $spot) {
+            $this->research->pickCardForLocation('deck1', 'table', $spot);
         }
     }
 
@@ -525,7 +525,7 @@ trait UtilTrait {
     }
 
     function getTradeGains(int $playerId, int $bracelets) {
-        $research = $this->getDestinationsByLocation('played'.$playerId);
+        $research = $this->getResearchsByLocation('played'.$playerId);
 
         $gains = [];
 

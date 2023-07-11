@@ -1,9 +1,9 @@
 #research-board {
   position: relative;
-  width: 690px;
-  height: 518px;
+  width: 682px;
+  height: 512px;
+  margin-right: 170px;
   background: url('img/research-board.png');
-  background-size: cover; // TODO TEMP
 
   .marker {
     position: absolute;
@@ -14,6 +14,16 @@
     transition: transform 0.5s; 
     pointer-events: none;
 
+    &.vp {
+      width: 39px;
+      height: 45px;
+    }
+
+    &.research {
+      width: 35px;
+      height: 28px;
+    }
+
     .inner {
       position: absolute;
       top: 0;
@@ -21,11 +31,13 @@
       bottom: 0;
       right: 0;
       
+      background: var(--color);
       &.vp {
-        background-image: url('img/vp-pawns.png');
+        clip-path: polygon(0% 25%, 0% 75%, 50% 100%,100% 75% ,100% 25% ,50% 0% );
+        //background-image: url('img/vp-pawns.png');
       }
-      &.reputation {
-        background-image: url('img/reputation-pawns.png');
+      &.research {
+        //background-image: url('img/reputation-pawns.png');
       }
     }
       
@@ -73,6 +85,26 @@
         background: orange;
         border-radius: 50%;
         box-shadow: 0 0 5px 5px orange;
+      }
+    }
+  }
+
+  #objectives {
+    position: absolute;
+    left: 645px;
+
+    .slot {
+      position: absolute;
+      left: 0;
+
+      &[data-slot-id="1"] {
+        top: 64px;
+      }
+      &[data-slot-id="2"] {
+        top: 200px;
+      }
+      &[data-slot-id="3"] {
+        top: 336px;
       }
     }
   }

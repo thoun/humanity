@@ -100,7 +100,12 @@ class Humanity implements HumanityGame {
             onDimensionsChange: () => {
                 const tablesAndCenter = document.getElementById('tables-and-center');
                 const clientWidth = tablesAndCenter.clientWidth;
-                tablesAndCenter.classList.toggle('double-column', clientWidth > 1641); // 981 + 20 + 640
+                const tablesWidth = Math.max(640/*, document.getElementById('tables').clientWidth*/);
+                tablesAndCenter.classList.toggle('double-column', clientWidth > 1201 + tablesWidth); // 1181 + 20 + tablesWidth
+
+                /*const centerWrapper = document.getElementById('table-center-wrapper');
+                const centerClientWidth = centerWrapper.clientWidth;
+                centerWrapper.classList.toggle('double-column', centerClientWidth > 2033); // 1181 + 852      */          
             },
         });
 
@@ -412,7 +417,7 @@ class Humanity implements HumanityGame {
                         this.setRecruits(playerId, this.recruitCounters[playerId].getValue() + amount);
                         break;
                     case RESEARCH:
-                        this.setResearch(playerId, this.tableCenter.getResearch(playerId) + amount);
+                        this.setResearchSpot(playerId, this.tableCenter.getResearch(playerId) + amount);
                         break;
                 }
             }
@@ -421,12 +426,16 @@ class Humanity implements HumanityGame {
 
     private setScore(playerId: number, score: number) {
         (this as any).scoreCtrl[playerId]?.toValue(score);
-        this.tableCenter.setScore(playerId, score);
+        this.researchBoard.setScore(playerId, score);
     }
 
-    private setResearch(playerId: number, count: number) {
-        this.researchCounters[playerId].toValue(getVpByResearch(count));
-        this.tableCenter.setResearch(playerId, count);
+    private setResearchPoints(playerId: number, count: number) {
+        this.researchCounters[playerId].toValue(count);
+        this.researchBoard.setResearchSpot(playerId, count);
+    }
+
+    private setResearchSpot(playerId: number, count: number) {
+        this.researchBoard.setResearchSpot(playerId, count);
     }
 
     private setRecruits(playerId: number, count: number) {

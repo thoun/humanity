@@ -1,30 +1,22 @@
 #table-center-wrapper {
+  min-width: 1118px;
   display: flex;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  &.double-column {
+    flex-direction: row;
+  }
 }
 
-#table-center {
-  min-width: 818px;
-
-  display: grid;
-  grid-template-columns: 150px 690px;
-  gap: 8px;
-
-  .table-research-deck {
-    margin-left: -102px;
-  }
-
-  #table-research-A, #table-research-B {
-    .slot {      
-      width: 221px;
-      height: 150px;
-    }
-  }
+//#table-center {
 
   #board-1 {
     position: relative;
     width: 981px;
     height: 981px;
+    margin: 100px;
     background: url('img/board-1.png');
 
     #board-2 {
@@ -37,6 +29,26 @@
       transform-origin: 290px 290px;
       transition: transform 0.5s;
       transform: rotate(calc(var(--r) * 45deg));
+
+      #table-research {
+        position: absolute;
+        left: 221px;
+        top: 235px;
+        width: 150px;
+        height: 100px;
+  
+        .slot {    
+          position: absolute;  
+          width: 150px;
+          height: 100px;
+  
+          @for $r from 0 through 7 {
+            &[data-slot-id="#{$r}"] {
+              transform: rotate(#{$r * 45deg}) translateY(191px) rotate(-90deg);
+            }
+          }
+        }
+      }
     }
 
     #table-tiles {
@@ -52,30 +64,33 @@
         height: 150px;
 
         @for $r from 0 through 7 {
-          &[data-slot-id="#{$r}"] .front {
+          &[data-slot-id="#{$r}"] {
             transform: rotate(#{$r * 45deg}) translateY(380px);
           }
         }
-        //transform: rotate(var(--r)) translate(var(--x));
+      }
+    }
+
+    #table-workers {
+      position: absolute;
+      left: 390px;
+      top: 440px;
+      width: 200px;
+      height: 100px;
+
+      .slot {    
+        position: absolute;  
+        width: 200px;
+        height: 100px;
+        display: flex;
+        justify-content: center;
+
+        @for $r from 0 through 7 {
+          &[data-slot-id="#{$r}"] {
+            transform: rotate(#{$r * 45deg}) translateY(540px) rotate(180deg);
+          }
+        }
       }
     }
   }
-
-  #card-deck[data-empty="true"] {
-    background: #FFFFFF66;
-    border-radius: 8px;
-  }
-
-  .bga-cards_deck-counter {
-    pointer-events: all;
-
-    &#deck-counter {      
-      --bga-cards-deck-left: 25%;
-    }
-
-    &#discard-counter {
-      background-color: #aaaaaa;
-      --bga-cards-deck-left: 75%;
-    }
-  }
-}
+//}
