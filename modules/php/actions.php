@@ -17,35 +17,17 @@ trait ActionTrait {
         (note: each method below must match an input method in nicodemus.action.php)
     */
 
-    public function goTrade() {
-        self::checkAction('goTrade');
+    public function chooseWorker(int $id) {
+        self::checkAction('chooseWorker');
 
-        $this->gamestate->nextState('trade');
-    }
+        $args = $this->argChooseWorker();
+        $worker = $this->array_find($args['workers'], fn($worker) => $worker->id == $id);
 
-    public function playCard(int $id) {
-        self::checkAction('playCard');
-
-        if (boolval($this->getGameStateValue(RECRUIT_DONE))) {
-            throw new BgaUserException("Invalid action");
+        if ($worker == null) {
+            throw new BgaUserException("Invalid worker");
         }
 
-        $playerId = intval($this->getActivePlayerId());
-            
-
-        $hand = $this->getTilesByLocation('hand', $playerId);
-        $tile = $this->array_find($hand, fn($c) => $c->id == $id);
-
-        if ($tile == null || $tile->location != 'hand' || $tile->locationArg != $playerId) {
-            throw new BgaUserException("You can't play this card");
-        }
-
-        $this->tiles->moveCard($tile->id, 'played'.$playerId.'-'.$tile->color, intval($this->research->countCardInLocation('played'.$playerId.'-'.$tile->color)));
-
-        $tilesOfColor = $this->getTilesByLocation('played'.$playerId.'-'.$tile->color);
-        $gains = array_map(fn($tile) => $tile->gain, $tilesOfColor);
-        $groupGains = $this->groupGains($gains);
-        $effectiveGains = $this->gainResources($playerId, $groupGains, 'recruit');
+        /*$playerId = intval($this->getActivePlayerId());
 
         self::notifyAllPlayers('playCard', clienttranslate('${player_name} plays a ${card_color} ${card_type} card from their hand and gains ${gains}'), [
             'playerId' => $playerId,
@@ -55,33 +37,11 @@ trait ActionTrait {
             'gains' => $effectiveGains, // for logs
             'card_type' => $this->getGainName($tile->gain), // for logs
             'card_color' => $this->getColorName($tile->color), // for logs
-        ]);
+        ]);*/
 
-        $this->setGameStateValue(PLAYED_CARD_COLOR, $tile->color);
+        $this->setGameStateValue(SELECTED_WORKER, $id);
 
-        $argChooseNewCard = $this->argChooseNewCard();
-        if ($argChooseNewCard['allFree']) {
-            self::notifyAllPlayers('log', clienttranslate('${player_name} can recruit any viking for free thanks to ${objective_name} effect'), [
-                'player_name' => $this->getPlayerName($playerId),
-                'objective_name' => '', // for logs
-                'i18n' => ['objective_name'],
-            ]);
-        }
-
-        $this->incStat(1, 'playedCards');
-        $this->incStat(1, 'playedCards', $playerId);
-
-        $allGains = array_reduce($effectiveGains, fn($a, $b) => $a + $b, 0);
-        $this->incStat($allGains, 'assetsCollectedByPlayedCards');
-        $this->incStat($allGains, 'assetsCollectedByPlayedCards', $playerId);
-        foreach ($effectiveGains as $type => $count) {
-            if ($count > 0) {
-                $this->incStat($count, 'assetsCollectedByPlayedCards'.$type);
-                $this->incStat($count, 'assetsCollectedByPlayedCards'.$type, $playerId);
-            }
-        }
-
-        $this->gamestate->nextState('chooseNewCard');
+        $this->gamestate->nextState('next');
     }
 
     public function chooseNewCard(int $id) {

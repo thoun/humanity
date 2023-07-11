@@ -1,0 +1,37 @@
+.worker {
+    position: relative;
+    display: inline-block;
+    width: 88px;
+    height: 100px;
+    background-image: url('img/workers.png');
+    background-size: auto 100%;
+
+    @each $playerColor in $playerColors {
+        $i: index($playerColors, $playerColor) - 1;
+        &[data-player-color="#{$playerColor}"], &[data-player-color="#{$playerColor}"] .workforce { 
+            background-position-x: #{$i * 100% / 3};
+        }
+    }
+
+    &.selectable {
+        cursor: pointer;
+    }
+
+    .workforce {
+        position: absolute;
+        display: inline-block;
+        width: 40px;
+        height: 42px;
+        bottom: 0;
+        left: 28px;
+
+        background-image: url('img/workforces.png');
+        background-size: auto 300%;
+
+        @for $workforce from 2 through 4 {
+            &[data-workforce="#{$workforce}"] {
+                background-position-y: #{($workforce - 2) * 100% / 2};
+            }
+        }
+    }
+}

@@ -103,7 +103,7 @@ define('EXPLORE_DONE', 12);
 define('TRADE_DONE', 15);
 define('GO_DISCARD_TABLE_CARD', 16);
 define('GO_RESERVE', 17);
-define('PLAYED_CARD_COLOR', 20);
+define('SELECTED_WORKER', 20);
 define('SELECTED_DESTINATION', 21);
 define('COMPLETED_LINES', 22);
 

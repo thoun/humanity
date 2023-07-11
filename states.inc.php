@@ -89,14 +89,8 @@ $playerActionsGameStates = [
 
     ST_PLAYER_PLAY_ACTION => [
         "name" => "playAction",
-        "description" => clienttranslate('${actplayer} must recruit (play a card) or explore (take a research)'),
-        "descriptionmyturn" => clienttranslate('${you} must recruit (play a card) or explore (take a research)'),
-        "descriptionRecruitOnly" => clienttranslate('${actplayer} can recruit (play a card)'),
-        "descriptionmyturnRecruitOnly" => clienttranslate('${you} can recruit (play a card)'),
-        "descriptionExploreOnly" => clienttranslate('${actplayer} can explore (take a research)'),
-        "descriptionmyturnExploreOnly" => clienttranslate('${you} can explore (take a research)'),
-        "descriptionTradeOnly" => clienttranslate('${actplayer} can trade'),
-        "descriptionmyturnTradeOnly" => clienttranslate('${you} can trade'),
+        "description" => clienttranslate('${actplayer} must A. Travaillez dans la base, B. Déployez un module, C. Réalisez une expérience'),
+        "descriptionmyturn" => clienttranslate('${you} must A. Travaillez dans la base, B. Déployez un module, C. Réalisez une expérience'),
         "type" => "activeplayer",    
         "args" => "argPlayAction",
         //"action" => "stPlayAction",

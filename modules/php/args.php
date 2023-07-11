@@ -13,8 +13,13 @@ trait ArgsTrait {
     */
 
     function argChooseWorker() {
-        // TODO
-        return [];
+        $playerId = intval($this->getActivePlayerId());
+
+        $workers = $this->getPlayerWorkers($playerId, 'player', true);
+
+        return [
+            'workers' => $workers,
+        ];
     }
    
     function argPlayAction() {
@@ -53,7 +58,7 @@ trait ArgsTrait {
         $playerId = intval($this->getActivePlayerId());
         $player = $this->getPlayer($playerId);
 
-        $freeColor = intval($this->getGameStateValue(PLAYED_CARD_COLOR));
+        $freeColor = intval($this->getGameStateValue(SELECTED_WORKER));
         $centerCards = $this->getTilesByLocation('slot');
 
         $allFree = false;

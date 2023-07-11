@@ -104,7 +104,7 @@ trait StateTrait {
         $this->setGameStateValue(RECRUIT_DONE, 0);
         $this->setGameStateValue(EXPLORE_DONE, 0);
         $this->setGameStateValue(TRADE_DONE, 0);
-        $this->setGameStateValue(PLAYED_CARD_COLOR, 0);
+        $this->setGameStateValue(SELECTED_WORKER, 0);
         $this->setGameStateValue(GO_DISCARD_TABLE_CARD, 0);
         $this->setGameStateValue(GO_RESERVE, 0);
 

@@ -145,81 +145,15 @@ class Humanity implements HumanityGame {
         log('Entering state: ' + stateName, args.args);
 
         switch (stateName) {
-            case 'playAction':
-                this.onEnteringPlayAction(args.args);
-                break;
-            case 'chooseNewCard':
-                this.onEnteringChooseNewCard(args.args);
-                break;
-            case 'payDestination':
-                this.onEnteringPayDestination(args.args);
-                break;
-            case 'discardTableCard':
-                this.onEnteringDiscardTableCard();
-                break;
-            case 'reserveDestination':
-                this.onEnteringReserveDestination();
+            case 'chooseWorker':
+                this.onEnteringChooseWorker(args.args);
                 break;
         }
     }
-    
-    private setGamestateDescription(property: string = '') {
-        const originalState = this.gamedatas.gamestates[this.gamedatas.gamestate.id];
-        this.gamedatas.gamestate.description = `${originalState['description' + property]}`; 
-        this.gamedatas.gamestate.descriptionmyturn = `${originalState['descriptionmyturn' + property]}`;
-        (this as any).updatePageTitle();
-    }
 
-    private onEnteringPlayAction(args: EnteringPlayActionArgs) {
-        if (!args.canExplore && !args.canRecruit) {
-            this.setGamestateDescription('TradeOnly');
-        } else if (!args.canExplore) {
-            this.setGamestateDescription('RecruitOnly');
-        } else if (!args.canRecruit) {
-            this.setGamestateDescription('ExploreOnly');
-        }
-
+    private onEnteringChooseWorker(args: EnteringChooseWorkerArgs) {
         if ((this as any).isCurrentPlayerActive()) {
-            if (args.canExplore) {
-                this.tableCenter.setDestinationsSelectable(true, args.possibleDestinations);
-                this.getCurrentPlayerTable()?.setDestinationsSelectable(true, args.possibleDestinations);
-            }
-            if (args.canRecruit) {
-                this.getCurrentPlayerTable()?.setHandSelectable(true);
-            }
-        }
-    }
-
-    private onEnteringChooseNewCard(args: EnteringChooseNewCardArgs) {
-        if ((this as any).isCurrentPlayerActive()) {
-            this.tableCenter.setCardsSelectable(true, args.allFree ? null : args.freeColor, args.recruits);
-        }
-    }
-
-    private onEnteringDiscardTableCard() {
-        if ((this as any).isCurrentPlayerActive()) {
-            this.tableCenter.setCardsSelectable(true, null, 0);
-        }
-    }
-
-    private onEnteringDiscardCard(args: EnteringPayDestinationArgs) {
-        if ((this as any).isCurrentPlayerActive()) {
-            this.getCurrentPlayerTable()?.setCardsSelectable(true, [0]);
-        }
-    }
-
-    private onEnteringPayDestination(args: EnteringPayDestinationArgs) {
-        const selectedCardDiv = this.researchManager.getCardElement(args.selectedDestination);
-        selectedCardDiv.classList.add('selected-pay-research');
-
-        if ((this as any).isCurrentPlayerActive()) {
-            this.getCurrentPlayerTable()?.setCardsSelectable(true, args.selectedDestination.cost);
-        }
-    }
-
-    private onEnteringReserveDestination() {
-        if ((this as any).isCurrentPlayerActive()) {
-            this.tableCenter.setDestinationsSelectable(true, this.tableCenter.getVisibleDestinations());
+            this.getCurrentPlayerTable()?.setSelectableWorkers(args.workers);
         }
     }
 
@@ -227,78 +161,14 @@ class Humanity implements HumanityGame {
         log( 'Leaving state: '+stateName );
 
         switch (stateName) {
-            case 'playAction':
-                this.onLeavingPlayAction();
-                break;
-            case 'chooseNewCard':
-                this.onLeavingChooseNewCard();
-                break;
-            case 'payDestination':
-                this.onLeavingPayDestination();
-                break;
-            case 'discardTableCard':
-                this.onLeavingDiscardTableCard();
-                break;
-            case 'discardCard':
-                this.onLeavingDiscardCard();
-                break;
-            case 'reserveDestination':
-                this.onLeavingReserveDestination();
+            case 'chooseWorker':
+                this.onLeavingChooseWorker();
                 break;
         }
     }
 
-    private onLeavingPlayAction() {
-        this.tableCenter.setDestinationsSelectable(false);
-        this.getCurrentPlayerTable()?.setHandSelectable(false);
-        this.getCurrentPlayerTable()?.setDestinationsSelectable(false);
-    }
-    
-    private onLeavingChooseNewCard() {
-        this.tableCenter.setCardsSelectable(false);
-    }
-
-    private onLeavingPayDestination() {
-        document.querySelectorAll('.selected-pay-research').forEach(elem => elem.classList.remove('selected-pay-research'));
-        this.getCurrentPlayerTable()?.setCardsSelectable(false);
-    }
-    
-    private onLeavingDiscardTableCard() {
-        this.tableCenter.setCardsSelectable(false);
-    }
-
-    private onLeavingDiscardCard() {
-        this.getCurrentPlayerTable()?.setCardsSelectable(false);
-    }
-
-    private onLeavingReserveDestination() {
-        this.tableCenter.setDestinationsSelectable(false);
-    }
-
-    private setPayDestinationLabelAndState(args?: EnteringPayDestinationArgs) {
-        if (!args) {
-            args = this.gamedatas.gamestate.args;
-        }
-
-        const selectedCards = this.getCurrentPlayerTable().getSelectedCards();
-
-        const button = document.getElementById(`payDestination_button`);
-
-        const total = Object.values(args.selectedDestination.cost).reduce((a, b) => a + b, 0);
-        const cards = selectedCards.length;
-        const recruits = total - cards;
-        let message = '';
-        if (recruits > 0 && cards > 0) {
-            message = _("Pay the ${cards} selected card(s) and ${recruits} recruit(s)")
-        } else if (cards > 0) {
-            message = _("Pay the ${cards} selected card(s)");
-        } else if (recruits > 0) {
-            message = _("Pay ${recruits} recruit(s)");
-        }
-
-        button.innerHTML = message.replace('${recruits}', ''+recruits).replace('${cards}', ''+cards);
-        button.classList.toggle('disabled', args.recruits < recruits);
-        button.dataset.recruits = ''+recruits;
+    private onLeavingChooseWorker() {
+        this.getCurrentPlayerTable()?.setSelectableWorkers([]);
     }
 
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
@@ -309,7 +179,7 @@ class Humanity implements HumanityGame {
         if ((this as any).isCurrentPlayerActive()) {
             switch (stateName) {
                 case 'playAction':
-                    const playActionArgs = args as EnteringPlayActionArgs;
+                    const playActionArgs = args as EnteringChooseWorkerArgs;
                     (this as any).addActionButton(`goTrade_button`, _("Trade"), () => this.goTrade());
                     if (!playActionArgs.canTrade) {
                         document.getElementById(`goTrade_button`).classList.add('disabled');
@@ -447,8 +317,7 @@ class Humanity implements HumanityGame {
                     <span id="bracelet-counter-${player.id}"></span>
                 </div>
                 
-            </div>
-            <div>${playerId == gamedatas.firstPlayerId ? `<div id="first-player">${_('First player')}</div>` : ''}</div>`;
+            </div>`;
 
             dojo.place(html, `player_board_${player.id}`);
 
@@ -462,7 +331,14 @@ class Humanity implements HumanityGame {
 
             this.braceletCounters[playerId] = new ebg.counter();
             this.braceletCounters[playerId].create(`bracelet-counter-${playerId}`);
-            this.braceletCounters[playerId].setValue(player.bracelet);
+            this.braceletCounters[playerId].setValue(player.bracelet);    
+
+            // first player token
+            dojo.place(`<div id="player_board_${player.id}_firstPlayerWrapper" class="firstPlayerWrapper"></div>`, `player_board_${player.id}`);
+
+            if (gamedatas.firstPlayerId === playerId) {
+                this.placeFirstPlayerToken(gamedatas.firstPlayerId);
+            }
         });
 
         this.setTooltipToClass('research-counter', _('Research'));
@@ -481,6 +357,46 @@ class Humanity implements HumanityGame {
     private createPlayerTable(gamedatas: HumanityGamedatas, playerId: number) {
         const table = new PlayerTable(this, gamedatas.players[playerId]);
         this.playersTables.push(table);
+    }
+
+    public createWorker(worker: Worker): HTMLDivElement {
+        const workerDiv = document.createElement('div');
+        workerDiv.id = `worker-${worker.id}`;
+        workerDiv.classList.add('worker');
+        workerDiv.dataset.id = `${worker.id}`;
+        workerDiv.dataset.playerColor = this.getPlayer(worker.playerId).color;
+
+        workerDiv.addEventListener('click', () => {
+            if (workerDiv.classList.contains('selectable')) {
+                this.onWorkerClick(worker);
+            }
+        });
+        
+        const workforceDiv = document.createElement('div');
+        workforceDiv.id = `${workerDiv.id}-force`;
+        workforceDiv.classList.add('workforce');
+        workforceDiv.dataset.workforce = `${worker.workforce}`;
+        workerDiv.appendChild(workforceDiv);
+
+        return workerDiv;
+    }
+
+    placeFirstPlayerToken(playerId: number): Promise<any> {
+        const firstPlayerToken = document.getElementById('firstPlayerToken');
+        if (firstPlayerToken) {
+            this.animationManager.attachWithAnimation(
+                new BgaSlideAnimation({
+                    element: firstPlayerToken,
+                }),
+                document.getElementById(`player_board_${playerId}_firstPlayerWrapper`),
+            );
+        } else {
+            dojo.place('<div id="firstPlayerToken"></div>', `player_board_${playerId}_firstPlayerWrapper`);
+
+            (this as any).addTooltipHtml('firstPlayerToken', _("First Player token"));
+
+            return Promise.resolve(true);
+        }
     }
 
     private updateGains(playerId: number, gains: { [type: number]: number }) {
@@ -525,10 +441,6 @@ class Humanity implements HumanityGame {
     private setBracelets(playerId: number, count: number) {
         this.braceletCounters[playerId].toValue(count);
         this.getPlayerTable(playerId).updateCounter('bracelets', count);
-    }
-
-    public highlightPlayerTokens(playerId: number | null): void {
-        this.tableCenter.highlightPlayerTokens(playerId);
     }
 
     private getColorAddHtml() {
@@ -610,6 +522,22 @@ class Humanity implements HumanityGame {
         } else {
             this.setPayDestinationLabelAndState();
         }
+    }
+
+    public onWorkerClick(worker: Worker): void {
+        if (this.gamedatas.gamestate.name == 'chooseWorker') {
+            this.chooseWorker(worker.id);
+        }
+    }
+  	
+    public chooseWorker(id: number) {
+        if(!(this as any).checkAction('chooseWorker')) {
+            return;
+        }
+
+        this.takeAction('chooseWorker', {
+            id
+        });
     }
   	
     public goTrade() {
@@ -756,6 +684,8 @@ class Humanity implements HumanityGame {
         //log( 'notifications subscriptions setup' );
 
         const notifs = [
+            ['firstPlayerToken', undefined],
+
             ['playCard', undefined],
             ['takeCard', undefined],
             ['newTableCard', undefined],
@@ -798,6 +728,10 @@ class Humanity implements HumanityGame {
                 }
             });
         }
+    }
+
+    notif_firstPlayerToken(notif: Notif<NotifFirstPlayerTokenArgs>) {
+        return this.placeFirstPlayerToken(notif.args.playerId);
     }
 
     notif_playCard(args: NotifPlayCardArgs) {

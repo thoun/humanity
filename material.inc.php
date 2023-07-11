@@ -92,19 +92,20 @@ $this->TILES = [ //public int $type; // 0 start, 1..3 year, 8 communication, 9 o
 
     1 => [
         1 => new TileType(BLUE_OR_ORANGE, [INSECT => 1, ICE => 1, METHAN => 1], null, null, null, 3),
-        2 => new OrangeTileType([INSECT => 1, ICE => 1, METHAN => 1], null, null), // TODO power ? RESEARCH_POWER_TIME
-        3 => new OrangeTileType([ICE => 2], 1, [[INSECT => 1, METHAN => 1], [INSECT => 2, METHAN => 2], [INSECT => 3, METHAN => 3], []]),
-        4 => new OrangeTileType([METHAN => 2], 1, [[INSECT => 1, ICE => 1], [INSECT => 2, ICE => 2], [INSECT => 3, ICE => 3], []]),
-        5 => new OrangeTileType([INSECT => 2], 1, [[METHAN => 1, ICE => 1], [METHAN => 2, ICE => 2], [METHAN => 3, ICE => 3], []]),
-        6 => new BlueTileType([ICE => 3], 2, [[OXYGEN => 1], [OXYGEN => 2], [OXYGEN => 3], []]),
-        7 => new BlueTileType([METHAN => 3], 2, [[AIRCARBON => 1], [AIRCARBON => 2], [AIRCARBON => 3], []]),
-        8 => new BlueTileType([INSECT => 3], 2, [[PROTEIN => 1], [PROTEIN => 2], [PROTEIN => 3], []]),
-        9 => new PurpleTileType([ELECTRICITY => 1, METHAN => 1], 3, 2, GREEN),
-        10 => new PurpleTileType([ELECTRICITY => 1, ICE => 1], 3, 2, BLUE),
-        11 => new PurpleTileType([ELECTRICITY => 1, INSECT => 1], 3, 2, ORANGE),
-        12 => new GreenTileType([ICE => 2], SHAPE_OCTOGONAL),
-        13 => new GreenTileType([METHAN => 2], SHAPE_RECTANGULAR),
-        14 => new GreenTileType([INSECT => 2], SHAPE_ROUND),
+        2 => new TileType(BLUE_OR_ORANGE, [INSECT => 1, ICE => 1, METHAN => 1], null, null, null, 3),
+        3 => new OrangeTileType([INSECT => 1, ICE => 1, METHAN => 1], null, null), // TODO power ? RESEARCH_POWER_TIME
+        4 => new OrangeTileType([ICE => 2], 1, [[INSECT => 1, METHAN => 1], [INSECT => 2, METHAN => 2], [INSECT => 3, METHAN => 3], []]),
+        5 => new OrangeTileType([METHAN => 2], 1, [[INSECT => 1, ICE => 1], [INSECT => 2, ICE => 2], [INSECT => 3, ICE => 3], []]),
+        6 => new OrangeTileType([INSECT => 2], 1, [[METHAN => 1, ICE => 1], [METHAN => 2, ICE => 2], [METHAN => 3, ICE => 3], []]),
+        7 => new BlueTileType([ICE => 3], 2, [[OXYGEN => 1], [OXYGEN => 2], [OXYGEN => 3], []]),
+        8 => new BlueTileType([METHAN => 3], 2, [[AIRCARBON => 1], [AIRCARBON => 2], [AIRCARBON => 3], []]),
+        9 => new BlueTileType([INSECT => 3], 2, [[PROTEIN => 1], [PROTEIN => 2], [PROTEIN => 3], []]),
+        10 => new PurpleTileType([ELECTRICITY => 1, METHAN => 1], 3, 2, GREEN),
+        11 => new PurpleTileType([ELECTRICITY => 1, ICE => 1], 3, 2, BLUE),
+        12 => new PurpleTileType([ELECTRICITY => 1, INSECT => 1], 3, 2, ORANGE),
+        13 => new GreenTileType([ICE => 2], SHAPE_OCTOGONAL),
+        14 => new GreenTileType([METHAN => 2], SHAPE_RECTANGULAR),
+        15 => new GreenTileType([INSECT => 2], SHAPE_ROUND),
     ],
 
     2 => [

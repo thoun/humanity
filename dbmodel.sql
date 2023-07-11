@@ -58,8 +58,11 @@ CREATE TABLE IF NOT EXISTS `worker` (
   `id` TINYINT unsigned NOT NULL AUTO_INCREMENT,
   `player_id` int(11) NOT NULL,
   `workforce` TINYINT unsigned NOT NULL DEFAULT 2,
+  `remaining_workforce` TINYINT unsigned NOT NULL DEFAULT 2,
   `location` varchar(16) NOT NULL DEFAULT 'player',
-  `location_arg` tinyint(2) NULL,
+   `x` smallint(2) NULL,
+   `y` smallint(2) NULL,
+   `spot` tinyint(1) UNSIGNED NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 

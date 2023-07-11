@@ -32,10 +32,6 @@ class ObjectivesManager extends CardManager<Objective> {
             case 14: message = _("(+2) if you have at least 1 colour with exactly 4 cards."); break;
         }
 
-        message = message.replaceAll(/\(([+-]?\d)\)/g, (a, b) => { console.log(a, b); 
-            return `<div class="points-circle" data-negative="${Number(b) < 0}">${b}</div>`; 
-        });
-
         return message;
         
     }

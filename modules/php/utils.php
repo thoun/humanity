@@ -136,6 +136,32 @@ trait UtilTrait {
         ] + $args);
     }
 
+    function setupWorkers(array $playersIds) {
+        $sql = "INSERT INTO worker (`player_id`, `location`, `x`, `y`, `spot`) VALUES ";
+        $values = [];
+        foreach($playersIds as $index => $playerId) {
+            $startPosition = 7 - $index - (4 - count($playersIds));
+            $values[] = "($playerId, 'player', -1, -1, NULL)";
+            $values[] = "($playerId, 'player', 1, -1, NULL)";
+            $values[] = "($playerId, 'table', NULL, NULL, $startPosition)";
+        }
+
+        $sql .= implode(',', $values);
+        $this->DbQuery($sql);
+    } 
+
+    function getPlayerWorkers(int $playerId, ?string $location = null, bool $filterRemainingWorkforce = false) {
+        $sql = "SELECT * FROM worker WHERE `player_id` = $playerId";
+        if ($location !== null) {
+            $sql .= " AND `location` = '$location'";
+        }
+        if ($filterRemainingWorkforce) {
+            $sql .= " AND `remaining_workforce` > 0";
+        }
+        $dbWorkers = $this->getCollectionFromDB($sql);
+        return array_map(fn($dbWorker) => new Worker($dbWorker), array_values($dbWorkers));
+    }
+
     function getTileFromDb(/*array|null*/ $dbCard) {
         if ($dbCard == null) {
             return null;

@@ -19,6 +19,7 @@
 
 require_once(APP_GAMEMODULE_PATH.'module/table/table.game.php');
 
+require_once('modules/php/objects/worker.php');
 require_once('modules/php/objects/card.php');
 require_once('modules/php/objects/research.php');
 require_once('modules/php/objects/player.php');
@@ -53,7 +54,7 @@ class Humanity extends Table {
             TRADE_DONE => TRADE_DONE,
             GO_DISCARD_TABLE_CARD => GO_DISCARD_TABLE_CARD,
             GO_RESERVE => GO_RESERVE,
-            PLAYED_CARD_COLOR => PLAYED_CARD_COLOR,
+            SELECTED_WORKER => SELECTED_WORKER,
             SELECTED_DESTINATION => SELECTED_DESTINATION,
             COMPLETED_LINES => COMPLETED_LINES,
 
@@ -115,7 +116,7 @@ class Humanity extends Table {
         $this->setGameStateInitialValue(RECRUIT_DONE, 0);
         $this->setGameStateInitialValue(EXPLORE_DONE, 0);
         $this->setGameStateInitialValue(TRADE_DONE, 0);
-        $this->setGameStateInitialValue(PLAYED_CARD_COLOR, 0);
+        $this->setGameStateInitialValue(SELECTED_WORKER, 0);
         $this->setGameStateInitialValue(GO_DISCARD_TABLE_CARD, 0);
         $this->setGameStateInitialValue(GO_RESERVE, 0);
         
@@ -144,6 +145,7 @@ class Humanity extends Table {
         }
 
         // setup the initial game situation here
+        $this->setupWorkers(array_keys($players));
         $this->setupTiles($players);
         $this->setupResearches();
         $this->setupObjectives();
@@ -186,7 +188,7 @@ class Humanity extends Table {
             if ($player['playerNo'] == 1) {
                 $firstPlayerId = $playerId;
             }
-
+            $player['workers'] = $this->getPlayerWorkers($playerId);
             $player['research'] = intval($player['research']);
             $player['science'] = intval($player['science']);
             $player['tiles'] = $this->getTilesByLocation('player', $playerId);

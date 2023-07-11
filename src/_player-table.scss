@@ -30,8 +30,13 @@
     grid-template-rows: repeat(var(--rows), 120px);
     grid-template-columns: repeat(var(--columns), 120px);
     
-    //.tile grid-column: y;
-    //.tile grid-row: x;
+    .slot {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      //.tile grid-column: y;
+      //.tile grid-row: x;
+    }
   }
 
   .visible-cards {

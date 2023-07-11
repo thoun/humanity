@@ -4,6 +4,7 @@ $playerColors: 'f0db6c', '62bce6', '70c499', 'ddbdd7';
 @import '../node_modules/bga-zoom/bga-zoom';
 @import '../node_modules/bga-jump-to/bga-jump-to';
 @import '../node_modules/bga-cards/bga-cards';
+@import 'workers';
 @import 'tiles';
 @import 'research';
 @import 'objectives';
@@ -68,24 +69,6 @@ html, .mode_3d #game_play_area_background {
   }
 }
 
-.color {
-  display: inline-block;
-  width: 32px;
-  height: 32px;
-  background-image: url('img/colors.png');
-  background-size: auto 100%;
-  background-repeat: no-repeat;
-  background-position: center;
-  vertical-align: middle;
-  border-radius: 2px;
-  
-  @for $color from 1 through 5 {
-    &[data-color="#{$color}"] {
-        background-position-x: #{($color - 1) * 100% / 4};
-    }
-  }
-}
-
 .action-button, .log {
   .icon, .color {
     width: 24px;
@@ -129,6 +112,15 @@ html, .mode_3d #game_play_area_background {
       flex: 1;
     }
   }
+}
+
+#firstPlayerToken {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  border-radius: 50%;
+  box-shadow: 1px 1px 1px 1px #00000099;
+  background: url('img/first-player.png');
 }
 
 .objective-tooltip {

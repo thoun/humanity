@@ -72,7 +72,7 @@
 
         @each $playerColor in $playerColors {
             $i: index($playerColors, $playerColor) - 1;
-            &[data-color="#{$playerColor}"] .front { 
+            &[data-player-color="#{$playerColor}"] .front { 
                 background-position-x: #{$i * 100% / 3};
             }
         }
@@ -93,14 +93,6 @@
 
         .card-side {
             box-shadow: unset;
-        }
-    }
-
-    @for $color from 1 through 5 {
-        @for $gain from 1 through 4 {
-            .front[data-color="#{$color}"][data-gain="#{$gain}"] {
-                background-position-x: #{(($color - 1) * 4 + $gain) * 100% / 20};
-            }
         }
     }
 }

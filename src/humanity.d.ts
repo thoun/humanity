@@ -48,10 +48,21 @@ interface Objective {
     extremity?: number;
 }
 
+interface Worker {
+    id: number;
+    playerId: number;
+    workforce: number;
+    location: string;
+    x: number;
+    y: number;
+    spot: number; // table spot
+}
+
 interface HumanityPlayer extends Player {
     playerNo: number;
     objectives: Objective[];
     
+    workers: Worker[];
     // TODO check
     research: number;
     recruit: number;
@@ -102,37 +113,21 @@ interface HumanityGame extends Game {
     getTooltipColor(color: number): string;
     getGameStateName(): string;
     getCurrentPlayerTable(): PlayerTable | null;
+    createWorker(worker: Worker): HTMLDivElement;
 
     setTooltip(id: string, html: string): void;
-    highlightPlayerTokens(playerId: number | null): void;
     onTableDestinationClick(research: Research): void;
     onPlayerTileClick(card: Tile): void;
     onTableCardClick(card: Tile): void;
     onPlayedCardClick(card: Tile): void;
 }
 
-interface EnteringPlayActionArgs {
-    canRecruit: boolean;
-    canExplore: boolean;
-    canTrade: boolean;
-    possibleDestinations: Research[];
+interface EnteringChooseWorkerArgs {
+    workers: Worker[];
 }
 
-interface EnteringChooseNewCardArgs {
-    centerCards: Tile[];
-    freeColor: number;
-    recruits: number;
-    allFree: boolean;
-}
-
-interface EnteringPayDestinationArgs {
-    selectedDestination: Research;
-    recruits: number;
-}
-
-interface EnteringTradeArgs {
-    bracelets: number;
-    gainsByBracelets: { [bracelets: number]: number };
+interface NotifFirstPlayerTokenArgs {
+    playerId: number;
 }
 
 // playCard

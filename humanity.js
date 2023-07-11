@@ -2146,10 +2146,6 @@ var ObjectivesManager = /** @class */ (function (_super) {
                 message = _("(+2) if you have at least 1 colour with exactly 4 cards.");
                 break;
         }
-        message = message.replaceAll(/\(([+-]?\d)\)/g, function (a, b) {
-            console.log(a, b);
-            return "<div class=\"points-circle\" data-negative=\"".concat(Number(b) < 0, "\">").concat(b, "</div>");
-        });
         return message;
     };
     return ObjectivesManager;
@@ -2320,14 +2316,7 @@ var PlayerTable = /** @class */ (function () {
         this.limitSelection = null;
         this.playerId = Number(player.id);
         this.currentPlayer = this.playerId == this.game.getPlayerId();
-        var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div class=\"cols\">\n            <div class=\"col col1\">\n            <div id=\"player-table-").concat(this.playerId, "-tiles\" class=\"tiles\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-research\" class=\"research\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-boat\" class=\"boat\" data-color=\"").concat(player.color, "\" data-recruits=\"").concat(player.recruit, "\" data-bracelets=\"").concat(player.bracelet, "\">");
-        for (var i = 1; i <= 3; i++) {
-            if (this.currentPlayer) {
-                html += "<div id=\"player-table-".concat(this.playerId, "-column").concat(i, "\" class=\"column\" data-number=\"").concat(i, "\"></div>");
-            }
-            html += "\n            <div class=\"icon bracelet\" data-number=\"".concat(i, "\"></div>\n            <div class=\"icon recruit\" data-number=\"").concat(i, "\"></div>\n            ");
-        }
-        html += "\n            </div>\n            <div class=\"visible-cards\">";
+        var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div class=\"cols\">\n            <div class=\"col col1\">\n            <div id=\"player-table-").concat(this.playerId, "-tiles\" class=\"tiles\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-research\" class=\"research\"></div>\n            <div class=\"visible-cards\">");
         for (var i = 1; i <= 5; i++) {
             html += "\n                <div id=\"player-table-".concat(this.playerId, "-played-").concat(i, "\" class=\"cards\"></div>\n                ");
         }
@@ -2362,108 +2351,14 @@ var PlayerTable = /** @class */ (function () {
         });
         researchDiv.style.setProperty('--card-overlap', '94px');
         this.research.addCards(player.research);
-        [document.getElementById("player-table-".concat(this.playerId, "-name")), document.getElementById("player-table-".concat(this.playerId, "-boat"))].forEach(function (elem) {
-            elem.addEventListener('mouseenter', function () { return _this.game.highlightPlayerTokens(_this.playerId); });
-            elem.addEventListener('mouseleave', function () { return _this.game.highlightPlayerTokens(null); });
+        player.workers.filter(function (worker) { return worker.location == 'player'; }).forEach(function (worker) {
+            tilesDiv.querySelector("[data-slot-id=\"".concat(worker.x, "_").concat(worker.y, "\"]")).appendChild(_this.game.createWorker(worker));
         });
     }
-    PlayerTable.prototype.updateCounter = function (type, count) {
-        document.getElementById("player-table-".concat(this.playerId, "-boat")).dataset[type] = '' + count;
-    };
-    PlayerTable.prototype.playCard = function (card, fromElement) {
-        return this.played[card.color].addCard(card, {
-            fromElement: fromElement
+    PlayerTable.prototype.setSelectableWorkers = function (workers) {
+        document.getElementById("player-table-".concat(this.playerId, "-tiles")).querySelectorAll('.worker').forEach(function (worker) {
+            return worker.classList.toggle('selectable', workers.some(function (w) { return w.id == Number(worker.dataset.id); }));
         });
-    };
-    PlayerTable.prototype.setHandSelectable = function (selectable) {
-        this.tiles.setSelectionMode(selectable ? 'single' : 'none');
-    };
-    PlayerTable.prototype.setCardsSelectable = function (selectable, cost) {
-        if (cost === void 0) { cost = null; }
-        var colors = cost == null ? [] : Object.keys(cost).map(function (key) { return Number(key); });
-        var equalOrDifferent = cost == null ? false : [EQUAL, DIFFERENT].includes(colors[0]);
-        this.limitSelection = equalOrDifferent ? colors[0] : null;
-        for (var i = 1; i <= 5; i++) {
-            this.played[i].setSelectionMode(selectable ? 'multiple' : 'none');
-            if (selectable) {
-                var selectableCards = this.played[i].getCards().filter(function (card) {
-                    var disabled = !selectable || cost == null;
-                    if (!disabled) {
-                        if (colors.length != 1 || (colors.length == 1 && !equalOrDifferent)) {
-                            disabled = !colors.includes(card.color);
-                        }
-                    }
-                    return !disabled;
-                });
-                this.played[i].setSelectableCards(selectableCards);
-            }
-        }
-    };
-    PlayerTable.prototype.getSelectedCards = function () {
-        var cards = [];
-        for (var i = 1; i <= 5; i++) {
-            cards.push.apply(cards, this.played[i].getSelection());
-        }
-        return cards;
-    };
-    PlayerTable.prototype.reserveDestination = function (research) {
-        return this.reservedDestinations.addCard(research);
-    };
-    PlayerTable.prototype.setDestinationsSelectable = function (selectable, selectableCards) {
-        if (selectableCards === void 0) { selectableCards = null; }
-        if (!this.reservedDestinations) {
-            return;
-        }
-        this.reservedDestinations.setSelectionMode(selectable ? 'single' : 'none');
-        this.reservedDestinations.setSelectableCards(selectableCards);
-    };
-    PlayerTable.prototype.showColumns = function (number) {
-        if (number > 0) {
-            document.getElementById("player-table-".concat(this.playerId, "-boat")).style.setProperty('--column-height', "".concat(35 * (this.research.getCards().length + 1), "px"));
-        }
-        for (var i = 1; i <= 3; i++) {
-            document.getElementById("player-table-".concat(this.playerId, "-column").concat(i)).classList.toggle('highlight', i <= number);
-        }
-    };
-    PlayerTable.prototype.updateSelectable = function () {
-        var _this = this;
-        var selectedCards = this.getSelectedCards();
-        var selectedColors = selectedCards.map(function (card) { return card.color; });
-        var color = selectedCards.length ? selectedCards[0].color : null;
-        for (var i = 1; i <= 5; i++) {
-            var selectableCards = this.played[i].getCards().filter(function (card) {
-                var disabled = false;
-                if (_this.limitSelection === DIFFERENT) {
-                    disabled = selectedColors.includes(card.color) && !selectedCards.includes(card);
-                }
-                else if (_this.limitSelection === EQUAL) {
-                    disabled = color !== null && card.color != color;
-                }
-                return !disabled;
-            });
-            this.played[i].setSelectableCards(selectableCards);
-        }
-    };
-    PlayerTable.prototype.setDoubleColumn = function (isDoublePlayerColumn) {
-        var research = document.getElementById("player-table-".concat(this.playerId, "-research"));
-        var boat = document.getElementById("player-table-".concat(this.playerId, "-boat"));
-        var reservedDestinations = document.getElementById("player-table-".concat(this.playerId, "-reserved-research-wrapper"));
-        if (isDoublePlayerColumn) {
-            var col2 = document.getElementById("player-table-".concat(this.playerId)).querySelector('.col2');
-            col2.appendChild(research);
-            col2.appendChild(boat);
-            if (reservedDestinations) {
-                col2.appendChild(reservedDestinations);
-            }
-        }
-        else {
-            var visibleCards = document.getElementById("player-table-".concat(this.playerId)).querySelector('.visible-cards');
-            visibleCards.insertAdjacentElement('beforebegin', research);
-            visibleCards.insertAdjacentElement('beforebegin', boat);
-            if (reservedDestinations) {
-                visibleCards.insertAdjacentElement('afterend', reservedDestinations);
-            }
-        }
     };
     return PlayerTable;
 }());
@@ -2579,149 +2474,28 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.onEnteringState = function (stateName, args) {
         log('Entering state: ' + stateName, args.args);
         switch (stateName) {
-            case 'playAction':
-                this.onEnteringPlayAction(args.args);
-                break;
-            case 'chooseNewCard':
-                this.onEnteringChooseNewCard(args.args);
-                break;
-            case 'payDestination':
-                this.onEnteringPayDestination(args.args);
-                break;
-            case 'discardTableCard':
-                this.onEnteringDiscardTableCard();
-                break;
-            case 'reserveDestination':
-                this.onEnteringReserveDestination();
+            case 'chooseWorker':
+                this.onEnteringChooseWorker(args.args);
                 break;
         }
     };
-    Humanity.prototype.setGamestateDescription = function (property) {
-        if (property === void 0) { property = ''; }
-        var originalState = this.gamedatas.gamestates[this.gamedatas.gamestate.id];
-        this.gamedatas.gamestate.description = "".concat(originalState['description' + property]);
-        this.gamedatas.gamestate.descriptionmyturn = "".concat(originalState['descriptionmyturn' + property]);
-        this.updatePageTitle();
-    };
-    Humanity.prototype.onEnteringPlayAction = function (args) {
-        var _a, _b;
-        if (!args.canExplore && !args.canRecruit) {
-            this.setGamestateDescription('TradeOnly');
-        }
-        else if (!args.canExplore) {
-            this.setGamestateDescription('RecruitOnly');
-        }
-        else if (!args.canRecruit) {
-            this.setGamestateDescription('ExploreOnly');
-        }
-        if (this.isCurrentPlayerActive()) {
-            if (args.canExplore) {
-                this.tableCenter.setDestinationsSelectable(true, args.possibleDestinations);
-                (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setDestinationsSelectable(true, args.possibleDestinations);
-            }
-            if (args.canRecruit) {
-                (_b = this.getCurrentPlayerTable()) === null || _b === void 0 ? void 0 : _b.setHandSelectable(true);
-            }
-        }
-    };
-    Humanity.prototype.onEnteringChooseNewCard = function (args) {
-        if (this.isCurrentPlayerActive()) {
-            this.tableCenter.setCardsSelectable(true, args.allFree ? null : args.freeColor, args.recruits);
-        }
-    };
-    Humanity.prototype.onEnteringDiscardTableCard = function () {
-        if (this.isCurrentPlayerActive()) {
-            this.tableCenter.setCardsSelectable(true, null, 0);
-        }
-    };
-    Humanity.prototype.onEnteringDiscardCard = function (args) {
+    Humanity.prototype.onEnteringChooseWorker = function (args) {
         var _a;
         if (this.isCurrentPlayerActive()) {
-            (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setCardsSelectable(true, [0]);
-        }
-    };
-    Humanity.prototype.onEnteringPayDestination = function (args) {
-        var _a;
-        var selectedCardDiv = this.researchManager.getCardElement(args.selectedDestination);
-        selectedCardDiv.classList.add('selected-pay-research');
-        if (this.isCurrentPlayerActive()) {
-            (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setCardsSelectable(true, args.selectedDestination.cost);
-        }
-    };
-    Humanity.prototype.onEnteringReserveDestination = function () {
-        if (this.isCurrentPlayerActive()) {
-            this.tableCenter.setDestinationsSelectable(true, this.tableCenter.getVisibleDestinations());
+            (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableWorkers(args.workers);
         }
     };
     Humanity.prototype.onLeavingState = function (stateName) {
         log('Leaving state: ' + stateName);
         switch (stateName) {
-            case 'playAction':
-                this.onLeavingPlayAction();
-                break;
-            case 'chooseNewCard':
-                this.onLeavingChooseNewCard();
-                break;
-            case 'payDestination':
-                this.onLeavingPayDestination();
-                break;
-            case 'discardTableCard':
-                this.onLeavingDiscardTableCard();
-                break;
-            case 'discardCard':
-                this.onLeavingDiscardCard();
-                break;
-            case 'reserveDestination':
-                this.onLeavingReserveDestination();
+            case 'chooseWorker':
+                this.onLeavingChooseWorker();
                 break;
         }
     };
-    Humanity.prototype.onLeavingPlayAction = function () {
-        var _a, _b;
-        this.tableCenter.setDestinationsSelectable(false);
-        (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setHandSelectable(false);
-        (_b = this.getCurrentPlayerTable()) === null || _b === void 0 ? void 0 : _b.setDestinationsSelectable(false);
-    };
-    Humanity.prototype.onLeavingChooseNewCard = function () {
-        this.tableCenter.setCardsSelectable(false);
-    };
-    Humanity.prototype.onLeavingPayDestination = function () {
+    Humanity.prototype.onLeavingChooseWorker = function () {
         var _a;
-        document.querySelectorAll('.selected-pay-research').forEach(function (elem) { return elem.classList.remove('selected-pay-research'); });
-        (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setCardsSelectable(false);
-    };
-    Humanity.prototype.onLeavingDiscardTableCard = function () {
-        this.tableCenter.setCardsSelectable(false);
-    };
-    Humanity.prototype.onLeavingDiscardCard = function () {
-        var _a;
-        (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setCardsSelectable(false);
-    };
-    Humanity.prototype.onLeavingReserveDestination = function () {
-        this.tableCenter.setDestinationsSelectable(false);
-    };
-    Humanity.prototype.setPayDestinationLabelAndState = function (args) {
-        if (!args) {
-            args = this.gamedatas.gamestate.args;
-        }
-        var selectedCards = this.getCurrentPlayerTable().getSelectedCards();
-        var button = document.getElementById("payDestination_button");
-        var total = Object.values(args.selectedDestination.cost).reduce(function (a, b) { return a + b; }, 0);
-        var cards = selectedCards.length;
-        var recruits = total - cards;
-        var message = '';
-        if (recruits > 0 && cards > 0) {
-            message = _("Pay the ${cards} selected card(s) and ${recruits} recruit(s)");
-        }
-        else if (cards > 0) {
-            message = _("Pay the ${cards} selected card(s)");
-        }
-        else if (recruits > 0) {
-            message = _("Pay ${recruits} recruit(s)");
-        }
-        button.innerHTML = message.replace('${recruits}', '' + recruits).replace('${cards}', '' + cards);
-        button.classList.toggle('disabled', args.recruits < recruits);
-        button.dataset.recruits = '' + recruits;
+        (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableWorkers([]);
     };
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
     //                        action status bar (ie: the HTML links in the status bar).
@@ -2832,7 +2606,7 @@ var Humanity = /** @class */ (function () {
             var playerId = Number(player.id);
             document.getElementById("player_score_".concat(player.id)).insertAdjacentHTML('beforebegin', "<div class=\"vp icon\"></div>");
             document.getElementById("icon_point_".concat(player.id)).remove();
-            var html = "<div class=\"counters\">\n            \n                <div id=\"research-counter-wrapper-".concat(player.id, "\" class=\"research-counter\">\n                    <div class=\"research icon\"></div>\n                    <span id=\"research-counter-").concat(player.id, "\"></span> <span class=\"research-legend\"><div class=\"vp icon\"></div> / ").concat(_('round'), "</span>\n                </div>\n\n            </div><div class=\"counters\">\n            \n                <div id=\"recruit-counter-wrapper-").concat(player.id, "\" class=\"recruit-counter\">\n                    <div class=\"recruit icon\"></div>\n                    <span id=\"recruit-counter-").concat(player.id, "\"></span>\n                </div>\n            \n                <div id=\"bracelet-counter-wrapper-").concat(player.id, "\" class=\"bracelet-counter\">\n                    <div class=\"bracelet icon\"></div>\n                    <span id=\"bracelet-counter-").concat(player.id, "\"></span>\n                </div>\n                \n            </div>\n            <div>").concat(playerId == gamedatas.firstPlayerId ? "<div id=\"first-player\">".concat(_('First player'), "</div>") : '', "</div>");
+            var html = "<div class=\"counters\">\n            \n                <div id=\"research-counter-wrapper-".concat(player.id, "\" class=\"research-counter\">\n                    <div class=\"research icon\"></div>\n                    <span id=\"research-counter-").concat(player.id, "\"></span> <span class=\"research-legend\"><div class=\"vp icon\"></div> / ").concat(_('round'), "</span>\n                </div>\n\n            </div><div class=\"counters\">\n            \n                <div id=\"recruit-counter-wrapper-").concat(player.id, "\" class=\"recruit-counter\">\n                    <div class=\"recruit icon\"></div>\n                    <span id=\"recruit-counter-").concat(player.id, "\"></span>\n                </div>\n            \n                <div id=\"bracelet-counter-wrapper-").concat(player.id, "\" class=\"bracelet-counter\">\n                    <div class=\"bracelet icon\"></div>\n                    <span id=\"bracelet-counter-").concat(player.id, "\"></span>\n                </div>\n                \n            </div>");
             dojo.place(html, "player_board_".concat(player.id));
             _this.researchCounters[playerId] = new ebg.counter();
             _this.researchCounters[playerId].create("research-counter-".concat(playerId));
@@ -2843,6 +2617,11 @@ var Humanity = /** @class */ (function () {
             _this.braceletCounters[playerId] = new ebg.counter();
             _this.braceletCounters[playerId].create("bracelet-counter-".concat(playerId));
             _this.braceletCounters[playerId].setValue(player.bracelet);
+            // first player token
+            dojo.place("<div id=\"player_board_".concat(player.id, "_firstPlayerWrapper\" class=\"firstPlayerWrapper\"></div>"), "player_board_".concat(player.id));
+            if (gamedatas.firstPlayerId === playerId) {
+                _this.placeFirstPlayerToken(gamedatas.firstPlayerId);
+            }
         });
         this.setTooltipToClass('research-counter', _('Research'));
         this.setTooltipToClass('recruit-counter', _('Recruits'));
@@ -2858,6 +2637,38 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.createPlayerTable = function (gamedatas, playerId) {
         var table = new PlayerTable(this, gamedatas.players[playerId]);
         this.playersTables.push(table);
+    };
+    Humanity.prototype.createWorker = function (worker) {
+        var _this = this;
+        var workerDiv = document.createElement('div');
+        workerDiv.id = "worker-".concat(worker.id);
+        workerDiv.classList.add('worker');
+        workerDiv.dataset.id = "".concat(worker.id);
+        workerDiv.dataset.playerColor = this.getPlayer(worker.playerId).color;
+        workerDiv.addEventListener('click', function () {
+            if (workerDiv.classList.contains('selectable')) {
+                _this.onWorkerClick(worker);
+            }
+        });
+        var workforceDiv = document.createElement('div');
+        workforceDiv.id = "".concat(workerDiv.id, "-force");
+        workforceDiv.classList.add('workforce');
+        workforceDiv.dataset.workforce = "".concat(worker.workforce);
+        workerDiv.appendChild(workforceDiv);
+        return workerDiv;
+    };
+    Humanity.prototype.placeFirstPlayerToken = function (playerId) {
+        var firstPlayerToken = document.getElementById('firstPlayerToken');
+        if (firstPlayerToken) {
+            this.animationManager.attachWithAnimation(new BgaSlideAnimation({
+                element: firstPlayerToken,
+            }), document.getElementById("player_board_".concat(playerId, "_firstPlayerWrapper")));
+        }
+        else {
+            dojo.place('<div id="firstPlayerToken"></div>', "player_board_".concat(playerId, "_firstPlayerWrapper"));
+            this.addTooltipHtml('firstPlayerToken', _("First Player token"));
+            return Promise.resolve(true);
+        }
     };
     Humanity.prototype.updateGains = function (playerId, gains) {
         var _this = this;
@@ -2898,9 +2709,6 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.setBracelets = function (playerId, count) {
         this.braceletCounters[playerId].toValue(count);
         this.getPlayerTable(playerId).updateCounter('bracelets', count);
-    };
-    Humanity.prototype.highlightPlayerTokens = function (playerId) {
-        this.tableCenter.highlightPlayerTokens(playerId);
     };
     Humanity.prototype.getColorAddHtml = function () {
         var _this = this;
@@ -2945,6 +2753,19 @@ var Humanity = /** @class */ (function () {
         else {
             this.setPayDestinationLabelAndState();
         }
+    };
+    Humanity.prototype.onWorkerClick = function (worker) {
+        if (this.gamedatas.gamestate.name == 'chooseWorker') {
+            this.chooseWorker(worker.id);
+        }
+    };
+    Humanity.prototype.chooseWorker = function (id) {
+        if (!this.checkAction('chooseWorker')) {
+            return;
+        }
+        this.takeAction('chooseWorker', {
+            id: id
+        });
     };
     Humanity.prototype.goTrade = function () {
         if (!this.checkAction('goTrade')) {
@@ -3065,6 +2886,7 @@ var Humanity = /** @class */ (function () {
         //log( 'notifications subscriptions setup' );
         var _this = this;
         var notifs = [
+            ['firstPlayerToken', undefined],
             ['playCard', undefined],
             ['takeCard', undefined],
             ['newTableCard', undefined],
@@ -3102,6 +2924,9 @@ var Humanity = /** @class */ (function () {
                 }
             });
         }
+    };
+    Humanity.prototype.notif_firstPlayerToken = function (notif) {
+        return this.placeFirstPlayerToken(notif.args.playerId);
     };
     Humanity.prototype.notif_playCard = function (args) {
         var playerId = args.playerId;
