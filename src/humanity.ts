@@ -181,11 +181,8 @@ class Humanity implements HumanityGame {
             switch (stateName) {
                 case 'playAction':
                     const playActionArgs = args as EnteringChooseWorkerArgs;
-                    (this as any).addActionButton(`goTrade_button`, _("Trade"), () => this.goTrade());
-                    if (!playActionArgs.canTrade) {
-                        document.getElementById(`goTrade_button`).classList.add('disabled');
-                    }
-                    if (!playActionArgs.canExplore || !playActionArgs.canRecruit) {
+                    
+                    if (!playActionArgs.noActionYet) { // TODO
                         (this as any).addActionButton(`endTurn_button`, _("End turn"), () => this.endTurn());
                     }
                     break;

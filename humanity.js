@@ -2537,11 +2537,7 @@ var Humanity = /** @class */ (function () {
             switch (stateName) {
                 case 'playAction':
                     var playActionArgs = args;
-                    this.addActionButton("goTrade_button", _("Trade"), function () { return _this.goTrade(); });
-                    if (!playActionArgs.canTrade) {
-                        document.getElementById("goTrade_button").classList.add('disabled');
-                    }
-                    if (!playActionArgs.canExplore || !playActionArgs.canRecruit) {
+                    if (!playActionArgs.noActionYet) { // TODO
                         this.addActionButton("endTurn_button", _("End turn"), function () { return _this.endTurn(); });
                     }
                     break;

@@ -93,11 +93,9 @@ $playerActionsGameStates = [
         "descriptionmyturn" => clienttranslate('${you} must A. Travaillez dans la base, B. Déployez un module, C. Réalisez une expérience'),
         "type" => "activeplayer",    
         "args" => "argPlayAction",
-        //"action" => "stPlayAction",
         "possibleactions" => [ 
             "activateTile",
-            "takeDestination",
-            "goTrade",
+            "createTile",
             "endTurn",
         ],
         "transitions" => [

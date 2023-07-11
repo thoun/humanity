@@ -25,6 +25,7 @@ trait ActionTrait {
 
         if ($worker == null) {
             throw new BgaUserException("Invalid worker");
+        }
 
         $this->setGlobalVariable(SELECTED_WORKER, $id);
 
@@ -90,11 +91,19 @@ trait ActionTrait {
         }
     }
 
-    private function applyEndOfActivation(int $playerId, ?Worker $worker = null) {
+    public function endTurn() {
+        self::checkAction('endTurn');
+
+        $worker = $this->getSelectedWorker();
         if ($worker == null) {
-            $worker = $this->getSelectedWorker();
+            throw new BgaUserException("No active worker");
         }
 
+        $playerId = intval($this->getActivePlayerId());
+        $this->applyEndOfActivation($playerId, $worker);
+    }
+
+    private function applyEndOfActivation(int $playerId, Worker $worker) {
         if ($worker->remainingWorkforce > 0) {
             $this->DbQuery("UPDATE worker SET `remaining_workforce` = 0 WHERE `id` = $worker->id");
         }
