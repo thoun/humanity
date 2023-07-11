@@ -1,3 +1,4 @@
+@charset "UTF-8";
 #bga-help_buttons {
   position: fixed;
   bottom: 12px;
@@ -542,8 +543,8 @@ body > .card {
 .tile {
   display: inline-block;
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 150px;
+  height: 150px;
 }
 .tile[data-r="0"] .front {
   transform: rotate(0deg);
@@ -585,147 +586,150 @@ body > .card {
 }
 .tile[data-type="1"] .front {
   background-image: url("img/tiles-ages.png");
+  background-size: auto 300%;
   background-position-y: 0%;
 }
 .tile[data-type="1"] .front[data-number="1"] {
-  background-position-x: 0%;
+  background-position-x: 6.6666666667%;
 }
 .tile[data-type="1"] .front[data-number="2"] {
-  background-position-x: 7.1428571429%;
+  background-position-x: 13.3333333333%;
 }
 .tile[data-type="1"] .front[data-number="3"] {
-  background-position-x: 14.2857142857%;
+  background-position-x: 20%;
 }
 .tile[data-type="1"] .front[data-number="4"] {
-  background-position-x: 21.4285714286%;
+  background-position-x: 26.6666666667%;
 }
 .tile[data-type="1"] .front[data-number="5"] {
-  background-position-x: 28.5714285714%;
+  background-position-x: 33.3333333333%;
 }
 .tile[data-type="1"] .front[data-number="6"] {
-  background-position-x: 35.7142857143%;
+  background-position-x: 40%;
 }
 .tile[data-type="1"] .front[data-number="7"] {
-  background-position-x: 42.8571428571%;
+  background-position-x: 46.6666666667%;
 }
 .tile[data-type="1"] .front[data-number="8"] {
-  background-position-x: 50%;
+  background-position-x: 53.3333333333%;
 }
 .tile[data-type="1"] .front[data-number="9"] {
-  background-position-x: 57.1428571429%;
+  background-position-x: 60%;
 }
 .tile[data-type="1"] .front[data-number="10"] {
-  background-position-x: 64.2857142857%;
+  background-position-x: 66.6666666667%;
 }
 .tile[data-type="1"] .front[data-number="11"] {
-  background-position-x: 71.4285714286%;
+  background-position-x: 73.3333333333%;
 }
 .tile[data-type="1"] .front[data-number="12"] {
-  background-position-x: 78.5714285714%;
+  background-position-x: 80%;
 }
 .tile[data-type="1"] .front[data-number="13"] {
-  background-position-x: 85.7142857143%;
+  background-position-x: 86.6666666667%;
 }
 .tile[data-type="1"] .front[data-number="14"] {
-  background-position-x: 92.8571428571%;
+  background-position-x: 93.3333333333%;
 }
 .tile[data-type="1"] .front[data-number="15"] {
   background-position-x: 100%;
 }
 .tile[data-type="2"] .front {
   background-image: url("img/tiles-ages.png");
+  background-size: auto 300%;
   background-position-y: 50%;
 }
 .tile[data-type="2"] .front[data-number="1"] {
-  background-position-x: 0%;
+  background-position-x: 6.6666666667%;
 }
 .tile[data-type="2"] .front[data-number="2"] {
-  background-position-x: 7.1428571429%;
+  background-position-x: 13.3333333333%;
 }
 .tile[data-type="2"] .front[data-number="3"] {
-  background-position-x: 14.2857142857%;
+  background-position-x: 20%;
 }
 .tile[data-type="2"] .front[data-number="4"] {
-  background-position-x: 21.4285714286%;
+  background-position-x: 26.6666666667%;
 }
 .tile[data-type="2"] .front[data-number="5"] {
-  background-position-x: 28.5714285714%;
+  background-position-x: 33.3333333333%;
 }
 .tile[data-type="2"] .front[data-number="6"] {
-  background-position-x: 35.7142857143%;
+  background-position-x: 40%;
 }
 .tile[data-type="2"] .front[data-number="7"] {
-  background-position-x: 42.8571428571%;
+  background-position-x: 46.6666666667%;
 }
 .tile[data-type="2"] .front[data-number="8"] {
-  background-position-x: 50%;
+  background-position-x: 53.3333333333%;
 }
 .tile[data-type="2"] .front[data-number="9"] {
-  background-position-x: 57.1428571429%;
+  background-position-x: 60%;
 }
 .tile[data-type="2"] .front[data-number="10"] {
-  background-position-x: 64.2857142857%;
+  background-position-x: 66.6666666667%;
 }
 .tile[data-type="2"] .front[data-number="11"] {
-  background-position-x: 71.4285714286%;
+  background-position-x: 73.3333333333%;
 }
 .tile[data-type="2"] .front[data-number="12"] {
-  background-position-x: 78.5714285714%;
+  background-position-x: 80%;
 }
 .tile[data-type="2"] .front[data-number="13"] {
-  background-position-x: 85.7142857143%;
+  background-position-x: 86.6666666667%;
 }
 .tile[data-type="2"] .front[data-number="14"] {
-  background-position-x: 92.8571428571%;
+  background-position-x: 93.3333333333%;
 }
 .tile[data-type="2"] .front[data-number="15"] {
   background-position-x: 100%;
 }
 .tile[data-type="3"] .front {
   background-image: url("img/tiles-ages.png");
+  background-size: auto 300%;
   background-position-y: 100%;
 }
 .tile[data-type="3"] .front[data-number="1"] {
-  background-position-x: 0%;
+  background-position-x: 6.6666666667%;
 }
 .tile[data-type="3"] .front[data-number="2"] {
-  background-position-x: 7.1428571429%;
+  background-position-x: 13.3333333333%;
 }
 .tile[data-type="3"] .front[data-number="3"] {
-  background-position-x: 14.2857142857%;
+  background-position-x: 20%;
 }
 .tile[data-type="3"] .front[data-number="4"] {
-  background-position-x: 21.4285714286%;
+  background-position-x: 26.6666666667%;
 }
 .tile[data-type="3"] .front[data-number="5"] {
-  background-position-x: 28.5714285714%;
+  background-position-x: 33.3333333333%;
 }
 .tile[data-type="3"] .front[data-number="6"] {
-  background-position-x: 35.7142857143%;
+  background-position-x: 40%;
 }
 .tile[data-type="3"] .front[data-number="7"] {
-  background-position-x: 42.8571428571%;
+  background-position-x: 46.6666666667%;
 }
 .tile[data-type="3"] .front[data-number="8"] {
-  background-position-x: 50%;
+  background-position-x: 53.3333333333%;
 }
 .tile[data-type="3"] .front[data-number="9"] {
-  background-position-x: 57.1428571429%;
+  background-position-x: 60%;
 }
 .tile[data-type="3"] .front[data-number="10"] {
-  background-position-x: 64.2857142857%;
+  background-position-x: 66.6666666667%;
 }
 .tile[data-type="3"] .front[data-number="11"] {
-  background-position-x: 71.4285714286%;
+  background-position-x: 73.3333333333%;
 }
 .tile[data-type="3"] .front[data-number="12"] {
-  background-position-x: 78.5714285714%;
+  background-position-x: 80%;
 }
 .tile[data-type="3"] .front[data-number="13"] {
-  background-position-x: 85.7142857143%;
+  background-position-x: 86.6666666667%;
 }
 .tile[data-type="3"] .front[data-number="14"] {
-  background-position-x: 92.8571428571%;
+  background-position-x: 93.3333333333%;
 }
 .tile[data-type="3"] .front[data-number="15"] {
   background-position-x: 100%;
@@ -792,7 +796,7 @@ body > .card {
   display: inline-block;
   position: relative;
   width: 221px;
-  height: 120px;
+  height: 150px;
   border-radius: 8px;
 }
 .card.research[data-year="1"] .front {
@@ -981,7 +985,7 @@ body > .card {
   display: inline-block;
   position: relative;
   width: 221px;
-  height: 120px;
+  height: 150px;
 }
 .card.objective[data-type="1"] .card-side {
   background-position-x: 0%;
@@ -1030,7 +1034,7 @@ body > .card {
 #table-center {
   min-width: 818px;
   display: grid;
-  grid-template-columns: 120px 690px;
+  grid-template-columns: 150px 690px;
   gap: 8px;
 }
 #table-center .table-research-deck {
@@ -1038,17 +1042,60 @@ body > .card {
 }
 #table-center #table-research-A .slot, #table-center #table-research-B .slot {
   width: 221px;
-  height: 120px;
+  height: 150px;
 }
-#table-center #board {
+#table-center #board-1 {
   position: relative;
-  width: 690px;
-  height: 256px;
-  background: url("img/board.jpg");
+  width: 981px;
+  height: 981px;
+  background: url("img/board-1.png");
 }
-#table-center #table-cards .slot {
-  width: 120px;
-  height: 221px;
+#table-center #board-1 #board-2 {
+  position: absolute;
+  left: 200px;
+  top: 200px;
+  width: 581px;
+  height: 738px;
+  background: url("img/board-2.png");
+  transform-origin: 290px 290px;
+  transition: transform 0.5s;
+  transform: rotate(calc(var(--r) * 45deg));
+}
+#table-center #board-1 #table-tiles {
+  position: absolute;
+  left: 415px;
+  top: 415px;
+  width: 150px;
+  height: 150px;
+}
+#table-center #board-1 #table-tiles .slot {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+}
+#table-center #board-1 #table-tiles .slot[data-slot-id="0"] .front {
+  transform: rotate(0deg) translateY(380px);
+}
+#table-center #board-1 #table-tiles .slot[data-slot-id="1"] .front {
+  transform: rotate(45deg) translateY(380px);
+}
+#table-center #board-1 #table-tiles .slot[data-slot-id="2"] .front {
+  transform: rotate(90deg) translateY(380px);
+}
+#table-center #board-1 #table-tiles .slot[data-slot-id="3"] .front {
+  transform: rotate(135deg) translateY(380px);
+}
+#table-center #board-1 #table-tiles .slot[data-slot-id="4"] .front {
+  transform: rotate(180deg) translateY(380px);
+}
+#table-center #board-1 #table-tiles .slot[data-slot-id="5"] .front {
+  transform: rotate(225deg) translateY(380px);
+}
+#table-center #board-1 #table-tiles .slot[data-slot-id="6"] .front {
+  transform: rotate(270deg) translateY(380px);
+}
+#table-center #board-1 #table-tiles .slot[data-slot-id="7"] .front {
+  transform: rotate(315deg) translateY(380px);
 }
 #table-center #card-deck[data-empty=true] {
   background: rgba(255, 255, 255, 0.4);
@@ -1063,6 +1110,78 @@ body > .card {
 #table-center .bga-cards_deck-counter#discard-counter {
   background-color: #aaaaaa;
   --bga-cards-deck-left: 75%;
+}
+
+#research-board {
+  position: relative;
+  width: 690px;
+  height: 518px;
+  background: url("img/research-board.png");
+  background-size: cover;
+}
+#research-board .marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 26px;
+  height: 28px;
+  transition: transform 0.5s;
+  pointer-events: none;
+}
+#research-board .marker .inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+#research-board .marker .inner.vp {
+  background-image: url("img/vp-pawns.png");
+}
+#research-board .marker .inner.reputation {
+  background-image: url("img/reputation-pawns.png");
+}
+#research-board .marker[data-color=f0db6c] .inner {
+  background-position-x: 0%;
+}
+#research-board .marker[data-color="62bce6"] .inner {
+  background-position-x: 33.3333333333%;
+}
+#research-board .marker[data-color="70c499"] .inner {
+  background-position-x: 66.6666666667%;
+}
+#research-board .marker[data-color=ddbdd7] .inner {
+  background-position-x: 100%;
+}
+#research-board .marker.color-blind .inner::after {
+  font-size: 120%;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  margin-top: -4px;
+}
+#research-board .marker.color-blind[data-player-no="1"] .inner::after {
+  content: "●";
+}
+#research-board .marker.color-blind[data-player-no="2"] .inner::after {
+  content: "▲";
+}
+#research-board .marker.color-blind[data-player-no="3"] .inner::after {
+  content: "■";
+}
+#research-board .marker.color-blind[data-player-no="4"] .inner::after {
+  content: "◆";
+}
+#research-board .marker.highlight::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: orange;
+  border-radius: 50%;
+  box-shadow: 0 0 5px 5px orange;
 }
 
 .player-board {
@@ -1134,8 +1253,8 @@ body > .card {
 }
 .player-table .tiles {
   display: grid;
-  grid-template-rows: repeat(var(--rows), 120px);
-  grid-template-columns: repeat(var(--columns), 120px);
+  grid-template-rows: repeat(var(--rows), 150px);
+  grid-template-columns: repeat(var(--columns), 150px);
 }
 .player-table .tiles .slot {
   display: flex;
@@ -1149,7 +1268,7 @@ body > .card {
   margin: 10px;
 }
 .player-table .visible-cards .cards {
-  width: 120px;
+  width: 150px;
 }
 .player-table .visible-cards .cards .card:not(:first-child) {
   margin-top: calc(-1 * var(--card-overlap));

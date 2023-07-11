@@ -41,6 +41,7 @@ class Humanity implements HumanityGame {
     private animationManager: AnimationManager;
     private gamedatas: HumanityGamedatas;
     private tableCenter: TableCenter;
+    private researchBoard: ResearchBoard;
     private playersTables: PlayerTable[] = [];
     private researchCounters: Counter[] = [];
     private recruitCounters: Counter[] = [];
@@ -85,6 +86,7 @@ class Humanity implements HumanityGame {
         });
 
         this.tableCenter = new TableCenter(this, gamedatas);
+        this.researchBoard = new ResearchBoard(this, gamedatas);
         this.createPlayerPanels(gamedatas);
         this.createPlayerTables(gamedatas);
         
@@ -98,13 +100,7 @@ class Humanity implements HumanityGame {
             onDimensionsChange: () => {
                 const tablesAndCenter = document.getElementById('tables-and-center');
                 const clientWidth = tablesAndCenter.clientWidth;
-                tablesAndCenter.classList.toggle('double-column', clientWidth > 1478);
-                const wasDoublePlayerColumn = tablesAndCenter.classList.contains('double-player-column');
-                const isDoublePlayerColumn = clientWidth > 1798;
-                if (wasDoublePlayerColumn != isDoublePlayerColumn) {
-                    tablesAndCenter.classList.toggle('double-player-column', isDoublePlayerColumn);
-                    this.playersTables.forEach(table => table.setDoubleColumn(isDoublePlayerColumn));
-                }
+                tablesAndCenter.classList.toggle('double-column', clientWidth > 1641); // 981 + 20 + 640
             },
         });
 
@@ -124,7 +120,7 @@ class Humanity implements HumanityGame {
                     unfoldedHtml: this.getColorAddHtml(),
                     foldedContentExtraClasses: 'color-help-folded-content',
                     unfoldedContentExtraClasses: 'color-help-unfolded-content',
-                    expandedWidth: '120px',
+                    expandedWidth: '150px',
                     expandedHeight: '210px',
                 }),
             ]
@@ -799,7 +795,7 @@ class Humanity implements HumanityGame {
         const playerId = args.playerId;
         const playerTable = this.getPlayerTable(playerId);
 
-        const promise = playerTable.playCard(args.card, document.getElementById('board'));
+        const promise = playerTable.playCard(args.card, document.getElementById('research-board'));
 
         this.tableCenter.cardDeck.setCardNumber(args.cardDeckCount, args.cardDeckTop);
 

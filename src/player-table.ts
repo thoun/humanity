@@ -5,10 +5,7 @@ class PlayerTable {
     public playerId: number;
     public voidStock: VoidStock<Tile>;
     public tiles: SlotStock<Tile>;
-    public played: LineStock<Tile>[] = [];
     public research: LineStock<Research>;
-    public reservedDestinations?: LineStock<Research>;
-    public limitSelection: number | null = null;
 
     private currentPlayer: boolean;
 
@@ -19,22 +16,8 @@ class PlayerTable {
         let html = `
         <div id="player-table-${this.playerId}" class="player-table" style="--player-color: #${player.color};">
             <div id="player-table-${this.playerId}-name" class="name-wrapper">${player.name}</div>
-            <div class="cols">
-            <div class="col col1">
             <div id="player-table-${this.playerId}-tiles" class="tiles"></div>
             <div id="player-table-${this.playerId}-research" class="research"></div>
-            <div class="visible-cards">`;            
-            for (let i = 1; i <= 5; i++) {
-                html += `
-                <div id="player-table-${this.playerId}-played-${i}" class="cards"></div>
-                `;
-            }
-            html += `
-            </div>
-            </div>
-            
-            <div class="col col2"></div>
-            </div>
         </div>
         `;
 

@@ -1,8 +1,8 @@
 .tile {
     display: inline-block;
     position: relative;
-    width: 120px;
-    height: 120px;
+    width: 150px;
+    height: 150px;
 
     @for $r from 0 through 3 {
         &[data-r="#{$r}"] .front {
@@ -39,11 +39,12 @@
     @for $age from 1 through 3 {
         &[data-type="#{$age}"] .front {
             background-image: url('img/tiles-ages.png');  
+            background-size: auto 300%;
             background-position-y: #{($age - 1) * 100% / 2};
 
             @for $number from 1 through 15 {
                 &[data-number="#{$number}"] {
-                    background-position-x: #{($number - 1) * 100% / 14};
+                    background-position-x: #{$number * 100% / 15};
                 }
             }
         }

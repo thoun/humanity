@@ -1,0 +1,79 @@
+#research-board {
+  position: relative;
+  width: 690px;
+  height: 518px;
+  background: url('img/research-board.png');
+  background-size: cover; // TODO TEMP
+
+  .marker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 26px;
+    height: 28px;
+    transition: transform 0.5s; 
+    pointer-events: none;
+
+    .inner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      
+      &.vp {
+        background-image: url('img/vp-pawns.png');
+      }
+      &.reputation {
+        background-image: url('img/reputation-pawns.png');
+      }
+    }
+      
+    @each $playerColor in $playerColors {
+      $i: index($playerColors, $playerColor) - 1;
+      &[data-color="#{$playerColor}"] .inner { 
+        background-position-x: #{$i * 100% / 3};
+      }
+    }
+    
+    &.color-blind {
+      .inner::after {
+        font-size: 120%;
+        display: flex;
+        align-content: center;
+        justify-content: center;
+        margin-top: -4px;
+      }
+
+      &[data-player-no="1"] .inner::after {
+        content: '●'; // circle
+      }
+
+      &[data-player-no="2"] .inner::after {
+        content: '▲'; // triangle
+      }
+
+      &[data-player-no="3"] .inner::after {
+        content: '■'; // square
+      }
+
+      &[data-player-no="4"] .inner::after {
+        content: '◆'; // diamond
+      }
+    }
+
+    &.highlight {
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: orange;
+        border-radius: 50%;
+        box-shadow: 0 0 5px 5px orange;
+      }
+    }
+  }
+}

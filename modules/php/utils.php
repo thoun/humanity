@@ -206,6 +206,10 @@ trait UtilTrait {
             $this->tiles->shuffle('deck'.$age);
         }
 
+        foreach ([1, 2, 3, 4, 5, 6, 7] as $spot) {
+            $this->tiles->pickCardForLocation('deck1', 'table', $spot);
+        }
+
         foreach ($players as $playerId => $player) {
             $tiles = [];
             foreach ($this->TILES[0] as $subType => $tileType) {

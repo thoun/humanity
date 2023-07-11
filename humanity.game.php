@@ -199,6 +199,8 @@ class Humanity extends Table {
             }
         }
 
+        $result['tableTiles'] = $this->getTilesByLocation('table');
+
         $result['cardDeckTop'] = Tile::onlyId($this->getTileFromDb($this->tiles->getCardOnTop('deck')));
         $result['cardDeckCount'] = intval($this->tiles->countCardInLocation('deck'));
         $result['cardDiscardCount'] = intval($this->tiles->countCardInLocation('discard'));
@@ -229,7 +231,7 @@ class Humanity extends Table {
         This method is called each time we are in a game state with the "updateGameProgression" property set to true 
         (see states.inc.php)
     */
-    function getGameProgression() {
+    function getGameProgression() { // TODO
         $maxScore = intval($this->getUniqueValueFromDB("SELECT max(`player_score`) FROM player"));
         return $maxScore * 100 / 40;
     }

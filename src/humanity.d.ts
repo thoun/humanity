@@ -86,6 +86,7 @@ interface HumanityGamedatas {
 
     // Add here variables you set up in getAllDatas
     tableObjectives: Objective[];
+    tableTiles: Tile[];
 
     // TODO check
     cardDeckTop?: Tile;

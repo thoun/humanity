@@ -9,7 +9,7 @@ class TileType {
     public ?array $production;
     public ?int $adjacentPoints;
     public ?int $points;
-    public ?int $matchType; // color for research, shape for green
+    public ?int $matchType; // power for blue/orange, color for research, shape for green
   
     public function __construct(int $color, array $cost, ?int $workforce = null, ?array $production = null, ?int $adjacentPoints = null, ?int $points = null, ?int $matchType = null) {
         $this->color = $color;
@@ -23,14 +23,14 @@ class TileType {
 }
 
 class BlueTileType extends TileType {
-    public function __construct(array $cost, ?int $workforce = null, ?array $production = null) {
-        parent::__construct(BLUE, $cost, $workforce, $production);
+    public function __construct(array $cost, ?int $workforce = null, ?array $production = null, ?int $power = null) {
+        parent::__construct(BLUE, $cost, $workforce, $production, null, null, $power);
     } 
 }
 
 class OrangeTileType extends TileType {
-    public function __construct(array $cost, ?int $workforce = null, ?array $production = null) {
-        parent::__construct(ORANGE, $cost, $workforce, $production);
+    public function __construct(array $cost, ?int $workforce = null, ?array $production = null, ?int $power = null) {
+        parent::__construct(ORANGE, $cost, $workforce, $production, null, null, $power);
     } 
 }
 

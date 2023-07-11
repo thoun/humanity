@@ -2009,8 +2009,8 @@ var TilesManager = /** @class */ (function (_super) {
                 game.setTooltip(div.id, _this.getTooltip(card));
             },
             isCardVisible: function (card) { return Boolean(card.number) || [0, 8, 9].includes(card.type); },
-            cardWidth: 120,
-            cardHeight: 120,
+            cardWidth: 150,
+            cardHeight: 150,
         }) || this;
         _this.game = game;
         return _this;
@@ -2150,14 +2150,10 @@ var ObjectivesManager = /** @class */ (function (_super) {
     };
     return ObjectivesManager;
 }(CardManager));
-var POINT_CASE_SIZE_LEFT = 38.8;
-var POINT_CASE_SIZE_TOP = 37.6;
 var TableCenter = /** @class */ (function () {
     function TableCenter(game, gamedatas) {
         var _this = this;
         this.game = game;
-        this.vp = new Map();
-        this.researchPoints = new Map();
         /*this.researchDecks = new Deck<Destination>(game.researchManager, document.getElementById(`table-research-${letter}-deck`), {
             cardNumber: gamedatas.centerDestinationsDeckCount,
             topCard: gamedatas.centerDestinationsDeckTop,
@@ -2185,32 +2181,19 @@ var TableCenter = /** @class */ (function () {
         this.game.setTooltip(deckCounterDiv.id, _('Deck size'));
         this.game.setTooltip(discardCounterDiv.id, _('Discard size'));
         this.cardDiscard = new VoidStock(game.tilesManager, discardCounterDiv);
-        this.cards = new SlotStock(game.tilesManager, document.getElementById("table-cards"), {
-            slotsIds: [1, 2, 3, 4, 5],
+        this.tiles = new SlotStock(game.tilesManager, document.getElementById("table-tiles"), {
+            slotsIds: [0, 1, 2, 3, 4, 5, 6, 7],
             mapCardToSlot: function (card) { return card.locationArg; },
             gap: '12px',
         });
-        this.cards.onCardClick = function (card) { return _this.game.onTableCardClick(card); };
-        this.cards.addCards(gamedatas.centerCards);
-        var players = Object.values(gamedatas.players);
-        var html = '';
-        // points
-        players.forEach(function (player) {
-            return html += "\n            <div id=\"player-".concat(player.id, "-vp-marker\" class=\"marker ").concat(/*this.game.isColorBlindMode() ? 'color-blind' : */ '', "\" data-player-id=\"").concat(player.id, "\" data-player-no=\"").concat(player.playerNo, "\" data-color=\"").concat(player.color, "\"><div class=\"inner vp\"></div></div>\n            <div id=\"player-").concat(player.id, "-research-marker\" class=\"marker ").concat(/*this.game.isColorBlindMode() ? 'color-blind' : */ '', "\" data-player-id=\"").concat(player.id, "\" data-player-no=\"").concat(player.playerNo, "\" data-color=\"").concat(player.color, "\"><div class=\"inner research\"></div></div>\n            ");
-        });
-        dojo.place(html, 'board');
-        players.forEach(function (player) {
-            _this.vp.set(Number(player.id), Number(player.score));
-            _this.researchPoints.set(Number(player.id), Math.min(14, Number(player.research)));
-        });
-        this.moveVP();
-        this.moveResearch();
+        this.tiles.onCardClick = function (card) { return _this.game.onTableCardClick(card); };
+        this.tiles.addCards(gamedatas.tableTiles);
         document.getElementById('table-center').insertAdjacentHTML('afterbegin', "<div></div><div id=\"objectives\"></div>");
         this.objectives = new LineStock(this.game.objectivesManager, document.getElementById("objectives"));
         this.objectives.addCards(gamedatas.tableObjectives);
     }
     TableCenter.prototype.newTableCard = function (card) {
-        return this.cards.addCard(card);
+        return this.tiles.addCard(card);
     };
     TableCenter.prototype.newTableDestination = function (research, letter, researchDeckCount, researchDeckTop) {
         var promise = this.research.addCard(research);
@@ -2225,13 +2208,53 @@ var TableCenter = /** @class */ (function () {
             _this.research.setSelectableCards(selectableCards);
         });
     };
-    TableCenter.prototype.getVPCoordinates = function (points) {
+    TableCenter.prototype.setCardsSelectable = function (selectable, freeColor, recruits) {
+        if (freeColor === void 0) { freeColor = null; }
+        if (recruits === void 0) { recruits = null; }
+        this.tiles.setSelectionMode(selectable ? 'single' : 'none');
+        if (selectable) {
+            var selectableCards = this.tiles.getCards().filter(function (card) { return freeColor === null || card.locationArg == freeColor || recruits >= 1; });
+            this.tiles.setSelectableCards(selectableCards);
+        }
+    };
+    TableCenter.prototype.getVisibleDestinations = function () {
+        return __spreadArray(__spreadArray([], this.research['A'].getCards(), true), this.research['B'].getCards(), true);
+    };
+    TableCenter.prototype.setDiscardCount = function (cardDiscardCount) {
+        var discardCounterDiv = document.getElementById('discard-counter');
+        discardCounterDiv.innerHTML = '' + cardDiscardCount;
+    };
+    return TableCenter;
+}());
+var POINT_CASE_SIZE_LEFT = 38.8;
+var POINT_CASE_SIZE_TOP = 37.6;
+var ResearchBoard = /** @class */ (function () {
+    function ResearchBoard(game, gamedatas) {
+        var _this = this;
+        this.game = game;
+        this.vp = new Map();
+        this.researchPoints = new Map();
+        var players = Object.values(gamedatas.players);
+        var html = '';
+        // points
+        players.forEach(function (player) {
+            return html += "\n            <div id=\"player-".concat(player.id, "-vp-marker\" class=\"marker ").concat(/*this.game.isColorBlindMode() ? 'color-blind' : */ '', "\" data-player-id=\"").concat(player.id, "\" data-player-no=\"").concat(player.playerNo, "\" data-color=\"").concat(player.color, "\"><div class=\"inner vp\"></div></div>\n            <div id=\"player-").concat(player.id, "-research-marker\" class=\"marker ").concat(/*this.game.isColorBlindMode() ? 'color-blind' : */ '', "\" data-player-id=\"").concat(player.id, "\" data-player-no=\"").concat(player.playerNo, "\" data-color=\"").concat(player.color, "\"><div class=\"inner research\"></div></div>\n            ");
+        });
+        dojo.place(html, 'research-board');
+        players.forEach(function (player) {
+            _this.vp.set(Number(player.id), Number(player.score));
+            _this.researchPoints.set(Number(player.id), Math.min(14, Number(player.research)));
+        });
+        this.moveVP();
+        this.moveResearch();
+    }
+    ResearchBoard.prototype.getVPCoordinates = function (points) {
         var cases = points % 40;
         var top = cases >= 16 ? (cases > 36 ? (40 - cases) : Math.min(4, cases - 16)) * POINT_CASE_SIZE_TOP : 0;
         var left = cases > 20 ? (36 - Math.min(cases, 36)) * POINT_CASE_SIZE_LEFT : Math.min(16, cases) * POINT_CASE_SIZE_LEFT;
         return [22 + left, 39 + top];
     };
-    TableCenter.prototype.moveVP = function () {
+    ResearchBoard.prototype.moveVP = function () {
         var _this = this;
         this.vp.forEach(function (points, playerId) {
             var markerDiv = document.getElementById("player-".concat(playerId, "-vp-marker"));
@@ -2249,17 +2272,17 @@ var TableCenter = /** @class */ (function () {
             markerDiv.style.transform = "translateX(".concat(left + leftShift, "px) translateY(").concat(top + topShift, "px)");
         });
     };
-    TableCenter.prototype.setScore = function (playerId, points) {
+    ResearchBoard.prototype.setScore = function (playerId, points) {
         this.vp.set(playerId, points);
         this.moveVP();
     };
-    TableCenter.prototype.getResearchCoordinates = function (points) {
+    ResearchBoard.prototype.getResearchCoordinates = function (points) {
         var cases = points;
         var top = cases % 2 ? -14 : 0;
         var left = cases * 16.9;
         return [368 + left, 123 + top];
     };
-    TableCenter.prototype.moveResearch = function () {
+    ResearchBoard.prototype.moveResearch = function () {
         var _this = this;
         this.researchPoints.forEach(function (points, playerId) {
             var markerDiv = document.getElementById("player-".concat(playerId, "-research-marker"));
@@ -2277,33 +2300,18 @@ var TableCenter = /** @class */ (function () {
             markerDiv.style.transform = "translateX(".concat(left + leftShift, "px) translateY(").concat(top + topShift, "px)");
         });
     };
-    TableCenter.prototype.setResearch = function (playerId, research) {
+    ResearchBoard.prototype.setResearch = function (playerId, research) {
         this.researchPoints.set(playerId, Math.min(14, research));
         this.moveResearch();
     };
-    TableCenter.prototype.getResearch = function (playerId) {
+    ResearchBoard.prototype.getResearch = function (playerId) {
         return this.researchPoints.get(playerId);
     };
-    TableCenter.prototype.setCardsSelectable = function (selectable, freeColor, recruits) {
-        if (freeColor === void 0) { freeColor = null; }
-        if (recruits === void 0) { recruits = null; }
-        this.cards.setSelectionMode(selectable ? 'single' : 'none');
-        if (selectable) {
-            var selectableCards = this.cards.getCards().filter(function (card) { return freeColor === null || card.locationArg == freeColor || recruits >= 1; });
-            this.cards.setSelectableCards(selectableCards);
-        }
+    // TODO keep?
+    ResearchBoard.prototype.highlightPlayerTokens = function (playerId) {
+        document.querySelectorAll('#research-board .marker').forEach(function (elem) { return elem.classList.toggle('highlight', Number(elem.dataset.playerId) === playerId); });
     };
-    TableCenter.prototype.getVisibleDestinations = function () {
-        return __spreadArray(__spreadArray([], this.research['A'].getCards(), true), this.research['B'].getCards(), true);
-    };
-    TableCenter.prototype.highlightPlayerTokens = function (playerId) {
-        document.querySelectorAll('#board .marker').forEach(function (elem) { return elem.classList.toggle('highlight', Number(elem.dataset.playerId) === playerId); });
-    };
-    TableCenter.prototype.setDiscardCount = function (cardDiscardCount) {
-        var discardCounterDiv = document.getElementById('discard-counter');
-        discardCounterDiv.innerHTML = '' + cardDiscardCount;
-    };
-    return TableCenter;
+    return ResearchBoard;
 }());
 var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 ;
@@ -2312,15 +2320,9 @@ var PlayerTable = /** @class */ (function () {
     function PlayerTable(game, player) {
         var _this = this;
         this.game = game;
-        this.played = [];
-        this.limitSelection = null;
         this.playerId = Number(player.id);
         this.currentPlayer = this.playerId == this.game.getPlayerId();
-        var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div class=\"cols\">\n            <div class=\"col col1\">\n            <div id=\"player-table-").concat(this.playerId, "-tiles\" class=\"tiles\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-research\" class=\"research\"></div>\n            <div class=\"visible-cards\">");
-        for (var i = 1; i <= 5; i++) {
-            html += "\n                <div id=\"player-table-".concat(this.playerId, "-played-").concat(i, "\" class=\"cards\"></div>\n                ");
-        }
-        html += "\n            </div>\n            </div>\n            \n            <div class=\"col col2\"></div>\n            </div>\n        </div>\n        ";
+        var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.playerId, "-tiles\" class=\"tiles\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-research\" class=\"research\"></div>\n        </div>\n        ");
         dojo.place(html, document.getElementById('tables'));
         var slotsIds = [];
         var xs = player.tiles.map(function (tile) { return tile.x; });
@@ -2421,6 +2423,7 @@ var Humanity = /** @class */ (function () {
             defaultFolded: true,
         });
         this.tableCenter = new TableCenter(this, gamedatas);
+        this.researchBoard = new ResearchBoard(this, gamedatas);
         this.createPlayerPanels(gamedatas);
         this.createPlayerTables(gamedatas);
         this.zoomManager = new ZoomManager({
@@ -2433,13 +2436,7 @@ var Humanity = /** @class */ (function () {
             onDimensionsChange: function () {
                 var tablesAndCenter = document.getElementById('tables-and-center');
                 var clientWidth = tablesAndCenter.clientWidth;
-                tablesAndCenter.classList.toggle('double-column', clientWidth > 1478);
-                var wasDoublePlayerColumn = tablesAndCenter.classList.contains('double-player-column');
-                var isDoublePlayerColumn = clientWidth > 1798;
-                if (wasDoublePlayerColumn != isDoublePlayerColumn) {
-                    tablesAndCenter.classList.toggle('double-player-column', isDoublePlayerColumn);
-                    _this.playersTables.forEach(function (table) { return table.setDoubleColumn(isDoublePlayerColumn); });
-                }
+                tablesAndCenter.classList.toggle('double-column', clientWidth > 1641); // 981 + 20 + 640
             },
         });
         if (gamedatas.lastTurn) {
@@ -2457,7 +2454,7 @@ var Humanity = /** @class */ (function () {
                     unfoldedHtml: this.getColorAddHtml(),
                     foldedContentExtraClasses: 'color-help-folded-content',
                     unfoldedContentExtraClasses: 'color-help-unfolded-content',
-                    expandedWidth: '120px',
+                    expandedWidth: '150px',
                     expandedHeight: '210px',
                 }),
             ]
@@ -2974,7 +2971,7 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_takeDeckCard = function (args) {
         var playerId = args.playerId;
         var playerTable = this.getPlayerTable(playerId);
-        var promise = playerTable.playCard(args.card, document.getElementById('board'));
+        var promise = playerTable.playCard(args.card, document.getElementById('research-board'));
         this.tableCenter.cardDeck.setCardNumber(args.cardDeckCount, args.cardDeckTop);
         return promise;
     };

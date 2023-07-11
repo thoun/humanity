@@ -93,7 +93,7 @@ $this->TILES = [ //public int $type; // 0 start, 1..3 year, 8 communication, 9 o
     1 => [
         1 => new TileType(BLUE_OR_ORANGE, [INSECT => 1, ICE => 1, METHAN => 1], null, null, null, 3),
         2 => new TileType(BLUE_OR_ORANGE, [INSECT => 1, ICE => 1, METHAN => 1], null, null, null, 3),
-        3 => new OrangeTileType([INSECT => 1, ICE => 1, METHAN => 1], null, null), // TODO power ? RESEARCH_POWER_TIME
+        3 => new OrangeTileType([INSECT => 1, ICE => 1, METHAN => 1], null, null, RESEARCH_POWER_TIME),
         4 => new OrangeTileType([ICE => 2], 1, [[INSECT => 1, METHAN => 1], [INSECT => 2, METHAN => 2], [INSECT => 3, METHAN => 3], []]),
         5 => new OrangeTileType([METHAN => 2], 1, [[INSECT => 1, ICE => 1], [INSECT => 2, ICE => 2], [INSECT => 3, ICE => 3], []]),
         6 => new OrangeTileType([INSECT => 2], 1, [[METHAN => 1, ICE => 1], [METHAN => 2, ICE => 2], [METHAN => 3, ICE => 3], []]),
@@ -111,7 +111,7 @@ $this->TILES = [ //public int $type; // 0 start, 1..3 year, 8 communication, 9 o
     2 => [
         1 => new TileType(BLUE_OR_ORANGE, [OXYGEN => 1, ICE => 1, METHAN => 1], null, null, null, 4),
         2 => new TileType(BLUE_OR_ORANGE, [PROTEIN => 1, INSECT => 1, METHAN => 1], null, null, null, 4),
-        3 => new OrangeTileType([PROTEIN => 1, ICE => 1, METHAN => 1], null, null), // TODO power ? RESEARCH_POWER_TIME
+        3 => new OrangeTileType([PROTEIN => 1, ICE => 1, METHAN => 1], null, null, RESEARCH_POWER_TIME),
         4 => new OrangeTileType([INSECT => 1, OXYGEN => 1], 1, [[ELECTRICITY => 1], [ELECTRICITY => 2], [ELECTRICITY => 3], []]),
         5 => new OrangeTileType([INSECT => 1, AIRCARBON => 1], 1, [[ELECTRICITY => 1], [ELECTRICITY => 2], [ELECTRICITY => 3], []]),
         6 => new BlueTileType([INSECT => 2, ICE => 2], 2, [[PROTEIN => 1, OXYGEN => 1], [PROTEIN => 2, OXYGEN => 2], [PROTEIN => 3, OXYGEN => 3], []]),

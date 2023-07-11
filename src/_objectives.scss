@@ -2,7 +2,7 @@
     display: inline-block;
     position: relative;
     width: 221px;
-    height: 120px;
+    height: 150px;
 
     @for $type from 1 through 3 {
         &[data-type="#{$type}"] .card-side {

@@ -34,6 +34,7 @@
         "src/research.ts",
         "src/objectives.ts",
         "src/table-center.ts",
+        "src/research-board.ts",
         "src/player-table.ts",
         "src/humanity.ts",
         "src/define.ts"
