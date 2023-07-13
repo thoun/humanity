@@ -115,6 +115,7 @@ $playerActionsGameStates = [
         ],
         "transitions" => [
             "next" => ST_PLAYER_CHOOSE_ACTION,
+            "endTurn" => ST_CHECK_OBJECTIVES,
         ],
     ],
 

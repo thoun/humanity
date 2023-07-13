@@ -52,6 +52,7 @@ interface Worker {
     id: number;
     playerId: number;
     workforce: number;
+    remainingWorkforce: number;
     location: string;
     x: number;
     y: number;
@@ -95,7 +96,6 @@ interface HumanityGamedatas {
     tableResearch: Research[];
     objectives?: number[];
     firstPlayerId: number;
-    lastTurn: boolean;
 }
 
 interface HumanityGame extends Game {
@@ -153,4 +153,10 @@ interface NotifDisableWorkerArgs {
 interface NotifGainTimeUnitArgs {
     playerId: number;
     workers: Worker[];
+}
+
+// moveWorkerToTable
+interface NotifMoveWorkerToTableArgs {
+    playerId: number;
+    worker: Worker;
 }

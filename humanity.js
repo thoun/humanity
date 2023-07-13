@@ -2378,6 +2378,9 @@ var PlayerTable = /** @class */ (function () {
         this.objectives.addCards(player.objectives);
         player.workers.filter(function (worker) { return worker.location == 'player'; }).forEach(function (worker) {
             tilesDiv.querySelector("[data-slot-id=\"".concat(worker.x, "_").concat(worker.y, "\"]")).appendChild(_this.game.createWorker(worker));
+            if (!worker.remainingWorkforce) {
+                document.getElementById("worker-".concat(worker.id)).classList.add('disabled-worker');
+            }
         });
     }
     PlayerTable.prototype.setSelectableWorkers = function (workers) {
@@ -2471,9 +2474,6 @@ var Humanity = /** @class */ (function () {
                 centerWrapper.classList.toggle('double-column', centerClientWidth > 2033); // 1181 + 852      */
             },
         });
-        if (gamedatas.lastTurn) {
-            this.notif_lastTurn(false);
-        }
         new HelpManager(this, {
             buttons: [
                 new BgaHelpPopinButton({
@@ -2860,6 +2860,7 @@ var Humanity = /** @class */ (function () {
             ['removeTile', ANIMATION_MS],
             ['disableWorker', ANIMATION_MS],
             ['gainTimeUnit', ANIMATION_MS],
+            ['moveWorkerToTable', ANIMATION_MS],
         ];
         notifs.forEach(function (notif) {
             dojo.subscribe(notif[0], _this, function (notifDetails) {
@@ -2903,6 +2904,11 @@ var Humanity = /** @class */ (function () {
         var _this = this;
         var workers = args.workers;
         workers.forEach(function (worker) { return _this.tableCenter.moveWorker(worker); });
+    };
+    Humanity.prototype.notif_moveWorkerToTable = function (args) {
+        var worker = args.worker;
+        this.setWorkerDisabled(worker, false);
+        this.tableCenter.moveWorker(worker);
     };
     Humanity.prototype.setWorkerDisabled = function (worker, disabled) {
         document.getElementById("worker-".concat(worker.id)).classList.toggle('disabled-worker', disabled);

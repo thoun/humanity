@@ -100,10 +100,6 @@ class Humanity implements HumanityGame {
             },
         });
 
-        if (gamedatas.lastTurn) {
-            this.notif_lastTurn(false);
-        }
-
         new HelpManager(this, { 
             buttons: [
                 new BgaHelpPopinButton({
@@ -613,6 +609,7 @@ class Humanity implements HumanityGame {
             ['removeTile', ANIMATION_MS],
             ['disableWorker', ANIMATION_MS],
             ['gainTimeUnit', ANIMATION_MS],
+            ['moveWorkerToTable', ANIMATION_MS],
         ];
     
         notifs.forEach((notif) => {
@@ -667,6 +664,12 @@ class Humanity implements HumanityGame {
     notif_gainTimeUnit(args: NotifGainTimeUnitArgs) {
         const { workers } = args;
         workers.forEach(worker => this.tableCenter.moveWorker(worker));
+    }
+
+    notif_moveWorkerToTable(args: NotifMoveWorkerToTableArgs) {
+        const { worker } = args;
+        this.setWorkerDisabled(worker, false);
+        this.tableCenter.moveWorker(worker);
     }
 
     private setWorkerDisabled(worker: Worker, disabled: boolean) {

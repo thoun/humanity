@@ -488,4 +488,29 @@ trait UtilTrait {
     function reactivatePlayerWorkers() {
         $this->DbQuery("UPDATE worker SET `remaining_workforce` = `workforce`");
     }
+    
+    function moveWorkerToTable(int $playerId,  Worker $worker, int $spot) {
+        $this->DbQuery("UPDATE worker SET `location` = 'table', `spot` = $spot WHERE `id` = $worker->id");
+        $worker->location = 'table';
+        $worker->spot = $spot;
+
+        self::notifyAllPlayers('moveWorkerToTable', '', [
+            'playerId' => $playerId,
+            'player_name' => $this->getPlayerName($playerId),
+            'worker' => $worker,
+        ]);
+    }
+
+
+    function deployTile(int $playerId, /*CurrentAction*/ $currentAction, Worker $worker) {
+        $this->moveWorkerToTable($playerId, $worker, $currentAction->spot);
+
+        // TODO
+    }
+
+    function deployResearch(int $playerId, /*CurrentAction*/ $currentAction, Worker $worker) {
+        $this->moveWorkerToTable($playerId, $worker, $currentAction->spot);
+
+        // TODO
+    }
 }

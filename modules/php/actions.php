@@ -36,11 +36,18 @@ trait ActionTrait {
 
             $this->gamestate->nextState('activate');
         } else {
+            $playerId = intval($this->getActivePlayerId());
+
             $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
             $currentAction->selectedWorker = $id;
             $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
-            // TODO
+            if ($currentAction->type == 'tile') {
+                $this->deployTile($playerId, $currentAction, $worker);
+            } else if ($currentAction->type == 'research') {
+                $this->deployResearch($playerId, $currentAction, $worker);
+            }
+
             $this->gamestate->nextState('endTurn');
         }
     }
@@ -109,6 +116,8 @@ trait ActionTrait {
 
         $currentAction = new CurrentAction('tile');
         $currentAction->tile = $id;
+        $currentAction->spot = 1; // TODO
+        $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
         $this->gamestate->nextState('pay');
     }
@@ -118,6 +127,8 @@ trait ActionTrait {
 
         $currentAction = new CurrentAction('research');
         $currentAction->research = $id;
+        $currentAction->spot = 2; // TODO
+        $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
         $this->gamestate->nextState('pay');
     }

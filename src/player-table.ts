@@ -61,6 +61,9 @@ class PlayerTable {
 
         player.workers.filter(worker => worker.location == 'player').forEach(worker => {
             tilesDiv.querySelector(`[data-slot-id="${worker.x}_${worker.y}"]`).appendChild(this.game.createWorker(worker));
+            if (!worker.remainingWorkforce) {
+                document.getElementById(`worker-${worker.id}`).classList.add('disabled-worker');
+            }
         });
     }
     
