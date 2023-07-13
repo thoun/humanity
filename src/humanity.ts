@@ -19,15 +19,6 @@ const VP_BY_RESEARCH = {
     14: 5,
 };
 
-const EQUAL = -1;
-const DIFFERENT = 0;
-
-const VP = 1;
-const BRACELET = 2;
-const RECRUIT = 3;
-const RESEARCH = 4;
-const CARD = 5;
-
 function getVpByResearch(research: number) {
     return Object.entries(VP_BY_RESEARCH).findLast(entry => research >= Number(entry[0]))[1];
 }
@@ -146,9 +137,21 @@ class Humanity implements HumanityGame {
         log('Entering state: ' + stateName, args.args);
 
         switch (stateName) {
+            case 'chooseAction':
+                this.onEnteringChooseAction(args.args);
+                break;
             case 'chooseWorker':
                 this.onEnteringChooseWorker(args.args);
                 break;
+            case 'endRound':
+                this.onEnteringEndRound();
+                break;
+        }
+    }
+
+    private onEnteringChooseAction(args: EnteringChooseActionArgs) {
+        if ((this as any).isCurrentPlayerActive()) {
+            this.getCurrentPlayerTable()?.setSelectableWorkers(args.workers);
         }
     }
 
@@ -158,10 +161,17 @@ class Humanity implements HumanityGame {
         }
     }
 
+    private onEnteringEndRound() {
+        this.playersTables.forEach(playerTable => playerTable.reactivateWorkers());
+    }
+
     public onLeavingState(stateName: string) {
         log( 'Leaving state: '+stateName );
 
         switch (stateName) {
+            case 'chooseAction':
+                this.onLeavingChooseWorker();
+                break;
             case 'chooseWorker':
                 this.onLeavingChooseWorker();
                 break;
@@ -179,10 +189,10 @@ class Humanity implements HumanityGame {
         
         if ((this as any).isCurrentPlayerActive()) {
             switch (stateName) {
-                case 'playAction':
-                    const playActionArgs = args as EnteringChooseWorkerArgs;
+                case 'chooseAction':
+                    const chooseActionArgs = args as EnteringChooseActionArgs;
                     
-                    if (!playActionArgs.noActionYet) { // TODO
+                    if (!chooseActionArgs.noActionYet) { // TODO
                         (this as any).addActionButton(`endTurn_button`, _("End turn"), () => this.endTurn());
                     }
                     break;
@@ -498,11 +508,9 @@ class Humanity implements HumanityGame {
         }
     }
     
-    public onTableDestinationClick(research: Research): void {
-        if (this.gamedatas.gamestate.name == 'reserveDestination') {
-            this.reserveDestination(research.id);
-        } else {
-            this.takeDestination(research.id);
+    public onTableResearchClick(research: Research): void {
+        if (this.gamedatas.gamestate.name == 'chooseAction') {
+            this.chooseNewResearch(research.id);
         }
     }
 
@@ -510,24 +518,14 @@ class Humanity implements HumanityGame {
         this.activateTile(card.id);
     }
 
-    public onTableCardClick(card: Tile): void {
-        if (this.gamedatas.gamestate.name == 'discardTableCard') {
-            this.discardTableCard(card.id);
-        } else {
-            this.chooseNewCard(card.id);
-        }
-    }
-
-    public onPlayedCardClick(card: Tile): void {
-        if (this.gamedatas.gamestate.name == 'discardCard') {
-            this.discardCard(card.id);
-        } else {
-            this.setPayDestinationLabelAndState();
+    public onTableTileClick(tile: Tile): void {
+        if (this.gamedatas.gamestate.name == 'chooseAction') {
+            this.chooseNewTile(tile.id);
         }
     }
 
     public onWorkerClick(worker: Worker): void {
-        if (this.gamedatas.gamestate.name == 'chooseWorker') {
+        if (['chooseAction', 'chooseWorker'].includes(this.gamedatas.gamestate.name)) {
             this.chooseWorker(worker.id);
         }
     }
@@ -560,80 +558,24 @@ class Humanity implements HumanityGame {
         });
     }
   	
-    public takeDestination(id: number) {
-        if(!(this as any).checkAction('takeDestination')) {
+    public chooseNewTile(id: number) {
+        if(!(this as any).checkAction('chooseNewTile')) {
             return;
         }
 
-        this.takeAction('takeDestination', {
+        this.takeAction('chooseNewTile', {
             id
         });
     }
   	
-    public reserveDestination(id: number) {
-        if(!(this as any).checkAction('reserveDestination')) {
+    public chooseNewResearch(id: number) {
+        if(!(this as any).checkAction('chooseNewResearch')) {
             return;
         }
 
-        this.takeAction('reserveDestination', {
+        this.takeAction('chooseNewResearch', {
             id
         });
-    }
-  	
-    public chooseNewCard(id: number) {
-        if(!(this as any).checkAction('chooseNewCard')) {
-            return;
-        }
-
-        this.takeAction('chooseNewCard', {
-            id
-        });
-    }
-  	
-    public payDestination() {
-        if(!(this as any).checkAction('payDestination')) {
-            return;
-        }
-
-        const ids = this.getCurrentPlayerTable().getSelectedCards().map(card => card.id);
-        const recruits = Number(document.getElementById(`payDestination_button`).dataset.recruits);
-
-        this.takeAction('payDestination', {
-            ids: ids.join(','),
-            recruits
-        });
-    }
-  	
-    public trade(number: number, gainsByBracelets: { [bracelets: number]: number } | null) {
-        if(!(this as any).checkAction('trade')) {
-            return;
-        }
-
-        let warning = null;
-        if (gainsByBracelets != null) {
-            if (gainsByBracelets[number] == 0) {
-                warning = _("Are you sure you want to trade ${bracelets} bracelet(s) ?").replace('${bracelets}', number) + ' '+ _("There is nothing to gain yet with this number of bracelet(s)");
-            } else if (number > 1 && gainsByBracelets[number] == gainsByBracelets[number - 1]) {
-                warning = _("Are you sure you want to trade ${bracelets} bracelet(s) ?").replace('${bracelets}', number) + ' '+ _("You would gain the same with one less bracelet");
-            }
-        }
-
-        if (warning != null) {
-            (this as any).confirmationDialog(warning, () => this.trade(number, null));
-            return;
-        }
-
-        this.takeAction('trade', {
-            number
-        });
-    }
-  	
-    public cancel() {
-        if(!(this as any).checkAction('cancel')) {
-            return;
-        }
-
-        this.takeAction('cancel');
     }
   	
     public endTurn() {
@@ -642,26 +584,6 @@ class Humanity implements HumanityGame {
         }
 
         this.takeAction('endTurn');
-    }
-  	
-    public discardTableCard(id: number) {
-        if(!(this as any).checkAction('discardTableCard')) {
-            return;
-        }
-
-        this.takeAction('discardTableCard', {
-            id
-        });
-    }
-  	
-    public discardCard(id: number) {
-        if(!(this as any).checkAction('discardCard')) {
-            return;
-        }
-
-        this.takeAction('discardCard', {
-            id
-        });
     }
 
     public takeAction(action: string, data?: any) {

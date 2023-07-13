@@ -6,6 +6,7 @@ class PlayerTable {
     public voidStock: VoidStock<Tile>;
     public tiles: SlotStock<Tile>;
     public research: LineStock<Research>;
+    public objectives: LineStock<Objective>;
 
     private currentPlayer: boolean;
 
@@ -18,6 +19,7 @@ class PlayerTable {
             <div id="player-table-${this.playerId}-name" class="name-wrapper">${player.name}</div>
             <div id="player-table-${this.playerId}-tiles" class="tiles"></div>
             <div id="player-table-${this.playerId}-research" class="research"></div>
+            <div id="player-table-${this.playerId}-objective" class="objective"></div>
         </div>
         `;
 
@@ -50,12 +52,12 @@ class PlayerTable {
         this.voidStock = new VoidStock<Tile>(this.game.tilesManager, document.getElementById(`player-table-${this.playerId}-name`));
         
         const researchDiv = document.getElementById(`player-table-${this.playerId}-research`);
-        this.research = new LineStock<Research>(this.game.researchManager, researchDiv, {
-            center: false,
-        });
-        researchDiv.style.setProperty('--card-overlap', '94px');
-        
+        this.research = new LineStock<Research>(this.game.researchManager, researchDiv);        
         this.research.addCards(player.research);
+        
+        const objectiveDiv = document.getElementById(`player-table-${this.playerId}-objective`);
+        this.objectives = new LineStock<Objective>(this.game.objectivesManager, objectiveDiv);
+        this.objectives.addCards(player.objectives);
 
         player.workers.filter(worker => worker.location == 'player').forEach(worker => {
             tilesDiv.querySelector(`[data-slot-id="${worker.x}_${worker.y}"]`).appendChild(this.game.createWorker(worker));
@@ -75,5 +77,11 @@ class PlayerTable {
     
     public removeTile(tile: Tile) {
         this.tiles.removeCard(tile);
+    }
+    
+    public reactivateWorkers(): void {
+        document.getElementById(`player-table-${this.playerId}-tiles`).querySelectorAll('.worker').forEach((worker: HTMLDivElement) => 
+            worker.classList.remove('disabled-worker')
+        );
     }
 }

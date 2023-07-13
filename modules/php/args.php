@@ -12,6 +12,35 @@ trait ArgsTrait {
         game state.
     */
 
+    function argActivateTile() {
+        $playerId = intval($this->getActivePlayerId());
+
+        $playerTiles = $this->getTilesByLocation('player', $playerId);
+
+        $worker = $this->getSelectedWorker();
+        $activatableTiles = array_values(array_filter($playerTiles, fn($tile) => $tile->workforce != null && $tile->r < 3));
+
+        return [
+            'remaining' => $worker->remainingWorkforce, // for title
+            'activatableTiles' => $activatableTiles,
+        ];
+    }
+   
+    function argChooseAction() {
+        $playerId = intval($this->getActivePlayerId());
+
+        return [
+        ] + $this->argChooseWorker();
+    }
+
+    function argPay() {
+        $playerId = intval($this->getActivePlayerId());
+
+        return [
+            // TODO
+        ];
+    }
+
     function argChooseWorker() {
         $playerId = intval($this->getActivePlayerId());
 
@@ -20,26 +49,5 @@ trait ArgsTrait {
         return [
             'workers' => $workers,
         ];
-    }
-
-    function argActivateTile(int $playerId) {
-        $playerTiles = $this->getTilesByLocation('player', $playerId);
-
-        $activatableTiles = array_values(array_filter($playerTiles, fn($tile) => $tile->workforce != null && $tile->r < 3));
-
-        return [
-            'activatableTiles' => $activatableTiles,
-        ];
-    }
-   
-    function argPlayAction() {
-        $playerId = intval($this->getActivePlayerId());
-
-        $worker = $this->getSelectedWorker();
-        $argActivateTile = $this->argActivateTile($playerId);
-
-        return [
-            'worker' => $worker,
-        ] + $argActivateTile;
     }
 } 

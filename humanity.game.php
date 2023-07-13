@@ -23,6 +23,7 @@ require_once('modules/php/objects/worker.php');
 require_once('modules/php/objects/card.php');
 require_once('modules/php/objects/research.php');
 require_once('modules/php/objects/player.php');
+require_once('modules/php/objects/current-action.php');
 require_once('modules/php/objects/undo.php');
 require_once('modules/php/constants.inc.php');
 require_once('modules/php/utils.php');
@@ -194,9 +195,8 @@ class Humanity extends Table {
         This method is called each time we are in a game state with the "updateGameProgression" property set to true 
         (see states.inc.php)
     */
-    function getGameProgression() { // TODO
-        $maxScore = intval($this->getUniqueValueFromDB("SELECT max(`player_score`) FROM player"));
-        return $maxScore * 100 / 40;
+    function getGameProgression() {
+        return ($this->getGlobalVariable(YEAR) - 1) * 100 / 3;
     }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -15,14 +15,14 @@ class TableCenter {
             mapCardToSlot: card => card.locationArg,
         });
         this.research.addCards(gamedatas.tableResearch);
-        this.research.onCardClick = (card: Research) => this.game.onTableDestinationClick(card);
+        this.research.onCardClick = (card: Research) => this.game.onTableResearchClick(card);
 
         this.tiles = new SlotStock<Tile>(game.tilesManager, document.getElementById(`table-tiles`), {
             slotsIds: [0, 1, 2, 3, 4, 5, 6, 7],
             mapCardToSlot: card => card.locationArg,
             gap: '12px',
         });
-        this.tiles.onCardClick = card => this.game.onTableCardClick(card);
+        this.tiles.onCardClick = card => this.game.onTableTileClick(card);
         this.tiles.addCards(gamedatas.tableTiles);
 
         const tableWorkers = document.getElementById('table-workers');

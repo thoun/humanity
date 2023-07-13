@@ -60,13 +60,13 @@ interface Worker {
 
 interface HumanityPlayer extends Player {
     playerNo: number;
-    objectives: Objective[];
     
     workers: Worker[];
     tiles: Tile[];
     research: Research[];
     researchSpot: number;
     sciencePoints?: number;
+    objectives: Objective[];
 }
 
 interface HumanityGamedatas {
@@ -114,14 +114,17 @@ interface HumanityGame extends Game {
     createWorker(worker: Worker): HTMLDivElement;
 
     setTooltip(id: string, html: string): void;
-    onTableDestinationClick(research: Research): void;
+    onTableResearchClick(research: Research): void;
     onPlayerTileClick(card: Tile): void;
-    onTableCardClick(card: Tile): void;
-    onPlayedCardClick(card: Tile): void;
+    onTableTileClick(card: Tile): void;
 }
 
 interface EnteringChooseWorkerArgs {
     workers: Worker[];
+}
+
+interface EnteringChooseActionArgs extends EnteringChooseWorkerArgs {
+    // TODO
 }
 
 interface NotifFirstPlayerTokenArgs {

@@ -2168,13 +2168,13 @@ var TableCenter = /** @class */ (function () {
             mapCardToSlot: function (card) { return card.locationArg; },
         });
         this.research.addCards(gamedatas.tableResearch);
-        this.research.onCardClick = function (card) { return _this.game.onTableDestinationClick(card); };
+        this.research.onCardClick = function (card) { return _this.game.onTableResearchClick(card); };
         this.tiles = new SlotStock(game.tilesManager, document.getElementById("table-tiles"), {
             slotsIds: [0, 1, 2, 3, 4, 5, 6, 7],
             mapCardToSlot: function (card) { return card.locationArg; },
             gap: '12px',
         });
-        this.tiles.onCardClick = function (card) { return _this.game.onTableCardClick(card); };
+        this.tiles.onCardClick = function (card) { return _this.game.onTableTileClick(card); };
         this.tiles.addCards(gamedatas.tableTiles);
         var tableWorkers = document.getElementById('table-workers');
         tableWorkers.insertAdjacentHTML('beforeend', [0, 1, 2, 3, 4, 5, 6, 7].map(function (spot) { return "<div></div><div class=\"slot\" data-slot-id=\"".concat(spot, "\"></div>"); }).join(''));
@@ -2345,7 +2345,7 @@ var PlayerTable = /** @class */ (function () {
         this.game = game;
         this.playerId = Number(player.id);
         this.currentPlayer = this.playerId == this.game.getPlayerId();
-        var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.playerId, "-tiles\" class=\"tiles\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-research\" class=\"research\"></div>\n        </div>\n        ");
+        var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.playerId, "-tiles\" class=\"tiles\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-research\" class=\"research\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-objective\" class=\"objective\"></div>\n        </div>\n        ");
         dojo.place(html, document.getElementById('tables'));
         var slotsIds = [];
         var xs = player.tiles.map(function (tile) { return tile.x; });
@@ -2371,11 +2371,11 @@ var PlayerTable = /** @class */ (function () {
         player.tiles.filter(function (tile) { return tile.type == 9; }).forEach(function (tile) { return _this.game.tilesManager.getCardElement(tile).dataset.playerColor = player.color; });
         this.voidStock = new VoidStock(this.game.tilesManager, document.getElementById("player-table-".concat(this.playerId, "-name")));
         var researchDiv = document.getElementById("player-table-".concat(this.playerId, "-research"));
-        this.research = new LineStock(this.game.researchManager, researchDiv, {
-            center: false,
-        });
-        researchDiv.style.setProperty('--card-overlap', '94px');
+        this.research = new LineStock(this.game.researchManager, researchDiv);
         this.research.addCards(player.research);
+        var objectiveDiv = document.getElementById("player-table-".concat(this.playerId, "-objective"));
+        this.objectives = new LineStock(this.game.objectivesManager, objectiveDiv);
+        this.objectives.addCards(player.objectives);
         player.workers.filter(function (worker) { return worker.location == 'player'; }).forEach(function (worker) {
             tilesDiv.querySelector("[data-slot-id=\"".concat(worker.x, "_").concat(worker.y, "\"]")).appendChild(_this.game.createWorker(worker));
         });
@@ -2392,6 +2392,11 @@ var PlayerTable = /** @class */ (function () {
     PlayerTable.prototype.removeTile = function (tile) {
         this.tiles.removeCard(tile);
     };
+    PlayerTable.prototype.reactivateWorkers = function () {
+        document.getElementById("player-table-".concat(this.playerId, "-tiles")).querySelectorAll('.worker').forEach(function (worker) {
+            return worker.classList.remove('disabled-worker');
+        });
+    };
     return PlayerTable;
 }());
 var ANIMATION_MS = 500;
@@ -2405,13 +2410,6 @@ var VP_BY_RESEARCH = {
     10: 3,
     14: 5,
 };
-var EQUAL = -1;
-var DIFFERENT = 0;
-var VP = 1;
-var BRACELET = 2;
-var RECRUIT = 3;
-var RESEARCH = 4;
-var CARD = 5;
 function getVpByResearch(research) {
     return Object.entries(VP_BY_RESEARCH).findLast(function (entry) { return research >= Number(entry[0]); })[1];
 }
@@ -2505,9 +2503,21 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.onEnteringState = function (stateName, args) {
         log('Entering state: ' + stateName, args.args);
         switch (stateName) {
+            case 'chooseAction':
+                this.onEnteringChooseAction(args.args);
+                break;
             case 'chooseWorker':
                 this.onEnteringChooseWorker(args.args);
                 break;
+            case 'endRound':
+                this.onEnteringEndRound();
+                break;
+        }
+    };
+    Humanity.prototype.onEnteringChooseAction = function (args) {
+        var _a;
+        if (this.isCurrentPlayerActive()) {
+            (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableWorkers(args.workers);
         }
     };
     Humanity.prototype.onEnteringChooseWorker = function (args) {
@@ -2516,9 +2526,15 @@ var Humanity = /** @class */ (function () {
             (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableWorkers(args.workers);
         }
     };
+    Humanity.prototype.onEnteringEndRound = function () {
+        this.playersTables.forEach(function (playerTable) { return playerTable.reactivateWorkers(); });
+    };
     Humanity.prototype.onLeavingState = function (stateName) {
         log('Leaving state: ' + stateName);
         switch (stateName) {
+            case 'chooseAction':
+                this.onLeavingChooseWorker();
+                break;
             case 'chooseWorker':
                 this.onLeavingChooseWorker();
                 break;
@@ -2535,9 +2551,9 @@ var Humanity = /** @class */ (function () {
         var _this = this;
         if (this.isCurrentPlayerActive()) {
             switch (stateName) {
-                case 'playAction':
-                    var playActionArgs = args;
-                    if (!playActionArgs.noActionYet) { // TODO
+                case 'chooseAction':
+                    var chooseActionArgs = args;
+                    if (!chooseActionArgs.noActionYet) { // TODO
                         this.addActionButton("endTurn_button", _("End turn"), function () { return _this.endTurn(); });
                     }
                     break;
@@ -2757,35 +2773,21 @@ var Humanity = /** @class */ (function () {
             this.objectivesManager.setForHelp(i, "help-objective-".concat(i));
         }
     };
-    Humanity.prototype.onTableDestinationClick = function (research) {
-        if (this.gamedatas.gamestate.name == 'reserveDestination') {
-            this.reserveDestination(research.id);
-        }
-        else {
-            this.takeDestination(research.id);
+    Humanity.prototype.onTableResearchClick = function (research) {
+        if (this.gamedatas.gamestate.name == 'chooseAction') {
+            this.chooseNewResearch(research.id);
         }
     };
     Humanity.prototype.onPlayerTileClick = function (card) {
         this.activateTile(card.id);
     };
-    Humanity.prototype.onTableCardClick = function (card) {
-        if (this.gamedatas.gamestate.name == 'discardTableCard') {
-            this.discardTableCard(card.id);
-        }
-        else {
-            this.chooseNewCard(card.id);
-        }
-    };
-    Humanity.prototype.onPlayedCardClick = function (card) {
-        if (this.gamedatas.gamestate.name == 'discardCard') {
-            this.discardCard(card.id);
-        }
-        else {
-            this.setPayDestinationLabelAndState();
+    Humanity.prototype.onTableTileClick = function (tile) {
+        if (this.gamedatas.gamestate.name == 'chooseAction') {
+            this.chooseNewTile(tile.id);
         }
     };
     Humanity.prototype.onWorkerClick = function (worker) {
-        if (this.gamedatas.gamestate.name == 'chooseWorker') {
+        if (['chooseAction', 'chooseWorker'].includes(this.gamedatas.gamestate.name)) {
             this.chooseWorker(worker.id);
         }
     };
@@ -2811,90 +2813,27 @@ var Humanity = /** @class */ (function () {
             id: id
         });
     };
-    Humanity.prototype.takeDestination = function (id) {
-        if (!this.checkAction('takeDestination')) {
+    Humanity.prototype.chooseNewTile = function (id) {
+        if (!this.checkAction('chooseNewTile')) {
             return;
         }
-        this.takeAction('takeDestination', {
+        this.takeAction('chooseNewTile', {
             id: id
         });
     };
-    Humanity.prototype.reserveDestination = function (id) {
-        if (!this.checkAction('reserveDestination')) {
+    Humanity.prototype.chooseNewResearch = function (id) {
+        if (!this.checkAction('chooseNewResearch')) {
             return;
         }
-        this.takeAction('reserveDestination', {
+        this.takeAction('chooseNewResearch', {
             id: id
         });
-    };
-    Humanity.prototype.chooseNewCard = function (id) {
-        if (!this.checkAction('chooseNewCard')) {
-            return;
-        }
-        this.takeAction('chooseNewCard', {
-            id: id
-        });
-    };
-    Humanity.prototype.payDestination = function () {
-        if (!this.checkAction('payDestination')) {
-            return;
-        }
-        var ids = this.getCurrentPlayerTable().getSelectedCards().map(function (card) { return card.id; });
-        var recruits = Number(document.getElementById("payDestination_button").dataset.recruits);
-        this.takeAction('payDestination', {
-            ids: ids.join(','),
-            recruits: recruits
-        });
-    };
-    Humanity.prototype.trade = function (number, gainsByBracelets) {
-        var _this = this;
-        if (!this.checkAction('trade')) {
-            return;
-        }
-        var warning = null;
-        if (gainsByBracelets != null) {
-            if (gainsByBracelets[number] == 0) {
-                warning = _("Are you sure you want to trade ${bracelets} bracelet(s) ?").replace('${bracelets}', number) + ' ' + _("There is nothing to gain yet with this number of bracelet(s)");
-            }
-            else if (number > 1 && gainsByBracelets[number] == gainsByBracelets[number - 1]) {
-                warning = _("Are you sure you want to trade ${bracelets} bracelet(s) ?").replace('${bracelets}', number) + ' ' + _("You would gain the same with one less bracelet");
-            }
-        }
-        if (warning != null) {
-            this.confirmationDialog(warning, function () { return _this.trade(number, null); });
-            return;
-        }
-        this.takeAction('trade', {
-            number: number
-        });
-    };
-    Humanity.prototype.cancel = function () {
-        if (!this.checkAction('cancel')) {
-            return;
-        }
-        this.takeAction('cancel');
     };
     Humanity.prototype.endTurn = function () {
         if (!this.checkAction('endTurn')) {
             return;
         }
         this.takeAction('endTurn');
-    };
-    Humanity.prototype.discardTableCard = function (id) {
-        if (!this.checkAction('discardTableCard')) {
-            return;
-        }
-        this.takeAction('discardTableCard', {
-            id: id
-        });
-    };
-    Humanity.prototype.discardCard = function (id) {
-        if (!this.checkAction('discardCard')) {
-            return;
-        }
-        this.takeAction('discardCard', {
-            id: id
-        });
     };
     Humanity.prototype.takeAction = function (action, data) {
         data = data || {};

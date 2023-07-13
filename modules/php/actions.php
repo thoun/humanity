@@ -26,10 +26,23 @@ trait ActionTrait {
         if ($worker == null) {
             throw new BgaUserException("Invalid worker");
         }
+        
+        $stateId = intval($this->gamestate->state_id());
+        
+        if ($stateId == ST_PLAYER_CHOOSE_ACTION) {
+            $currentAction = new CurrentAction('activate');
+            $currentAction->selectedWorker = $id;
+            $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
-        $this->setGlobalVariable(SELECTED_WORKER, $id);
+            $this->gamestate->nextState('activate');
+        } else {
+            $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
+            $currentAction->selectedWorker = $id;
+            $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
-        $this->gamestate->nextState('next');
+            // TODO
+            $this->gamestate->nextState('endTurn');
+        }
     }
 
     public function activateTile(int $id) {
@@ -89,6 +102,24 @@ trait ActionTrait {
         } else {
             $this->applyEndOfActivation($playerId, $worker);
         }
+    }
+
+    public function chooseNewTile(int $id) {
+        self::checkAction('chooseNewTile');
+
+        $currentAction = new CurrentAction('tile');
+        $currentAction->tile = $id;
+
+        $this->gamestate->nextState('pay');
+    }
+
+    public function chooseNewResearch(int $id) {
+        self::checkAction('chooseNewResearch');
+
+        $currentAction = new CurrentAction('research');
+        $currentAction->research = $id;
+
+        $this->gamestate->nextState('pay');
     }
 
     public function endTurn() {

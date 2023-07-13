@@ -62,6 +62,7 @@ class Objective extends ObjectiveType {
             $this->minimum = $objectiveType->minimum;
             $this->color = $objectiveType->color;
             $this->adjacent = $objectiveType->adjacent;
+            $this->diagonal = $objectiveType->diagonal;
             $this->direction = $objectiveType->direction;
             $this->sameColor = $objectiveType->sameColor;
             $this->baseType = $objectiveType->baseType;

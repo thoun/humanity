@@ -138,7 +138,7 @@ trait UtilTrait {
         return array_map(fn($dbWorker) => new Worker($dbWorker), array_values($dbWorkers));
     }
 
-    function countRemainingWorkers(?int $playerId) {
+    function countRemainingWorkers(?int $playerId = null) {
         $sql = "SELECT count(*) FROM worker WHERE `location` = 'player' && `remaining_workforce` > 0";
         if ($playerId !== null) {
             $sql .= " AND `player_id` = '$playerId'";
@@ -264,11 +264,6 @@ trait UtilTrait {
         if ($dbCard == null) {
             return null;
         }
-
-        self::notifyAllPlayers('log', clienttranslate('objective = ${objective}'), [
-            'objective' => json_encode($dbCard),
-        ]);
-
         return new Objective($dbCard, $this->OBJECTIVES);
     }
 
@@ -276,7 +271,7 @@ trait UtilTrait {
         return array_map(fn($dbCard) => $this->getObjectiveFromDb($dbCard), array_values($dbCards));
     }
 
-    function getObjectivesByLocation(?string $location, ?int $location_arg = null, ?int $type = null, ?int $number = null) {
+    function getObjectivesByLocation(?string $location = null, ?int $location_arg = null, ?int $type = null, ?int $number = null) {
         $sql = "SELECT * FROM `objective` WHERE";
         if ($location !== null) {
             $sql .= " `card_location` = '$location'";
@@ -315,7 +310,8 @@ trait UtilTrait {
     }
 
     function getSelectedWorker() {
-        return $this->getWorkerById($this->getGlobalVariable(SELECTED_WORKER));
+        $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
+        return $currentAction != null ? $this->getWorkerById($currentAction->selectedWorker) : null;
     }
 
     function getArm() {
@@ -487,5 +483,9 @@ trait UtilTrait {
             'fromPlayerId' => $fromPlayerId,
             'player_name2' => $fromPlayerId !== null ? $this->getPlayerName($fromPlayerId) : null, // for logs
         ]);
+    }
+
+    function reactivatePlayerWorkers() {
+        $this->DbQuery("UPDATE worker SET `remaining_workforce` = `workforce`");
     }
 }

@@ -10,70 +10,11 @@ trait StateTrait {
         Here, you can create methods defined as "game state actions" (see "action" property in states.inc.php).
         The action method of state X is called everytime the current game state is set to X.
     */
-    
-    function stChooseWorker() {
-        // TODO skip if one available worker ?
-    }
 
-    /*function stPlayAction() {
-        $playerId = intval($this->getActivePlayerId());
+    function stPay() {
+        // TODO let player pay
 
-        if ($this->getGlobalVariable(UNDO) == null) {
-            $this->saveForUndo($playerId, false);
-        }
-    }*/
-
-    function stDiscardCard() {
-        $playersIds = $this->getPlayersIds();
-
-        $max = -1;
-        $maxPlayersIds = [];
-
-        foreach ($playersIds as $playerId) {
-            $playerCardCount = intval($this->getUniqueValueFromDB("SELECT count(*) FROM tile WHERE card_location LIKE 'played$playerId%'"));
-            if ($playerCardCount > $max) {
-                $max = $playerCardCount;
-                $maxPlayersIds = [$playerId];
-            } else if ($playerCardCount == $max) {
-                $maxPlayersIds[] = $playerId;
-            }
-        }
-
-        $this->gamestate->setPlayersMultiactive($maxPlayersIds, 'next', true);
-    }
-
-    function stAfterDiscardCard() {
-        $remainingCardsToTake = $this->getGlobalVariable(REMAINING_CARDS_TO_TAKE);
-        $playerId = $remainingCardsToTake->playerId;
-
-        if ($remainingCardsToTake->phase == 'recruit') {
-            $this->deleteGlobalVariable(REMAINING_CARDS_TO_TAKE);
-            $this->endOfRecruit($playerId, $remainingCardsToTake->slotColor);
-        } else {
-            $available = $this->getAvailableDeckCards();
-            $effectiveGain = min($remainingCardsToTake->remaining, $available);
-            for ($i = 0; $i < $effectiveGain; $i++) {
-                $this->powerTakeCard($playerId);
-            }
-            if ($effectiveGain < $remainingCardsToTake->remaining) {
-                $remainingCardsToTake->remaining = $remainingCardsToTake->remaining - $effectiveGain;
-                $this->setGlobalVariable(REMAINING_CARDS_TO_TAKE, $remainingCardsToTake);
-                $this->gamestate->nextState('discardCardsForDeck');
-            } else {
-                $this->deleteGlobalVariable(REMAINING_CARDS_TO_TAKE);
-                if ($remainingCardsToTake->phase == 'explore') {
-                    $this->incStat($effectiveGain, 'assetsCollectedByDestination5');
-                    $this->incStat($effectiveGain, 'assetsCollectedByDestination5', $playerId);
-
-                    $this->endExplore($playerId, $remainingCardsToTake->fromReserve, $remainingCardsToTake->research, $remainingCardsToTake->researchIndex);
-                } else if ($remainingCardsToTake->phase == 'trade') {
-                    $this->incStat($effectiveGain, 'assetsCollectedByTrade5');
-                    $this->incStat($effectiveGain, 'assetsCollectedByTrade5', $playerId);
-
-                    $this->endTrade($playerId);
-                }
-            }
-        }
+        $this->gamestate->nextState('next');
     }
 
     function stCheckObjectives() {
@@ -95,7 +36,7 @@ trait StateTrait {
     function stNextPlayer() {
         $playerId = intval($this->getActivePlayerId());
 
-        $this->deleteGlobalVariable(SELECTED_WORKER);
+        $this->deleteGlobalVariables([CURRENT_ACTION]);
 
         if ($this->countRemainingWorkers() > 0) {
 
@@ -151,9 +92,8 @@ Important : réfléchissez bien avant de placer vos astronautes,
 car vous ne pourrez pas les déplacer, à moins de les envoyer
 autour du plateau principal, et c’est à leur emplacement que
 les prochains modules pourront être construits.
-7 Tous les astronautes déjà présents dans votre base restent à
-leur place et sont rendus actifs.
-8 Un nouveau tour de jeu peut commencer.*/
+*/
+            $this->reactivatePlayerWorkers();
 
             $this->gamestate->nextState('next');
         } else {
@@ -186,10 +126,10 @@ puis reportez-vous à la section suivante.
 */
 
         $year = $this->getGlobalVariable(YEAR);
+        $this->setGlobalVariable(YEAR, $year + 1);
         if ($year == 3) {
             $this->gamestate->nextState('endScore');
         } else {
-            $this->setGlobalVariable(YEAR, $year + 1);
             $this->gamestate->nextState('next');
         }
     }

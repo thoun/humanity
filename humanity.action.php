@@ -57,6 +57,24 @@
         self::ajaxResponse();
     }
 
+    public function chooseNewTile() {
+        self::setAjaxMode();     
+
+        $id = self::getArg("id", AT_posint, true);
+        $this->game->chooseNewTile($id);
+
+        self::ajaxResponse();
+    }
+
+    public function chooseNewResearch() {
+        self::setAjaxMode();     
+
+        $id = self::getArg("id", AT_posint, true);
+        $this->game->chooseNewResearch($id);
+
+        self::ajaxResponse();
+    }
+
     public function endTurn() {
         self::setAjaxMode();     
 

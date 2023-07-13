@@ -56,7 +56,7 @@ $basicGameStates = [
         "description" => clienttranslate("Game setup"),
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => [ "" => ST_PLAYER_CHOOSE_WORKER ]
+        "transitions" => [ "" => ST_PLAYER_CHOOSE_ACTION ]
     ],
    
     // Final state.
@@ -72,156 +72,70 @@ $basicGameStates = [
 
 $playerActionsGameStates = [
 
+    ST_PLAYER_CHOOSE_ACTION => [
+        "name" => "chooseAction",
+        "description" => clienttranslate('${actplayer} must A. Travaillez dans la base, B. Déployez un module, C. Réalisez une expérience'),
+        "descriptionmyturn" => clienttranslate('${you} must A. Travaillez dans la base, B. Déployez un module, C. Réalisez une expérience'),
+        "type" => "activeplayer",    
+        "args" => "argChooseAction",
+        "possibleactions" => [ 
+            "chooseWorker",
+            "chooseNewTile",
+            "chooseNewResearch",
+        ],
+        "transitions" => [
+            "activate" => ST_PLAYER_ACTIVATE_TILE,
+            "pay" => ST_PLAYER_PAY,
+        ],
+    ],
+
+    ST_PLAYER_PAY => [
+        "name" => "pay",
+        "description" => clienttranslate('${actplayer} must pay'),
+        "descriptionmyturn" => clienttranslate('${you} must pay'),
+        "type" => "activeplayer",    
+        "args" => "argPay", 
+        "action" => "stPay",
+        "possibleactions" => [ 
+            "pay",
+        ],
+        "transitions" => [
+            "next" => ST_PLAYER_CHOOSE_WORKER,
+        ],
+    ],
+
     ST_PLAYER_CHOOSE_WORKER => [
         "name" => "chooseWorker",
         "description" => clienttranslate('${actplayer} must choose a worker'),
         "descriptionmyturn" => clienttranslate('${you} must choose a worker'),
         "type" => "activeplayer",    
         "args" => "argChooseWorker",
-        "action" => "stChooseWorker",
         "possibleactions" => [ 
             "chooseWorker",
         ],
         "transitions" => [
-            "next" => ST_PLAYER_PLAY_ACTION,
+            "next" => ST_PLAYER_CHOOSE_ACTION,
         ],
     ],
 
-    ST_PLAYER_PLAY_ACTION => [
-        "name" => "playAction",
-        "description" => clienttranslate('${actplayer} must A. Travaillez dans la base, B. Déployez un module, C. Réalisez une expérience'),
-        "descriptionmyturn" => clienttranslate('${you} must A. Travaillez dans la base, B. Déployez un module, C. Réalisez une expérience'),
-        "type" => "activeplayer",    
-        "args" => "argPlayAction",
+    ST_PLAYER_ACTIVATE_TILE => [
+        "name" => "activateTile",
+        "description" => clienttranslate('${actplayer} can activate some tiles (${remaining} workforce remaining)'),
+        "descriptionmyturn" => clienttranslate('${you} can activate some tiles (${remaining} workforce remaining)'),
+        "type" => "activeplayer",
+        "args" => "argActivateTile",
         "possibleactions" => [ 
             "activateTile",
-            "createTile",
             "endTurn",
         ],
         "transitions" => [
-            "stay" => ST_PLAYER_PLAY_ACTION,
-            "endTurn" => ST_CHECK_OBJECTIVES,
-        ],
-    ],
-
-    ST_PLAYER_CHOOSE_NEW_CARD => [
-        "name" => "chooseNewCard",
-        "description" => clienttranslate('${actplayer} must choose the new card to take from the table'),
-        "descriptionmyturn" => clienttranslate('${you} must choose the new card to take from the table'),
-        "type" => "activeplayer",
-        "args" => "argChooseNewCard",
-        "possibleactions" => [ 
-            "chooseNewCard",
-            "cancel",
-        ],
-        "transitions" => [
-            "next" => ST_PLAYER_CHOOSE_WORKER,
-            "discardCardsForDeck" => ST_MULTIPLAYER_DISCARD_CARD,
-            "reserve" => ST_PLAYER_RESERVE_DESTINATION,
-            "discardTableCard" => ST_PLAYER_DISCARD_TABLE_CARD,
-            "endTurn" => ST_CHECK_OBJECTIVES,
-            "cancel" => ST_PLAYER_PLAY_ACTION,
-        ]
-    ],
-
-    ST_PLAYER_PAY_DESTINATION => [
-        "name" => "payDestination",
-        "description" => clienttranslate('${actplayer} must choose the cards to pay for the selected research'),
-        "descriptionmyturn" => clienttranslate('${you} must choose the cards to pay for the selected research'),
-        "type" => "activeplayer",
-        "args" => "argPayDestination",
-        "possibleactions" => [ 
-            "payDestination",
-            "cancel",
-        ],
-        "transitions" => [
-            "next" => ST_PLAYER_CHOOSE_WORKER,
-            "discardCardsForDeck" => ST_MULTIPLAYER_DISCARD_CARD,
-            "reserve" => ST_PLAYER_RESERVE_DESTINATION,
-            "discardTableCard" => ST_PLAYER_DISCARD_TABLE_CARD,
-            "endTurn" => ST_CHECK_OBJECTIVES,
-            "cancel" => ST_PLAYER_PLAY_ACTION,
-        ]
-    ],
-
-    ST_PLAYER_RESERVE_DESTINATION => [
-        "name" => "reserveDestination",
-        "description" => clienttranslate('${actplayer} can reserve a research'),
-        "descriptionmyturn" => clienttranslate('${you} can reserve a research'),
-        "type" => "activeplayer",
-        "possibleactions" => [ 
-            "reserveDestination",
-            "pass",
-        ],
-        "transitions" => [
-            "next" => ST_PLAYER_CHOOSE_WORKER,
+            "stay" => ST_PLAYER_ACTIVATE_TILE,
             "endTurn" => ST_CHECK_OBJECTIVES,
         ]
-    ],
-
-    ST_PLAYER_DISCARD_TABLE_CARD => [
-        "name" => "discardTableCard",
-        "description" => clienttranslate('${actplayer} can discard a card from the table'),
-        "descriptionmyturn" => clienttranslate('${you} can discard a card from the table'),
-        "type" => "activeplayer",
-        "possibleactions" => [ 
-            "discardTableCard",
-            "pass",
-        ],
-        "transitions" => [
-            "next" => ST_PLAYER_CHOOSE_WORKER,
-            "endTurn" => ST_CHECK_OBJECTIVES,
-        ]
-    ],
-
-    ST_PLAYER_TRADE => [
-        "name" => "trade",
-        "description" => clienttranslate('${actplayer} must choose how many bracelets to spend'),
-        "descriptionmyturn" => clienttranslate('${you} must choose how many bracelets to spend'),
-        "type" => "activeplayer",
-        "args" => "argTrade",
-        "possibleactions" => [ 
-            "trade",
-            "cancel",
-        ],
-        "transitions" => [
-            "next" => ST_PLAYER_CHOOSE_WORKER,
-            "discardCardsForDeck" => ST_MULTIPLAYER_DISCARD_CARD,
-            "endTurn" => ST_NEXT_PLAYER,
-            "cancel" => ST_PLAYER_PLAY_ACTION,
-        ]
-    ],
-
-    ST_MULTIPLAYER_DISCARD_CARD => [
-        "name" => "discardCard",
-        "description" => clienttranslate('Waiting for other players'),
-        "descriptionmyturn" => clienttranslate('${you} must discard a card to refill the deck'),
-        "type" => "multipleactiveplayer",
-        "action" => "stDiscardCard",
-        "possibleactions" => [ 
-            "discardCard",
-        ],
-        "transitions" => [
-            "next" => ST_AFTER_DISCARD_CARD,
-        ],
     ],
 ];
 
 $gameGameStates = [
-
-    ST_AFTER_DISCARD_CARD => [
-        "name" => "afterDiscardCard",
-        "description" => "",
-        "type" => "game",
-        "action" => "stAfterDiscardCard",
-        "transitions" => [
-            "next" => ST_PLAYER_CHOOSE_WORKER,
-            "discardCardsForDeck" => ST_MULTIPLAYER_DISCARD_CARD,
-            "reserve" => ST_PLAYER_RESERVE_DESTINATION,
-            "discardTableCard" => ST_PLAYER_DISCARD_TABLE_CARD,
-            "endTurn" => ST_CHECK_OBJECTIVES,
-        ],
-    ],
 
     ST_CHECK_OBJECTIVES => [
         "name" => "checkObjectives",
@@ -240,7 +154,7 @@ $gameGameStates = [
         "action" => "stNextPlayer",
         "updateGameProgression" => true,
         "transitions" => [
-            "nextPlayer" => ST_PLAYER_CHOOSE_WORKER,
+            "nextPlayer" => ST_PLAYER_CHOOSE_ACTION,
             "endRound" => ST_END_ROUND,
         ],
     ],
@@ -251,7 +165,7 @@ $gameGameStates = [
         "type" => "game",
         "action" => "stEndRound",
         "transitions" => [
-            "next" => ST_PLAYER_CHOOSE_WORKER,
+            "next" => ST_PLAYER_CHOOSE_ACTION,
             "endYear" => ST_END_YEAR,
         ],
     ],
@@ -262,7 +176,7 @@ $gameGameStates = [
         "type" => "game",
         "action" => "stEndYear",
         "transitions" => [
-            "next" => ST_PLAYER_CHOOSE_WORKER,
+            "next" => ST_PLAYER_CHOOSE_ACTION,
             "endScore" => ST_END_SCORE,
         ]
     ],
