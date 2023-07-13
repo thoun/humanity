@@ -105,7 +105,7 @@ class Humanity extends Table {
         $this->initStat('table', 'roundNumber', 0);
         foreach(['table', 'player'] as $type) {
             foreach([
-                "researchPoints", 
+                "sciencePoints", 
                 // cards
                 "playedCards", 
                 "assetsCollectedByPlayedCards", "assetsCollectedByPlayedCards1", "assetsCollectedByPlayedCards2", "assetsCollectedByPlayedCards3", "assetsCollectedByPlayedCards4", 
@@ -155,7 +155,7 @@ class Humanity extends Table {
     
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
-        $sql = "SELECT player_id id, player_score score, player_no playerNo, player_research_spot researchSpot, player_research_points researchPoints, player_science science FROM player ";
+        $sql = "SELECT player_id id, player_score score, player_no playerNo, player_research_spot researchSpot, player_science_points sciencePoints, player_science science FROM player ";
         $result['players'] = self::getCollectionFromDb( $sql );
   
         // Gather all information about current game situation (visible by player $current_player_id).
@@ -168,14 +168,11 @@ class Humanity extends Table {
             
             $player['workers'] = $this->getPlayerWorkers($playerId);
             $player['researchSpot'] = intval($player['researchSpot']);
-            $player['researchPoints'] = $isEndScore || $playerId == $currentPlayerId ? intval($player['researchPoints']) : null;
+            $player['sciencePoints'] = $isEndScore || $playerId == $currentPlayerId ? intval($player['sciencePoints']) : null;
             $player['science'] = intval($player['science']);
             $player['tiles'] = $this->getTilesByLocation('player', $playerId);
-            $player['research'] = $this->getResearchsByLocation('played'.$playerId);
-
-            if ($currentPlayerId == $playerId) {
-                $player['hand'] = $this->getTilesByLocation('hand', $playerId);
-            }
+            $player['research'] = $this->getResearchsByLocation('player', $playerId);
+            $player['objectives'] = $this->getObjectivesByLocation('player', $playerId);
         }
 
         $result['tableTiles'] = $this->getTilesByLocation('table');
@@ -183,7 +180,6 @@ class Humanity extends Table {
         $result['tableObjectives'] = $this->getObjectivesByLocation('table');      
 
         $result['firstPlayerId'] = $firstPlayerId;
-        //$result['lastTurn'] = !$isEndScore && boolval($this->getGameStateValue(LAST_TURN));
   
         return $result;
     }

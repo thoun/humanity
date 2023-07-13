@@ -162,7 +162,7 @@ $this->OBJECTIVES = [
     1 => [
         1 => new ObjectiveTypeA(4, ORANGE, true),
         2 => new ObjectiveTypeA(3, BLUE, true),
-        3 => new ObjectiveTypeA(3, PURPLE, true), // TODO allow diagonal for PURPLE & adjacent
+        3 => new ObjectiveTypeA(3, PURPLE, true, true),
 
         4 => new ObjectiveTypeA(6, ORANGE, false),
         5 => new ObjectiveTypeA(4, BLUE, false),

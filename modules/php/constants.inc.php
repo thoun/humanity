@@ -46,9 +46,9 @@ define('PROTEIN', 13);
 /*
  * Extremity
  */
-define('LEFT', 1);
-define('CENTRAL', 2);
-define('RIGHT', 3);
+const LEFT = 1;
+const CENTRAL = 2;
+const RIGHT = 3;
 
 /*
  * Green shapes
@@ -87,7 +87,9 @@ define('ST_AFTER_DISCARD_CARD', 71);
 
 define('ST_CHECK_OBJECTIVES', 90);
 define('ST_NEXT_PLAYER', 92);
-define('ST_END_YEAR', 95);
+
+define('ST_END_ROUND', 95);
+define('ST_END_YEAR', 96);
 
 define('ST_END_SCORE', 98);
 
@@ -97,7 +99,8 @@ define('END_SCORE', 100);
 /*
  * Global variables
  */
-define('SELECTED_WORKER', 'SELECTED_WORKER');
+define('YEAR', 'YEAR');
 define('ARM', 'ARM');
+define('SELECTED_WORKER', 'SELECTED_WORKER');
 
 ?>

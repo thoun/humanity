@@ -28,7 +28,7 @@ interface Research {
     number: number;
     extremity: number;
     cost: number[];
-    researchPoints: number;
+    sciencePoints: number;
     effect?: number;
     points: number;
 }
@@ -66,7 +66,7 @@ interface HumanityPlayer extends Player {
     tiles: Tile[];
     research: Research[];
     researchSpot: number;
-    researchPoints?: number;
+    sciencePoints?: number;
 }
 
 interface HumanityGamedatas {

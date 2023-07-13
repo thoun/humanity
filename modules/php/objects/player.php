@@ -7,7 +7,7 @@ class HumanityPlayer {
     public int $no;
     public int $score;
     public int $researchSpot;
-    public int $researchPoints;
+    public int $sciencePoints;
     public int $science;
 
     public function __construct($dbPlayer) {
@@ -17,7 +17,7 @@ class HumanityPlayer {
         $this->no = intval($dbPlayer['player_no']);
         $this->score = intval($dbPlayer['player_score']);
         $this->researchSpot = intval($dbPlayer['player_research_spot']);
-        $this->researchPoints = intval($dbPlayer['player_research_points']);
+        $this->sciencePoints = intval($dbPlayer['player_science_points']);
         $this->science = intval($dbPlayer['player_science']);
     }
 }

@@ -426,7 +426,7 @@ class Humanity implements HumanityGame {
         this.researchBoard.setScore(playerId, score);
     }
 
-    private setResearchPoints(playerId: number, count: number) {
+    private setSciencePoints(playerId: number, count: number) {
         this.researchCounters[playerId].toValue(count);
         this.researchBoard.setResearchSpot(playerId, count);
     }

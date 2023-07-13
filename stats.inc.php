@@ -49,7 +49,7 @@
 
 $commonStats = [
     // repuration
-    "researchPoints" => [
+    "sciencePoints" => [
         "id" => 20,
         "name" => totranslate("Points gained with research"),
         "type" => "int"

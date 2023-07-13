@@ -5,14 +5,14 @@ require_once(__DIR__.'/../constants.inc.php');
 class ResearchType {
     public int $extremity;
     public array $cost;
-    public int $researchPoints;
+    public int $sciencePoints;
     public ?int $effect;
     public ?int $points;
   
-    public function __construct(int $extremity, array $cost, ?int $researchPoints, ?int $effect = null, ?int $points = 0) {
+    public function __construct(int $extremity, array $cost, ?int $sciencePoints, ?int $effect = null, ?int $points = 0) {
         $this->extremity = $extremity;
         $this->cost = $cost;
-        $this->researchPoints = $researchPoints;
+        $this->sciencePoints = $sciencePoints;
         $this->effect = $effect;
         $this->points = $points;
     } 
@@ -34,9 +34,9 @@ class Research extends ResearchType {
         $this->number = array_key_exists('card_type_arg', $dbCard) || array_key_exists('type_arg', $dbCard) ? intval($dbCard['card_type_arg'] ?? $dbCard['type_arg']) : null;
 
         if ($this->number !== null) {
-            $objectiveType = $RESEARCH[$this->year][$this->number];        
+            $objectiveType = $RESEARCH[$this->year][$this->number];
             $this->cost = $objectiveType->cost;
-            $this->researchPoints = $objectiveType->researchPoints;
+            $this->sciencePoints = $objectiveType->sciencePoints;
             $this->effect = $objectiveType->effect;
             $this->points = $objectiveType->points;
         }

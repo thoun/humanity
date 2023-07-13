@@ -7,7 +7,7 @@ const RESEARCH_CASE_HEIGHT = 33.5;
 class ResearchBoard {
     private objectives: SlotStock<Objective>;
     private vp = new Map<number, number>();
-    private researchPoints = new Map<number, number>(); 
+    private sciencePoints = new Map<number, number>(); 
         
     constructor(private game: HumanityGame, gamedatas: HumanityGamedatas) {
         const players = Object.values(gamedatas.players);
@@ -22,7 +22,7 @@ class ResearchBoard {
         dojo.place(html, 'research-board');
         players.forEach(player => {
             this.vp.set(Number(player.id), Number(player.score));
-            this.researchPoints.set(Number(player.id), Math.min(14, Number(player.researchSpot)));
+            this.sciencePoints.set(Number(player.id), Math.min(14, Number(player.researchSpot)));
         });
         this.moveVP();
         this.moveResearch();
@@ -123,7 +123,7 @@ class ResearchBoard {
     }
 
     private moveResearch() {
-        this.researchPoints.forEach((points, playerId) => {
+        this.sciencePoints.forEach((points, playerId) => {
             const markerDiv = document.getElementById(`player-${playerId}-research-marker`);
 
             const coordinates = this.getResearchCoordinates(points);
@@ -132,7 +132,7 @@ class ResearchBoard {
     
             let topShift = 0;
             let leftShift = 0;
-            this.researchPoints.forEach((iPoints, iPlayerId) => {
+            this.sciencePoints.forEach((iPoints, iPlayerId) => {
                 if (iPoints === points && iPlayerId < playerId) {
                     topShift += 5;
                     //leftShift += 5;
@@ -144,12 +144,12 @@ class ResearchBoard {
     }
     
     public setResearchSpot(playerId: number, researchSpot: number) {
-        this.researchPoints.set(playerId, researchSpot);
+        this.sciencePoints.set(playerId, researchSpot);
         this.moveResearch();
     }
     
     public getResearchSpot(playerId: number): number {
-        return this.researchPoints.get(playerId);
+        return this.sciencePoints.get(playerId);
     }
 
     // TODO keep?

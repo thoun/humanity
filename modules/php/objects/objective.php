@@ -6,15 +6,17 @@ class ObjectiveType {
     public int $minimum;
     public ?int $color;
     public ?bool $adjacent;
+    public ?bool $diagonal;
     public ?int $direction;
     public ?bool $sameColor;
     public ?int $baseType;
     public ?int $extremity;
   
-    public function __construct(int $minimum, ?int $color, ?bool $adjacent, ?int $direction, ?bool $sameColor, ?int $baseType, ?int $extremity) {
+    public function __construct(int $minimum, ?int $color, ?bool $adjacent, ?bool $diagonal, ?int $direction, ?bool $sameColor, ?int $baseType, ?int $extremity) {
         $this->minimum = $minimum;
         $this->color = $color;
         $this->adjacent = $adjacent;
+        $this->diagonal = $diagonal;
         $this->direction = $direction;
         $this->sameColor = $sameColor;
         $this->baseType = $baseType;
@@ -23,20 +25,20 @@ class ObjectiveType {
 }
 
 class ObjectiveTypeA extends ObjectiveType {  
-    public function __construct(int $minimum, ?int $color, ?bool $adjacent) {
-        parent::__construct($minimum, $color, $adjacent, null, null, null, null);
+    public function __construct(int $minimum, ?int $color, ?bool $adjacent, bool $diagonal = false) {
+        parent::__construct($minimum, $color, $adjacent, $diagonal, null, null, null, null);
     } 
 }
 
 class ObjectiveTypeB extends ObjectiveType {  
     public function __construct(int $minimum, ?int $direction, ?int $sameColor) {
-        parent::__construct($minimum, null, null, $direction, $sameColor, null, null);
+        parent::__construct($minimum, null, null, null, $direction, $sameColor, null, null);
     } 
 }
 
 class ObjectiveTypeC extends ObjectiveType {  
     public function __construct(int $minimum, ?int $baseType, ?int $extremity) {
-        parent::__construct($minimum, null, null, null, null, $baseType, $extremity);
+        parent::__construct($minimum, null, null, null, null, null, $baseType, $extremity);
     } 
 }
 

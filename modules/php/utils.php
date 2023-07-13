@@ -138,6 +138,14 @@ trait UtilTrait {
         return array_map(fn($dbWorker) => new Worker($dbWorker), array_values($dbWorkers));
     }
 
+    function countRemainingWorkers(?int $playerId) {
+        $sql = "SELECT count(*) FROM worker WHERE `location` = 'player' && `remaining_workforce` > 0";
+        if ($playerId !== null) {
+            $sql .= " AND `player_id` = '$playerId'";
+        }
+        return intval($this->getUniqueValueFromDB($sql));
+    }
+
     function getTileFromDb(/*array|null*/ $dbCard) {
         if ($dbCard == null) {
             return null;
@@ -314,6 +322,10 @@ trait UtilTrait {
         return $this->getGlobalVariable(ARM) ?? 0;
     }
 
+    function getYear() {
+        return $this->getGlobalVariable(YEAR) ?? 1;
+    }
+
     function gainTimeUnit(int $playerId, int $amount) { // TODO test
         $workers = $this->getPlayerWorkers($playerId, 'table');
         $arm = $this->getArm();
@@ -335,6 +347,145 @@ trait UtilTrait {
             'player_name' => $this->getPlayerName($playerId),
             'workers' => $movedWorkers,
             'amount' => $amount, // for logs
+        ]);
+    }
+
+    function getAdjacentTiles(array $tiles, Tile $fromTile, bool $diagonal = false) {
+        $adjacentTiles = [];
+        for ($x = -1; $x <= 1; $x++) {
+            for ($y = -1; $y <= 1; $y++) {
+                if ($x == 0 && $y == 0) { continue; }
+                if (!$diagonal && $x != 0 && $y != 0) { continue; }
+            }
+
+            $adjacentTile = $this->array_find($tiles, fn($tile) => 
+                $tile->x == $fromTile->x + $x && $tile->y == $fromTile->y + $y
+            );
+
+            if ($adjacentTile != null){
+                $adjacentTiles[] = $adjacentTile;
+            }
+        }
+
+        return $adjacentTiles;
+    }
+
+    function getAdjacentTilesCount(array $tiles, Tile $fromTile, bool $diagonal, array $alreadyCounted) {
+        $maxFromHere = 0;
+
+        $adjacentTiles = $this->getAdjacentTiles($tiles, $fromTile, $diagonal);
+        foreach ($adjacentTiles as $adjacentTile) {
+            if (!$this->some($alreadyCounted, fn($countedTile) => $countedTile->id == $adjacentTile->id)) {
+                $fromAdjacentTile = $this->getAdjacentTilesCount(
+                    $tiles, 
+                    $adjacentTile, 
+                    $diagonal, 
+                    array_merge($alreadyCounted, [$adjacentTile]),
+                );
+                if ($fromAdjacentTile > $maxFromHere) {
+                    $maxFromHere = $fromAdjacentTile;
+                }
+            }
+        }
+
+        return $maxFromHere + count($alreadyCounted);
+    }
+
+    function countTilesOfColor(int $playerId, int $color, bool $adjacent, bool $diagonal) {
+        $tiles = $this->getTilesByLocation('player', $playerId);
+        $tilesOfColor = array_values(array_filter($tiles, fn($tile) => $tile->color == $color));
+
+        if ($adjacent) {
+            return max(array_map(fn($fromTile) => $this->getAdjacentTilesCount($tilesOfColor, $fromTile, $diagonal, [$fromTile]), $tilesOfColor));
+        } else {
+            return count($tilesOfColor);
+        }
+    }
+
+    function getMaxTilesInDirectionFromTile(array $tiles, Tile $fromTile, int $x, int $y, bool $sameColor) {
+        $count = 1;
+        do {
+            $nextTile = $this->array_find($tiles, fn($tile) => 
+                $tile->x == $fromTile->x + $x * $count && $tile->y == $fromTile->y + $y * $count
+            );
+
+            if ($nextTile !== null && (!$sameColor || $nextTile->color == $fromTile->color)) {
+                $count++;
+            } else {
+                return $count;
+            }
+        } while (true);
+    }
+
+    function getMaxTilesInDirection(int $playerId, int $direction, bool $sameColor) {
+        $tiles = $this->getTilesByLocation('player', $playerId);
+
+        if ($direction == HORIZONTAL) {
+            return max(array_map(fn($fromTile) => $this->getMaxTilesInDirectionFromTile($tiles, $fromTile, 1, 0, $sameColor), $tiles));
+        } else if ($direction == VERTICAL) {
+            return max(array_map(fn($fromTile) => $this->getMaxTilesInDirectionFromTile($tiles, $fromTile, 0, 1, $sameColor), $tiles));
+        } else if ($direction == DIAGONAL) {
+            return max(
+                max(array_map(fn($fromTile) => $this->getMaxTilesInDirectionFromTile($tiles, $fromTile, 1, 1, $sameColor), $tiles)),
+                max(array_map(fn($fromTile) => $this->getMaxTilesInDirectionFromTile($tiles, $fromTile, -1, 1, $sameColor), $tiles)),
+            );
+        }
+    }
+
+    function getResearchTypeIcons(int $playerId, int $baseType) {
+        $researchTiles = $this->getResearchsByLocation('player', $playerId);
+        $count = 0;
+
+        foreach ($researchTiles as $researchTile) {
+            $count += count(array_filter($researchTile->cost, fn($cost) => $cost == $baseType || $cost == ($baseType + 10)));
+        }
+
+        return $count;
+    }
+
+    function getResearchExtremities(int $playerId, int $extremity) {
+        $researchTiles = $this->getResearchsByLocation('player', $playerId);
+        return count(array_filter($researchTiles, fn($researchTile) => $researchTile->extremity == $extremity));
+    }
+    
+    function fulfillObjective(int $playerId, Objective $objective) {
+        if ($objective->color !== null) {
+            return $this->countTilesOfColor($playerId, $objective->color, $objective->adjacent, $objective->diagonal) >= $objective->minimum;
+        } else if ($objective->direction !== null) {
+            return $this->getMaxTilesInDirection($playerId, $objective->direction, $objective->sameColor) >= $objective->minimum;
+        } else if ($objective->baseType !== null) {
+            return $this->getResearchTypeIcons($playerId, $objective->baseType) >= $objective->minimum;
+        } else if ($objective->extremity !== null) {
+            return $this->getResearchExtremities($playerId, $objective->extremity) >= $objective->minimum;
+        }
+        return false;
+    }
+    
+    function gainObjective(int $playerId, Objective $objective) {
+        $fromPlayerId = null;
+        if ($objective->location == 'player') {
+            $fromPlayerId = $objective->locationArg;
+        }
+
+        $this->objective->moveCard($objective->id, 'player', $playerId);
+
+        if ($fromPlayerId !== null) {
+            // TODO dec score 3 $fromPlayerId
+        } else {
+            // TODO gain 1 science $playerId
+        } 
+        // TODO inc score 3 $playerId
+
+        $message = $fromPlayerId === null ?
+            clienttranslate('${player_name} gains an objective card and 1 science point') :
+            clienttranslate('${player_name} gains an objective card previously owned by ${player_name2}');
+
+        self::notifyAllPlayers('gainObjective', $message, [
+            'playerId' => $playerId,
+            'player_name' => $this->getPlayerName($playerId),
+            'objective' => $objective,
+            'fromPlayerId' => $fromPlayerId,
+            'player_name2' => $fromPlayerId !== null ? $this->getPlayerName($fromPlayerId) : null, // for logs
         ]);
     }
 }

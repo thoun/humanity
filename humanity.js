@@ -2197,7 +2197,7 @@ var ResearchBoard = /** @class */ (function () {
         var _this = this;
         this.game = game;
         this.vp = new Map();
-        this.researchPoints = new Map();
+        this.sciencePoints = new Map();
         var players = Object.values(gamedatas.players);
         var html = '';
         // points
@@ -2207,7 +2207,7 @@ var ResearchBoard = /** @class */ (function () {
         dojo.place(html, 'research-board');
         players.forEach(function (player) {
             _this.vp.set(Number(player.id), Number(player.score));
-            _this.researchPoints.set(Number(player.id), Math.min(14, Number(player.researchSpot)));
+            _this.sciencePoints.set(Number(player.id), Math.min(14, Number(player.researchSpot)));
         });
         this.moveVP();
         this.moveResearch();
@@ -2307,14 +2307,14 @@ var ResearchBoard = /** @class */ (function () {
     };
     ResearchBoard.prototype.moveResearch = function () {
         var _this = this;
-        this.researchPoints.forEach(function (points, playerId) {
+        this.sciencePoints.forEach(function (points, playerId) {
             var markerDiv = document.getElementById("player-".concat(playerId, "-research-marker"));
             var coordinates = _this.getResearchCoordinates(points);
             var left = coordinates[0];
             var top = coordinates[1];
             var topShift = 0;
             var leftShift = 0;
-            _this.researchPoints.forEach(function (iPoints, iPlayerId) {
+            _this.sciencePoints.forEach(function (iPoints, iPlayerId) {
                 if (iPoints === points && iPlayerId < playerId) {
                     topShift += 5;
                     //leftShift += 5;
@@ -2324,11 +2324,11 @@ var ResearchBoard = /** @class */ (function () {
         });
     };
     ResearchBoard.prototype.setResearchSpot = function (playerId, researchSpot) {
-        this.researchPoints.set(playerId, researchSpot);
+        this.sciencePoints.set(playerId, researchSpot);
         this.moveResearch();
     };
     ResearchBoard.prototype.getResearchSpot = function (playerId) {
-        return this.researchPoints.get(playerId);
+        return this.sciencePoints.get(playerId);
     };
     // TODO keep?
     ResearchBoard.prototype.highlightPlayerTokens = function (playerId) {
@@ -2725,7 +2725,7 @@ var Humanity = /** @class */ (function () {
         (_a = this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.toValue(score);
         this.researchBoard.setScore(playerId, score);
     };
-    Humanity.prototype.setResearchPoints = function (playerId, count) {
+    Humanity.prototype.setSciencePoints = function (playerId, count) {
         this.researchCounters[playerId].toValue(count);
         this.researchBoard.setResearchSpot(playerId, count);
     };

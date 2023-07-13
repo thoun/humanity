@@ -241,6 +241,17 @@ $gameGameStates = [
         "updateGameProgression" => true,
         "transitions" => [
             "nextPlayer" => ST_PLAYER_CHOOSE_WORKER,
+            "endRound" => ST_END_ROUND,
+        ],
+    ],
+
+    ST_END_ROUND => [
+        "name" => "endRound",
+        "description" => "",
+        "type" => "game",
+        "action" => "stEndRound",
+        "transitions" => [
+            "next" => ST_PLAYER_CHOOSE_WORKER,
             "endYear" => ST_END_YEAR,
         ],
     ],
