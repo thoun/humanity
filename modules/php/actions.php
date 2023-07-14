@@ -135,11 +135,12 @@ trait ActionTrait {
             throw new BgaUserException("Invalid color");
         }
 
-        $radarTiles = $this->getTilesByLocation('radar');
-        $year = $this->getYear();
-        $tile = $this->array_find($radarTiles, fn($t) => $t->color == $color && $t->researchPoints == $year + 2);
-
         $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
+        
+        $radarTiles = $this->getTilesByLocation('radar');
+        $tile = $this->getTileById($currentAction->removeTileId);
+        $tile = $this->array_find($radarTiles, fn($t) => $t->color == $color && $t->researchPoints == $tile->researchPoints);
+
         $currentAction->addTileId = $tile->id;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 

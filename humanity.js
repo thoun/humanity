@@ -2180,6 +2180,12 @@ var TableCenter = /** @class */ (function () {
         this.research.removeAll();
         this.research.addCards(tableResearch);
     };
+    TableCenter.prototype.setSelectableTiles = function (selectableTiles) {
+        this.tiles.setSelectionMode(selectableTiles ? 'single' : 'none', selectableTiles);
+    };
+    TableCenter.prototype.setSelectableResearch = function (selectableResearch) {
+        this.research.setSelectionMode(selectableResearch ? 'single' : 'none', selectableResearch);
+    };
     return TableCenter;
 }());
 var POINT_CASE_HALF_WIDTH = 20.82;
@@ -2656,6 +2662,8 @@ var Humanity = /** @class */ (function () {
         var _a;
         if (this.isCurrentPlayerActive()) {
             (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableWorkers(args.workers);
+            this.tableCenter.setSelectableTiles(args.selectableTiles);
+            this.tableCenter.setSelectableResearch(args.selectableResearch);
         }
     };
     Humanity.prototype.onEnteringChooseWorker = function (args) {
@@ -2673,6 +2681,8 @@ var Humanity = /** @class */ (function () {
         switch (stateName) {
             case 'chooseAction':
                 this.onLeavingChooseWorker();
+                this.tableCenter.setSelectableTiles(null);
+                this.tableCenter.setSelectableResearch(null);
                 break;
             case 'chooseWorker':
                 this.onLeavingChooseWorker();

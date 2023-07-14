@@ -140,6 +140,8 @@ class Humanity implements HumanityGame {
     private onEnteringChooseAction(args: EnteringChooseActionArgs) {
         if ((this as any).isCurrentPlayerActive()) {
             this.getCurrentPlayerTable()?.setSelectableWorkers(args.workers);
+            this.tableCenter.setSelectableTiles(args.selectableTiles);
+            this.tableCenter.setSelectableResearch(args.selectableResearch);
         }
     }
 
@@ -159,6 +161,8 @@ class Humanity implements HumanityGame {
         switch (stateName) {
             case 'chooseAction':
                 this.onLeavingChooseWorker();
+                this.tableCenter.setSelectableTiles(null);
+                this.tableCenter.setSelectableResearch(null);
                 break;
             case 'chooseWorker':
                 this.onLeavingChooseWorker();

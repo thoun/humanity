@@ -118,7 +118,12 @@ trait ObjectiveTrait {
         $count = 0;
 
         foreach ($researchTiles as $researchTile) {
-            $count += count(array_filter($researchTile->cost, fn($cost) => $cost == $baseType || $cost == ($baseType + 10)));
+            if (array_key_exists($baseType, $researchTile->cost)) {
+                $count += $researchTile->cost[$baseType];
+            }
+            if (array_key_exists($baseType + 10, $researchTile->cost)) {
+                $count += $researchTile->cost[$baseType + 10];
+            }
         }
 
         return $count;

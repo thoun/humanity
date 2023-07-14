@@ -33,8 +33,6 @@ Also add one auto-FTP upload extension (for example https://marketplace.visualst
 Make sure ftp-sync.json and node_modules are in .gitignore
 
 # Rules
+You can mix electricity with a base resource when you want to use 3 base resources instead of a advanced resource
 
-
-# TODO TOCHECK
-selon votre choix, parmi les modules de communication supplémentaires de l’année en cours.
-TOCHECK année en cours ou research points de la tuile sélectionnée ?
+You take a radar of the same research point value, no matter the current year

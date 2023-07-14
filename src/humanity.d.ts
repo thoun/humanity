@@ -123,7 +123,8 @@ interface EnteringChooseWorkerArgs {
 }
 
 interface EnteringChooseActionArgs extends EnteringChooseWorkerArgs {
-    // TODO
+    selectableTiles: Tile[];
+    selectableResearch: Research[];
 }
 
 interface EnteringMoveWorkerArgs {

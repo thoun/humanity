@@ -64,4 +64,12 @@ class TableCenter {
         this.research.removeAll();
         this.research.addCards(tableResearch);
     }
+    
+    public setSelectableTiles(selectableTiles: Tile[] | null) {
+        this.tiles.setSelectionMode(selectableTiles ? 'single' : 'none', selectableTiles);
+    }
+    
+    public setSelectableResearch(selectableResearch: Research[] | null) {
+        this.research.setSelectionMode(selectableResearch ? 'single' : 'none', selectableResearch);
+    }
 }

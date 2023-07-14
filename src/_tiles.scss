@@ -3,6 +3,7 @@
     position: relative;
     width: 150px;
     height: 150px;
+    border-radius: 25px;
 
     @for $r from 0 through 3 {
         &[data-r="#{$r}"] .front {
@@ -81,28 +82,12 @@
 
     &.bga-cards_selectable-card:not(.bga-cards_disabled-card) {
         &:not(.bga-cards_selected-card) {
-            animation: selectable-card-animation 1s alternate infinite ease-in-out;
-        }
-
-        .card-side {
-            box-shadow: unset;
+            outline: 5px dashed red;
         }
     }    
 
     &.bga-cards_selected-card:not(.bga-cards_disabled-card) {
-        box-shadow: 0 0 5px 5px orange;
-
-        .card-side {
-            box-shadow: unset;
-        }
+        outline: 5px solid red;
     }
 }
 
-@keyframes selectable-card-animation {
-    0% {
-      box-shadow: 0 0 3px 2px rgb(255, 212, 131);
-    }
-    100% { 
-      box-shadow: 0 0 5px 3px rgb(255, 212, 131);
-    }
-}

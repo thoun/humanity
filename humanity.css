@@ -520,6 +520,8 @@ body > .card {
   background-position-x: 100%;
 }
 .worker.selectable {
+  outline: 5px dashed red;
+  border-radius: 15px;
   cursor: pointer;
 }
 .worker.disabled-worker {
@@ -550,6 +552,7 @@ body > .card {
   position: relative;
   width: 150px;
   height: 150px;
+  border-radius: 25px;
 }
 .tile[data-r="0"] .front {
   transform: rotate(0deg);
@@ -777,31 +780,18 @@ body > .card {
   background-position-x: 100%;
 }
 .tile.bga-cards_selectable-card:not(.bga-cards_disabled-card):not(.bga-cards_selected-card) {
-  animation: selectable-card-animation 1s alternate infinite ease-in-out;
-}
-.tile.bga-cards_selectable-card:not(.bga-cards_disabled-card) .card-side {
-  box-shadow: unset;
+  outline: 5px dashed red;
 }
 .tile.bga-cards_selected-card:not(.bga-cards_disabled-card) {
-  box-shadow: 0 0 5px 5px orange;
-}
-.tile.bga-cards_selected-card:not(.bga-cards_disabled-card) .card-side {
-  box-shadow: unset;
+  outline: 5px solid red;
 }
 
-@keyframes selectable-card-animation {
-  0% {
-    box-shadow: 0 0 3px 2px rgb(255, 212, 131);
-  }
-  100% {
-    box-shadow: 0 0 5px 3px rgb(255, 212, 131);
-  }
-}
 .card.research {
   display: inline-block;
   position: relative;
   width: 150px;
   height: 100px;
+  border-radius: 25px;
 }
 .card.research[data-year="1"] .front {
   background-image: url("img/research-age1.png");
@@ -848,22 +838,10 @@ body > .card {
   user-select: none;
 }
 .card.research.bga-cards_selectable-card:not(.bga-cards_disabled-card):not(.bga-cards_selected-card) {
-  animation: selectable-card-animation 1s alternate infinite ease-in-out;
-}
-.card.research.bga-cards_selectable-card:not(.bga-cards_disabled-card) .card-side {
-  box-shadow: unset;
+  outline: 5px dashed red;
 }
 .card.research.bga-cards_selected-card:not(.bga-cards_disabled-card) {
-  box-shadow: 0 0 5px 5px orange;
-}
-.card.research.bga-cards_selected-card:not(.bga-cards_disabled-card) .card-side {
-  box-shadow: unset;
-}
-.card.research.selected-pay-research {
-  outline: 5px solid orange;
-}
-.card.research.selected-pay-research .card-side {
-  box-shadow: unset;
+  outline: 5px solid red;
 }
 .card.research[data-type="1"] .card-side {
   background-position-x: 0%;
@@ -977,14 +955,6 @@ body > .card {
   background-position-y: 75%;
 }
 
-@keyframes selectable-card-animation {
-  0% {
-    box-shadow: 0 0 3px 2px rgb(255, 212, 131);
-  }
-  100% {
-    box-shadow: 0 0 5px 3px rgb(255, 212, 131);
-  }
-}
 .card.objective {
   display: inline-block;
   position: relative;

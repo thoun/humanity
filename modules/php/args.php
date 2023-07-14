@@ -28,8 +28,17 @@ trait ArgsTrait {
    
     function argChooseAction() {
         $playerId = intval($this->getActivePlayerId());
+        $playerIcons = $this->getPlayerIcons($playerId);
+
+        $tableTiles = $this->getTilesByLocation('table');
+        $tableResearch = $this->getResearchsByLocation('table');
+
+        $selectableTiles = array_values(array_filter($tableTiles, fn($tile) => $this->canPay($tile->cost, $playerIcons) != null));
+        $selectableResearch = array_values(array_filter($tableResearch, fn($tile) => $this->canPay($tile->cost, $playerIcons) != null));
 
         return [
+            'selectableTiles' => $selectableTiles,
+            'selectableResearch' => $selectableResearch,
         ] + $this->argChooseWorker();
     }
 

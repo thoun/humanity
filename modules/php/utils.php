@@ -143,4 +143,63 @@ trait UtilTrait {
     function getYear() {
         return $this->getGlobalVariable(YEAR) ?? 1;
     }
+
+    function canPay(array $cost, array $icons) { // payment if can pay, null if cannot pay
+        $remainingIcons = $icons; // copy
+
+        $payWith = [
+            ELECTRICITY => 0,
+            1 => 0, 2 => 0, 3 => 0,
+            11 => 0, 12 => 0, 13 => 0,
+        ];
+
+        if (array_key_exists(ELECTRICITY, $cost)) {
+            if ($cost[ELECTRICITY] > $remainingIcons[ELECTRICITY]) {
+                return null;
+            } else {
+                $payWith[ELECTRICITY] += $cost[ELECTRICITY];
+                $remainingIcons[ELECTRICITY] -= $cost[ELECTRICITY];
+            }
+        }
+
+        foreach([1, 2, 3] as $type) {
+            if (array_key_exists($type, $cost)) {
+                $payWithType = min($cost[$type], $remainingIcons[$type]);
+                $payWith[$type] -= $payWithType;
+                $remainingIcons[$type] -= $payWithType;
+
+                $remainingOfType = $cost[$type] - $payWithType;
+                if ($remainingOfType > $remainingIcons[ELECTRICITY]) {
+                    return null;
+                } else {
+                    $payWith[ELECTRICITY] += $remainingOfType;
+                    $remainingIcons[ELECTRICITY] -= $remainingOfType;
+                }
+            }
+        }
+
+        foreach([11, 12, 13] as $type) {
+            if (array_key_exists($type, $cost)) {
+                $baseType = $type - 10;
+                $payWithType = min($cost[$type], $remainingIcons[$type]);
+                $payWith[$type] -= $payWithType;
+                $remainingIcons[$type] -= $payWithType;
+
+                $remainingOfType = $cost[$type] - $payWithType;
+                if ((3 * $remainingOfType) > ($remainingIcons[ELECTRICITY] + $remainingIcons[$baseType])) {
+                    return null;
+                } else {
+                    $payWithBaseType = min(3 * $remainingOfType, $remainingIcons[$baseType]);
+                    $payWith[$baseType] -= $payWithBaseType;
+                    $remainingIcons[$baseType] -= $payWithBaseType;
+
+                    $payWithElectricity = (3 * $remainingOfType) - $payWithBaseType;
+                    $payWith[ELECTRICITY] += $payWithElectricity;
+                    $remainingIcons[ELECTRICITY] -= $payWithElectricity;
+                }
+            }
+        }
+
+        return $payWith;
+    }
 }
