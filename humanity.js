@@ -2168,7 +2168,10 @@ var TableCenter = /** @class */ (function () {
         this.tiles.removeCard(tile);
     };
     TableCenter.prototype.shiftTile = function (tile) {
-        this.tiles.addCard(tile);
+        return this.tiles.addCard(tile);
+    };
+    TableCenter.prototype.newTile = function (tile) {
+        return this.tiles.addCard(tile);
     };
     TableCenter.prototype.moveArm = function (arm) {
         document.getElementById('board-2').style.setProperty('--r', "".concat(arm));
@@ -2326,6 +2329,36 @@ var ResearchBoard = /** @class */ (function () {
 var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 ;
 var log = isDebug ? console.log.bind(window.console) : function () { };
+var TileStock = /** @class */ (function (_super) {
+    __extends(TileStock, _super);
+    function TileStock(game, element, slotsIds) {
+        var _this = _super.call(this, game.tilesManager, element, {
+            slotsIds: slotsIds,
+            mapCardToSlot: function (tile) { return "".concat(tile.x, "_").concat(tile.y); },
+        }) || this;
+        _this.game = game;
+        _this.element = element;
+        return _this;
+    }
+    TileStock.prototype.addSlotsIds = function (newSlotsIds) {
+        var _a;
+        var _this = this;
+        if (newSlotsIds.length == 0) {
+            // no change
+            return;
+        }
+        (_a = this.slotsIds).push.apply(_a, newSlotsIds);
+        newSlotsIds.forEach(function (slotId) {
+            _this.createSlot(slotId);
+        });
+    };
+    TileStock.prototype.createSlot = function (slotId) {
+        _super.prototype.createSlot.call(this, slotId);
+        var coordinates = slotId.split('_').map(function (val) { return Number(val); });
+        this.slots[slotId].style.setProperty('--area', "slot".concat(coordinates[0] * 1000 + coordinates[1]));
+    };
+    return TileStock;
+}(SlotStock));
 var PlayerTable = /** @class */ (function () {
     function PlayerTable(game, player) {
         var _this = this;
@@ -2335,24 +2368,32 @@ var PlayerTable = /** @class */ (function () {
         this.currentPlayer = this.playerId == this.game.getPlayerId();
         var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.playerId, "-tiles\" class=\"tiles\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-research-lines\" class=\"research-lines\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-objective\" class=\"objective\"></div>\n        </div>\n        ");
         dojo.place(html, document.getElementById('tables'));
+        var playerWorkers = player.workers.filter(function (worker) { return worker.location == 'player'; });
         var slotsIds = [];
-        var xs = player.tiles.map(function (tile) { return tile.x; });
-        var ys = player.tiles.map(function (tile) { return tile.y; });
-        var minX = Math.min.apply(Math, xs);
-        var maxX = Math.max.apply(Math, xs);
-        var minY = Math.min.apply(Math, ys);
-        var maxY = Math.max.apply(Math, ys);
-        for (var y = minY; y <= maxY; y++) {
-            for (var x = minX; x <= maxX; x++) {
+        var xs = __spreadArray(__spreadArray([], player.tiles.map(function (tile) { return tile.x; }), true), playerWorkers.map(function (worker) { return worker.x; }), true);
+        var ys = __spreadArray(__spreadArray([], player.tiles.map(function (tile) { return tile.y; }), true), playerWorkers.map(function (worker) { return worker.y; }), true);
+        this.tileMinX = Math.min.apply(Math, xs);
+        this.tileMaxX = Math.max.apply(Math, xs);
+        this.tileMinY = Math.min.apply(Math, ys);
+        this.tileMaxY = Math.max.apply(Math, ys);
+        for (var y = this.tileMinY; y <= this.tileMaxY; y++) {
+            for (var x = this.tileMinX; x <= this.tileMaxX; x++) {
                 slotsIds.push("".concat(x, "_").concat(y));
             }
         }
         var tilesDiv = document.getElementById("player-table-".concat(this.playerId, "-tiles"));
-        tilesDiv.style.setProperty('--rows', "".concat(maxX - minX + 1));
-        tilesDiv.style.setProperty('--columns', "".concat(maxY - minY + 1));
-        this.tiles = new SlotStock(this.game.tilesManager, tilesDiv, {
-            slotsIds: slotsIds,
-            mapCardToSlot: function (tile) { return "".concat(tile.x, "_").concat(tile.y); },
+        tilesDiv.style.setProperty('--rows', "".concat(this.tileMaxX - this.tileMinX + 1));
+        tilesDiv.style.setProperty('--columns', "".concat(this.tileMaxY - this.tileMinY + 1));
+        this.tiles = new TileStock(this.game, tilesDiv, slotsIds);
+        this.updateGridTemplateAreas();
+        slotsIds.forEach(function (slotId) {
+            var slotDiv = tilesDiv.querySelector("[data-slot-id=\"".concat(slotId, "\"]"));
+            slotDiv.addEventListener('click', function () {
+                if (slotDiv.classList.contains('selectable')) {
+                    var coordinates = slotId.split('_').map(function (val) { return Number(val); });
+                    _this.game.onPlayerTileSpotClick(coordinates[0], coordinates[1]);
+                }
+            });
         });
         this.tiles.onCardClick = function (card) { return _this.game.onPlayerTileClick(card); };
         this.tiles.addCards(player.tiles);
@@ -2362,7 +2403,7 @@ var PlayerTable = /** @class */ (function () {
         var objectiveDiv = document.getElementById("player-table-".concat(this.playerId, "-objective"));
         this.objectives = new LineStock(this.game.objectivesManager, objectiveDiv);
         this.objectives.addCards(player.objectives);
-        player.workers.filter(function (worker) { return worker.location == 'player'; }).forEach(function (worker) {
+        playerWorkers.forEach(function (worker) {
             tilesDiv.querySelector("[data-slot-id=\"".concat(worker.x, "_").concat(worker.y, "\"]")).appendChild(_this.game.createWorker(worker));
             if (!worker.remainingWorkforce) {
                 document.getElementById("worker-".concat(worker.id)).classList.add('disabled-worker');
@@ -2403,6 +2444,96 @@ var PlayerTable = /** @class */ (function () {
         document.getElementById("player-table-".concat(this.playerId, "-tiles")).querySelectorAll('.worker').forEach(function (worker) {
             return worker.classList.remove('disabled-worker');
         });
+    };
+    PlayerTable.prototype.updateGridTemplateAreas = function () {
+        var tilesDiv = document.getElementById("player-table-".concat(this.playerId, "-tiles"));
+        var linesAreas = [];
+        for (var y = this.tileMinY; y <= this.tileMaxY; y++) {
+            var lineAreas = [];
+            for (var x = this.tileMinX; x <= this.tileMaxX; x++) {
+                lineAreas.push("slot".concat(x * 1000 + y));
+            }
+            linesAreas.push(lineAreas.join(' '));
+        }
+        tilesDiv.style.gridTemplateAreas = linesAreas.map(function (line) { return "\"".concat(line, "\""); }).join(' ');
+    };
+    PlayerTable.prototype.addLeftCol = function () {
+        this.tileMinX = this.tileMinX - 1;
+        var newSlotsIds = [];
+        for (var y = this.tileMinY; y <= this.tileMaxY; y++) {
+            newSlotsIds.push("".concat(this.tileMinX, "_").concat(y));
+        }
+        this.addNewSlotsIds(newSlotsIds, 'column');
+    };
+    PlayerTable.prototype.addRightCol = function () {
+        this.tileMaxX = this.tileMaxX + 1;
+        var newSlotsIds = [];
+        for (var y = this.tileMinY; y <= this.tileMaxY; y++) {
+            newSlotsIds.push("".concat(this.tileMaxX, "_").concat(y));
+        }
+        this.addNewSlotsIds(newSlotsIds, 'column');
+    };
+    PlayerTable.prototype.addTopRow = function () {
+        this.tileMinY = this.tileMinY - 1;
+        var newSlotsIds = [];
+        for (var x = this.tileMinX; x <= this.tileMaxX; x++) {
+            newSlotsIds.push("".concat(x, "_").concat(this.tileMinY));
+        }
+        this.addNewSlotsIds(newSlotsIds, 'row');
+    };
+    PlayerTable.prototype.addBottomRow = function () {
+        this.tileMaxY = this.tileMaxY + 1;
+        var newSlotsIds = [];
+        for (var x = this.tileMinX; x <= this.tileMaxX; x++) {
+            newSlotsIds.push("".concat(x, "_").concat(this.tileMaxY));
+        }
+        this.addNewSlotsIds(newSlotsIds, 'row');
+    };
+    PlayerTable.prototype.addNewSlotsIds = function (newSlotsIds, type) {
+        var _this = this;
+        var tilesDiv = document.getElementById("player-table-".concat(this.playerId, "-tiles"));
+        if (type == 'row') {
+            tilesDiv.style.setProperty('--rows', "".concat(this.tileMaxX - this.tileMinX + 1));
+        }
+        else if (type == 'column') {
+            tilesDiv.style.setProperty('--columns', "".concat(this.tileMaxY - this.tileMinY + 1));
+        }
+        this.updateGridTemplateAreas();
+        this.tiles.addSlotsIds(newSlotsIds);
+        newSlotsIds.forEach(function (slotId) {
+            var slotDiv = tilesDiv.querySelector("[data-slot-id=\"".concat(slotId, "\"]"));
+            slotDiv.addEventListener('click', function () {
+                if (slotDiv.classList.contains('selectable')) {
+                    var coordinates = slotId.split('_').map(function (val) { return Number(val); });
+                    _this.game.onPlayerTileSpotClick(coordinates[0], coordinates[1]);
+                }
+            });
+        });
+    };
+    PlayerTable.prototype.setSelectableTileSpots = function (possibleCoordinates) {
+        var _this = this;
+        var tilesDiv = document.getElementById("player-table-".concat(this.playerId, "-tiles"));
+        if (possibleCoordinates) {
+            possibleCoordinates.forEach(function (coordinate) {
+                var _a;
+                while (coordinate[0] < _this.tileMinX) {
+                    _this.addLeftCol();
+                }
+                while (coordinate[0] > _this.tileMaxX) {
+                    _this.addRightCol();
+                }
+                while (coordinate[1] < _this.tileMinY) {
+                    _this.addTopRow();
+                }
+                while (coordinate[1] > _this.tileMaxY) {
+                    _this.addBottomRow();
+                }
+                (_a = tilesDiv.querySelector("[data-slot-id=\"".concat(coordinate[0], "_").concat(coordinate[1], "\"]"))) === null || _a === void 0 ? void 0 : _a.classList.add('selectable');
+            });
+        }
+        else {
+            tilesDiv.querySelectorAll('.slot.selectable').forEach(function (elem) { return elem.classList.remove('selectable'); });
+        }
     };
     return PlayerTable;
 }());
@@ -2506,6 +2637,9 @@ var Humanity = /** @class */ (function () {
             case 'endRound':
                 this.onEnteringEndRound();
                 break;
+            case 'moveWorker':
+                this.onEnteringMoveWorker(args.args);
+                break;
         }
     };
     Humanity.prototype.onEnteringChooseAction = function (args) {
@@ -2523,6 +2657,10 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.onEnteringEndRound = function () {
         this.playersTables.forEach(function (playerTable) { return playerTable.reactivateWorkers(); });
     };
+    Humanity.prototype.onEnteringMoveWorker = function (args) {
+        var _a;
+        (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableTileSpots(args.possibleCoordinates);
+    };
     Humanity.prototype.onLeavingState = function (stateName) {
         log('Leaving state: ' + stateName);
         switch (stateName) {
@@ -2532,11 +2670,18 @@ var Humanity = /** @class */ (function () {
             case 'chooseWorker':
                 this.onLeavingChooseWorker();
                 break;
+            case 'moveWorker':
+                this.onLeavingMoveWorker();
+                break;
         }
     };
     Humanity.prototype.onLeavingChooseWorker = function () {
         var _a;
         (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableWorkers([]);
+    };
+    Humanity.prototype.onLeavingMoveWorker = function () {
+        var _a;
+        (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableTileSpots(null);
     };
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
     //                        action status bar (ie: the HTML links in the status bar).
@@ -2546,9 +2691,10 @@ var Humanity = /** @class */ (function () {
         if (this.isCurrentPlayerActive()) {
             switch (stateName) {
                 case 'activateTile':
-                    //const chooseActionArgs = args as EnteringChooseActionArgs;
-                    //if (!chooseActionArgs.noActionYet) { // TODO
                     this.addActionButton("endTurn_button", _("End turn"), function () { return _this.endTurn(); });
+                    break;
+                case 'confirmMoveWorkers':
+                    this.addActionButton("confirmMoveWorkers_button", _("Confirm"), function () { return _this.confirmMoveWorkers(); });
                     //}
                     break;
             }
@@ -2734,6 +2880,12 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.onPlayerTileClick = function (card) {
         this.activateTile(card.id);
     };
+    Humanity.prototype.onPlayerTileSpotClick = function (x, y) {
+        var _a;
+        if (((_a = this.gamedatas.gamestate.private_state) === null || _a === void 0 ? void 0 : _a.name) == 'moveWorker') {
+            this.moveWorker(x, y);
+        }
+    };
     Humanity.prototype.onTableTileClick = function (tile) {
         if (this.gamedatas.gamestate.name == 'chooseAction') {
             this.chooseNewTile(tile.id);
@@ -2788,6 +2940,21 @@ var Humanity = /** @class */ (function () {
         }
         this.takeAction('endTurn');
     };
+    Humanity.prototype.moveWorker = function (x, y) {
+        if (!this.checkAction('moveWorker')) {
+            return;
+        }
+        this.takeAction('moveWorker', {
+            x: x + 1000,
+            y: y + 1000,
+        });
+    };
+    Humanity.prototype.confirmMoveWorkers = function () {
+        if (!this.checkAction('confirmMoveWorkers')) {
+            return;
+        }
+        this.takeAction('confirmMoveWorkers');
+    };
     Humanity.prototype.takeAction = function (action, data) {
         data = data || {};
         data.lock = true;
@@ -2822,6 +2989,7 @@ var Humanity = /** @class */ (function () {
             ['newFirstPlayer', ANIMATION_MS],
             ['removeTableTile', ANIMATION_MS],
             ['shiftTableTile', ANIMATION_MS],
+            ['newTableTile', ANIMATION_MS],
             ['moveArm', ANIMATION_MS],
         ];
         notifs.forEach(function (notif) {
@@ -2899,6 +3067,9 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.notif_shiftTableTile = function (args) {
         this.tableCenter.shiftTile(args.tile);
+    };
+    Humanity.prototype.notif_newTableTile = function (args) {
+        this.tableCenter.newTile(args.tile);
     };
     Humanity.prototype.notif_moveArm = function (args) {
         this.tableCenter.moveArm(args.arm);

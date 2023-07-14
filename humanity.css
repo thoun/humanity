@@ -1340,13 +1340,18 @@ body > .card {
 }
 .player-table .tiles {
   display: grid;
-  grid-template-rows: repeat(var(--rows), 150px);
-  grid-template-columns: repeat(var(--columns), 150px);
 }
 .player-table .tiles .slot {
+  width: 150px;
+  height: 150px;
   display: flex;
   justify-content: center;
   align-items: center;
+  grid-area: var(--area);
+}
+.player-table .tiles .slot.selectable {
+  outline: 4px dashed red;
+  cursor: pointer;
 }
 .player-table .research-lines .slot {
   width: 150px;

@@ -48,8 +48,12 @@ class TableCenter {
         this.tiles.removeCard(tile);
     }
     
-    public shiftTile(tile: Tile) {
-        this.tiles.addCard(tile);
+    public shiftTile(tile: Tile): Promise<any> {
+        return this.tiles.addCard(tile);
+    }
+    
+    public newTile(tile: Tile): Promise<any> {
+        return this.tiles.addCard(tile);
     }
     
     public moveArm(arm: number) {

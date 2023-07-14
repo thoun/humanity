@@ -67,12 +67,13 @@ trait StateTrait {
         ]);
 
         // remove first 2 modules
-        $arm = $this->getArm();
+        $armBefore = $this->getArm();
         $tableTiles = $this->getTilesByLocation('table');
         foreach ([1, 2] as $moduleIndex) {
-            $spot = ($arm + $moduleIndex) % 7;
+            $spot = ($armBefore + $moduleIndex) % 7;
             $spotTile = $this->array_find($tableTiles, fn($tableTile) => $tableTile->locationArg == $spot);
             if ($spotTile) {
+                $this->tiles->moveCard($spotTile->id, 'void');
                 self::notifyAllPlayers('removeTableTile', '', [
                     'tile' => $spotTile,
                 ]);
@@ -89,6 +90,7 @@ trait StateTrait {
                     usort($lowerTiles, fn($a, $b) => $b->locationArg - $a->locationArg);
                     $newTile = $lowerTiles[0];
                     $newTile->locationArg = $spot;
+                    $this->tiles->moveCard($newTile->id, 'table', $spot);
 
                     self::notifyAllPlayers('shiftTableTile', '', [
                         'tile' => $newTile,
@@ -99,50 +101,62 @@ trait StateTrait {
 
         // move arm
         $minSpot = min(array_map(fn($tile) => $tile->locationArg, $tableTiles));
-        $arm = $minSpot - 1;
-        $this->setGlobalVariable(ARM, $arm);
+        $armAfter = $minSpot - 1;
+        $this->setGlobalVariable(ARM, $armAfter);
         self::notifyAllPlayers('moveArm', '', [
-            'arm' => $arm,
+            'arm' => $armAfter,
         ]);
 
-        
-// TODO
-/*
-4 Tous les astronautes dépassés par le bras articulé vous sont
-restitués. Les astronautes en face du bras articulé (comme
-l’astronaute vert sur l’exemple) ainsi que tous ceux qui n’ont
-pas été dépassés restent bloqués autour du plateau principal.*/
-/*
-5 Remplissez les hangars vides dans le sens horaire avec les
-modules de l’année en cours. Il ne faut pas toucher à la roue
-des expériences, elle reste en l’état jusqu’à la fin de l’année.
-Important : si vous ne parvenez pas à remplir tous les
-hangars de module car la pioche est épuisée, cela déclenche
-la fin d’année. Arrêtez la réinitialisation pour l’instant et
-reportez-vous à la section suivante « Fin d’année ». Si la
-pioche est épuisée, mais que vous êtes parvenu à remplir tous
-les hangars, ce n’est pas encore la fin d’année.*/
-$canRefillTiles = true;
-
-        if ($canRefillTiles) {
-            // TODO
-             /* 
-6 Replacez dans votre base les astronautes que vous
-avez récupérés. Un astronaute doit être placé adjacent
-orthogonalement à au moins un module (les obstacles ne
-sont pas des modules). De plus, il doit être tourné face à vous,
-c’est-à-dire actif.
-Important : réfléchissez bien avant de placer vos astronautes,
-car vous ne pourrez pas les déplacer, à moins de les envoyer
-autour du plateau principal, et c’est à leur emplacement que
-les prochains modules pourront être construits.
-*/
-            $this->reactivatePlayerWorkers();
-
-            $this->gamestate->nextState('next');
-        } else {
-            $this->gamestate->nextState('endYear');
+        // reset workers in arm range
+        $tableWorkers = $this->getTableWorkers();
+        $movedWorkers = [];
+        foreach ($tableWorkers as $worker) {
+            if ($worker->spot >= $armBefore && $worker->spot <= $armAfter) {
+                $movedWorkers[] = $worker;
+            }
         }
+        $this->setGlobalVariable(MOVED_WORKERS, $movedWorkers);
+
+        // place new tiles
+        $age = $this->getYear();
+        $tableTiles = $this->getTilesByLocation('table');
+        for ($i = 1; $i < 8; $i++) {
+            $spot = ($armAfter + $i) % 8;
+            $spotTile = $this->array_find($tableTiles, fn($tableTile) => $tableTile->locationArg == $spot);
+            if (!$spotTile) {
+                $newTile = $this->getTileFromDb($this->tiles->pickCardForLocation('deck'.$age, 'table', $spot));
+                if ($newTile == null) {
+                    self::notifyAllPlayers('log', clienttranslate('Impossible to refill the tiles, moving to next year'), []);
+                    
+                    $this->gamestate->nextState('endYear');
+                    return;
+                } else {
+                    self::notifyAllPlayers('newTableTile', '', [
+                        'tile' => $newTile,
+                    ]);
+                }
+            }
+        }
+
+        if (count($movedWorkers)) {
+            $this->gamestate->nextState('moveWorkers');
+        } else {            
+            $this->gamestate->nextState('afterEndRound');
+        }
+    }
+
+    function stMoveWorkers() {
+        $movedWorkers = $this->getGlobalVariable(MOVED_WORKERS);
+        $playersIds = array_values(array_unique(array_map(fn($worker) =>$worker->playerId, $movedWorkers)));
+
+        $this->gamestate->setPlayersMultiactive($playersIds, 'next');
+        $this->gamestate->initializePrivateStateForAllActivePlayers(); 
+    }
+
+    function stAfterEndRound() {
+        $this->reactivatePlayerWorkers();
+
+        $this->gamestate->nextState('nextRound');
     }
 
     function stEndYear() {

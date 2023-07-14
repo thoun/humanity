@@ -134,6 +134,40 @@ $playerActionsGameStates = [
             "endTurn" => ST_CHECK_OBJECTIVES,
         ]
     ],
+    
+
+    ST_MULTIPLAYER_MOVE_WORKERS => [
+        "name" => "moveWorkers",
+        "description" => clienttranslate('Waiting for other players'),
+        "descriptionmyturn" => '',
+        "type" => "multipleactiveplayer",
+        "action" => "stMoveWorkers",
+        "initialprivate" => ST_PRIVATE_MOVE_WORKER,
+        "possibleactions" => [ ],
+        "transitions" => [
+            "next" => ST_AFTER_END_ROUND,
+        ],
+    ],
+
+    ST_PRIVATE_MOVE_WORKER => [
+        "name" => "moveWorker",
+        "descriptionmyturn" => clienttranslate('Phase 2 : ${you} must choose a place for moved worker'),
+        "type" => "private",
+        "args" => "argMoveWorker",
+        "possibleactions" => [ "moveWorker" ],
+        "transitions" => [
+            'stay' => ST_PRIVATE_MOVE_WORKER,
+            'next' => ST_PRIVATE_CONFIRM_MOVE_WORKERS,
+        ],
+    ],
+
+    ST_PRIVATE_CONFIRM_MOVE_WORKERS => [
+        "name" => "confirmMoveWorkers",
+        "descriptionmyturn" => clienttranslate('${you} must confirm moved workers'),
+        "type" => "private",
+        "possibleactions" => [ "confirmMoveWorkers" ],
+        "transitions" => [],
+    ],
 ];
 
 $gameGameStates = [
@@ -162,12 +196,23 @@ $gameGameStates = [
 
     ST_END_ROUND => [
         "name" => "endRound",
-        "description" => "",
+        "description" => clienttranslate('Update and refill board...'),
         "type" => "game",
         "action" => "stEndRound",
         "transitions" => [
-            "next" => ST_PLAYER_CHOOSE_ACTION,
+            "moveWorkers" => ST_MULTIPLAYER_MOVE_WORKERS,
+            "afterEndRound" => ST_AFTER_END_ROUND,
             "endYear" => ST_END_YEAR,
+        ],
+    ],
+
+    ST_AFTER_END_ROUND => [
+        "name" => "afterEndRound",
+        "description" => clienttranslate('Reactivating workers...'),
+        "type" => "game",
+        "action" => "stAfterEndRound",
+        "transitions" => [
+            "nextRound" => ST_PLAYER_CHOOSE_ACTION,
         ],
     ],
 

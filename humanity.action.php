@@ -82,6 +82,24 @@
 
         self::ajaxResponse();
     }
+
+    public function moveWorker() {
+        self::setAjaxMode();     
+
+        $x = self::getArg("x", AT_posint, true);
+        $y = self::getArg("y", AT_posint, true);
+        $this->game->moveWorker($x - 1000, $y - 1000);
+
+        self::ajaxResponse();
+    }
+
+    public function confirmMoveWorkers() {
+        self::setAjaxMode();     
+
+        $this->game->confirmMoveWorkers();
+
+        self::ajaxResponse();
+    }
   }
   
 

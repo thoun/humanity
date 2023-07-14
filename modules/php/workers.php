@@ -34,6 +34,12 @@ trait WorkerTrait {
         return array_map(fn($dbWorker) => new Worker($dbWorker), array_values($dbWorkers));
     }
 
+    function getTableWorkers() {
+        $sql = "SELECT * FROM worker WHERE `location` = 'table'";
+        $dbWorkers = $this->getCollectionFromDB($sql);
+        return array_map(fn($dbWorker) => new Worker($dbWorker), array_values($dbWorkers));
+    }
+
     function countRemainingWorkers(?int $playerId = null) {
         $sql = "SELECT count(*) FROM worker WHERE `location` = 'player' && `remaining_workforce` > 0";
         if ($playerId !== null) {
@@ -76,7 +82,7 @@ trait WorkerTrait {
     }
     
     function moveWorkerToTable(int $playerId,  Worker $worker, int $spot) {
-        $this->DbQuery("UPDATE worker SET `location` = 'table', `spot` = $spot WHERE `id` = $worker->id");
+        $this->DbQuery("UPDATE worker SET `location` = 'table', `x` = null, `y` = null, `spot` = $spot WHERE `id` = $worker->id");
         $worker->location = 'table';
         $worker->spot = $spot;
 
@@ -85,6 +91,40 @@ trait WorkerTrait {
             'player_name' => $this->getPlayerName($playerId),
             'worker' => $worker,
         ]);
+    }
+
+    function getWorkerPossibleCoordinates(int $playerId, array $alreadyMovedWorkers) {
+        $workers = $this->getPlayerWorkers($playerId);
+        $tilesAndObstacles = ($this->getTilesByLocation('player', $playerId));
+        $tiles = array_values(array_filter($tilesAndObstacles, fn($tile) => $tile->type !== 9));
+        $possibleCoordinates = [];
+
+        foreach ($tiles as $tile) {    
+            for ($dx = -1; $dx <= 1; $dx++) {
+                for ($dy = -1; $dy <= 1; $dy++) {
+                    if ($dx == 0 && $dy == 0) { continue; }
+                    if ($dx != 0 && $dy != 0) { continue; }
+
+                    $x = $tile->x + $dx;
+                    $y = $tile->y + $dy;
+
+                    if ($dy > 1) {
+                        $this->debug([$dx, $dy, $x, $y, $tile->x, $tile->y]);
+                    }
+
+                    if (
+                        !$this->array_some($tilesAndObstacles, fn($t) => $t->x == $x && $t->y == $y) // no tile or obstacle in this place
+                        && !$this->array_some($workers, fn($w) => $w->x == $x && $w->y == $y) // no worker in this place
+                        && !$this->array_some($alreadyMovedWorkers, fn($w) => $w->x == $x && $w->y == $y) // not already moved worker in this place
+                        && !$this->array_some($possibleCoordinates, fn($pc) => $pc[0] == $x && $pc[1] == $y) // not already in the array
+                    ) {
+                        $possibleCoordinates[] = [$x, $y];
+                    }
+                }
+            }
+        }
+
+        return $possibleCoordinates;
     }
 
 }

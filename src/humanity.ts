@@ -130,6 +130,9 @@ class Humanity implements HumanityGame {
             case 'endRound':
                 this.onEnteringEndRound();
                 break;
+            case 'moveWorker':
+                this.onEnteringMoveWorker(args.args);
+                break;
         }
     }
 
@@ -149,6 +152,10 @@ class Humanity implements HumanityGame {
         this.playersTables.forEach(playerTable => playerTable.reactivateWorkers());
     }
 
+    private onEnteringMoveWorker(args: EnteringMoveWorkerArgs) {
+        this.getCurrentPlayerTable()?.setSelectableTileSpots(args.possibleCoordinates);
+    }
+
     public onLeavingState(stateName: string) {
         log( 'Leaving state: '+stateName );
 
@@ -159,11 +166,18 @@ class Humanity implements HumanityGame {
             case 'chooseWorker':
                 this.onLeavingChooseWorker();
                 break;
+            case 'moveWorker':
+                this.onLeavingMoveWorker();
+                break;
         }
     }
 
     private onLeavingChooseWorker() {
         this.getCurrentPlayerTable()?.setSelectableWorkers([]);
+    }
+
+    private onLeavingMoveWorker() {
+        this.getCurrentPlayerTable()?.setSelectableTileSpots(null);
     }
 
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
@@ -173,13 +187,13 @@ class Humanity implements HumanityGame {
         
         if ((this as any).isCurrentPlayerActive()) {
             switch (stateName) {
-                case 'activateTile':                    
-                    //const chooseActionArgs = args as EnteringChooseActionArgs;
-                        
-                    //if (!chooseActionArgs.noActionYet) { // TODO
-                        (this as any).addActionButton(`endTurn_button`, _("End turn"), () => this.endTurn());
+                case 'activateTile':
+                    (this as any).addActionButton(`endTurn_button`, _("End turn"), () => this.endTurn());
+                    break;
+                case 'confirmMoveWorkers':
+                    (this as any).addActionButton(`confirmMoveWorkers_button`, _("Confirm"), () => this.confirmMoveWorkers());
                     //}
-                    break;                    
+                    break;
             }
         }
     }
@@ -444,6 +458,12 @@ class Humanity implements HumanityGame {
     public onPlayerTileClick(card: Tile): void {
         this.activateTile(card.id);
     }
+    
+    public onPlayerTileSpotClick(x: number, y: number): void {
+        if (this.gamedatas.gamestate.private_state?.name == 'moveWorker') {
+            this.moveWorker(x, y);
+        }
+    }
 
     public onTableTileClick(tile: Tile): void {
         if (this.gamedatas.gamestate.name == 'chooseAction') {
@@ -512,6 +532,25 @@ class Humanity implements HumanityGame {
 
         this.takeAction('endTurn');
     }
+  	
+    public moveWorker(x: number, y: number) {
+        if(!(this as any).checkAction('moveWorker')) {
+            return;
+        }
+
+        this.takeAction('moveWorker', {
+            x: x + 1000,
+            y: y + 1000,
+        });
+    }
+  	
+    public confirmMoveWorkers() {
+        if(!(this as any).checkAction('confirmMoveWorkers')) {
+            return;
+        }
+
+        this.takeAction('confirmMoveWorkers');
+    }
 
     public takeAction(action: string, data?: any) {
         data = data || {};
@@ -549,6 +588,7 @@ class Humanity implements HumanityGame {
             ['newFirstPlayer', ANIMATION_MS],
             ['removeTableTile', ANIMATION_MS],
             ['shiftTableTile', ANIMATION_MS],
+            ['newTableTile', ANIMATION_MS],
             ['moveArm', ANIMATION_MS],
         ];
     
@@ -646,6 +686,10 @@ class Humanity implements HumanityGame {
 
     notif_shiftTableTile(args: NotifTableTileArgs) {
         this.tableCenter.shiftTile(args.tile);
+    }     
+
+    notif_newTableTile(args: NotifTableTileArgs) {
+        this.tableCenter.newTile(args.tile);
     }  
 
     notif_moveArm(args: NotifMoveArmArgs) {

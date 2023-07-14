@@ -1,14 +1,45 @@
 const isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;;
 const log = isDebug ? console.log.bind(window.console) : function () { };
 
+class TileStock extends SlotStock<Tile> {
+    constructor(protected game: HumanityGame, protected element: HTMLElement, slotsIds: string[]) {
+        super(game.tilesManager, element, {
+            slotsIds,
+            mapCardToSlot: tile => `${tile.x}_${tile.y}`,
+        });
+    }
+
+    public addSlotsIds(newSlotsIds: SlotId[]) {
+        if (newSlotsIds.length == 0) {
+            // no change
+            return;
+        }
+
+        this.slotsIds.push(...newSlotsIds);
+        newSlotsIds.forEach(slotId => {
+            this.createSlot(slotId);
+        });
+    }
+
+    protected createSlot(slotId: SlotId) {
+        super.createSlot(slotId);
+        const coordinates = (slotId as string).split('_').map(val => Number(val));
+        this.slots[slotId].style.setProperty('--area', `slot${coordinates[0] * 1000 + coordinates[1]}`);
+    }
+}
+
 class PlayerTable {
     public playerId: number;
     public voidStock: VoidStock<Tile>;
-    public tiles: SlotStock<Tile>;
+    public tiles: TileStock;
     public researchLines: SlotStock<Research>[] = [];
     public objectives: LineStock<Objective>;
 
     private currentPlayer: boolean;
+    private tileMinX: number;
+    private tileMaxX: number;
+    private tileMinY: number;
+    private tileMaxY: number;
 
     constructor(private game: HumanityGame, player: HumanityPlayer) {
         this.playerId = Number(player.id);
@@ -25,24 +56,33 @@ class PlayerTable {
 
         dojo.place(html, document.getElementById('tables'));
 
+        const playerWorkers = player.workers.filter(worker => worker.location == 'player');
+
         const slotsIds = [];
-        const xs = player.tiles.map(tile => tile.x);
-        const ys = player.tiles.map(tile => tile.y);
-        const minX = Math.min(...xs);
-        const maxX = Math.max(...xs);
-        const minY = Math.min(...ys);
-        const maxY = Math.max(...ys);
-        for (let y = minY; y <= maxY; y++) {
-            for (let x = minX; x <= maxX; x++) {
+        const xs = [...player.tiles.map(tile => tile.x), ...playerWorkers.map(worker => worker.x)];
+        const ys = [...player.tiles.map(tile => tile.y), ...playerWorkers.map(worker => worker.y)];
+        this.tileMinX = Math.min(...xs);
+        this.tileMaxX = Math.max(...xs);
+        this.tileMinY = Math.min(...ys);
+        this.tileMaxY = Math.max(...ys);
+        for (let y = this.tileMinY; y <= this.tileMaxY; y++) {
+            for (let x = this.tileMinX; x <= this.tileMaxX; x++) {
                 slotsIds.push(`${x}_${y}`);
             }
         }
         const tilesDiv = document.getElementById(`player-table-${this.playerId}-tiles`);
-        tilesDiv.style.setProperty('--rows', `${maxX - minX + 1}`);
-        tilesDiv.style.setProperty('--columns', `${maxY - minY + 1}`);
-        this.tiles = new SlotStock<Tile>(this.game.tilesManager, tilesDiv, {
-            slotsIds,
-            mapCardToSlot: tile => `${tile.x}_${tile.y}`,
+        tilesDiv.style.setProperty('--rows', `${this.tileMaxX - this.tileMinX + 1}`);
+        tilesDiv.style.setProperty('--columns', `${this.tileMaxY - this.tileMinY + 1}`);
+        this.tiles = new TileStock(this.game, tilesDiv, slotsIds);
+        this.updateGridTemplateAreas();
+        slotsIds.forEach(slotId => {
+            const slotDiv = tilesDiv.querySelector(`[data-slot-id="${slotId}"]`);
+            slotDiv.addEventListener('click', () => {
+                if (slotDiv.classList.contains('selectable')) {
+                    const coordinates = slotId.split('_').map(val => Number(val));
+                    this.game.onPlayerTileSpotClick(coordinates[0], coordinates[1]);
+                }
+            })
         });
         this.tiles.onCardClick = (card: Tile) => this.game.onPlayerTileClick(card);
         
@@ -57,7 +97,7 @@ class PlayerTable {
         this.objectives = new LineStock<Objective>(this.game.objectivesManager, objectiveDiv);
         this.objectives.addCards(player.objectives);
 
-        player.workers.filter(worker => worker.location == 'player').forEach(worker => {
+        playerWorkers.forEach(worker => {
             tilesDiv.querySelector(`[data-slot-id="${worker.x}_${worker.y}"]`).appendChild(this.game.createWorker(worker));
             if (!worker.remainingWorkforce) {
                 document.getElementById(`worker-${worker.id}`).classList.add('disabled-worker');
@@ -105,5 +145,103 @@ class PlayerTable {
         document.getElementById(`player-table-${this.playerId}-tiles`).querySelectorAll('.worker').forEach((worker: HTMLDivElement) => 
             worker.classList.remove('disabled-worker')
         );
+    }
+
+    public updateGridTemplateAreas() {
+        const tilesDiv = document.getElementById(`player-table-${this.playerId}-tiles`);
+
+        const linesAreas = [];
+        for (let y = this.tileMinY; y <= this.tileMaxY; y++) {
+            const lineAreas = [];
+            for (let x = this.tileMinX; x <= this.tileMaxX; x++) {
+                lineAreas.push(`slot${x * 1000 + y}`);
+            }
+            linesAreas.push(lineAreas.join(' '));
+        }
+
+        tilesDiv.style.gridTemplateAreas = linesAreas.map(line => `"${line}"`).join(' ');
+    }
+
+    private addLeftCol() {
+        this.tileMinX = this.tileMinX - 1;
+
+        const newSlotsIds = [];
+        for (let y = this.tileMinY; y <= this.tileMaxY; y++) {
+            newSlotsIds.push(`${this.tileMinX}_${y}`);
+        }
+        this.addNewSlotsIds(newSlotsIds, 'column');
+    }
+
+    private addRightCol() {
+        this.tileMaxX = this.tileMaxX + 1;
+
+        const newSlotsIds = [];
+        for (let y = this.tileMinY; y <= this.tileMaxY; y++) {
+            newSlotsIds.push(`${this.tileMaxX}_${y}`);
+        }
+        this.addNewSlotsIds(newSlotsIds, 'column');
+    }
+
+    private addTopRow() {
+        this.tileMinY = this.tileMinY - 1;
+
+        const newSlotsIds = [];
+        for (let x = this.tileMinX; x <= this.tileMaxX; x++) {
+            newSlotsIds.push(`${x}_${this.tileMinY}`);
+        }
+        this.addNewSlotsIds(newSlotsIds, 'row');
+    }
+
+    private addBottomRow() {
+        this.tileMaxY = this.tileMaxY + 1;
+
+        const newSlotsIds = [];
+        for (let x = this.tileMinX; x <= this.tileMaxX; x++) {
+            newSlotsIds.push(`${x}_${this.tileMaxY}`);
+        }
+        this.addNewSlotsIds(newSlotsIds, 'row');
+    }
+
+    private addNewSlotsIds(newSlotsIds: string[], type: 'row' | 'column') {
+        const tilesDiv = document.getElementById(`player-table-${this.playerId}-tiles`);
+        if (type == 'row') {
+            tilesDiv.style.setProperty('--rows', `${this.tileMaxX - this.tileMinX + 1}`);
+        } else if (type == 'column') {
+            tilesDiv.style.setProperty('--columns', `${this.tileMaxY - this.tileMinY + 1}`);
+        }
+        this.updateGridTemplateAreas();
+        this.tiles.addSlotsIds(newSlotsIds);
+        newSlotsIds.forEach(slotId => {
+            const slotDiv = tilesDiv.querySelector(`[data-slot-id="${slotId}"]`);
+            slotDiv.addEventListener('click', () => {
+                if (slotDiv.classList.contains('selectable')) {
+                    const coordinates = slotId.split('_').map(val => Number(val));
+                    this.game.onPlayerTileSpotClick(coordinates[0], coordinates[1]);
+                }
+            })
+        });
+    }
+    
+    public setSelectableTileSpots(possibleCoordinates: number[][] | null) {
+        const tilesDiv = document.getElementById(`player-table-${this.playerId}-tiles`);
+        if (possibleCoordinates) {
+            possibleCoordinates.forEach(coordinate => {
+                while (coordinate[0] < this.tileMinX) {
+                    this.addLeftCol();
+                }
+                while (coordinate[0] > this.tileMaxX) {
+                    this.addRightCol();
+                }
+                while (coordinate[1] < this.tileMinY) {
+                    this.addTopRow();
+                }
+                while (coordinate[1] > this.tileMaxY) {
+                    this.addBottomRow();
+                }
+                tilesDiv.querySelector(`[data-slot-id="${coordinate[0]}_${coordinate[1]}"]`)?.classList.add('selectable');
+            });
+        } else {
+            tilesDiv.querySelectorAll('.slot.selectable').forEach(elem => elem.classList.remove('selectable'))
+        }
     }
 }

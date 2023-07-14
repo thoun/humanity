@@ -50,4 +50,19 @@ trait ArgsTrait {
             'workers' => $workers,
         ];
     }
+
+    function argMoveWorker(int $playerId) {
+        $movedWorkers = $this->getGlobalVariable(MOVED_WORKERS);
+        $playerMovedWorkers = array_values(array_filter($movedWorkers, fn($worker) => $worker->playerId));
+        $alreadyMovedWorkers = array_values(array_filter($playerMovedWorkers, fn($worker) => $worker->x !== null));
+        $worker = $this->array_find($playerMovedWorkers, fn($worker) => $worker->x === null);
+
+        $possibleCoordinates = $this->getWorkerPossibleCoordinates($playerId, $alreadyMovedWorkers);
+
+        return [
+            'playerMovedWorkers' => $playerMovedWorkers,
+            'worker' => $worker,
+            'possibleCoordinates' => $possibleCoordinates,
+        ];
+    }
 } 

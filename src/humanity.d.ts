@@ -84,8 +84,9 @@ interface HumanityGamedatas {
     tablespeed: string;
 
     // Add here variables you set up in getAllDatas
-    tableObjectives: Objective[];
     tableTiles: Tile[];
+    tableResearch: Research[];
+    tableObjectives: Objective[];
     arm: number;
     year: number;
     firstPlayerId: number;
@@ -108,6 +109,7 @@ interface HumanityGame extends Game {
     setTooltip(id: string, html: string): void;
     onTableResearchClick(research: Research): void;
     onPlayerTileClick(card: Tile): void;
+    onPlayerTileSpotClick(x: number, y: number): void;
     onTableTileClick(card: Tile): void;
 }
 
@@ -117,6 +119,11 @@ interface EnteringChooseWorkerArgs {
 
 interface EnteringChooseActionArgs extends EnteringChooseWorkerArgs {
     // TODO
+}
+
+interface EnteringMoveWorkerArgs {
+    worker: Worker;
+    possibleCoordinates: number[][];
 }
 
 interface NotifFirstPlayerTokenArgs {
@@ -178,7 +185,7 @@ interface NotifNewFirstPlayerArgs {
     playerId: number;
 }  
 
-// removeTableTile, shiftTableTile
+// removeTableTile, shiftTableTile, newTableTile
 interface NotifTableTileArgs {
     tile: Tile;
 }

@@ -158,4 +158,43 @@ trait ActionTrait {
 
         $this->gamestate->nextState('endTurn');
     }
+
+    public function moveWorker(int $x, int $y) {
+        self::checkAction('moveWorker');
+
+        $playerId = intval($this->getCurrentPlayerId());
+        $arg = $this->argMoveWorker($playerId);
+        $worker = $arg['worker'];
+
+        if (!$this->array_some($arg['possibleCoordinates'], fn($coordinate) => $coordinate[0] == $x && $coordinate[1] == $y)) {
+            throw new BgaUserException("Invalid coordinate");
+        }
+        $movedWorkers = $this->getGlobalVariable(MOVED_WORKERS);
+        $this->debug($worker);
+        $movedWorker = $this->array_find($movedWorkers, fn($w) => ((object)$w)->id == ((object)$worker)->id);
+        $movedWorker->x = $x;
+        $movedWorker->y = $y;
+        $this->setGlobalVariable(MOVED_WORKERS, $movedWorkers);
+        // TODO notif
+
+        $remaining = count(array_filter($arg['playerMovedWorkers'], fn($w) => $w->x === null)) > 1;
+
+        $this->gamestate->nextPrivateState($playerId, $remaining ? 'stay' : 'next');
+    }
+
+    public function confirmMoveWorkers() {
+        self::checkAction('confirmMoveWorkers');
+
+        $playerId = intval($this->getCurrentPlayerId());
+
+        $movedWorkers = $this->getGlobalVariable(MOVED_WORKERS);
+        $playerMovedWorkers = array_values(array_filter($movedWorkers, fn($worker) => $worker->playerId));
+
+        foreach ($playerMovedWorkers as $worker) {
+            $this->DbQuery("UPDATE worker SET `location` = 'player', `spot` = null, `x` = $worker->x, `y` = $worker->y WHERE `id` = $worker->id");
+            // TODO notif
+        }
+
+        $this->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    }
 }
