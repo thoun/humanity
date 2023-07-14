@@ -82,6 +82,10 @@ class Tile extends TileType {
         }
     } 
 
+    public function getProduction() {
+        return $this->production[$this->r];
+    }
+
     public static function onlyId(?Tile $tile) {
         if ($tile == null) {
             return null;

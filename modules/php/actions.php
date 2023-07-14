@@ -49,8 +49,12 @@ trait ActionTrait {
                 $this->deployResearch($playerId, $currentAction, $worker);
             }
 
-            // TODO handle upgrades
-            $this->gamestate->nextState('endTurn');
+            if ($upgrade > 0) {
+                $currentAction->upgrade = $upgrade;
+                $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
+            }
+
+            $this->gamestate->nextState($upgrade > 0 ? 'upgrade' : 'endTurn');
         }
     }
 
@@ -122,6 +126,7 @@ trait ActionTrait {
         $currentAction = new CurrentAction('tile');
         $currentAction->addTileId = $id;
         $currentAction->removeTileId = $id;
+        $currentAction->remainingCost = $tile->cost;
         $currentAction->workerSpot = $tile->locationArg;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
@@ -136,7 +141,7 @@ trait ActionTrait {
         }
 
         $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
-        
+
         $radarTiles = $this->getTilesByLocation('radar');
         $tile = $this->getTileById($currentAction->removeTileId);
         $tile = $this->array_find($radarTiles, fn($t) => $t->color == $color && $t->researchPoints == $tile->researchPoints);
@@ -154,10 +159,54 @@ trait ActionTrait {
 
         $currentAction = new CurrentAction('research');
         $currentAction->research = $id;
+        $currentAction->remainingCost = $tile->cost;
         $currentAction->workerSpot = ($tile->locationArg + $this->getArm()) % 8;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
         $this->gamestate->nextState('pay');
+    }
+
+    public function autoPay() {
+        self::checkAction('autoPay');
+
+        $playerId = intval($this->getActivePlayerId());
+        $playerIcons = $this->getPlayerIcons($playerId);
+        $playerTiles = $this->getTilesByLocation('player', $playerId);
+        $playerTiles = array_values(array_filter($playerTiles, fn($t) => $t->production !== null && $t->r > 0));
+
+        $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
+        
+        $pay = $this->canPay((array)$currentAction->remainingCost, $playerIcons);
+        if ($pay == null) {
+            throw new BgaVisibleSystemException("You cannot afford this tile");
+        }
+
+        foreach ($pay as $type => $amount) {
+            $remainingAmount = $amount;
+
+            foreach ($playerTiles as $produceTile) {
+                $produce = $produceTile->getProduction();
+                if (array_key_exists($type, $produce)) {
+                    $rotate = min($remainingAmount, $produce[$type]);
+                    $remainingAmount -= $rotate;
+                    $playerIcons[$type] -= $rotate;
+                    $produceTile->r -= $rotate;
+
+                    self::notifyAllPlayers('pay', '', [
+                        'playerId' => $playerId,
+                        'player_name' => $this->getPlayerName($playerId),
+                        'tile' => $produceTile,
+                        'icons' => $playerIcons,
+                    ]);
+
+                    if ($remainingAmount == 0) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        $this->gamestate->nextState('next');
     }
 
     public function endTurn() {
@@ -184,6 +233,39 @@ trait ActionTrait {
         ]);
 
         $this->gamestate->nextState('endTurn');
+    }
+
+    public function upgradeWorker(int $id) {
+        self::checkAction('upgradeWorker');
+
+        $playerId = intval($this->getActivePlayerId());
+
+        $args = $this->argUpgradeWorker();
+        $worker = $this->array_find($args['workers'], fn($worker) => $worker->id == $id);
+
+        if ($worker == null || $worker->workforce >= 4) {
+            throw new BgaUserException("Invalid worker");
+        }        
+        
+        $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
+        $currentAction->upgrade--;
+        $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
+
+        $this->DbQuery("UPDATE worker SET `workforce` = `workforce` + 1 WHERE `id` = $worker->id");
+        if ($worker->remainingWorkforce > 0) {
+            $this->DbQuery("UPDATE worker SET `remaining_workforce` = `remaining_workforce` + 1 WHERE `id` = $worker->id");
+        }
+        $worker->workforce++;
+
+        self::notifyAllPlayers('upgradeWorker', clienttranslate('${player_name} upgrades a worker workforce from ${from} to ${to}'), [
+            'playerId' => $playerId,
+            'player_name' => $this->getPlayerName($playerId),
+            'worker' => $worker,
+            'from' => $worker->workforce - 1, // for logs
+            'to' => $worker->workforce, // for logs
+        ]);
+
+        $this->gamestate->nextState($currentAction->upgrade > 0 ? 'stay' : 'endTurn');
     }
 
     public function moveWorker(int $x, int $y) {

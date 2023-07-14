@@ -143,12 +143,12 @@ class ResearchBoard {
         });
     }
     
-    public setResearchSpot(playerId: number, researchPoints: number) {
+    public setResearchPoints(playerId: number, researchPoints: number) {
         this.sciencePoints.set(playerId, researchPoints);
         this.moveResearch();
     }
     
-    public getResearchSpot(playerId: number): number {
+    public getResearchPoints(playerId: number): number {
         return this.sciencePoints.get(playerId);
     }
 

@@ -138,7 +138,7 @@ $this->TILES = [ //public int $type; // 0 start, 1..3 year, 8 communication, 9 o
         9 => new PurpleTileType([ELECTRICITY => 1, PROTEIN => 1, ICE => 1], 5, 0, ORANGE),
         10 => new PurpleTileType([ELECTRICITY => 1, INSECT => 1, AIRCARBON => 1], 5, 0, GREEN),
         11 => new PurpleTileType([ELECTRICITY => 1, PROTEIN => 1, METHAN => 1], 4, 1, ANY_COLOR),
-        12 => new GreenTileType([OXYGEN => 1, ICE => 1], SHAPE_OCTOGONAL, 1), // TODO 1 point for theses colors
+        12 => new GreenTileType([OXYGEN => 1, ICE => 1], SHAPE_OCTOGONAL, 1),
         13 => new GreenTileType([AIRCARBON => 1, METHAN => 1], SHAPE_RECTANGULAR, 1),
         14 => new GreenTileType([PROTEIN => 1, INSECT => 1], SHAPE_ROUND, 1),
         15 => new GreenTileType([ELECTRICITY => 1, ICE => 1, AIRCARBON => 1], SHAPE_JOKER, 1),

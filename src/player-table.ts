@@ -9,18 +9,6 @@ class TileStock extends SlotStock<Tile> {
         });
     }
 
-    public addSlotsIds(newSlotsIds: SlotId[]) {
-        if (newSlotsIds.length == 0) {
-            // no change
-            return;
-        }
-
-        this.slotsIds.push(...newSlotsIds);
-        newSlotsIds.forEach(slotId => {
-            this.createSlot(slotId);
-        });
-    }
-
     protected createSlot(slotId: SlotId) {
         super.createSlot(slotId);
         const coordinates = (slotId as string).split('_').map(val => Number(val));
@@ -111,7 +99,17 @@ class PlayerTable {
         );
     }
     
-    public activateTile(tile: Tile) {
+    public setSelectedWorker(selectedWorker: Worker) {
+        document.getElementById(`player-table-${this.playerId}-tiles`).querySelectorAll('.worker').forEach((worker: HTMLDivElement) => 
+            worker.classList.toggle('selected', selectedWorker?.id == Number(worker.dataset.id))
+        );
+    }
+    
+    public setSelectableTiles(selectableTiles: Tile[] | null) {
+        this.tiles.setSelectionMode(selectableTiles ? 'single' : 'none', selectableTiles);
+    }
+    
+    public rotateTile(tile: Tile) {
         const tileDiv = this.game.tilesManager.getCardElement(tile);
         tileDiv.dataset.r = `${tile.r}`;
     }

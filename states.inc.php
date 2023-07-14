@@ -105,13 +105,12 @@ $playerActionsGameStates = [
 
     ST_PLAYER_PAY => [
         "name" => "pay",
-        "description" => clienttranslate('${actplayer} must pay'),
-        "descriptionmyturn" => clienttranslate('${you} must pay'),
+        "description" => clienttranslate('${actplayer} must pay ${cost}'),
+        "descriptionmyturn" => clienttranslate('${you} must pay ${cost}'),
         "type" => "activeplayer",    
-        "args" => "argPay", 
-        "action" => "stPay",
+        "args" => "argPay",
         "possibleactions" => [ 
-            "pay",
+            "autoPay",
         ],
         "transitions" => [
             "next" => ST_PLAYER_CHOOSE_WORKER,
@@ -129,6 +128,23 @@ $playerActionsGameStates = [
         ],
         "transitions" => [
             "next" => ST_PLAYER_CHOOSE_ACTION,
+            "upgrade" => ST_PLAYER_UPGRADE_WORKER,
+            "endTurn" => ST_CHECK_OBJECTIVES,
+        ],
+    ],
+
+    ST_PLAYER_UPGRADE_WORKER => [
+        "name" => "upgradeWorker",
+        "description" => clienttranslate('${actplayer} must choose a worker to upgrade (${remaining} upgrade(s) remaining)'),
+        "descriptionmyturn" => clienttranslate('${you} must choose a worker to upgrade (${remaining} upgrade(s) remaining)'),
+        "type" => "activeplayer",    
+        "args" => "argUpgradeWorker",
+        "action" => "stUpgradeWorkers",
+        "possibleactions" => [ 
+            "upgradeWorker",
+        ],
+        "transitions" => [
+            "stay" => ST_PLAYER_UPGRADE_WORKER,
             "endTurn" => ST_CHECK_OBJECTIVES,
         ],
     ],

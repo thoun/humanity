@@ -11,10 +11,12 @@ trait StateTrait {
         The action method of state X is called everytime the current game state is set to X.
     */
 
-    function stPay() {
-        // TODO let player pay
+    function stUpgradeWorkers() {
+        $args = $this->argUpgradeWorker();
 
-        $this->gamestate->nextState('next');
+        if (count($args['workers']) == 0) {
+            $this->gamestate->nextState('endTurn');
+        }
     }
 
     function stCheckObjectives() {
@@ -70,7 +72,7 @@ trait StateTrait {
         $armBefore = $this->getArm();
         $tableTiles = $this->getTilesByLocation('table');
         foreach ([1, 2] as $moduleIndex) {
-            $spot = ($armBefore + $moduleIndex) % 7;
+            $spot = ($armBefore + $moduleIndex) % 8;
             $spotTile = $this->array_find($tableTiles, fn($tableTile) => $tableTile->locationArg == $spot);
             if ($spotTile) {
                 $this->tiles->moveCard($spotTile->id, 'void');
@@ -166,9 +168,9 @@ trait StateTrait {
         // gain science points based on year research
         foreach($playersIds as $playerId) {
             $sciencePoints = 0;
-            $playerResearchSpot = $this->getPlayer($playerId)->researchPoints;
+            $playerResearchPoints = $this->getPlayer($playerId)->researchPoints;
             foreach (SCIENCE_BY_RESEARCH_SPOT as $inc => $minSpot) {
-                if ($playerResearchSpot >= $minSpot) {
+                if ($playerResearchPoints >= $minSpot) {
                     $sciencePoints = $inc;
                 }
             }

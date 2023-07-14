@@ -18,9 +18,10 @@ trait ArgsTrait {
         $playerTiles = $this->getTilesByLocation('player', $playerId);
 
         $worker = $this->getSelectedWorker();
-        $activatableTiles = array_values(array_filter($playerTiles, fn($tile) => $tile->workforce != null && $tile->r < 3));
+        $activatableTiles = array_values(array_filter($playerTiles, fn($tile) => $tile->workforce != null && $tile->r < 3 && $tile->workforce <= $worker->remainingWorkforce));
 
         return [
+            'worker' => $worker,
             'remaining' => $worker->remainingWorkforce, // for title
             'activatableTiles' => $activatableTiles,
         ];
@@ -44,9 +45,15 @@ trait ArgsTrait {
 
     function argPay() {
         $playerId = intval($this->getActivePlayerId());
+        $playerIcons = $this->getPlayerIcons($playerId);
+        
+        $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
+        
+        $pay = $this->canPay((array)$currentAction->remainingCost, $playerIcons);
 
         return [
-            // TODO
+            'cost' => $currentAction->remainingCost,
+            'pay' => $pay,
         ];
     }
 
@@ -56,6 +63,20 @@ trait ArgsTrait {
         $workers = $this->getPlayerWorkers($playerId, 'player', true);
 
         return [
+            'workers' => $workers,
+        ];
+    }
+
+    function argUpgradeWorker() {
+        $playerId = intval($this->getActivePlayerId());
+
+        $workers = $this->getPlayerWorkers($playerId);
+        $workers = array_values(array_filter($workers, fn($worker) => $worker->workforce < 4));
+        
+        $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
+
+        return [
+            'remaining' => $currentAction->upgrade, // for title
             'workers' => $workers,
         ];
     }

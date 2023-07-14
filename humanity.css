@@ -524,6 +524,10 @@ body > .card {
   border-radius: 15px;
   cursor: pointer;
 }
+.worker.selected {
+  outline: 5px solid red;
+  border-radius: 15px;
+}
 .worker.disabled-worker {
   transform: rotate(180deg);
 }

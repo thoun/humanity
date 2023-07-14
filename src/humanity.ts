@@ -13,6 +13,11 @@ const LOCAL_STORAGE_JUMP_TO_FOLDED_KEY = 'Humanity-jump-to-folded';
 
 const ICONS_COUNTERS_TYPES = [1, 2, 3, 0];
 
+
+function getCostStr(cost: Icons) {
+    return Object.entries(cost).filter(entry => entry[1] > 0).map(entry => `${entry[1]} <div class="resource-icon" data-type="${entry[0]}"></div>`).join(' ');
+}
+
 class Humanity implements HumanityGame {
     public tilesManager: TilesManager;
     public researchManager: DestinationsManager;
@@ -59,10 +64,11 @@ class Humanity implements HumanityGame {
         new JumpToManager(this, {
             localStorageFoldedKey: LOCAL_STORAGE_JUMP_TO_FOLDED_KEY,
             topEntries: [
-                new JumpToEntry(_('Main board TODO rename'), 'table-center', { 'color': '#224757' })
+                new JumpToEntry(_('Main board TODO rename'), 'board-1', { 'color': '#224757' }),
+                new JumpToEntry(_('Research board TODO rename'), 'research-board', { 'color': '#224757' }),
             ],
             entryClasses: 'hexa-point',
-            defaultFolded: true,
+            defaultFolded: false,
         });
 
         this.tableCenter = new TableCenter(this, gamedatas);
@@ -125,11 +131,14 @@ class Humanity implements HumanityGame {
             case 'chooseAction':
                 this.onEnteringChooseAction(args.args);
                 break;
+            case 'activateTile':
+                this.onEnteringActivateTile(args.args);
+                break;
             case 'chooseWorker':
                 this.onEnteringChooseWorker(args.args);
                 break;
-            case 'endRound':
-                this.onEnteringEndRound();
+            case 'upgradeWorker':
+                this.onEnteringUpgradeWorker(args.args);
                 break;
             case 'moveWorker':
                 this.onEnteringMoveWorker(args.args);
@@ -144,10 +153,24 @@ class Humanity implements HumanityGame {
             this.tableCenter.setSelectableResearch(args.selectableResearch);
         }
     }
+    
+    public onEnteringActivateTile(args: EnteringActivateTileArgs) {
+        if ((this as any).isCurrentPlayerActive()) {
+            const table = this.getCurrentPlayerTable();
+            table.setSelectedWorker(args.worker);
+            table.setSelectableTiles(args.activatableTiles);
+        }
+    }
 
     private onEnteringChooseWorker(args: EnteringChooseWorkerArgs) {
         if ((this as any).isCurrentPlayerActive()) {
             this.getCurrentPlayerTable()?.setSelectableWorkers(args.workers);
+        }
+    }
+
+    private onEnteringUpgradeWorker(args: EnteringChooseWorkerArgs) {
+        if ((this as any).isCurrentPlayerActive()) {
+            args.workers.forEach(worker => document.getElementById(`worker-${worker.id}`).classList.add('selectable'));
         }
     }
 
@@ -164,12 +187,26 @@ class Humanity implements HumanityGame {
                 this.tableCenter.setSelectableTiles(null);
                 this.tableCenter.setSelectableResearch(null);
                 break;
+            case 'activateTile':
+                this.onLeavingActivateTile();
+                break;
             case 'chooseWorker':
                 this.onLeavingChooseWorker();
                 break;
             case 'moveWorker':
                 this.onLeavingMoveWorker();
                 break;
+            case 'upgradeWorker':
+                this.onLeavingUpgradeWorker();
+                break;
+        }
+    }
+    
+    public onLeavingActivateTile() {
+        if ((this as any).isCurrentPlayerActive()) {
+            const table = this.getCurrentPlayerTable();
+            table.setSelectedWorker(null);
+            table.setSelectableTiles(null);
         }
     }
 
@@ -179,6 +216,10 @@ class Humanity implements HumanityGame {
 
     private onLeavingMoveWorker() {
         this.getCurrentPlayerTable()?.setSelectableTileSpots(null);
+    }
+
+    private onLeavingUpgradeWorker() {
+        document.querySelectorAll('.worker.selectable').forEach(worker => worker.classList.remove('selectable'));
     }
 
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
@@ -194,6 +235,9 @@ class Humanity implements HumanityGame {
                 case 'chooseRadarColor':
                     (this as any).addActionButton(`blue_button`, _("Blue"), () => this.chooseRadarColor(2));
                     (this as any).addActionButton(`orange_button`, _("Orange"), () => this.chooseRadarColor(1));
+                    break;
+                case 'pay':
+                    (this as any).addActionButton(`autoPay_button`, _("Pay ${cost}").replace('${cost}', getCostStr(args.pay)), () => this.autoPay());
                     break;
                 case 'confirmMoveWorkers':
                     (this as any).addActionButton(`confirmMoveWorkers_button`, _("Confirm"), () => this.confirmMoveWorkers());
@@ -310,13 +354,13 @@ class Humanity implements HumanityGame {
             this.iconsCounters[playerId] = [];
             ICONS_COUNTERS_TYPES.forEach(type => {
                 this.iconsCounters[playerId][type] = new ebg.counter();
-                this.scienceCounters[playerId].create(`type-${type}-counter-${playerId}`);
-                this.scienceCounters[playerId].setValue(player.icons[type]);
+                this.iconsCounters[playerId][type].create(`type-${type}-counter-${playerId}`);
+                this.iconsCounters[playerId][type].setValue(player.icons[type]);
 
                 if (type != 0) {
                     this.iconsCounters[playerId][type + 10] = new ebg.counter();
-                    this.scienceCounters[playerId].create(`type-${type + 10}-counter-${playerId}`);
-                    this.scienceCounters[playerId].setValue(player.icons[type + 10]);
+                    this.iconsCounters[playerId][type + 10].create(`type-${type + 10}-counter-${playerId}`);
+                    this.iconsCounters[playerId][type + 10].setValue(player.icons[type + 10]);
                 }
             });
 
@@ -331,8 +375,8 @@ class Humanity implements HumanityGame {
         this.setTooltipToClass('science-counter', _('Science'));
     }
 
-    private updateIcons(playerId: number, icons: PlayerIcons) {
-        ICONS_COUNTERS_TYPES.forEach(type => {    
+    private updateIcons(playerId: number, icons: Icons) {
+        ICONS_COUNTERS_TYPES.forEach(type => { 
             this.iconsCounters[playerId][type].toValue(icons[type]);
     
             if (type != 0) {
@@ -403,8 +447,8 @@ class Humanity implements HumanityGame {
         this.scienceCounters[playerId].toValue(count);
     }
 
-    private setResearchSpot(playerId: number, count: number) {
-        this.researchBoard.setResearchSpot(playerId, count);
+    private setResearchPoints(playerId: number, count: number) {
+        this.researchBoard.setResearchPoints(playerId, count);
     }
 
     private getColorAddHtml() {
@@ -485,6 +529,8 @@ class Humanity implements HumanityGame {
     public onWorkerClick(worker: Worker): void {
         if (['chooseAction', 'chooseWorker'].includes(this.gamedatas.gamestate.name)) {
             this.chooseWorker(worker.id);
+        } else if (this.gamedatas.gamestate.name == 'upgradeWorker') {
+            this.upgradeWorker(worker.id);
         }
     }
   	
@@ -498,12 +544,14 @@ class Humanity implements HumanityGame {
         });
     }
   	
-    public goTrade() {
-        if(!(this as any).checkAction('goTrade')) {
+    public upgradeWorker(id: number) {
+        if(!(this as any).checkAction('upgradeWorker')) {
             return;
         }
 
-        this.takeAction('goTrade');
+        this.takeAction('upgradeWorker', {
+            id
+        });
     }
   	
     public activateTile(id: number) {
@@ -544,6 +592,14 @@ class Humanity implements HumanityGame {
         this.takeAction('chooseNewResearch', {
             id
         });
+    }
+  	
+    public autoPay() {
+        if(!(this as any).checkAction('autoPay')) {
+            return;
+        }
+
+        this.takeAction('autoPay');
     }
   	
     public endTurn() {
@@ -597,6 +653,7 @@ class Humanity implements HumanityGame {
         const notifs = [
             ['firstPlayerToken', undefined],
             ['activateTile', ANIMATION_MS],
+            ['pay', 50],
             ['removeTile', ANIMATION_MS],
             ['disableWorker', ANIMATION_MS],
             ['gainTimeUnit', ANIMATION_MS],
@@ -613,6 +670,7 @@ class Humanity implements HumanityGame {
             ['moveArm', ANIMATION_MS],
             ['newTableResearch', ANIMATION_MS],
             ['reactivateWorkers', ANIMATION_MS],
+            ['upgradeWorker', 50],
         ];
     
         notifs.forEach((notif) => {
@@ -650,11 +708,18 @@ class Humanity implements HumanityGame {
         return this.placeFirstPlayerToken(notif.args.playerId);
     }
 
-    notif_activateTile(args: NotifActivateTileArgs) {
+    notif_activateTile(args: NotifRotateTileArgs) {
         const playerId = args.playerId;
         const playerTable = this.getPlayerTable(playerId);
 
-        playerTable.activateTile(args.tile);
+        playerTable.rotateTile(args.tile);
+    }
+
+    notif_pay(args: NotifRotateTileArgs) {
+        const playerId = args.playerId;
+        const playerTable = this.getPlayerTable(playerId);
+
+        playerTable.rotateTile(args.tile);
     }
 
     notif_removeTile(args: NotifRemoveTileArgs) {
@@ -664,7 +729,7 @@ class Humanity implements HumanityGame {
         playerTable.removeTile(args.tile);
     }
 
-    notif_disableWorker(args: NotifDisableWorkerArgs) {
+    notif_disableWorker(args: NotifWorkerArgs) {
         this.setWorkerDisabled(args.worker, true);
     }
 
@@ -693,8 +758,8 @@ class Humanity implements HumanityGame {
         this.setScore(args.playerId, +args.new);
     }
 
-    notif_researchSpot(args: NotifScoreArgs) {
-        this.setResearchSpot(args.playerId, args.new);
+    notif_researchPoints(args: NotifScoreArgs) {
+        this.setResearchPoints(args.playerId, args.new);
     }
 
     notif_science(args: NotifScoreArgs) {
@@ -733,11 +798,11 @@ class Humanity implements HumanityGame {
         } else {
             this.playersTables.forEach(playerTable => playerTable.reactivateWorkers());
         }
-    } 
+    }
 
-    private onEnteringEndRound() {
-        this.playersTables.forEach(playerTable => playerTable.reactivateWorkers());
-    }  
+    notif_upgradeWorker(args: NotifWorkerArgs) {
+        document.getElementById(`worker-${args.worker.id}-force`).dataset.workforce = `${args.worker.workforce}`;
+    }
 
     private setWorkerDisabled(worker: Worker, disabled: boolean) {
         document.getElementById(`worker-${worker.id}`).classList.toggle('disabled-worker', disabled);
@@ -762,9 +827,8 @@ class Humanity implements HumanityGame {
     public format_string_recursive(log: string, args: any) {
         try {
             if (log && args && !args.processed) {
-                if (args.gains && (typeof args.gains !== 'string' || args.gains[0] !== '<')) {
-                    const entries = Object.entries(args.gains);
-                    args.gains = entries.length ? entries.map(entry => `<strong>${entry[1]}</strong> <div class="icon" data-type="${entry[0]}"></div>`).join(' ') : `<strong>${_('nothing')}</strong>`;
+                if (args.cost && (typeof args.cost !== 'string' || args.cost[0] !== '<')) {
+                    args.cost = getCostStr(args.cost);
                 }
 
                 for (const property in args) {

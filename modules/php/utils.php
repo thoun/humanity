@@ -165,7 +165,7 @@ trait UtilTrait {
         foreach([1, 2, 3] as $type) {
             if (array_key_exists($type, $cost)) {
                 $payWithType = min($cost[$type], $remainingIcons[$type]);
-                $payWith[$type] -= $payWithType;
+                $payWith[$type] += $payWithType;
                 $remainingIcons[$type] -= $payWithType;
 
                 $remainingOfType = $cost[$type] - $payWithType;

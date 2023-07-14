@@ -60,15 +60,12 @@ class Humanity extends Table {
 		
         $this->tiles = $this->getNew("module.common.deck");
         $this->tiles->init("tile");
-        // TODO? $this->tiles->autoreshuffle = true;     
 		
         $this->research = $this->getNew("module.common.deck");
-        $this->research->init("research");
-        // TODO? $this->research->autoreshuffle = false;    
+        $this->research->init("research");   
 		
         $this->objectives = $this->getNew("module.common.deck");
-        $this->objectives->init("objective");
-        // TODO? $this->objectives->autoreshuffle = false;   
+        $this->objectives->init("objective");  
 	}
 	
     protected function getGameName() {

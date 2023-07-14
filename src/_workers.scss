@@ -21,6 +21,11 @@
         cursor: pointer;
     }
 
+    &.selected {
+        outline: 5px solid red;
+        border-radius: 15px;
+    }
+
     &.disabled-worker {
         transform: rotate(180deg);
     }

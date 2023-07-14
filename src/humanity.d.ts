@@ -61,7 +61,7 @@ interface Worker {
     spot: number; // table spot
 }
 
-type PlayerIcons = { [type: number]: number };
+type Icons = { [type: number]: number };
 
 interface HumanityPlayer extends Player {
     playerNo: number;
@@ -73,7 +73,7 @@ interface HumanityPlayer extends Player {
     science?: number;
     objectives: Objective[];
 
-    icons: PlayerIcons;
+    icons: Icons;
 }
 
 interface HumanityGamedatas {
@@ -127,6 +127,16 @@ interface EnteringChooseActionArgs extends EnteringChooseWorkerArgs {
     selectableResearch: Research[];
 }
 
+interface EnteringPayArgs {
+    cost: Icons;
+    pay: Icons;
+}
+
+interface EnteringActivateTileArgs {
+    worker: Worker;
+    activatableTiles: Tile[];
+}
+
 interface EnteringMoveWorkerArgs {
     worker: Worker;
     possibleCoordinates: number[][];
@@ -136,8 +146,8 @@ interface NotifFirstPlayerTokenArgs {
     playerId: number;
 }
 
-// activateTile
-interface NotifActivateTileArgs {
+// activateTile, pay
+interface NotifRotateTileArgs {
     playerId: number;
     tile: Tile;
 }
@@ -148,8 +158,8 @@ interface NotifRemoveTileArgs {
     tile: Tile;
 }
 
-// disableWorker
-interface NotifDisableWorkerArgs {
+// disableWorker, upgradeWorker
+interface NotifWorkerArgs {
     playerId: number;
     worker: Worker;
 }
@@ -210,3 +220,4 @@ interface NotifNewTableResearchArgs {
 interface NotifReactivateWorkersArgs {
     playerId: number | null;
 }
+

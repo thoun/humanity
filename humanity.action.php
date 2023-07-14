@@ -48,6 +48,15 @@
         self::ajaxResponse();
     }
 
+    public function upgradeWorker() {
+        self::setAjaxMode();     
+
+        $id = self::getArg("id", AT_posint, true);
+        $this->game->upgradeWorker($id);
+
+        self::ajaxResponse();
+    }
+
     public function activateTile() {
         self::setAjaxMode();     
 
@@ -80,6 +89,14 @@
 
         $id = self::getArg("id", AT_posint, true);
         $this->game->chooseNewResearch($id);
+
+        self::ajaxResponse();
+    }
+
+    public function autoPay() {
+        self::setAjaxMode();     
+
+        $this->game->autoPay();
 
         self::ajaxResponse();
     }

@@ -1154,10 +1154,10 @@ var CardStock = /** @class */ (function () {
         var selectableCardsClass = this.getSelectableCardClass();
         var unselectableCardsClass = this.getUnselectableCardClass();
         if (selectableCardsClass) {
-            element.classList.toggle(selectableCardsClass, selectable);
+            element === null || element === void 0 ? void 0 : element.classList.toggle(selectableCardsClass, selectable);
         }
         if (unselectableCardsClass) {
-            element.classList.toggle(unselectableCardsClass, !selectable);
+            element === null || element === void 0 ? void 0 : element.classList.toggle(unselectableCardsClass, !selectable);
         }
         if (!selectable && this.isSelected(card)) {
             this.unselectCard(card, true);
@@ -1192,7 +1192,7 @@ var CardStock = /** @class */ (function () {
         }
         var element = this.getCardElement(card);
         var selectableCardsClass = this.getSelectableCardClass();
-        if (!element.classList.contains(selectableCardsClass)) {
+        if (!element || !element.classList.contains(selectableCardsClass)) {
             return;
         }
         if (this.selectionMode === 'single') {
@@ -1216,7 +1216,7 @@ var CardStock = /** @class */ (function () {
         if (silent === void 0) { silent = false; }
         var element = this.getCardElement(card);
         var selectedCardsClass = this.getSelectedCardClass();
-        element.classList.remove(selectedCardsClass);
+        element === null || element === void 0 ? void 0 : element.classList.remove(selectedCardsClass);
         var index = this.selectedCards.findIndex(function (c) { return _this.manager.getId(c) == _this.manager.getId(card); });
         if (index !== -1) {
             this.selectedCards.splice(index, 1);
@@ -1363,7 +1363,7 @@ var CardStock = /** @class */ (function () {
         var selectableCardsClass = this.getSelectableCardClass();
         var unselectableCardsClass = this.getUnselectableCardClass();
         var selectedCardsClass = this.getSelectedCardClass();
-        cardElement.classList.remove(selectableCardsClass, unselectableCardsClass, selectedCardsClass);
+        cardElement === null || cardElement === void 0 ? void 0 : cardElement.classList.remove(selectableCardsClass, unselectableCardsClass, selectedCardsClass);
     };
     return CardStock;
 }());
@@ -1642,6 +1642,23 @@ var SlotStock = /** @class */ (function (_super) {
         this.element.innerHTML = '';
         this.slotsIds = slotsIds !== null && slotsIds !== void 0 ? slotsIds : [];
         this.slotsIds.forEach(function (slotId) {
+            _this.createSlot(slotId);
+        });
+    };
+    /**
+     * Add new slots ids. Will not change nor empty the existing ones.
+     *
+     * @param slotsIds the new slotsIds. Will be merged with the old ones.
+     */
+    SlotStock.prototype.addSlotsIds = function (newSlotsIds) {
+        var _a;
+        var _this = this;
+        if (newSlotsIds.length == 0) {
+            // no change
+            return;
+        }
+        (_a = this.slotsIds).push.apply(_a, newSlotsIds);
+        newSlotsIds.forEach(function (slotId) {
             _this.createSlot(slotId);
         });
     };
@@ -2161,8 +2178,10 @@ var TableCenter = /** @class */ (function () {
         this.moveArm(gamedatas.arm);
     }
     TableCenter.prototype.moveWorker = function (worker) {
+        var workerDiv = document.getElementById("worker-".concat(worker.id));
+        workerDiv.classList.remove('selectable', 'selected');
         var tableWorkers = document.getElementById('table-workers');
-        tableWorkers.querySelector(".slot[data-slot-id=\"".concat(worker.spot, "\"]")).appendChild(document.getElementById("worker-".concat(worker.id)));
+        tableWorkers.querySelector(".slot[data-slot-id=\"".concat(worker.spot, "\"]")).appendChild(workerDiv);
     };
     TableCenter.prototype.removeTile = function (tile) {
         this.tiles.removeCard(tile);
@@ -2323,11 +2342,11 @@ var ResearchBoard = /** @class */ (function () {
             markerDiv.style.transform = "translateX(".concat(left + leftShift, "px) translateY(").concat(top + topShift, "px)");
         });
     };
-    ResearchBoard.prototype.setResearchSpot = function (playerId, researchPoints) {
+    ResearchBoard.prototype.setResearchPoints = function (playerId, researchPoints) {
         this.sciencePoints.set(playerId, researchPoints);
         this.moveResearch();
     };
-    ResearchBoard.prototype.getResearchSpot = function (playerId) {
+    ResearchBoard.prototype.getResearchPoints = function (playerId) {
         return this.sciencePoints.get(playerId);
     };
     // TODO keep?
@@ -2350,18 +2369,6 @@ var TileStock = /** @class */ (function (_super) {
         _this.element = element;
         return _this;
     }
-    TileStock.prototype.addSlotsIds = function (newSlotsIds) {
-        var _a;
-        var _this = this;
-        if (newSlotsIds.length == 0) {
-            // no change
-            return;
-        }
-        (_a = this.slotsIds).push.apply(_a, newSlotsIds);
-        newSlotsIds.forEach(function (slotId) {
-            _this.createSlot(slotId);
-        });
-    };
     TileStock.prototype.createSlot = function (slotId) {
         _super.prototype.createSlot.call(this, slotId);
         var coordinates = slotId.split('_').map(function (val) { return Number(val); });
@@ -2425,7 +2432,15 @@ var PlayerTable = /** @class */ (function () {
             return worker.classList.toggle('selectable', workers.some(function (w) { return w.id == Number(worker.dataset.id); }));
         });
     };
-    PlayerTable.prototype.activateTile = function (tile) {
+    PlayerTable.prototype.setSelectedWorker = function (selectedWorker) {
+        document.getElementById("player-table-".concat(this.playerId, "-tiles")).querySelectorAll('.worker').forEach(function (worker) {
+            return worker.classList.toggle('selected', (selectedWorker === null || selectedWorker === void 0 ? void 0 : selectedWorker.id) == Number(worker.dataset.id));
+        });
+    };
+    PlayerTable.prototype.setSelectableTiles = function (selectableTiles) {
+        this.tiles.setSelectionMode(selectableTiles ? 'single' : 'none', selectableTiles);
+    };
+    PlayerTable.prototype.rotateTile = function (tile) {
         var tileDiv = this.game.tilesManager.getCardElement(tile);
         tileDiv.dataset.r = "".concat(tile.r);
     };
@@ -2558,6 +2573,9 @@ var ACTION_TIMER_DURATION = 5;
 var LOCAL_STORAGE_ZOOM_KEY = 'Humanity-zoom';
 var LOCAL_STORAGE_JUMP_TO_FOLDED_KEY = 'Humanity-jump-to-folded';
 var ICONS_COUNTERS_TYPES = [1, 2, 3, 0];
+function getCostStr(cost) {
+    return Object.entries(cost).filter(function (entry) { return entry[1] > 0; }).map(function (entry) { return "".concat(entry[1], " <div class=\"resource-icon\" data-type=\"").concat(entry[0], "\"></div>"); }).join(' ');
+}
 var Humanity = /** @class */ (function () {
     function Humanity() {
         this.playersTables = [];
@@ -2589,10 +2607,11 @@ var Humanity = /** @class */ (function () {
         new JumpToManager(this, {
             localStorageFoldedKey: LOCAL_STORAGE_JUMP_TO_FOLDED_KEY,
             topEntries: [
-                new JumpToEntry(_('Main board TODO rename'), 'table-center', { 'color': '#224757' })
+                new JumpToEntry(_('Main board TODO rename'), 'board-1', { 'color': '#224757' }),
+                new JumpToEntry(_('Research board TODO rename'), 'research-board', { 'color': '#224757' }),
             ],
             entryClasses: 'hexa-point',
-            defaultFolded: true,
+            defaultFolded: false,
         });
         this.tableCenter = new TableCenter(this, gamedatas);
         this.researchBoard = new ResearchBoard(this, gamedatas);
@@ -2647,11 +2666,14 @@ var Humanity = /** @class */ (function () {
             case 'chooseAction':
                 this.onEnteringChooseAction(args.args);
                 break;
+            case 'activateTile':
+                this.onEnteringActivateTile(args.args);
+                break;
             case 'chooseWorker':
                 this.onEnteringChooseWorker(args.args);
                 break;
-            case 'endRound':
-                this.onEnteringEndRound();
+            case 'upgradeWorker':
+                this.onEnteringUpgradeWorker(args.args);
                 break;
             case 'moveWorker':
                 this.onEnteringMoveWorker(args.args);
@@ -2666,10 +2688,22 @@ var Humanity = /** @class */ (function () {
             this.tableCenter.setSelectableResearch(args.selectableResearch);
         }
     };
+    Humanity.prototype.onEnteringActivateTile = function (args) {
+        if (this.isCurrentPlayerActive()) {
+            var table = this.getCurrentPlayerTable();
+            table.setSelectedWorker(args.worker);
+            table.setSelectableTiles(args.activatableTiles);
+        }
+    };
     Humanity.prototype.onEnteringChooseWorker = function (args) {
         var _a;
         if (this.isCurrentPlayerActive()) {
             (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableWorkers(args.workers);
+        }
+    };
+    Humanity.prototype.onEnteringUpgradeWorker = function (args) {
+        if (this.isCurrentPlayerActive()) {
+            args.workers.forEach(function (worker) { return document.getElementById("worker-".concat(worker.id)).classList.add('selectable'); });
         }
     };
     Humanity.prototype.onEnteringMoveWorker = function (args) {
@@ -2684,12 +2718,25 @@ var Humanity = /** @class */ (function () {
                 this.tableCenter.setSelectableTiles(null);
                 this.tableCenter.setSelectableResearch(null);
                 break;
+            case 'activateTile':
+                this.onLeavingActivateTile();
+                break;
             case 'chooseWorker':
                 this.onLeavingChooseWorker();
                 break;
             case 'moveWorker':
                 this.onLeavingMoveWorker();
                 break;
+            case 'upgradeWorker':
+                this.onLeavingUpgradeWorker();
+                break;
+        }
+    };
+    Humanity.prototype.onLeavingActivateTile = function () {
+        if (this.isCurrentPlayerActive()) {
+            var table = this.getCurrentPlayerTable();
+            table.setSelectedWorker(null);
+            table.setSelectableTiles(null);
         }
     };
     Humanity.prototype.onLeavingChooseWorker = function () {
@@ -2699,6 +2746,9 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.onLeavingMoveWorker = function () {
         var _a;
         (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableTileSpots(null);
+    };
+    Humanity.prototype.onLeavingUpgradeWorker = function () {
+        document.querySelectorAll('.worker.selectable').forEach(function (worker) { return worker.classList.remove('selectable'); });
     };
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
     //                        action status bar (ie: the HTML links in the status bar).
@@ -2713,6 +2763,9 @@ var Humanity = /** @class */ (function () {
                 case 'chooseRadarColor':
                     this.addActionButton("blue_button", _("Blue"), function () { return _this.chooseRadarColor(2); });
                     this.addActionButton("orange_button", _("Orange"), function () { return _this.chooseRadarColor(1); });
+                    break;
+                case 'pay':
+                    this.addActionButton("autoPay_button", _("Pay ${cost}").replace('${cost}', getCostStr(args.pay)), function () { return _this.autoPay(); });
                     break;
                 case 'confirmMoveWorkers':
                     this.addActionButton("confirmMoveWorkers_button", _("Confirm"), function () { return _this.confirmMoveWorkers(); });
@@ -2789,12 +2842,12 @@ var Humanity = /** @class */ (function () {
             _this.iconsCounters[playerId] = [];
             ICONS_COUNTERS_TYPES.forEach(function (type) {
                 _this.iconsCounters[playerId][type] = new ebg.counter();
-                _this.scienceCounters[playerId].create("type-".concat(type, "-counter-").concat(playerId));
-                _this.scienceCounters[playerId].setValue(player.icons[type]);
+                _this.iconsCounters[playerId][type].create("type-".concat(type, "-counter-").concat(playerId));
+                _this.iconsCounters[playerId][type].setValue(player.icons[type]);
                 if (type != 0) {
                     _this.iconsCounters[playerId][type + 10] = new ebg.counter();
-                    _this.scienceCounters[playerId].create("type-".concat(type + 10, "-counter-").concat(playerId));
-                    _this.scienceCounters[playerId].setValue(player.icons[type + 10]);
+                    _this.iconsCounters[playerId][type + 10].create("type-".concat(type + 10, "-counter-").concat(playerId));
+                    _this.iconsCounters[playerId][type + 10].setValue(player.icons[type + 10]);
                 }
             });
             // first player token
@@ -2865,8 +2918,8 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.setScience = function (playerId, count) {
         this.scienceCounters[playerId].toValue(count);
     };
-    Humanity.prototype.setResearchSpot = function (playerId, count) {
-        this.researchBoard.setResearchSpot(playerId, count);
+    Humanity.prototype.setResearchPoints = function (playerId, count) {
+        this.researchBoard.setResearchPoints(playerId, count);
     };
     Humanity.prototype.getColorAddHtml = function () {
         var _this = this;
@@ -2908,6 +2961,9 @@ var Humanity = /** @class */ (function () {
         if (['chooseAction', 'chooseWorker'].includes(this.gamedatas.gamestate.name)) {
             this.chooseWorker(worker.id);
         }
+        else if (this.gamedatas.gamestate.name == 'upgradeWorker') {
+            this.upgradeWorker(worker.id);
+        }
     };
     Humanity.prototype.chooseWorker = function (id) {
         if (!this.checkAction('chooseWorker')) {
@@ -2917,11 +2973,13 @@ var Humanity = /** @class */ (function () {
             id: id
         });
     };
-    Humanity.prototype.goTrade = function () {
-        if (!this.checkAction('goTrade')) {
+    Humanity.prototype.upgradeWorker = function (id) {
+        if (!this.checkAction('upgradeWorker')) {
             return;
         }
-        this.takeAction('goTrade');
+        this.takeAction('upgradeWorker', {
+            id: id
+        });
     };
     Humanity.prototype.activateTile = function (id) {
         if (!this.checkAction('activateTile')) {
@@ -2954,6 +3012,12 @@ var Humanity = /** @class */ (function () {
         this.takeAction('chooseNewResearch', {
             id: id
         });
+    };
+    Humanity.prototype.autoPay = function () {
+        if (!this.checkAction('autoPay')) {
+            return;
+        }
+        this.takeAction('autoPay');
     };
     Humanity.prototype.endTurn = function () {
         if (!this.checkAction('endTurn')) {
@@ -2998,6 +3062,7 @@ var Humanity = /** @class */ (function () {
         var notifs = [
             ['firstPlayerToken', undefined],
             ['activateTile', ANIMATION_MS],
+            ['pay', 50],
             ['removeTile', ANIMATION_MS],
             ['disableWorker', ANIMATION_MS],
             ['gainTimeUnit', ANIMATION_MS],
@@ -3014,6 +3079,7 @@ var Humanity = /** @class */ (function () {
             ['moveArm', ANIMATION_MS],
             ['newTableResearch', ANIMATION_MS],
             ['reactivateWorkers', ANIMATION_MS],
+            ['upgradeWorker', 50],
         ];
         notifs.forEach(function (notif) {
             dojo.subscribe(notif[0], _this, function (notifDetails) {
@@ -3046,7 +3112,12 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_activateTile = function (args) {
         var playerId = args.playerId;
         var playerTable = this.getPlayerTable(playerId);
-        playerTable.activateTile(args.tile);
+        playerTable.rotateTile(args.tile);
+    };
+    Humanity.prototype.notif_pay = function (args) {
+        var playerId = args.playerId;
+        var playerTable = this.getPlayerTable(playerId);
+        playerTable.rotateTile(args.tile);
     };
     Humanity.prototype.notif_removeTile = function (args) {
         var playerId = args.playerId;
@@ -3077,8 +3148,8 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_score = function (args) {
         this.setScore(args.playerId, +args.new);
     };
-    Humanity.prototype.notif_researchSpot = function (args) {
-        this.setResearchSpot(args.playerId, args.new);
+    Humanity.prototype.notif_researchPoints = function (args) {
+        this.setResearchPoints(args.playerId, args.new);
     };
     Humanity.prototype.notif_science = function (args) {
         if (!args.private || args.playerId == this.getPlayerId()) {
@@ -3111,8 +3182,8 @@ var Humanity = /** @class */ (function () {
             this.playersTables.forEach(function (playerTable) { return playerTable.reactivateWorkers(); });
         }
     };
-    Humanity.prototype.onEnteringEndRound = function () {
-        this.playersTables.forEach(function (playerTable) { return playerTable.reactivateWorkers(); });
+    Humanity.prototype.notif_upgradeWorker = function (args) {
+        document.getElementById("worker-".concat(args.worker.id, "-force")).dataset.workforce = "".concat(args.worker.workforce);
     };
     Humanity.prototype.setWorkerDisabled = function (worker, disabled) {
         document.getElementById("worker-".concat(worker.id)).classList.toggle('disabled-worker', disabled);
@@ -3134,9 +3205,8 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.format_string_recursive = function (log, args) {
         try {
             if (log && args && !args.processed) {
-                if (args.gains && (typeof args.gains !== 'string' || args.gains[0] !== '<')) {
-                    var entries = Object.entries(args.gains);
-                    args.gains = entries.length ? entries.map(function (entry) { return "<strong>".concat(entry[1], "</strong> <div class=\"icon\" data-type=\"").concat(entry[0], "\"></div>"); }).join(' ') : "<strong>".concat(_('nothing'), "</strong>");
+                if (args.cost && (typeof args.cost !== 'string' || args.cost[0] !== '<')) {
+                    args.cost = getCostStr(args.cost);
                 }
                 for (var property in args) {
                     if (['number', 'color', 'card_color', 'card_type', 'objective_name'].includes(property) && args[property][0] != '<') {

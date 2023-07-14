@@ -65,7 +65,6 @@ trait WorkerTrait {
             }
             if ($distanceWithArm != 0) {
                 $moved = min($amount, $distanceWithArm - 1);
-                self::notifyAllPlayers('log', "arm $arm, init spot $worker->spot, moved $moved, new spot ".($worker->spot - $moved), []);
                 $worker->spot -= $moved;
                 $this->DbQuery("UPDATE worker SET `spot` = $worker->spot WHERE `id` = $worker->id");
 

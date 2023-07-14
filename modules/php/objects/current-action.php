@@ -7,6 +7,8 @@ class CurrentAction {
     public ?int $addTileId;
     public ?int $removeTileId;
     public ?int $research;
+    public ?array $remainingCost;
+    public ?int $upgrade;
 
     public function __construct(string $type) {
         $this->type = $type;

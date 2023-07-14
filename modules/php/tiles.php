@@ -139,7 +139,7 @@ trait TileTrait {
         }
         
         if ($points > 0) {
-            $this->incPlayerScore($playerId, $tile->points, clienttranslate('${player_name} gains ${inc} points with placed tile'));
+            $this->incPlayerScore($playerId, $points, clienttranslate('${player_name} gains ${inc} points with placed tile'));
         }
         $researchPoints = $tile->researchPoints;
 
@@ -170,7 +170,7 @@ trait TileTrait {
         $icons = [ELECTRICITY => 0, 1 => 0, 2 => 0, 3 => 0, 11 => 0, 12 => 0, 13 => 0];
 
         foreach ($tiles as $tile) {
-            $production = $tile->production[$tile->r];
+            $production = $tile->getProduction();
 
             foreach ($production as $type => $amount) {
                 $icons[$type] += $amount;

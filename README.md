@@ -32,7 +32,9 @@ Also add one auto-FTP upload extension (for example https://marketplace.visualst
 ## Hint
 Make sure ftp-sync.json and node_modules are in .gitignore
 
-# Rules
+# Rules & comments from publisher
+No automatic actions like selecting last worker
+
 You can mix electricity with a base resource when you want to use 3 base resources instead of a advanced resource
 
 You take a radar of the same research point value, no matter the current year
