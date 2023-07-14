@@ -505,6 +505,7 @@ body > .card {
   background-image: url("img/workers.png");
   background-size: auto 100%;
   transition: transform 0.5s;
+  flex-shrink: 0;
 }
 .worker[data-player-color=f0db6c], .worker[data-player-color=f0db6c] .workforce {
   background-position-x: 0%;
@@ -813,7 +814,7 @@ body > .card {
 }
 .card.research .card-sides .card-side {
   box-shadow: none;
-  background-size: auto 100%;
+  background-size: 1000% 100%;
 }
 .card.research .card-sides .card-side[data-number="1"] {
   background-position-x: 11.1111111111%;
