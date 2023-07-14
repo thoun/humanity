@@ -2176,6 +2176,10 @@ var TableCenter = /** @class */ (function () {
     TableCenter.prototype.moveArm = function (arm) {
         document.getElementById('board-2').style.setProperty('--r', "".concat(arm));
     };
+    TableCenter.prototype.newResearch = function (tableResearch) {
+        this.research.removeAll();
+        this.research.addCards(tableResearch);
+    };
     return TableCenter;
 }());
 var POINT_CASE_HALF_WIDTH = 20.82;
@@ -2991,6 +2995,7 @@ var Humanity = /** @class */ (function () {
             ['shiftTableTile', ANIMATION_MS],
             ['newTableTile', ANIMATION_MS],
             ['moveArm', ANIMATION_MS],
+            ['newTableResearch', ANIMATION_MS],
         ];
         notifs.forEach(function (notif) {
             dojo.subscribe(notif[0], _this, function (notifDetails) {
@@ -3073,6 +3078,9 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.notif_moveArm = function (args) {
         this.tableCenter.moveArm(args.arm);
+    };
+    Humanity.prototype.notif_newTableResearch = function (args) {
+        this.tableCenter.newResearch(args.tableResearch);
     };
     Humanity.prototype.setWorkerDisabled = function (worker, disabled) {
         document.getElementById("worker-".concat(worker.id)).classList.toggle('disabled-worker', disabled);

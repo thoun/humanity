@@ -590,6 +590,7 @@ class Humanity implements HumanityGame {
             ['shiftTableTile', ANIMATION_MS],
             ['newTableTile', ANIMATION_MS],
             ['moveArm', ANIMATION_MS],
+            ['newTableResearch', ANIMATION_MS],
         ];
     
         notifs.forEach((notif) => {
@@ -694,7 +695,11 @@ class Humanity implements HumanityGame {
 
     notif_moveArm(args: NotifMoveArmArgs) {
         this.tableCenter.moveArm(args.arm);
-    }
+    }   
+
+    notif_newTableResearch(args: NotifNewTableResearchArgs) {
+        this.tableCenter.newResearch(args.tableResearch);
+    }    
 
     private setWorkerDisabled(worker: Worker, disabled: boolean) {
         document.getElementById(`worker-${worker.id}`).classList.toggle('disabled-worker', disabled);

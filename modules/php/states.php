@@ -138,9 +138,10 @@ trait StateTrait {
             }
         }
 
+        // move workers
         if (count($movedWorkers)) {
             $this->gamestate->nextState('moveWorkers');
-        } else {            
+        } else {
             $this->gamestate->nextState('afterEndRound');
         }
     }
@@ -160,41 +161,67 @@ trait StateTrait {
     }
 
     function stEndYear() {
-        // TODO
-        /* 
-        6 Gagnez autant de pions science que le plus grand chiffre que
-vous avez atteint sur la piste de recherche, puis autant que
-le nombre de marqueurs de recherche derrière vous sur la
-piste de recherche (à deux, celui ou celle qui est en tête gagne
-deux pions science). Placez-les derrière votre aide de jeu et
-replacez votre marqueur de recherche au début de la piste.*/
-/*
-7 Retirez toutes les expériences du plateau principal et
-remplacez-les par 7 expériences de la nouvelle année.*/
-/*
-8 Complétez le remplissage des hangars avec des modules de
-la nouvelle année. Les modules de l’année précédente restent
-autour du plateau principal.*/
-/*
-9 Replacez dans votre base les astronautes que vous avez
-récupérés. Un astronaute doit toujours être placé actif et
-adjacent orthogonalement à au moins un module.*/
-/*
-10 Tous les astronautes déjà présents dans votre base restent à
-leur place et sont rendus actifs.*/
-/*
-11 Un nouveau tour de jeu peut commencer.
-Important : à la fin de l’année 3, la partie est terminée. Résolvez
-le décompte de la piste de recherche (voir le point 6 ci-dessus),
-puis reportez-vous à la section suivante.
-*/
+        $playersIds = $this->getPlayersIds();
 
-        $year = $this->getGlobalVariable(YEAR);
-        $this->setGlobalVariable(YEAR, $year + 1);
-        if ($year == 3) {
+        // gain science points based on year research
+        foreach($playersIds as $playerId) {
+            $sciencePoints = 0;
+            $playerResearchSpot = $this->getPlayer($playerId)->researchSpot;
+            foreach (SCIENCE_BY_RESEARCH_SPOT as $inc => $minSpot) {
+                if ($playerResearchSpot >= $minSpot) {
+                    $sciencePoints = $inc;
+                }
+            }
+
+            $this->incPlayerScience($playerId, $sciencePoints, '${player_name} gains ${inc} science points with year research');
+
+            $this->DbQuery("UPDATE player SET `player_research_spot` = 0 WHERE player_id = $playerId");                
+            $this->notifyAllPlayers('researchSpot', '', [
+                'playerId' => $playerId,
+                'player_name' => $this->getPlayerName($playerId),
+                'new' => 0,
+            ]);
+        }
+
+        $year = $this->getYear();
+        // don't go further if last year
+        if ($year >= 3) {
             $this->gamestate->nextState('endScore');
+            return;
+        }
+
+        $year++;
+        $this->setGlobalVariable(YEAR, $year);
+
+        // replace all research tiles
+        $this->research->moveAllCardsInLocation('table', 'void');
+        foreach ([1, 2, 3, 4, 5, 6, 7] as $spot) {
+            $this->research->pickCardForLocation('deck'.$year, 'table', $spot);
+        }
+        self::notifyAllPlayers('newTableResearch', '', [
+            'tableResearch' => $this->getResearchsByLocation('table'),
+        ]);
+
+        // continue to fill tiles with new age tiles
+        $arm = $this->getArm();
+        $tableTiles = $this->getTilesByLocation('table');
+        for ($i = 1; $i < 8; $i++) {
+            $spot = ($arm + $i) % 8;
+            $spotTile = $this->array_find($tableTiles, fn($tableTile) => $tableTile->locationArg == $spot);
+            if (!$spotTile) {
+                $newTile = $this->getTileFromDb($this->tiles->pickCardForLocation('deck'.$year, 'table', $spot));
+                self::notifyAllPlayers('newTableTile', '', [
+                    'tile' => $newTile,
+                ]);
+            }
+        }
+
+        // move workers
+        $movedWorkers = $this->getGlobalVariable(MOVED_WORKERS);
+        if (count($movedWorkers)) {
+            $this->gamestate->nextState('moveWorkers');
         } else {
-            $this->gamestate->nextState('next');
+            $this->gamestate->nextState('afterEndRound');
         }
     }
 

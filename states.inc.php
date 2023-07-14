@@ -213,6 +213,7 @@ $gameGameStates = [
         "action" => "stAfterEndRound",
         "transitions" => [
             "nextRound" => ST_PLAYER_CHOOSE_ACTION,
+            "endYear" => ST_END_YEAR,
         ],
     ],
 
@@ -222,7 +223,8 @@ $gameGameStates = [
         "type" => "game",
         "action" => "stEndYear",
         "transitions" => [
-            "next" => ST_PLAYER_CHOOSE_ACTION,
+            "moveWorkers" => ST_MULTIPLAYER_MOVE_WORKERS,
+            "afterEndRound" => ST_AFTER_END_ROUND,
             "endScore" => ST_END_SCORE,
         ]
     ],

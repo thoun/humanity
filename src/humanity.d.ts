@@ -194,3 +194,8 @@ interface NotifTableTileArgs {
 interface NotifMoveArmArgs {
     arm: number;
 }
+
+// newTableResearch
+interface NotifNewTableResearchArgs {
+    tableResearch: Research[];
+}

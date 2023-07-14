@@ -59,4 +59,9 @@ class TableCenter {
     public moveArm(arm: number) {
         document.getElementById('board-2').style.setProperty('--r', `${arm}`);
     }
+    
+    public newResearch(tableResearch: Research[]) {
+        this.research.removeAll();
+        this.research.addCards(tableResearch);
+    }
 }
