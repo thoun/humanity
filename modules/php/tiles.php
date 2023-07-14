@@ -112,23 +112,43 @@ trait TileTrait {
         ]);
 
         $points = $tile->points;
-        /* TODO
-5 Vérifiez si votre nouveau module vient compléter un carré de
-quatre modules. Si c’est le cas, vous gagnez immédiatement
-un pion point de victoire que vous placez à l’intersection des
-quatre modules et vous avancez d’une case sur la piste de
-score. Vérifiez également si le carré que vous venez de former
-vous permet d’améliorer un astronaute. Cette étape est
-détaillée p. 11.
-Dépensez des ressources*/
+
+        $playerTilesAndObstacles = $this->getTilesByLocation('player', $playerId);
+        $playerTiles = array_values(array_filter($playerTilesAndObstacles, fn($t) => $t->type != 9));
+        
+        $squareResult = $this->checkNewTileSquares($tile, $playerTiles);
+        $points += $squareResult['points'];
+
+        if ($tile->color == GREEN) {
+            $tilesOfColor = array_values(array_filter($playerTiles, fn($t) => $t->color == GREEN));
+
+            $greenhouseGroupSize = $this->getAdjacentTilesCount($tilesOfColor, $tile, false, [$tile]);
+            $points += $greenhouseGroupSize;
+        }
+        
         if ($points > 0) {
             $this->incPlayerScore($playerId, $tile->points, clienttranslate('${player_name} gains ${inc} points with placed tile'));
         }
         $science = $tile->science;
-        // TODO adjacentScience
+
+        $adjacentTiles = $this->getAdjacentTiles($playerTiles, $tile);
+        if ($tile->adjacentScience !== null) {
+            $validAdjacentTiles = $tile->matchType == ANY_COLOR ? $adjacentTiles : array_values(array_filter($adjacentTiles, fn($t) => $t->color == $tile->matchType));
+            $science += $tile->adjacentScience * count($validAdjacentTiles);
+        }
+
+        // if new tile match adjacent already placed purple tile
+        foreach ($adjacentTiles as $adjacentTile) {
+            if ($adjacentTile->adjacentScience !== null && ($adjacentTile->matchType == ANY_COLOR || $adjacentTile->matchType == $tile->color)) {
+                $science += $tile->adjacentScience;
+            }
+        }
+
         if ($science > 0) {
             $this->incPlayerScience($playerId, $tile->points, clienttranslate('${player_name} gains ${inc} science points with placed tile'));
         }
+
+        return $squareResult['upgrade'];
     }
     
     function getPlayerIcons(int $playerId) {
@@ -146,5 +166,38 @@ Dépensez des ressources*/
         }
 
         return $icons;
+    }
+    
+    function checkNewTileSquares(Tile $tile, array $playerTiles) {
+        $points = 0;
+        $upgrade = 0;
+
+        for ($x = -1; $x <= 1; $x += 2) {
+            for ($y = -1; $y <= 1; $y += 2) {
+
+                $squareTiles = [
+                    $tile,
+                    $this->array_find($playerTiles, fn($t) => $t->x == $tile->x + $x && $t->y == $tile->y + $y),
+                    $this->array_find($playerTiles, fn($t) => $t->x == $tile->x && $t->y == $tile->y + $y),
+                    $this->array_find($playerTiles, fn($t) => $t->x == $tile->x + $x && $t->y == $tile->y),
+                ];
+
+                $squareTiles = array_values(array_filter($squareTiles, fn($tile) => $tile != null));
+                if (count($squareTiles) == 4) {
+                    $points++;
+
+                    $colors = count(array_unique(array_map(fn($tile) => $tile->color, $squareTiles)));
+
+                    if ($colors <= 2) {
+                        $upgrade++;
+                    }
+                }
+            }
+        }
+
+        return [
+            'points' => $points,
+            'upgrade' => $upgrade,
+        ];
     }
 }

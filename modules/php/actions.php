@@ -42,12 +42,14 @@ trait ActionTrait {
             $currentAction->selectedWorker = $id;
             $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
+            $upgrade = 0;
             if ($currentAction->type == 'tile') {
-                $this->deployTile($playerId, $currentAction, $worker);
+                $upgrade = $this->deployTile($playerId, $currentAction, $worker);
             } else if ($currentAction->type == 'research') {
                 $this->deployResearch($playerId, $currentAction, $worker);
             }
 
+            // TODO handle upgrades
             $this->gamestate->nextState('endTurn');
         }
     }
