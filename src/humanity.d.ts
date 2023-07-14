@@ -106,8 +106,7 @@ interface HumanityGame extends Game {
 
     getPlayerId(): number;
     getPlayer(playerId: number): HumanityPlayer;
-    //getColor(color: number): string;
-    getTooltipColor(color: number): string;
+    getColor(color: number, blueOrOrange: boolean): string;
     getGameStateName(): string;
     getCurrentPlayerTable(): PlayerTable | null;
     createWorker(worker: Worker): HTMLDivElement;

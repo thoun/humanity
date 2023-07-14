@@ -2681,14 +2681,7 @@ var Humanity = /** @class */ (function () {
                     title: _("Card help").toUpperCase(),
                     html: this.getHelpHtml(),
                     onPopinCreated: function () { return _this.populateHelp(); },
-                    buttonBackground: '#5890a9',
-                }),
-                new BgaHelpExpandableButton({
-                    unfoldedHtml: this.getColorAddHtml(),
-                    foldedContentExtraClasses: 'color-help-folded-content',
-                    unfoldedContentExtraClasses: 'color-help-unfolded-content',
-                    expandedWidth: '150px',
-                    expandedHeight: '210px',
+                    buttonBackground: '#653771',
                 }),
             ]
         });
@@ -2876,7 +2869,7 @@ var Humanity = /** @class */ (function () {
             var html = "<div class=\"counters with-tokens\">            \n                <div id=\"vp-counter-wrapper-".concat(player.id, "\" class=\"vp-counter\">\n                    <div class=\"vp icon\"></div>\n                    <span id=\"vp-counter-").concat(player.id, "\"></span>\n                </div>\n                <div id=\"science-counter-wrapper-").concat(player.id, "\" class=\"science-counter\">\n                    <div class=\"science icon\"></div>\n                    <span id=\"science-counter-").concat(player.id, "\">?</span>\n                </div>\n            </div>\n            \n            <div class=\"icons counters\">");
             html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type, "-counter-wrapper-").concat(player.id, "\">\n                    <div class=\"resource-icon\" data-type=\"").concat(type, "\"></div>\n                    <span id=\"type-").concat(type, "-counter-").concat(player.id, "\"></span>\n                </div>\n            "); }).join('');
             html += "</div>\n            <div class=\"icons counters\">";
-            html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type + 10, "-counter-wrapper-").concat(player.id, "\">\n                ").concat(type == 0 ? '' : "<div class=\"resource-icon\" data-type=\"".concat(type, "\"></div>\n                    <span id=\"type-").concat(type + 10, "-counter-").concat(player.id, "\"></span>"), "\n                </div>\n            "); }).join('');
+            html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type + 10, "-counter-wrapper-").concat(player.id, "\">\n                ").concat(type == 0 ? '' : "<div class=\"resource-icon\" data-type=\"".concat(type + 10, "\"></div>\n                    <span id=\"type-").concat(type + 10, "-counter-").concat(player.id, "\"></span>"), "\n                </div>\n            "); }).join('');
             html += "</div>";
             dojo.place(html, "player_board_".concat(player.id));
             _this.vpCounters[playerId] = new ebg.counter();
@@ -2892,10 +2885,12 @@ var Humanity = /** @class */ (function () {
                 _this.iconsCounters[playerId][type] = new ebg.counter();
                 _this.iconsCounters[playerId][type].create("type-".concat(type, "-counter-").concat(playerId));
                 _this.iconsCounters[playerId][type].setValue(player.icons[type]);
+                _this.setTooltip("type-".concat(type, "-counter-wrapper-").concat(player.id), _this.getResourceTooltip(type));
                 if (type != 0) {
                     _this.iconsCounters[playerId][type + 10] = new ebg.counter();
                     _this.iconsCounters[playerId][type + 10].create("type-".concat(type + 10, "-counter-").concat(playerId));
                     _this.iconsCounters[playerId][type + 10].setValue(player.icons[type + 10]);
+                    _this.setTooltip("type-".concat(type + 10, "-counter-wrapper-").concat(player.id), _this.getResourceTooltip(type + 10));
                 }
             });
             // first player token
@@ -2972,10 +2967,6 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.setResearchPoints = function (playerId, count) {
         this.researchBoard.setResearchPoints(playerId, count);
-    };
-    Humanity.prototype.getColorAddHtml = function () {
-        var _this = this;
-        return [1, 2, 3, 4, 5].map(function (number) { return "\n            <div class=\"color\" data-color=\"".concat(number, "\"></div>\n            <span class=\"label\"> ").concat(_this.getColor(number), "</span>\n        "); }).join('');
     };
     Humanity.prototype.getHelpHtml = function () {
         var html = "\n        <div id=\"help-popin\">\n            <h1>".concat(_("Assets"), "</h2>\n            <div class=\"help-section\">\n                <div class=\"icon vp\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Victory Point</strong>. The player moves their token forward 1 space on the Score Track."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon recruit\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Recruit</strong>: The player adds 1 Recruit token to their ship."), " ").concat(_("It is not possible to have more than 3."), " ").concat(_("A recruit allows a player to draw the Viking card of their choice when Recruiting or replaces a Viking card during Exploration."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon bracelet\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Silver Bracelet</strong>: The player adds 1 Silver Bracelet token to their ship."), " ").concat(_("It is not possible to have more than 3."), " ").concat(_("They are used for Trading."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon research\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Research Point</strong>: The player moves their token forward 1 space on the Research Track."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon take-card\"></div>\n                <div class=\"help-label\">").concat(_("Draw <strong>the first Viking card</strong> from the deck: It is placed in the player’s Crew Zone (without taking any assets)."), "</div>\n            </div>\n\n            <h1>").concat(_("Powers of the objectives (variant option)"), "</h1>\n        ");
@@ -3297,17 +3288,25 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.setWorkerDisabled = function (worker, disabled) {
         document.getElementById("worker-".concat(worker.id)).classList.toggle('disabled-worker', disabled);
     };
-    Humanity.prototype.getColor = function (color) {
+    Humanity.prototype.getColor = function (color, blueOrOrange) {
         switch (color) {
-            case 1: return _("Red");
-            case 2: return _("Yellow");
-            case 3: return _("Green");
-            case 4: return _("Blue");
-            case 5: return _("Purple");
+            case 0: return blueOrOrange ? _("Blue or orange") : _("Any color");
+            case 1: return _("Orange");
+            case 2: return _("Blue");
+            case 3: return _("Purple");
+            case 4: return _("Green");
         }
     };
-    Humanity.prototype.getTooltipColor = function (color) {
-        return "".concat(this.getColor(color), " (<div class=\"color\" data-color=\"").concat(color, "\"></div>)");
+    Humanity.prototype.getResourceTooltip = function (color) {
+        switch (color) {
+            case 0: return _("Electricity");
+            case 1: return _("Ice");
+            case 2: return _("Methan");
+            case 3: return _("Insect");
+            case 11: return _("Oxygen");
+            case 12: return _("Aircarbon");
+            case 13: return _("Protein");
+        }
     };
     /* This enable to inject translatable styled things to logs or action bar */
     /* @Override */

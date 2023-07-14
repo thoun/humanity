@@ -27,6 +27,7 @@ trait ActionTrait {
             throw new BgaUserException("Invalid worker");
         }
         
+        $playerId = intval($this->getActivePlayerId());
         $stateId = intval($this->gamestate->state_id());
         
         if ($stateId == ST_PLAYER_CHOOSE_ACTION) {
@@ -34,9 +35,14 @@ trait ActionTrait {
             $currentAction->selectedWorker = $id;
             $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
+            self::notifyAllPlayers('log', clienttranslate('${player_name} selects a worker of workforce ${workforce} to activate tiles'), [
+                'playerId' => $playerId,
+                'player_name' => $this->getPlayerName($playerId),
+                'workforce' => $worker->workforce,
+            ]);
+
             $this->gamestate->nextState('activate');
         } else {
-            $playerId = intval($this->getActivePlayerId());
 
             $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
             $currentAction->selectedWorker = $id;
@@ -80,19 +86,31 @@ trait ActionTrait {
         $worker->remainingWorkforce -= $tile->workforce;
         $this->DbQuery("UPDATE worker SET `remaining_workforce` = $worker->remainingWorkforce WHERE `id` = $worker->id");
 
+        $message = null;
+        $args = [];
         if ($tile->matchType) {
             if ($tile->matchType == RESEARCH_POWER_TIME) {
                 $this->gainTimeUnit($playerId, 1);
             }
+            $message = clienttranslate('${player_name} activates a tile to trigger TODO POWER TIME effect');
         } else {
             if ($tile->r >= 3) {
                 throw new BgaUserException("You cannot activate this tile (already fully activated)");
             }
             $tile->r += 1;
             $this->DbQuery("UPDATE tile SET `r` = $tile->r WHERE `card_id` = $tile->id");
+
+            if ($tile->type == 9) {
+                $message = clienttranslate('${player_name} activates an obstacle to reduce resistance to ${resistance}');
+                $args['resistance'] = 3 - $tile->r;
+            } else {
+                $message = clienttranslate('${player_name} activates a tile to produce 1 more ${type_icons}');
+                $args['type_icon'] = $this->getResourceName(array_keys($tile->getProduction()));
+                $args['i18n'] = ['type_icon'];
+            }
         }
 
-        self::notifyAllPlayers('activateTile', clienttranslate('${player_name} activates tile'), [
+        self::notifyAllPlayers('activateTile', $message, [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
             'tile' => $tile,

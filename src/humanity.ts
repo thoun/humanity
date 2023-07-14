@@ -108,14 +108,7 @@ class Humanity implements HumanityGame {
                     title: _("Card help").toUpperCase(),
                     html: this.getHelpHtml(),
                     onPopinCreated: () => this.populateHelp(),
-                    buttonBackground: '#5890a9',
-                }),
-                new BgaHelpExpandableButton({
-                    unfoldedHtml: this.getColorAddHtml(),
-                    foldedContentExtraClasses: 'color-help-folded-content',
-                    unfoldedContentExtraClasses: 'color-help-unfolded-content',
-                    expandedWidth: '150px',
-                    expandedHeight: '210px',
+                    buttonBackground: '#653771',
                 }),
             ]
         });
@@ -351,7 +344,7 @@ class Humanity implements HumanityGame {
             <div class="icons counters">`;            
             html += ICONS_COUNTERS_TYPES.map(type => `
                 <div id="type-${type + 10}-counter-wrapper-${player.id}">
-                ${type == 0 ? '' : `<div class="resource-icon" data-type="${type}"></div>
+                ${type == 0 ? '' : `<div class="resource-icon" data-type="${type + 10}"></div>
                     <span id="type-${type + 10}-counter-${player.id}"></span>`}
                 </div>
             `).join('');
@@ -374,11 +367,13 @@ class Humanity implements HumanityGame {
                 this.iconsCounters[playerId][type] = new ebg.counter();
                 this.iconsCounters[playerId][type].create(`type-${type}-counter-${playerId}`);
                 this.iconsCounters[playerId][type].setValue(player.icons[type]);
+                this.setTooltip(`type-${type}-counter-wrapper-${player.id}`, this.getResourceTooltip(type));
 
                 if (type != 0) {
                     this.iconsCounters[playerId][type + 10] = new ebg.counter();
                     this.iconsCounters[playerId][type + 10].create(`type-${type + 10}-counter-${playerId}`);
                     this.iconsCounters[playerId][type + 10].setValue(player.icons[type + 10]);
+                    this.setTooltip(`type-${type + 10}-counter-wrapper-${player.id}`, this.getResourceTooltip(type + 10));
                 }
             });
 
@@ -472,13 +467,6 @@ class Humanity implements HumanityGame {
 
     private setResearchPoints(playerId: number, count: number) {
         this.researchBoard.setResearchPoints(playerId, count);
-    }
-
-    private getColorAddHtml() {
-        return [1, 2, 3, 4, 5].map(number => `
-            <div class="color" data-color="${number}"></div>
-            <span class="label"> ${this.getColor(number)}</span>
-        `).join('');
     }
 
     private getHelpHtml() {
@@ -899,18 +887,26 @@ class Humanity implements HumanityGame {
         document.getElementById(`worker-${worker.id}`).classList.toggle('disabled-worker', disabled);
     }
 
-    public getColor(color: number): string {
+    public getColor(color: number, blueOrOrange: boolean): string {
         switch (color) {
-            case 1: return _("Red");
-            case 2: return _("Yellow");
-            case 3: return _("Green");
-            case 4: return _("Blue");
-            case 5: return _("Purple");
+            case 0: return blueOrOrange ? _("Blue or orange") : _("Any color");
+            case 1: return _("Orange");
+            case 2: return _("Blue");
+            case 3: return _("Purple");
+            case 4: return _("Green");
         }
     }
 
-    public getTooltipColor(color: number): string {
-        return `${this.getColor(color)} (<div class="color" data-color="${color}"></div>)`;
+    public getResourceTooltip(color: number): string {
+        switch (color) {
+            case 0: return _("Electricity");
+            case 1: return _("Ice");
+            case 2: return _("Methan");
+            case 3: return _("Insect");
+            case 11: return _("Oxygen");
+            case 12: return _("Aircarbon");
+            case 13: return _("Protein");
+        }
     }
 
     /* This enable to inject translatable styled things to logs or action bar */
