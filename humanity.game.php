@@ -191,6 +191,8 @@ class Humanity extends Table {
         $result['tableResearch'] = $this->getResearchsByLocation('table');
         $result['tableObjectives'] = $this->getObjectivesByLocation('table');      
 
+        $result['arm'] = $this->getArm();
+        $result['year'] = $this->getYear();
         $result['firstPlayerId'] = $this->getGlobalVariable(FIRST_PLAYER);
         $result['isEnd'] = $isEndScore;
   

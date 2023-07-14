@@ -57,6 +57,7 @@ trait StateTrait {
     }
 
     function stEndRound() {
+        // change first player
         $newFirstPlayer = intval($this->getPlayerAfter($this->getGlobalVariable(FIRST_PLAYER)));
         $this->setGlobalVariable(FIRST_PLAYER, $newFirstPlayer);
         $this->gamestate->changeActivePlayer($newFirstPlayer);
@@ -64,16 +65,48 @@ trait StateTrait {
             'playerId' => $newFirstPlayer,
             'player_name' => $this->getPlayerName($newFirstPlayer),
         ]);
+
+        // remove first 2 modules
+        $arm = $this->getArm();
+        $tableTiles = $this->getTilesByLocation('table');
+        foreach ([1, 2] as $moduleIndex) {
+            $spot = ($arm + $moduleIndex) % 7;
+            $spotTile = $this->array_find($tableTiles, fn($tableTile) => $tableTile->locationArg == $spot);
+            if ($spotTile) {
+                self::notifyAllPlayers('removeTableTile', '', [
+                    'tile' => $spotTile,
+                ]);
+                $tableTiles = array_values(array_filter($tableTiles, fn($tableTile) => $tableTile->id != $spotTile->id));
+            }
+        }
+
+        // shift remaining modules
+        for ($spot = 7; $spot >= 0; $spot--) {
+            $spotTile = $this->array_find($tableTiles, fn($tableTile) => $tableTile->locationArg == $spot);
+            if (!$spotTile) {
+                $lowerTiles = array_values(array_filter($tableTiles, fn($tableTile) => $tableTile->locationArg < $spot));
+                if (count($lowerTiles)) {
+                    usort($lowerTiles, fn($a, $b) => $b->locationArg - $a->locationArg);
+                    $newTile = $lowerTiles[0];
+                    $newTile->locationArg = $spot;
+
+                    self::notifyAllPlayers('shiftTableTile', '', [
+                        'tile' => $newTile,
+                    ]);
+                }
+            }
+        }
+
+        // move arm
+        $minSpot = min(array_map(fn($tile) => $tile->locationArg, $tableTiles));
+        $arm = $minSpot - 1;
+        $this->setGlobalVariable(ARM, $arm);
+        self::notifyAllPlayers('moveArm', '', [
+            'arm' => $arm,
+        ]);
+
         
 // TODO
-/*
-2 Si les deux premiers modules, placés sous les croix blanches,
-n’ont pas été déployés, ils sont retirés du jeu.*/
-/*
-3 Décalez en sens horaire les modules restant autour du
-plateau principal sans laisser de hangar vide entre eux.
-Tournez le bras articulé en sens horaire jusqu’à le placer sur le
-dernier hangar vide.*/
 /*
 4 Tous les astronautes dépassés par le bras articulé vous sont
 restitués. Les astronautes en face du bras articulé (comme

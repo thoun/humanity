@@ -2158,10 +2158,20 @@ var TableCenter = /** @class */ (function () {
         Object.values(gamedatas.players).forEach(function (player) { return player.workers.filter(function (worker) { return worker.location == 'table'; }).forEach(function (worker) {
             return tableWorkers.querySelector(".slot[data-slot-id=\"".concat(worker.spot, "\"]")).appendChild(_this.game.createWorker(worker));
         }); });
+        this.moveArm(gamedatas.arm);
     }
     TableCenter.prototype.moveWorker = function (worker) {
         var tableWorkers = document.getElementById('table-workers');
         tableWorkers.querySelector(".slot[data-slot-id=\"".concat(worker.spot, "\"]")).appendChild(document.getElementById("worker-".concat(worker.id)));
+    };
+    TableCenter.prototype.removeTile = function (tile) {
+        this.tiles.removeCard(tile);
+    };
+    TableCenter.prototype.shiftTile = function (tile) {
+        this.tiles.addCard(tile);
+    };
+    TableCenter.prototype.moveArm = function (arm) {
+        document.getElementById('board-2').style.setProperty('--r', "".concat(arm));
     };
     return TableCenter;
 }());
@@ -2810,6 +2820,9 @@ var Humanity = /** @class */ (function () {
             ['researchSpot', 1],
             ['science', 1],
             ['newFirstPlayer', ANIMATION_MS],
+            ['removeTableTile', ANIMATION_MS],
+            ['shiftTableTile', ANIMATION_MS],
+            ['moveArm', ANIMATION_MS],
         ];
         notifs.forEach(function (notif) {
             dojo.subscribe(notif[0], _this, function (notifDetails) {
@@ -2880,6 +2893,15 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.notif_newFirstPlayer = function (args) {
         this.placeFirstPlayerToken(args.playerId);
+    };
+    Humanity.prototype.notif_removeTableTile = function (args) {
+        this.tableCenter.removeTile(args.tile);
+    };
+    Humanity.prototype.notif_shiftTableTile = function (args) {
+        this.tableCenter.shiftTile(args.tile);
+    };
+    Humanity.prototype.notif_moveArm = function (args) {
+        this.tableCenter.moveArm(args.arm);
     };
     Humanity.prototype.setWorkerDisabled = function (worker, disabled) {
         document.getElementById("worker-".concat(worker.id)).classList.toggle('disabled-worker', disabled);

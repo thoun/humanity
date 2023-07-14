@@ -86,16 +86,8 @@ interface HumanityGamedatas {
     // Add here variables you set up in getAllDatas
     tableObjectives: Objective[];
     tableTiles: Tile[];
-
-    // TODO check
-    cardDeckTop?: Tile;
-    cardDeckCount: number;
-    cardDiscardCount: number;
-    centerCards: Tile[];
-    //centerDestinationsDeckTop: { [letter: string]: Research };
-    //centerDestinationsDeckCount: { [letter: string]: number };
-    tableResearch: Research[];
-    objectives?: number[];
+    arm: number;
+    year: number;
     firstPlayerId: number;
     isEnd: boolean;
 }
@@ -185,3 +177,13 @@ interface NotifScoreArgs {
 interface NotifNewFirstPlayerArgs {
     playerId: number;
 }  
+
+// removeTableTile, shiftTableTile
+interface NotifTableTileArgs {
+    tile: Tile;
+}
+
+// moveArm
+interface NotifMoveArmArgs {
+    arm: number;
+}

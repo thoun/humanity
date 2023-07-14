@@ -95,9 +95,9 @@ trait ActionTrait {
         if ($tile->type == 9 && $tile->r == 3) {
             $this->DbQuery("DELETE from tile WHERE `card_id` = $tile->id");
 
-            // TODO gain 3 points
+            $this->incPlayerScience($playerId, 3, '');
 
-            self::notifyAllPlayers('removeTile', clienttranslate('${player_name} removes an obstacle and gain 3 points'), [
+            self::notifyAllPlayers('removeTile', clienttranslate('${player_name} removes an obstacle and gain 3 science points'), [
                 'playerId' => $playerId,
                 'player_name' => $this->getPlayerName($playerId),
                 'tile' => $tile,

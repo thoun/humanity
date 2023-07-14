@@ -33,6 +33,8 @@ class TableCenter {
         Object.values(gamedatas.players).forEach(player => player.workers.filter(worker => worker.location == 'table').forEach(worker => 
             tableWorkers.querySelector(`.slot[data-slot-id="${worker.spot}"]`).appendChild(this.game.createWorker(worker))
         ));
+
+        this.moveArm(gamedatas.arm);
     }
     
     public moveWorker(worker: Worker): void {
@@ -40,5 +42,17 @@ class TableCenter {
         tableWorkers.querySelector(`.slot[data-slot-id="${worker.spot}"]`).appendChild(
             document.getElementById(`worker-${worker.id}`)
         );
+    }
+    
+    public removeTile(tile: Tile) {
+        this.tiles.removeCard(tile);
+    }
+    
+    public shiftTile(tile: Tile) {
+        this.tiles.addCard(tile);
+    }
+    
+    public moveArm(arm: number) {
+        document.getElementById('board-2').style.setProperty('--r', `${arm}`);
     }
 }

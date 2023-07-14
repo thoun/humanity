@@ -547,6 +547,9 @@ class Humanity implements HumanityGame {
             ['researchSpot', 1],
             ['science', 1],
             ['newFirstPlayer', ANIMATION_MS],
+            ['removeTableTile', ANIMATION_MS],
+            ['shiftTableTile', ANIMATION_MS],
+            ['moveArm', ANIMATION_MS],
         ];
     
         notifs.forEach((notif) => {
@@ -635,6 +638,18 @@ class Humanity implements HumanityGame {
 
     notif_newFirstPlayer(args: NotifNewFirstPlayerArgs) {
         this.placeFirstPlayerToken(args.playerId);
+    }
+
+    notif_removeTableTile(args: NotifTableTileArgs) {
+        this.tableCenter.removeTile(args.tile);
+    }    
+
+    notif_shiftTableTile(args: NotifTableTileArgs) {
+        this.tableCenter.shiftTile(args.tile);
+    }  
+
+    notif_moveArm(args: NotifMoveArmArgs) {
+        this.tableCenter.moveArm(args.arm);
     }
 
     private setWorkerDisabled(worker: Worker, disabled: boolean) {
