@@ -250,4 +250,20 @@ class PlayerTable {
             tilesDiv.querySelectorAll('.slot.selectable').forEach(elem => elem.classList.remove('selectable'))
         }
     }
+
+    public resetTiles(tiles: Tile[]) {
+        this.tiles.removeAll(tiles);
+        this.tiles.addCards(tiles);
+    }
+
+    public resetResearch(research: Research[]) {
+        document.getElementById(`player-table-${this.playerId}-research-lines`).innerHTML = ``;
+        this.researchLines = [];
+        research.forEach(researchTile => this.addResearch(researchTile));
+    }
+    
+    public resetObjectives(objectives: Objective[]) {
+        this.objectives.removeAll();
+        this.objectives.addCards(objectives);
+    }
 }

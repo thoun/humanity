@@ -40,7 +40,7 @@ class TableCenter {
     public moveWorker(worker: Worker): void {
         const workerDiv = document.getElementById(`worker-${worker.id}`);
         workerDiv.classList.remove('selectable', 'selected');
-        
+
         const tableWorkers = document.getElementById('table-workers');
         tableWorkers.querySelector(`.slot[data-slot-id="${worker.spot}"]`).appendChild(workerDiv);
     }
@@ -72,5 +72,10 @@ class TableCenter {
     
     public setSelectableResearch(selectableResearch: Research[] | null) {
         this.research.setSelectionMode(selectableResearch ? 'single' : 'none', selectableResearch);
+    }
+    
+    public resetTiles(tiles: Tile[]) {
+        this.tiles.removeAll();
+        this.tiles.addCards(tiles);
     }
 }

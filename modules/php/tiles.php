@@ -139,7 +139,7 @@ trait TileTrait {
         }
         
         if ($points > 0) {
-            $this->incPlayerScore($playerId, $points, clienttranslate('${player_name} gains ${inc} points with placed tile'));
+            $this->incPlayerVP($playerId, $points, clienttranslate('${player_name} gains ${inc} points with placed tile'));
         }
         $researchPoints = $tile->researchPoints;
 

@@ -56,7 +56,7 @@ $basicGameStates = [
         "description" => clienttranslate("Game setup"),
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => [ "" => ST_PLAYER_CHOOSE_ACTION ]
+        "transitions" => [ "" => ST_START_TURN ]
     ],
    
     // Final state.
@@ -74,8 +74,8 @@ $playerActionsGameStates = [
 
     ST_PLAYER_CHOOSE_ACTION => [
         "name" => "chooseAction",
-        "description" => clienttranslate('${actplayer} must A. Travaillez dans la base, B. Déployez un module, C. Réalisez une expérience'),
-        "descriptionmyturn" => clienttranslate('${you} must A. Travaillez dans la base, B. Déployez un module, C. Réalisez une expérience'),
+        "description" => clienttranslate('${actplayer} must select a worker to activate tiles, or select a tile or research to deploy'),
+        "descriptionmyturn" => clienttranslate('${you} must select a worker to activate tiles, or select a tile or research to deploy'),
         "type" => "activeplayer",    
         "args" => "argChooseAction",
         "possibleactions" => [ 
@@ -127,9 +127,8 @@ $playerActionsGameStates = [
             "chooseWorker",
         ],
         "transitions" => [
-            "next" => ST_PLAYER_CHOOSE_ACTION,
             "upgrade" => ST_PLAYER_UPGRADE_WORKER,
-            "endTurn" => ST_CHECK_OBJECTIVES,
+            "endTurn" => ST_PLAYER_CONFIRM_TURN,
         ],
     ],
 
@@ -145,7 +144,7 @@ $playerActionsGameStates = [
         ],
         "transitions" => [
             "stay" => ST_PLAYER_UPGRADE_WORKER,
-            "endTurn" => ST_CHECK_OBJECTIVES,
+            "endTurn" => ST_PLAYER_CONFIRM_TURN,
         ],
     ],
 
@@ -161,10 +160,22 @@ $playerActionsGameStates = [
         ],
         "transitions" => [
             "stay" => ST_PLAYER_ACTIVATE_TILE,
-            "endTurn" => ST_CHECK_OBJECTIVES,
+            "endTurn" => ST_PLAYER_CONFIRM_TURN,
         ]
     ],
-    
+
+    ST_PLAYER_CONFIRM_TURN => [
+        "name" => "confirmTurn",
+        "description" => clienttranslate('${actplayer} must confirm turn'),
+        "descriptionmyturn" => clienttranslate('${you} must confirm turn'),
+        "type" => "activeplayer",
+        "possibleactions" => [ 
+            "confirmTurn",
+        ],
+        "transitions" => [
+            "endTurn" => ST_CHECK_OBJECTIVES,
+        ]
+    ],    
 
     ST_MULTIPLAYER_MOVE_WORKERS => [
         "name" => "moveWorkers",
@@ -202,6 +213,16 @@ $playerActionsGameStates = [
 
 $gameGameStates = [
 
+    ST_START_TURN => [
+        "name" => "startTurn",
+        "description" => clienttranslate('Scoring research points...'),
+        "type" => "game",
+        "action" => "stStartTurn",
+        "transitions" => [
+            "next" => ST_PLAYER_CHOOSE_ACTION,
+        ]
+    ],
+
     ST_CHECK_OBJECTIVES => [
         "name" => "checkObjectives",
         "description" => clienttranslate('Scoring research points...'),
@@ -219,7 +240,7 @@ $gameGameStates = [
         "action" => "stNextPlayer",
         "updateGameProgression" => true,
         "transitions" => [
-            "nextPlayer" => ST_PLAYER_CHOOSE_ACTION,
+            "nextPlayer" => ST_START_TURN,
             "endRound" => ST_END_ROUND,
         ],
     ],
@@ -242,7 +263,7 @@ $gameGameStates = [
         "type" => "game",
         "action" => "stAfterEndRound",
         "transitions" => [
-            "nextRound" => ST_PLAYER_CHOOSE_ACTION,
+            "nextRound" => ST_START_TURN,
             "endYear" => ST_END_YEAR,
         ],
     ],

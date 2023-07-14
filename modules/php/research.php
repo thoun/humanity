@@ -76,10 +76,10 @@ trait ResearchTrait {
             $args = ['i18n' => ['rank']];
             if ($alreadyBuildForSameLine == 1) {
                 $args['rank'] = clienttranslate('second');
-                $this->incPlayerScore($playerId, 1, $message, $args);
+                $this->incPlayerVP($playerId, 1, $message, $args);
             } else if ($alreadyBuildForSameLine == 2) {
                 $args['rank'] = clienttranslate('third');
-                $this->incPlayerScore($playerId, 2, $message, $args);
+                $this->incPlayerVP($playerId, 2, $message, $args);
             }
         }
 
@@ -88,7 +88,7 @@ trait ResearchTrait {
         }
 
         if ($tile->points > 0) {
-            $this->incPlayerScore($playerId, $tile->points, clienttranslate('${player_name} gains ${inc} points from the played research'));
+            $this->incPlayerVP($playerId, $tile->points, clienttranslate('${player_name} gains ${inc} points from the played research'));
         }
 
         $this->DbQuery("UPDATE research SET `card_location` = 'player', `card_location_arg` = $playerId, `line` = $line WHERE `card_id` = $tile->id");

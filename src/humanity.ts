@@ -29,6 +29,7 @@ class Humanity implements HumanityGame {
     private tableCenter: TableCenter;
     private researchBoard: ResearchBoard;
     private playersTables: PlayerTable[] = [];
+    private vpCounters: Counter[] = [];
     private scienceCounters: Counter[] = [];
     private iconsCounters: Counter[][] = [];
     
@@ -239,9 +240,17 @@ class Humanity implements HumanityGame {
                 case 'pay':
                     (this as any).addActionButton(`autoPay_button`, _("Pay ${cost}").replace('${cost}', getCostStr(args.pay)), () => this.autoPay());
                     break;
+                case 'confirmTurn':
+                    (this as any).addActionButton(`confirmTurn_button`, _("Confirm turn"), () => this.confirmTurn());
+                    break;
                 case 'confirmMoveWorkers':
                     (this as any).addActionButton(`confirmMoveWorkers_button`, _("Confirm"), () => this.confirmMoveWorkers());
                     break;
+            }
+
+            
+            if (['chooseRadarColor', 'pay', 'chooseWorker', 'upgradeWorker', 'activateTile', 'confirmTurn'].includes(stateName)) {
+                (this as any).addActionButton(`restartTurn_button`, _("Restart turn"), () => this.restartTurn(), null, null, 'red');
             }
         }
     }
@@ -311,18 +320,17 @@ class Humanity implements HumanityGame {
     private createPlayerPanels(gamedatas: HumanityGamedatas) {
 
         Object.values(gamedatas.players).forEach(player => {
-            const playerId = Number(player.id);   
+            const playerId = Number(player.id);
 
-            document.getElementById(`player_score_${player.id}`).insertAdjacentHTML('beforebegin', `<div class="vp icon"></div>`);
-            document.getElementById(`icon_point_${player.id}`).remove();
-
-            let html = `<div class="counters">
-            
+            let html = `<div class="counters">            
+                <div id="vp-counter-wrapper-${player.id}" class="science-counter">
+                    <div class="vp icon"></div>
+                    <span id="vp-counter-${player.id}"></span>
+                </div>
                 <div id="science-counter-wrapper-${player.id}" class="science-counter">
                     <div class="science icon"></div>
                     <span id="science-counter-${player.id}">?</span>
                 </div>
-
             </div>
             
             <div class="icons counters">`;
@@ -344,6 +352,10 @@ class Humanity implements HumanityGame {
             html += `</div>`;
 
             dojo.place(html, `player_board_${player.id}`);
+
+            this.vpCounters[playerId] = new ebg.counter();
+            this.vpCounters[playerId].create(`vp-counter-${playerId}`);
+            this.vpCounters[playerId].setValue(player.vp);
 
             this.scienceCounters[playerId] = new ebg.counter();
             this.scienceCounters[playerId].create(`science-counter-${playerId}`);
@@ -372,7 +384,8 @@ class Humanity implements HumanityGame {
             }
         });
 
-        this.setTooltipToClass('science-counter', _('Science'));
+        this.setTooltipToClass('vp-counter', _('Victory points'));
+        this.setTooltipToClass('science-counter', _('Science points'));
     }
 
     private updateIcons(playerId: number, icons: Icons) {
@@ -440,7 +453,11 @@ class Humanity implements HumanityGame {
 
     private setScore(playerId: number, score: number) {
         (this as any).scoreCtrl[playerId]?.toValue(score);
-        this.researchBoard.setScore(playerId, score);
+    }
+
+    private setVP(playerId: number, count: number) {
+        this.researchBoard.setVP(playerId, count);
+        this.vpCounters[playerId].toValue(count);
     }
 
     private setScience(playerId: number, count: number) {
@@ -610,6 +627,18 @@ class Humanity implements HumanityGame {
         this.takeAction('endTurn');
     }
   	
+    public confirmTurn() {
+        if(!(this as any).checkAction('confirmTurn')) {
+            return;
+        }
+
+        this.takeAction('confirmTurn');
+    }
+  	
+    public restartTurn() {
+        this.takeAction('restartTurn');
+    }
+  	
     public moveWorker(x: number, y: number) {
         if(!(this as any).checkAction('moveWorker')) {
             return;
@@ -662,6 +691,7 @@ class Humanity implements HumanityGame {
             ['deployResearch', undefined],
             ['score', 1],
             ['researchPoints', 1],
+            ['vp', 1],
             ['science', 1],
             ['newFirstPlayer', ANIMATION_MS],
             ['removeTableTile', ANIMATION_MS],
@@ -671,6 +701,7 @@ class Humanity implements HumanityGame {
             ['newTableResearch', ANIMATION_MS],
             ['reactivateWorkers', ANIMATION_MS],
             ['upgradeWorker', 50],
+            ['restartTurn', 1],
         ];
     
         notifs.forEach((notif) => {
@@ -755,11 +786,15 @@ class Humanity implements HumanityGame {
     }
 
     notif_score(args: NotifScoreArgs) {
-        this.setScore(args.playerId, +args.new);
+        this.setScore(args.playerId, args.new);
     }
 
     notif_researchPoints(args: NotifScoreArgs) {
         this.setResearchPoints(args.playerId, args.new);
+    }
+
+    notif_vp(args: NotifScoreArgs) {
+        this.setVP(args.playerId, args.new);
     }
 
     notif_science(args: NotifScoreArgs) {
@@ -802,6 +837,41 @@ class Humanity implements HumanityGame {
 
     notif_upgradeWorker(args: NotifWorkerArgs) {
         document.getElementById(`worker-${args.worker.id}-force`).dataset.workforce = `${args.worker.workforce}`;
+    }
+
+    notif_restartTurn(args: NotifRestartTurnArgs) {
+        const { playerId, undo } = args;
+
+        this.tableCenter.resetTiles(undo.tableTiles);
+        this.tableCenter.newResearch(undo.tableResearch);
+        this.researchBoard.resetObjectives(undo.allObjectives.filter(objective => objective.location == 'table'));
+
+        this.playersTables.forEach(playerTable => playerTable.resetObjectives(undo.allObjectives.filter(objective => objective.location == 'player' && objective.locationArg == playerTable.playerId)));
+
+        const table = this.getPlayerTable(playerId);
+        table.resetTiles(undo.tiles);
+        table.resetResearch(undo.research);
+
+        undo.workers.forEach(worker => this.resetWorker(playerId, worker));
+
+        this.setResearchPoints(playerId, undo.researchPoints);
+        this.setVP(playerId, undo.vp);
+        if (args.playerId == this.getPlayerId()) {
+            this.setScience(playerId, undo.science);
+        }
+    }
+
+    private resetWorker(playerId: number, worker: Worker) {
+        const workerDiv = document.getElementById(`worker-${worker.id}`);
+        if (worker.location == 'player') {
+            const tilesDiv = document.getElementById(`player-table-${playerId}-tiles`);
+            tilesDiv.querySelector(`[data-slot-id="${worker.x}_${worker.y}"]`).appendChild(workerDiv);
+        } else if (worker.location == 'table') {
+            const tableWorkers = document.getElementById('table-workers');
+            tableWorkers.querySelector(`.slot[data-slot-id="${worker.spot}"]`).appendChild(workerDiv);
+        }
+        workerDiv.classList.toggle('disabled-worker', !worker.remainingWorkforce);
+        document.getElementById(`worker-${worker.id}-force`).dataset.workforce = `${worker.workforce}`;
     }
 
     private setWorkerDisabled(worker: Worker, disabled: boolean) {

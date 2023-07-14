@@ -70,6 +70,7 @@ interface HumanityPlayer extends Player {
     tiles: Tile[];
     research: Research[];
     researchPoints: number;
+    vp: number;
     science?: number;
     objectives: Objective[];
 
@@ -221,3 +222,20 @@ interface NotifReactivateWorkersArgs {
     playerId: number | null;
 }
 
+interface Undo {
+    tiles: Tile[];
+    research: Research[];
+    workers: Worker[];
+    vp: number;
+    researchPoints: number;
+    science: number;
+    tableTiles: Tile[];
+    tableResearch: Research[];
+    allObjectives: Objective[];
+}
+
+// restartTurn
+interface NotifRestartTurnArgs {
+    playerId: number;
+    undo: Undo;
+}

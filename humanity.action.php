@@ -109,6 +109,22 @@
         self::ajaxResponse();
     }
 
+    public function confirmTurn() {
+        self::setAjaxMode();     
+
+        $this->game->confirmTurn();
+
+        self::ajaxResponse();
+    }
+
+    public function restartTurn() {
+        self::setAjaxMode();     
+
+        $this->game->restartTurn();
+
+        self::ajaxResponse();
+    }
+
     public function moveWorker() {
         self::setAjaxMode();     
 

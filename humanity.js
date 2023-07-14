@@ -2205,6 +2205,10 @@ var TableCenter = /** @class */ (function () {
     TableCenter.prototype.setSelectableResearch = function (selectableResearch) {
         this.research.setSelectionMode(selectableResearch ? 'single' : 'none', selectableResearch);
     };
+    TableCenter.prototype.resetTiles = function (tiles) {
+        this.tiles.removeAll();
+        this.tiles.addCards(tiles);
+    };
     return TableCenter;
 }());
 var POINT_CASE_HALF_WIDTH = 20.82;
@@ -2287,7 +2291,7 @@ var ResearchBoard = /** @class */ (function () {
             markerDiv.style.transform = "translateX(".concat(left + leftShift, "px) translateY(").concat(top + topShift, "px)");
         });
     };
-    ResearchBoard.prototype.setScore = function (playerId, points) {
+    ResearchBoard.prototype.setVP = function (playerId, points) {
         this.vp.set(playerId, points);
         this.moveVP();
     };
@@ -2348,6 +2352,10 @@ var ResearchBoard = /** @class */ (function () {
     };
     ResearchBoard.prototype.getResearchPoints = function (playerId) {
         return this.sciencePoints.get(playerId);
+    };
+    ResearchBoard.prototype.resetObjectives = function (objectives) {
+        this.objectives.removeAll();
+        this.objectives.addCards(objectives);
     };
     // TODO keep?
     ResearchBoard.prototype.highlightPlayerTokens = function (playerId) {
@@ -2566,6 +2574,20 @@ var PlayerTable = /** @class */ (function () {
             tilesDiv.querySelectorAll('.slot.selectable').forEach(function (elem) { return elem.classList.remove('selectable'); });
         }
     };
+    PlayerTable.prototype.resetTiles = function (tiles) {
+        this.tiles.removeAll(tiles);
+        this.tiles.addCards(tiles);
+    };
+    PlayerTable.prototype.resetResearch = function (research) {
+        var _this = this;
+        document.getElementById("player-table-".concat(this.playerId, "-research-lines")).innerHTML = "";
+        this.researchLines = [];
+        research.forEach(function (researchTile) { return _this.addResearch(researchTile); });
+    };
+    PlayerTable.prototype.resetObjectives = function (objectives) {
+        this.objectives.removeAll();
+        this.objectives.addCards(objectives);
+    };
     return PlayerTable;
 }());
 var ANIMATION_MS = 500;
@@ -2579,6 +2601,7 @@ function getCostStr(cost) {
 var Humanity = /** @class */ (function () {
     function Humanity() {
         this.playersTables = [];
+        this.vpCounters = [];
         this.scienceCounters = [];
         this.iconsCounters = [];
         this.TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
@@ -2767,9 +2790,15 @@ var Humanity = /** @class */ (function () {
                 case 'pay':
                     this.addActionButton("autoPay_button", _("Pay ${cost}").replace('${cost}', getCostStr(args.pay)), function () { return _this.autoPay(); });
                     break;
+                case 'confirmTurn':
+                    this.addActionButton("confirmTurn_button", _("Confirm turn"), function () { return _this.confirmTurn(); });
+                    break;
                 case 'confirmMoveWorkers':
                     this.addActionButton("confirmMoveWorkers_button", _("Confirm"), function () { return _this.confirmMoveWorkers(); });
                     break;
+            }
+            if (['chooseRadarColor', 'pay', 'chooseWorker', 'upgradeWorker', 'activateTile', 'confirmTurn'].includes(stateName)) {
+                this.addActionButton("restartTurn_button", _("Restart turn"), function () { return _this.restartTurn(); }, null, null, 'red');
             }
         }
     };
@@ -2826,14 +2855,15 @@ var Humanity = /** @class */ (function () {
         var _this = this;
         Object.values(gamedatas.players).forEach(function (player) {
             var playerId = Number(player.id);
-            document.getElementById("player_score_".concat(player.id)).insertAdjacentHTML('beforebegin', "<div class=\"vp icon\"></div>");
-            document.getElementById("icon_point_".concat(player.id)).remove();
-            var html = "<div class=\"counters\">\n            \n                <div id=\"science-counter-wrapper-".concat(player.id, "\" class=\"science-counter\">\n                    <div class=\"science icon\"></div>\n                    <span id=\"science-counter-").concat(player.id, "\">?</span>\n                </div>\n\n            </div>\n            \n            <div class=\"icons counters\">");
+            var html = "<div class=\"counters\">            \n                <div id=\"vp-counter-wrapper-".concat(player.id, "\" class=\"science-counter\">\n                    <div class=\"vp icon\"></div>\n                    <span id=\"vp-counter-").concat(player.id, "\"></span>\n                </div>\n                <div id=\"science-counter-wrapper-").concat(player.id, "\" class=\"science-counter\">\n                    <div class=\"science icon\"></div>\n                    <span id=\"science-counter-").concat(player.id, "\">?</span>\n                </div>\n            </div>\n            \n            <div class=\"icons counters\">");
             html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type, "-counter-wrapper-").concat(player.id, "\">\n                    <div class=\"resource-icon\" data-type=\"").concat(type, "\"></div>\n                    <span id=\"type-").concat(type, "-counter-").concat(player.id, "\"></span>\n                </div>\n            "); }).join('');
             html += "</div>\n            <div class=\"icons counters\">";
             html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type + 10, "-counter-wrapper-").concat(player.id, "\">\n                ").concat(type == 0 ? '' : "<div class=\"resource-icon\" data-type=\"".concat(type, "\"></div>\n                    <span id=\"type-").concat(type + 10, "-counter-").concat(player.id, "\"></span>"), "\n                </div>\n            "); }).join('');
             html += "</div>";
             dojo.place(html, "player_board_".concat(player.id));
+            _this.vpCounters[playerId] = new ebg.counter();
+            _this.vpCounters[playerId].create("vp-counter-".concat(playerId));
+            _this.vpCounters[playerId].setValue(player.vp);
             _this.scienceCounters[playerId] = new ebg.counter();
             _this.scienceCounters[playerId].create("science-counter-".concat(playerId));
             if (gamedatas.isEnd || playerId == _this.getPlayerId()) {
@@ -2856,7 +2886,8 @@ var Humanity = /** @class */ (function () {
                 _this.placeFirstPlayerToken(gamedatas.firstPlayerId);
             }
         });
-        this.setTooltipToClass('science-counter', _('Science'));
+        this.setTooltipToClass('vp-counter', _('Victory points'));
+        this.setTooltipToClass('science-counter', _('Science points'));
     };
     Humanity.prototype.updateIcons = function (playerId, icons) {
         var _this = this;
@@ -2913,7 +2944,10 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.setScore = function (playerId, score) {
         var _a;
         (_a = this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.toValue(score);
-        this.researchBoard.setScore(playerId, score);
+    };
+    Humanity.prototype.setVP = function (playerId, count) {
+        this.researchBoard.setVP(playerId, count);
+        this.vpCounters[playerId].toValue(count);
     };
     Humanity.prototype.setScience = function (playerId, count) {
         this.scienceCounters[playerId].toValue(count);
@@ -3025,6 +3059,15 @@ var Humanity = /** @class */ (function () {
         }
         this.takeAction('endTurn');
     };
+    Humanity.prototype.confirmTurn = function () {
+        if (!this.checkAction('confirmTurn')) {
+            return;
+        }
+        this.takeAction('confirmTurn');
+    };
+    Humanity.prototype.restartTurn = function () {
+        this.takeAction('restartTurn');
+    };
     Humanity.prototype.moveWorker = function (x, y) {
         if (!this.checkAction('moveWorker')) {
             return;
@@ -3071,6 +3114,7 @@ var Humanity = /** @class */ (function () {
             ['deployResearch', undefined],
             ['score', 1],
             ['researchPoints', 1],
+            ['vp', 1],
             ['science', 1],
             ['newFirstPlayer', ANIMATION_MS],
             ['removeTableTile', ANIMATION_MS],
@@ -3080,6 +3124,7 @@ var Humanity = /** @class */ (function () {
             ['newTableResearch', ANIMATION_MS],
             ['reactivateWorkers', ANIMATION_MS],
             ['upgradeWorker', 50],
+            ['restartTurn', 1],
         ];
         notifs.forEach(function (notif) {
             dojo.subscribe(notif[0], _this, function (notifDetails) {
@@ -3146,10 +3191,13 @@ var Humanity = /** @class */ (function () {
         return this.getPlayerTable(playerId).addResearch(research);
     };
     Humanity.prototype.notif_score = function (args) {
-        this.setScore(args.playerId, +args.new);
+        this.setScore(args.playerId, args.new);
     };
     Humanity.prototype.notif_researchPoints = function (args) {
         this.setResearchPoints(args.playerId, args.new);
+    };
+    Humanity.prototype.notif_vp = function (args) {
+        this.setVP(args.playerId, args.new);
     };
     Humanity.prototype.notif_science = function (args) {
         if (!args.private || args.playerId == this.getPlayerId()) {
@@ -3184,6 +3232,36 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.notif_upgradeWorker = function (args) {
         document.getElementById("worker-".concat(args.worker.id, "-force")).dataset.workforce = "".concat(args.worker.workforce);
+    };
+    Humanity.prototype.notif_restartTurn = function (args) {
+        var _this = this;
+        var playerId = args.playerId, undo = args.undo;
+        this.tableCenter.resetTiles(undo.tableTiles);
+        this.tableCenter.newResearch(undo.tableResearch);
+        this.researchBoard.resetObjectives(undo.allObjectives.filter(function (objective) { return objective.location == 'table'; }));
+        this.playersTables.forEach(function (playerTable) { return playerTable.resetObjectives(undo.allObjectives.filter(function (objective) { return objective.location == 'player' && objective.locationArg == playerTable.playerId; })); });
+        var table = this.getPlayerTable(playerId);
+        table.resetTiles(undo.tiles);
+        table.resetResearch(undo.research);
+        undo.workers.forEach(function (worker) { return _this.resetWorker(playerId, worker); });
+        this.setResearchPoints(playerId, undo.researchPoints);
+        this.setVP(playerId, undo.vp);
+        if (args.playerId == this.getPlayerId()) {
+            this.setScience(playerId, undo.science);
+        }
+    };
+    Humanity.prototype.resetWorker = function (playerId, worker) {
+        var workerDiv = document.getElementById("worker-".concat(worker.id));
+        if (worker.location == 'player') {
+            var tilesDiv = document.getElementById("player-table-".concat(playerId, "-tiles"));
+            tilesDiv.querySelector("[data-slot-id=\"".concat(worker.x, "_").concat(worker.y, "\"]")).appendChild(workerDiv);
+        }
+        else if (worker.location == 'table') {
+            var tableWorkers = document.getElementById('table-workers');
+            tableWorkers.querySelector(".slot[data-slot-id=\"".concat(worker.spot, "\"]")).appendChild(workerDiv);
+        }
+        workerDiv.classList.toggle('disabled-worker', !worker.remainingWorkforce);
+        document.getElementById("worker-".concat(worker.id, "-force")).dataset.workforce = "".concat(worker.workforce);
     };
     Humanity.prototype.setWorkerDisabled = function (worker, disabled) {
         document.getElementById("worker-".concat(worker.id)).classList.toggle('disabled-worker', disabled);

@@ -93,15 +93,15 @@ trait UtilTrait {
         return array_map(fn($dbResult) => new HumanityPlayer($dbResult), array_values($dbResults))[0];
     }
 
-    function incPlayerScore(int $playerId, int $amount, $message = '', $args = []) {
+    function incPlayerVP(int $playerId, int $amount, $message = '', $args = []) {
         if ($amount != 0) {
-            $this->DbQuery("UPDATE player SET `player_score` = `player_score` + $amount WHERE player_id = $playerId");
+            $this->DbQuery("UPDATE player SET `player_vp` = `player_vp` + $amount WHERE player_id = $playerId");
         }
             
-        $this->notifyAllPlayers('score', $message, [
+        $this->notifyAllPlayers('vp', $message, [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'new' => $this->getPlayer($playerId)->score,
+            'new' => $this->getPlayer($playerId)->vp,
             'inc' => $amount,
             'absInc' => abs($amount),
         ] + $args);

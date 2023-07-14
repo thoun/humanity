@@ -100,7 +100,7 @@ trait ActionTrait {
         ]);
 
         if ($tile->type == 9 && $tile->r == 3) {
-            $this->DbQuery("DELETE from tile WHERE `card_id` = $tile->id");
+            $this->tiles->moveCard($tile->id, 'void');
 
             $this->incPlayerResearchPoints($playerId, 3);
 
@@ -221,6 +221,12 @@ trait ActionTrait {
         $this->applyEndOfActivation($playerId, $worker);
     }
 
+    public function confirmTurn() {
+        self::checkAction('confirmTurn');
+
+        $this->gamestate->nextState('endTurn');
+    }
+
     private function applyEndOfActivation(int $playerId, Worker $worker) {
         if ($worker->remainingWorkforce > 0) {
             $this->DbQuery("UPDATE worker SET `remaining_workforce` = 0 WHERE `id` = $worker->id");
@@ -304,5 +310,44 @@ trait ActionTrait {
         }
 
         $this->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    }
+
+    public function restartTurn() {
+        $playerId = intval($this->getActivePlayerId());
+        $undo = $this->getGlobalVariable(UNDO);
+
+        foreach ($undo->allObjectives as $objective) {
+            $this->DbQuery("UPDATE `objective` SET `card_location` = '$objective->location', `card_location_arg` = $objective->locationArg WHERE `card_id` = $objective->id");
+        }
+
+        foreach ($undo->tableTiles as $tile) {
+            $this->DbQuery("UPDATE `tile` SET `card_location` = '$tile->location', `card_location_arg` = $tile->locationArg, `x` = NULL, `y` = NULL, `r` = 0 WHERE `card_id` = $tile->id");
+        }
+        foreach ($undo->tableResearch as $tile) {
+            $this->DbQuery("UPDATE `research` SET `card_location` = '$tile->location', `card_location_arg` = $tile->locationArg, `line` = NULL WHERE `card_id` = $tile->id");
+        }
+       
+        $this->DbQuery("UPDATE `tile` SET `card_location` = 'radar' WHERE `card_type` = 8 && `card_location` = 'player' AND `card_location_arg` = $playerId");
+        foreach ($undo->tiles as $tile) {            
+            $this->DbQuery("UPDATE `tile` SET `card_location` = '$tile->location', `card_location_arg` = $tile->locationArg, `x` = $tile->x, `y` = $tile->y, `r` = $tile->r WHERE `card_id` = $tile->id");
+        }
+        foreach ($undo->research as $tile) {
+            $this->DbQuery("UPDATE `research` SET `card_location` = '$tile->location', `card_location_arg` = $tile->locationArg, `line` = $tile->line WHERE `card_id` = $tile->id");
+        }
+
+        foreach ($undo->workers as $worker) {
+            $this->DbQuery("UPDATE worker SET `location` = '$worker->location', `workforce` = $worker->workforce, `remaining_workforce` = $worker->remainingWorkforce, `spot` = ".($worker->spot === null ? 'NULL' : $worker->spot).", `x` = ".($worker->x === null ? 'NULL' : $worker->x).", `y` = ".($worker->y === null ? 'NULL' : $worker->y)." WHERE `id` = $worker->id");
+        }
+
+        $this->DbQuery("UPDATE player SET `player_vp` = $undo->vp, `player_research_points` = $undo->researchPoints, `player_science` = $undo->science WHERE `player_id` = $playerId");
+
+        self::notifyAllPlayers('restartTurn', clienttranslate('${player_name} restarts its turn'), [
+            'playerId' => $playerId,
+            'player_name' => $this->getPlayerName($playerId),
+            'undo' => $undo,
+            'icons' => $this->getPlayerIcons($playerId),
+        ]);
+
+        $this->gamestate->jumpToState(ST_PLAYER_CHOOSE_ACTION);
     }
 }

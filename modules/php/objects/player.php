@@ -7,6 +7,7 @@ class HumanityPlayer {
     public int $no;
     public int $score;
     public int $researchPoints;
+    public int $vp;
     public int $science;
 
     public function __construct($dbPlayer) {
@@ -15,6 +16,7 @@ class HumanityPlayer {
         $this->color = $dbPlayer['player_color'];
         $this->no = intval($dbPlayer['player_no']);
         $this->score = intval($dbPlayer['player_score']);
+        $this->vp = intval($dbPlayer['player_vp']);
         $this->researchPoints = intval($dbPlayer['player_research_points']);
         $this->science = intval($dbPlayer['player_science']);
     }

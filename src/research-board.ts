@@ -86,7 +86,7 @@ class ResearchBoard {
         });
     }
     
-    setScore(playerId: number, points: number) {
+    setVP(playerId: number, points: number) {
         this.vp.set(playerId, points);
         this.moveVP();
     }
@@ -150,6 +150,11 @@ class ResearchBoard {
     
     public getResearchPoints(playerId: number): number {
         return this.sciencePoints.get(playerId);
+    }
+    
+    public resetObjectives(objectives: Objective[]) {
+        this.objectives.removeAll();
+        this.objectives.addCards(objectives);
     }
 
     // TODO keep?

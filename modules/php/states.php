@@ -11,6 +11,22 @@ trait StateTrait {
         The action method of state X is called everytime the current game state is set to X.
     */
 
+    function stStartTurn() {
+        $playerId = intval($this->getActivePlayerId());
+
+        $this->setGlobalVariable(UNDO, new Undo(
+            $this->getTilesByLocation('player', $playerId),
+            $this->getResearchsByLocation('player', $playerId),
+            $this->getPlayerWorkers($playerId),
+            $this->getPlayer($playerId),
+            $this->getTilesByLocation('table'),
+            $this->getResearchsByLocation('table'),
+            $this->getObjectivesByLocation(),
+        ));
+        
+        $this->gamestate->nextState('next');
+    }
+
     function stUpgradeWorkers() {
         $args = $this->argUpgradeWorker();
 
@@ -234,22 +250,27 @@ trait StateTrait {
             $player = $this->getPlayer($playerId);
 
             // score science points
-            $this->incPlayerScore($playerId, $player->science, clienttranslate('${player_name} gains ${inc} points from with ${inc} science points'));
+            $this->incPlayerVP($playerId, $player->science, clienttranslate('${player_name} gains ${inc} points from with ${inc} science points'));
             
             // socre remaining sets of 5 resources
             $icons = $this->getPlayerIcons($playerId);
             $iconsSum = array_reduce($icons, fn($a, $b) => $a + $b);
             $iconPoints = floor($iconsSum / 5);
-            $this->incPlayerScore($playerId, $iconPoints, clienttranslate('${player_name} gains ${inc} points from with ${resources} remaining resources'), [
+            $this->incPlayerVP($playerId, $iconPoints, clienttranslate('${player_name} gains ${inc} points from with ${resources} remaining resources'), [
                 'resources' => $iconsSum,
             ]);
 
-            // tiebreak
+            // final score & tiebreak
             $scoreAux1 = $icons[ELECTRICITY];
             $scoreAux2 = $icons[11] + $icons[12] + $icons[13];
             $scoreAux3 = $icons[1] + $icons[2] + $icons[3];
             $scoreAux = 10000 * $scoreAux1 + 100 * $scoreAux2 + $scoreAux3;
-            $this->DbQuery("UPDATE player SET player_score_aux = $scoreAux WHERE player_id = $playerId");
+            $this->DbQuery("UPDATE player SET player_score = player_vp + player_science, player_score_aux = $scoreAux WHERE player_id = $playerId");
+
+            self::notifyAllPlayers('score', '', [
+                'playerId' => $playerId,
+                'new' => $this->getPlayer($playerId)->score,
+            ]);
         }
 
         $this->gamestate->nextState('endGame');
