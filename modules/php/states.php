@@ -228,12 +228,27 @@ trait StateTrait {
     function stEndScore() {
         $playersIds = $this->getPlayersIds();
 
-        /*foreach($playersIds as $playerId) {
+        foreach($playersIds as $playerId) {
             $player = $this->getPlayer($playerId);
-            //$scoreAux = $player->recruit + $player->bracelet;
-            //$this->DbQuery("UPDATE player SET player_score_aux = player_recruit + player_bracelet WHERE player_id = $playerId");
+
+            // score science points
+            $this->incPlayerScore($playerId, $player->science, clienttranslate('${player_name} gains ${inc} points from with ${inc} science points'));
+            
+            // socre remaining sets of 5 resources
+            $icons = $this->getPlayerIcons($playerId);
+            $iconsSum = array_reduce($icons, fn($a, $b) => $a + $b);
+            $iconPoints = floor($iconsSum / 5);
+            $this->incPlayerScore($playerId, $iconPoints, clienttranslate('${player_name} gains ${inc} points from with ${resources} remaining resources'), [
+                'resources' => $iconsSum,
+            ]);
+
+            // tiebreak
+            $scoreAux1 = $icons[ELECTRICITY];
+            $scoreAux2 = $icons[11] + $icons[12] + $icons[13];
+            $scoreAux3 = $icons[1] + $icons[2] + $icons[3];
+            $scoreAux = 10000 * $scoreAux1 + 100 * $scoreAux2 + $scoreAux3;
+            $this->DbQuery("UPDATE player SET player_score_aux = $scoreAux WHERE player_id = $playerId");
         }
-        //$this->DbQuery("UPDATE player SET player_score_aux = player_recruit + player_bracelet");*/
 
         $this->gamestate->nextState('endGame');
     }

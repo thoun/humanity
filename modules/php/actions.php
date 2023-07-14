@@ -90,6 +90,7 @@ trait ActionTrait {
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
             'tile' => $tile,
+            'icons' => $this->getPlayerIcons($playerId),
         ]);
 
         if ($tile->type == 9 && $tile->r == 3) {
@@ -170,7 +171,6 @@ trait ActionTrait {
             throw new BgaUserException("Invalid coordinate");
         }
         $movedWorkers = $this->getGlobalVariable(MOVED_WORKERS);
-        $this->debug($worker);
         $movedWorker = $this->array_find($movedWorkers, fn($w) => ((object)$w)->id == ((object)$worker)->id);
         $movedWorker->x = $x;
         $movedWorker->y = $y;

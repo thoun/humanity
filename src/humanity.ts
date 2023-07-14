@@ -11,6 +11,8 @@ const ACTION_TIMER_DURATION = 5;
 const LOCAL_STORAGE_ZOOM_KEY = 'Humanity-zoom';
 const LOCAL_STORAGE_JUMP_TO_FOLDED_KEY = 'Humanity-jump-to-folded';
 
+const ICONS_COUNTERS_TYPES = [1, 2, 3, 0];
+
 class Humanity implements HumanityGame {
     public tilesManager: TilesManager;
     public researchManager: DestinationsManager;
@@ -23,8 +25,7 @@ class Humanity implements HumanityGame {
     private researchBoard: ResearchBoard;
     private playersTables: PlayerTable[] = [];
     private scienceCounters: Counter[] = [];
-    private recruitCounters: Counter[] = [];
-    private braceletCounters: Counter[] = [];
+    private iconsCounters: Counter[][] = [];
     
     private TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
 
@@ -275,7 +276,25 @@ class Humanity implements HumanityGame {
                     <span id="science-counter-${player.id}">?</span>
                 </div>
 
-            </div>`;
+            </div>
+            
+            <div class="icons counters">`;
+            
+            html += ICONS_COUNTERS_TYPES.map(type => `
+                <div id="type-${type}-counter-wrapper-${player.id}">
+                    <div class="resource-icon" data-type="${type}"></div>
+                    <span id="type-${type}-counter-${player.id}"></span>
+                </div>
+            `).join('');
+            html += `</div>
+            <div class="icons counters">`;            
+            html += ICONS_COUNTERS_TYPES.map(type => `
+                <div id="type-${type + 10}-counter-wrapper-${player.id}">
+                ${type == 0 ? '' : `<div class="resource-icon" data-type="${type}"></div>
+                    <span id="type-${type + 10}-counter-${player.id}"></span>`}
+                </div>
+            `).join('');
+            html += `</div>`;
 
             dojo.place(html, `player_board_${player.id}`);
 
@@ -284,6 +303,19 @@ class Humanity implements HumanityGame {
             if (gamedatas.isEnd || playerId == this.getPlayerId()) {
                 this.scienceCounters[playerId].setValue(player.science);
             } 
+
+            this.iconsCounters[playerId] = [];
+            ICONS_COUNTERS_TYPES.forEach(type => {
+                this.iconsCounters[playerId][type] = new ebg.counter();
+                this.scienceCounters[playerId].create(`type-${type}-counter-${playerId}`);
+                this.scienceCounters[playerId].setValue(player.icons[type]);
+
+                if (type != 0) {
+                    this.iconsCounters[playerId][type + 10] = new ebg.counter();
+                    this.scienceCounters[playerId].create(`type-${type + 10}-counter-${playerId}`);
+                    this.scienceCounters[playerId].setValue(player.icons[type + 10]);
+                }
+            });
 
             // first player token
             dojo.place(`<div id="player_board_${player.id}_firstPlayerWrapper" class="firstPlayerWrapper"></div>`, `player_board_${player.id}`);
@@ -294,6 +326,16 @@ class Humanity implements HumanityGame {
         });
 
         this.setTooltipToClass('science-counter', _('Science'));
+    }
+
+    private updateIcons(playerId: number, icons: PlayerIcons) {
+        ICONS_COUNTERS_TYPES.forEach(type => {    
+            this.iconsCounters[playerId][type].toValue(icons[type]);
+    
+            if (type != 0) {
+                this.iconsCounters[playerId][type + 10].toValue(icons[type + 10]);
+            }
+        });
     }
 
     private createPlayerTables(gamedatas: HumanityGamedatas) {
@@ -349,30 +391,6 @@ class Humanity implements HumanityGame {
         }
     }
 
-    private updateGains(playerId: number, gains: { [type: number]: number }) {
-        Object.entries(gains).forEach(entry => {
-            const type = Number(entry[0]);
-            const amount = entry[1];
-
-            if (amount != 0) {
-                switch (type) {
-                    case VP:
-                        this.setScore(playerId, (this as any).scoreCtrl[playerId].getValue() + amount);
-                        break;
-                    case BRACELET:
-                        this.setBracelets(playerId, this.braceletCounters[playerId].getValue() + amount);
-                        break;
-                    case RECRUIT:
-                        this.setRecruits(playerId, this.recruitCounters[playerId].getValue() + amount);
-                        break;
-                    case RESEARCH:
-                        this.setResearchSpot(playerId, this.tableCenter.getResearch(playerId) + amount);
-                        break;
-                }
-            }
-        });
-    }
-
     private setScore(playerId: number, score: number) {
         (this as any).scoreCtrl[playerId]?.toValue(score);
         this.researchBoard.setScore(playerId, score);
@@ -384,16 +402,6 @@ class Humanity implements HumanityGame {
 
     private setResearchSpot(playerId: number, count: number) {
         this.researchBoard.setResearchSpot(playerId, count);
-    }
-
-    private setRecruits(playerId: number, count: number) {
-        this.recruitCounters[playerId].toValue(count);
-        this.getPlayerTable(playerId).updateCounter('recruits', count);
-    }
-
-    private setBracelets(playerId: number, count: number) {
-        this.braceletCounters[playerId].toValue(count);
-        this.getPlayerTable(playerId).updateCounter('bracelets', count);
     }
 
     private getColorAddHtml() {
@@ -598,6 +606,10 @@ class Humanity implements HumanityGame {
                 log(`notif_${notif[0]}`, notifDetails.args);
 
                 const promise = this[`notif_${notif[0]}`](notifDetails.args);
+
+                if (notifDetails.args.playerId && notifDetails.args.icons) {
+                    this.updateIcons(notifDetails.args.playerId, notifDetails.args.icons);
+                }
 
                 // tell the UI notification ends, if the function returned a promise
                 promise?.then(() => (this as any).notifqueue.onSynchronousNotificationEnd());

@@ -117,7 +117,11 @@ class PlayerTable {
     }
     
     public addTile(tile: Tile): Promise<any> {
-        return this.tiles.addCard(tile);
+        this.makeSlotForCoordinates(tile.x, tile.y);
+        const promise = this.tiles.addCard(tile);
+        this.game.tilesManager.getCardElement(tile).dataset.r = `${tile.r}`;
+
+        return promise;
     }
     
     public removeTile(tile: Tile) {
@@ -221,23 +225,27 @@ class PlayerTable {
             })
         });
     }
+
+    private makeSlotForCoordinates(x: number, y: number) {
+        while (x < this.tileMinX) {
+            this.addLeftCol();
+        }
+        while (x > this.tileMaxX) {
+            this.addRightCol();
+        }
+        while (y < this.tileMinY) {
+            this.addTopRow();
+        }
+        while (y > this.tileMaxY) {
+            this.addBottomRow();
+        }
+    }
     
     public setSelectableTileSpots(possibleCoordinates: number[][] | null) {
         const tilesDiv = document.getElementById(`player-table-${this.playerId}-tiles`);
         if (possibleCoordinates) {
             possibleCoordinates.forEach(coordinate => {
-                while (coordinate[0] < this.tileMinX) {
-                    this.addLeftCol();
-                }
-                while (coordinate[0] > this.tileMaxX) {
-                    this.addRightCol();
-                }
-                while (coordinate[1] < this.tileMinY) {
-                    this.addTopRow();
-                }
-                while (coordinate[1] > this.tileMaxY) {
-                    this.addBottomRow();
-                }
+                this.makeSlotForCoordinates(coordinate[0], coordinate[1]);
                 tilesDiv.querySelector(`[data-slot-id="${coordinate[0]}_${coordinate[1]}"]`)?.classList.add('selectable');
             });
         } else {

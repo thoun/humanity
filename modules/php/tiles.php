@@ -58,7 +58,7 @@ trait TileTrait {
                 $position = $this->STARTING_TILE_POSITIONS[$subType];
                 $x = $position[0];
                 $y = $position[1];
-                $this->DbQuery("UPDATE `tile` SET `card_location` = 'player', `card_location_arg` = $playerId, `x` = $x, `y` = $y WHERE card_id = $cardId");
+                $this->DbQuery("UPDATE `tile` SET `card_location` = 'player', `card_location_arg` = $playerId, `x` = $x, `y` = $y, `r` = 1 WHERE card_id = $cardId");
             }
             
             $this->tiles->createCards([[ 'type' => 9, 'type_arg' => 0, 'nbr' => 3 ]], 'temp');
@@ -97,16 +97,59 @@ trait TileTrait {
         $this->moveWorkerToTable($playerId, $worker, $currentAction->spot);
         $tile = $this->getTileById($currentAction->tile);
 
-        $this->DbQuery("UPDATE tile SET card_location = 'player', card_location_arg = $playerId, `x` = $worker->x, `y` = $worker->y WHERE `card_id` = $tile->id");
+        $r = $tile->production != null ? 1 : 0;
+        $this->DbQuery("UPDATE tile SET card_location = 'player', card_location_arg = $playerId, `x` = $worker->x, `y` = $worker->y, `r` = $r WHERE `card_id` = $tile->id");
         $tile->location = 'player';
         $tile->locationArg = $playerId;
         $tile->x = $worker->x;
         $tile->y = $worker->y;
+        $tile->r = $r;
 
         self::notifyAllPlayers('deployTile', '', [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
             'tile' => $tile,
         ]);
+
+        $points = $tile->points;
+        /* TODO
+5 Vérifiez si votre nouveau module vient compléter un carré de
+quatre modules. Si c’est le cas, vous gagnez immédiatement
+un pion point de victoire que vous placez à l’intersection des
+quatre modules et vous avancez d’une case sur la piste de
+score. Vérifiez également si le carré que vous venez de former
+vous permet d’améliorer un astronaute. Cette étape est
+détaillée p. 11.
+Dépensez des ressources*/
+        if ($points > 0) {
+            $this->incPlayerScore($playerId, $tile->points, clienttranslate('${player_name} gains ${inc} points with placed tile'));
+        }
+        $science = $tile->science;
+        // TODO adjacentScience
+        if ($science > 0) {
+            $this->incPlayerScience($playerId, $tile->points, clienttranslate('${player_name} gains ${inc} science points with placed tile'));
+        }
+    }
+    
+    function getPlayerIcons(int $playerId) {
+        $allTiles = $this->getTilesByLocation('player', $playerId);
+        $tiles = array_values(array_filter($allTiles, fn($tile) => $tile->production != null));
+        //$this->debug($tiles);
+
+        $icons = [ELECTRICITY => 0, 1 => 0, 2 => 0, 3 => 0, 11 => 0, 12 => 0, 13 => 0];
+
+        foreach ($tiles as $tile) {
+            $production = $tile->production[$tile->r];
+
+            foreach ($production as $type => $amount) {
+                if ($type == ELECTRICITY) {
+                    //$this->debug($amount);
+                    self::notifyAllPlayers('log', "$playerId, tileId $tile->id, r $tile->r, type $type, amount $amount production ".json_encode($production), []);
+                }
+                $icons[$type] += $amount;
+            }
+        }
+
+        return $icons;
     }
 }

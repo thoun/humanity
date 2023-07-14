@@ -42,7 +42,7 @@ html, .mode_3d #game_play_area_background {
   padding-top: 32px;
 }
 
-.icon {
+/*.icon {
   display: inline-block;
   width: 32px;
   height: 32px;
@@ -68,6 +68,25 @@ html, .mode_3d #game_play_area_background {
   &.take-card, &[data-type="5"] {
     background-position-x: #{4 * 100% / 4};
   }
+}*/
+
+
+.resource-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-image: url('img/resource-icons.png');
+  background-size: 200% auto;
+  vertical-align: middle;
+  
+  &[data-type="1"] { background-position: 0% 0%; }  
+  &[data-type="2"] { background-position: 0% 33.33%; }  
+  &[data-type="3"] { background-position: 0% 66.66%; }  
+  &[data-type="0"] { background-position: 0% 100%; } 
+
+  &[data-type="11"] { background-position: 100% 0%; } 
+  &[data-type="12"] { background-position: 100% 33.33%; }  
+  &[data-type="13"] { background-position: 100% 66.66%; } 
 }
 
 .action-button, .log {

@@ -56,7 +56,7 @@ trait ObjectiveTrait {
 
         $adjacentTiles = $this->getAdjacentTiles($tiles, $fromTile, $diagonal);
         foreach ($adjacentTiles as $adjacentTile) {
-            if (!$this->some($alreadyCounted, fn($countedTile) => $countedTile->id == $adjacentTile->id)) {
+            if (!$this->array_some($alreadyCounted, fn($countedTile) => $countedTile->id == $adjacentTile->id)) {
                 $fromAdjacentTile = $this->getAdjacentTilesCount(
                     $tiles, 
                     $adjacentTile, 

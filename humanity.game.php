@@ -185,6 +185,8 @@ class Humanity extends Table {
             $player['tiles'] = $this->getTilesByLocation('player', $playerId);
             $player['research'] = $this->getResearchsByLocation('player', $playerId);
             $player['objectives'] = $this->getObjectivesByLocation('player', $playerId);
+
+            $player['icons'] = $this->getPlayerIcons($playerId);
         }
 
         $result['tableTiles'] = $this->getTilesByLocation('table');

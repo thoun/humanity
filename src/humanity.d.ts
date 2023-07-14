@@ -15,7 +15,7 @@ interface Tile {
     cost: { [type: number]:number };
     workforce?: number;
     production: { [type: number]:number }[];
-    adjacentPoints: number;
+    adjacentScience: number;
     points: number;
     matchType: number;
 }
@@ -60,6 +60,8 @@ interface Worker {
     spot: number; // table spot
 }
 
+type PlayerIcons = { [type: number]: number };
+
 interface HumanityPlayer extends Player {
     playerNo: number;
     
@@ -69,6 +71,8 @@ interface HumanityPlayer extends Player {
     researchSpot: number;
     science?: number;
     objectives: Objective[];
+
+    icons: PlayerIcons;
 }
 
 interface HumanityGamedatas {

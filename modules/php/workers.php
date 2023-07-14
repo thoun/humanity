@@ -108,10 +108,6 @@ trait WorkerTrait {
                     $x = $tile->x + $dx;
                     $y = $tile->y + $dy;
 
-                    if ($dy > 1) {
-                        $this->debug([$dx, $dy, $x, $y, $tile->x, $tile->y]);
-                    }
-
                     if (
                         !$this->array_some($tilesAndObstacles, fn($t) => $t->x == $x && $t->y == $y) // no tile or obstacle in this place
                         && !$this->array_some($workers, fn($w) => $w->x == $x && $w->y == $y) // no worker in this place

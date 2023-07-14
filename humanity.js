@@ -2424,7 +2424,10 @@ var PlayerTable = /** @class */ (function () {
         tileDiv.dataset.r = "".concat(tile.r);
     };
     PlayerTable.prototype.addTile = function (tile) {
-        return this.tiles.addCard(tile);
+        this.makeSlotForCoordinates(tile.x, tile.y);
+        var promise = this.tiles.addCard(tile);
+        this.game.tilesManager.getCardElement(tile).dataset.r = "".concat(tile.r);
+        return promise;
     };
     PlayerTable.prototype.removeTile = function (tile) {
         this.tiles.removeCard(tile);
@@ -2514,24 +2517,27 @@ var PlayerTable = /** @class */ (function () {
             });
         });
     };
+    PlayerTable.prototype.makeSlotForCoordinates = function (x, y) {
+        while (x < this.tileMinX) {
+            this.addLeftCol();
+        }
+        while (x > this.tileMaxX) {
+            this.addRightCol();
+        }
+        while (y < this.tileMinY) {
+            this.addTopRow();
+        }
+        while (y > this.tileMaxY) {
+            this.addBottomRow();
+        }
+    };
     PlayerTable.prototype.setSelectableTileSpots = function (possibleCoordinates) {
         var _this = this;
         var tilesDiv = document.getElementById("player-table-".concat(this.playerId, "-tiles"));
         if (possibleCoordinates) {
             possibleCoordinates.forEach(function (coordinate) {
                 var _a;
-                while (coordinate[0] < _this.tileMinX) {
-                    _this.addLeftCol();
-                }
-                while (coordinate[0] > _this.tileMaxX) {
-                    _this.addRightCol();
-                }
-                while (coordinate[1] < _this.tileMinY) {
-                    _this.addTopRow();
-                }
-                while (coordinate[1] > _this.tileMaxY) {
-                    _this.addBottomRow();
-                }
+                _this.makeSlotForCoordinates(coordinate[0], coordinate[1]);
                 (_a = tilesDiv.querySelector("[data-slot-id=\"".concat(coordinate[0], "_").concat(coordinate[1], "\"]"))) === null || _a === void 0 ? void 0 : _a.classList.add('selectable');
             });
         }
@@ -2545,12 +2551,12 @@ var ANIMATION_MS = 500;
 var ACTION_TIMER_DURATION = 5;
 var LOCAL_STORAGE_ZOOM_KEY = 'Humanity-zoom';
 var LOCAL_STORAGE_JUMP_TO_FOLDED_KEY = 'Humanity-jump-to-folded';
+var ICONS_COUNTERS_TYPES = [1, 2, 3, 0];
 var Humanity = /** @class */ (function () {
     function Humanity() {
         this.playersTables = [];
         this.scienceCounters = [];
-        this.recruitCounters = [];
-        this.braceletCounters = [];
+        this.iconsCounters = [];
         this.TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
     }
     /*
@@ -2759,13 +2765,28 @@ var Humanity = /** @class */ (function () {
             var playerId = Number(player.id);
             document.getElementById("player_score_".concat(player.id)).insertAdjacentHTML('beforebegin', "<div class=\"vp icon\"></div>");
             document.getElementById("icon_point_".concat(player.id)).remove();
-            var html = "<div class=\"counters\">\n            \n                <div id=\"science-counter-wrapper-".concat(player.id, "\" class=\"science-counter\">\n                    <div class=\"science icon\"></div>\n                    <span id=\"science-counter-").concat(player.id, "\">?</span>\n                </div>\n\n            </div>");
+            var html = "<div class=\"counters\">\n            \n                <div id=\"science-counter-wrapper-".concat(player.id, "\" class=\"science-counter\">\n                    <div class=\"science icon\"></div>\n                    <span id=\"science-counter-").concat(player.id, "\">?</span>\n                </div>\n\n            </div>\n            \n            <div class=\"icons counters\">");
+            html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type, "-counter-wrapper-").concat(player.id, "\">\n                    <div class=\"resource-icon\" data-type=\"").concat(type, "\"></div>\n                    <span id=\"type-").concat(type, "-counter-").concat(player.id, "\"></span>\n                </div>\n            "); }).join('');
+            html += "</div>\n            <div class=\"icons counters\">";
+            html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type + 10, "-counter-wrapper-").concat(player.id, "\">\n                ").concat(type == 0 ? '' : "<div class=\"resource-icon\" data-type=\"".concat(type, "\"></div>\n                    <span id=\"type-").concat(type + 10, "-counter-").concat(player.id, "\"></span>"), "\n                </div>\n            "); }).join('');
+            html += "</div>";
             dojo.place(html, "player_board_".concat(player.id));
             _this.scienceCounters[playerId] = new ebg.counter();
             _this.scienceCounters[playerId].create("science-counter-".concat(playerId));
             if (gamedatas.isEnd || playerId == _this.getPlayerId()) {
                 _this.scienceCounters[playerId].setValue(player.science);
             }
+            _this.iconsCounters[playerId] = [];
+            ICONS_COUNTERS_TYPES.forEach(function (type) {
+                _this.iconsCounters[playerId][type] = new ebg.counter();
+                _this.scienceCounters[playerId].create("type-".concat(type, "-counter-").concat(playerId));
+                _this.scienceCounters[playerId].setValue(player.icons[type]);
+                if (type != 0) {
+                    _this.iconsCounters[playerId][type + 10] = new ebg.counter();
+                    _this.scienceCounters[playerId].create("type-".concat(type + 10, "-counter-").concat(playerId));
+                    _this.scienceCounters[playerId].setValue(player.icons[type + 10]);
+                }
+            });
             // first player token
             dojo.place("<div id=\"player_board_".concat(player.id, "_firstPlayerWrapper\" class=\"firstPlayerWrapper\"></div>"), "player_board_".concat(player.id));
             if (gamedatas.firstPlayerId === playerId) {
@@ -2773,6 +2794,15 @@ var Humanity = /** @class */ (function () {
             }
         });
         this.setTooltipToClass('science-counter', _('Science'));
+    };
+    Humanity.prototype.updateIcons = function (playerId, icons) {
+        var _this = this;
+        ICONS_COUNTERS_TYPES.forEach(function (type) {
+            _this.iconsCounters[playerId][type].toValue(icons[type]);
+            if (type != 0) {
+                _this.iconsCounters[playerId][type + 10].toValue(icons[type + 10]);
+            }
+        });
     };
     Humanity.prototype.createPlayerTables = function (gamedatas) {
         var _this = this;
@@ -2817,29 +2847,6 @@ var Humanity = /** @class */ (function () {
             return Promise.resolve(true);
         }
     };
-    Humanity.prototype.updateGains = function (playerId, gains) {
-        var _this = this;
-        Object.entries(gains).forEach(function (entry) {
-            var type = Number(entry[0]);
-            var amount = entry[1];
-            if (amount != 0) {
-                switch (type) {
-                    case VP:
-                        _this.setScore(playerId, _this.scoreCtrl[playerId].getValue() + amount);
-                        break;
-                    case BRACELET:
-                        _this.setBracelets(playerId, _this.braceletCounters[playerId].getValue() + amount);
-                        break;
-                    case RECRUIT:
-                        _this.setRecruits(playerId, _this.recruitCounters[playerId].getValue() + amount);
-                        break;
-                    case RESEARCH:
-                        _this.setResearchSpot(playerId, _this.tableCenter.getResearch(playerId) + amount);
-                        break;
-                }
-            }
-        });
-    };
     Humanity.prototype.setScore = function (playerId, score) {
         var _a;
         (_a = this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.toValue(score);
@@ -2850,14 +2857,6 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.setResearchSpot = function (playerId, count) {
         this.researchBoard.setResearchSpot(playerId, count);
-    };
-    Humanity.prototype.setRecruits = function (playerId, count) {
-        this.recruitCounters[playerId].toValue(count);
-        this.getPlayerTable(playerId).updateCounter('recruits', count);
-    };
-    Humanity.prototype.setBracelets = function (playerId, count) {
-        this.braceletCounters[playerId].toValue(count);
-        this.getPlayerTable(playerId).updateCounter('bracelets', count);
     };
     Humanity.prototype.getColorAddHtml = function () {
         var _this = this;
@@ -3001,6 +3000,9 @@ var Humanity = /** @class */ (function () {
             dojo.subscribe(notif[0], _this, function (notifDetails) {
                 log("notif_".concat(notif[0]), notifDetails.args);
                 var promise = _this["notif_".concat(notif[0])](notifDetails.args);
+                if (notifDetails.args.playerId && notifDetails.args.icons) {
+                    _this.updateIcons(notifDetails.args.playerId, notifDetails.args.icons);
+                }
                 // tell the UI notification ends, if the function returned a promise
                 promise === null || promise === void 0 ? void 0 : promise.then(function () { return _this.notifqueue.onSynchronousNotificationEnd(); });
             });

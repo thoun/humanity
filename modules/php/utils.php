@@ -143,5 +143,4 @@ trait UtilTrait {
     function getYear() {
         return $this->getGlobalVariable(YEAR) ?? 1;
     }
-
 }
