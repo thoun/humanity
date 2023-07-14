@@ -32,6 +32,7 @@ class Humanity implements HumanityGame {
     private vpCounters: Counter[] = [];
     private scienceCounters: Counter[] = [];
     private iconsCounters: Counter[][] = [];
+    private yearCounter: Counter;
     
     private TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
 
@@ -75,7 +76,12 @@ class Humanity implements HumanityGame {
         this.tableCenter = new TableCenter(this, gamedatas);
         this.researchBoard = new ResearchBoard(this, gamedatas);
         this.createPlayerPanels(gamedatas);
-        this.createPlayerTables(gamedatas);
+        this.createPlayerTables(gamedatas);      
+
+        document.getElementById(`year`).insertAdjacentText('beforebegin', _('Year') + ' ');
+        this.yearCounter = new ebg.counter();
+        this.yearCounter.create(`year`);
+        this.yearCounter.setValue(gamedatas.year);
         
         this.zoomManager = new ZoomManager({
             element: document.getElementById('table'),
@@ -701,6 +707,7 @@ class Humanity implements HumanityGame {
             ['newTableResearch', ANIMATION_MS],
             ['reactivateWorkers', ANIMATION_MS],
             ['upgradeWorker', 50],
+            ['year', ANIMATION_MS],
             ['restartTurn', 1],
         ];
     
@@ -837,6 +844,10 @@ class Humanity implements HumanityGame {
 
     notif_upgradeWorker(args: NotifWorkerArgs) {
         document.getElementById(`worker-${args.worker.id}-force`).dataset.workforce = `${args.worker.workforce}`;
+    }
+
+    notif_year(args: NotifYearArgs) {
+        this.yearCounter.toValue(+args.year);
     }
 
     notif_restartTurn(args: NotifRestartTurnArgs) {

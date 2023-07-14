@@ -1373,8 +1373,13 @@ html, .mode_3d #game_play_area_background {
   background-position: top;
 }
 
-#bga-zoom-wrapper {
-  padding-top: 32px;
+.year {
+  background: white;
+  margin: 8px;
+  padding: 5px;
+  font-size: 16pt;
+  font-family: "conthrax-sb";
+  text-align: center;
 }
 
 .icon {

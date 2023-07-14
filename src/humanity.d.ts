@@ -222,6 +222,11 @@ interface NotifReactivateWorkersArgs {
     playerId: number | null;
 }
 
+// year
+interface NotifYearArgs {
+    year: number | string;
+}
+
 interface Undo {
     tiles: Tile[];
     research: Research[];

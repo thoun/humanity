@@ -11,36 +11,11 @@ trait DebugUtilTrait {
             return;
         } 
 
-        //$this->debugSetPlayerScore(2343492, 10);
-        //$this->debugSetScore(39);
-        //$this->debugSetResearch(8);
-
-        //$this->debugAddDestinations(2343492, 'A', 15);
-        //$this->debugAddDestinations(2343492, 'B', 10);
-
-        //$this->tiles->pickCardsForLocation(13, 'deck', 'void');
-        
-        //$this->debugLastTurn();
+        $this->debugSetR();
     }
 
-    function debugSetScore($score) {
-		$this->DbQuery("UPDATE player SET `player_score` = $score");
-    }
-    
-    function debugSetPlayerScore($playerId, $score) {
-		$this->DbQuery("UPDATE player SET `player_score` = $score WHERE player_id = $playerId");
-    }
-
-    function debugSetResearch($score) {
-		$this->DbQuery("UPDATE player SET `player_research` = $score");
-    }
-    
-    function debugSetPlayerResearch($playerId, $score) {
-		$this->DbQuery("UPDATE player SET `player_research` = $score WHERE player_id = $playerId");
-    }
-
-    function debugLastTurn() {
-        //$this->setGameStateValue(LAST_TURN, 1);
+    function debugSetR() {
+		$this->DbQuery("UPDATE tile SET `r` = 3 WHERE card_location = 'player'");
     }
     
     function debugEmpty() {

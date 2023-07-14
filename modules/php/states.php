@@ -210,6 +210,9 @@ trait StateTrait {
 
         $year++;
         $this->setGlobalVariable(YEAR, $year);
+        $this->notifyAllPlayers('year', clienttranslate('Year ${year} begins'), [
+            'year' => $year,
+        ]);
 
         // replace all research tiles
         $this->research->moveAllCardsInLocation('table', 'void');

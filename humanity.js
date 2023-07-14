@@ -2640,6 +2640,10 @@ var Humanity = /** @class */ (function () {
         this.researchBoard = new ResearchBoard(this, gamedatas);
         this.createPlayerPanels(gamedatas);
         this.createPlayerTables(gamedatas);
+        document.getElementById("year").insertAdjacentText('beforebegin', _('Year') + ' ');
+        this.yearCounter = new ebg.counter();
+        this.yearCounter.create("year");
+        this.yearCounter.setValue(gamedatas.year);
         this.zoomManager = new ZoomManager({
             element: document.getElementById('table'),
             smooth: false,
@@ -3124,6 +3128,7 @@ var Humanity = /** @class */ (function () {
             ['newTableResearch', ANIMATION_MS],
             ['reactivateWorkers', ANIMATION_MS],
             ['upgradeWorker', 50],
+            ['year', ANIMATION_MS],
             ['restartTurn', 1],
         ];
         notifs.forEach(function (notif) {
@@ -3232,6 +3237,9 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.notif_upgradeWorker = function (args) {
         document.getElementById("worker-".concat(args.worker.id, "-force")).dataset.workforce = "".concat(args.worker.workforce);
+    };
+    Humanity.prototype.notif_year = function (args) {
+        this.yearCounter.toValue(+args.year);
     };
     Humanity.prototype.notif_restartTurn = function (args) {
         var _this = this;
