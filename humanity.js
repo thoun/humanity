@@ -2664,9 +2664,6 @@ var Humanity = /** @class */ (function () {
             (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableWorkers(args.workers);
         }
     };
-    Humanity.prototype.onEnteringEndRound = function () {
-        this.playersTables.forEach(function (playerTable) { return playerTable.reactivateWorkers(); });
-    };
     Humanity.prototype.onEnteringMoveWorker = function (args) {
         var _a;
         (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableTileSpots(args.possibleCoordinates);
@@ -2995,6 +2992,7 @@ var Humanity = /** @class */ (function () {
             ['newTableTile', ANIMATION_MS],
             ['moveArm', ANIMATION_MS],
             ['newTableResearch', ANIMATION_MS],
+            ['reactivateWorkers', ANIMATION_MS],
         ];
         notifs.forEach(function (notif) {
             dojo.subscribe(notif[0], _this, function (notifDetails) {
@@ -3083,6 +3081,17 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.notif_newTableResearch = function (args) {
         this.tableCenter.newResearch(args.tableResearch);
+    };
+    Humanity.prototype.notif_reactivateWorkers = function (args) {
+        if (args.playerId) {
+            this.getPlayerTable(args.playerId).reactivateWorkers();
+        }
+        else {
+            this.playersTables.forEach(function (playerTable) { return playerTable.reactivateWorkers(); });
+        }
+    };
+    Humanity.prototype.onEnteringEndRound = function () {
+        this.playersTables.forEach(function (playerTable) { return playerTable.reactivateWorkers(); });
     };
     Humanity.prototype.setWorkerDisabled = function (worker, disabled) {
         document.getElementById("worker-".concat(worker.id)).classList.toggle('disabled-worker', disabled);

@@ -83,8 +83,12 @@ trait ResearchTrait {
             }
         }
 
+        if ($tile->science > 0) {
+            $this->incPlayerScience($playerId, $tile->science, clienttranslate('${player_name} gains ${inc} science points from the played research'));
+        }
+
         if ($tile->points > 0) {
-            $this->incPlayerScore($playerId, $tile->points, clienttranslate('${player_name} gains ${inc} points from the played research'));
+            $this->incPlayerScience($playerId, $tile->points, clienttranslate('${player_name} gains ${inc} points from the played research'));
         }
 
         $this->DbQuery("UPDATE research SET `card_location` = 'player', `card_location_arg` = $playerId, `line` = $line WHERE `card_id` = $tile->id");
@@ -97,5 +101,11 @@ trait ResearchTrait {
             'player_name' => $this->getPlayerName($playerId),
             'research' => $tile,
         ]);
+
+        if ($tile->effect == RESEARCH_POWER_TIME) {
+            $this->gainTimeUnit($playerId, 2);
+        } else if ($tile->effect == RESEARCH_POWER_REACTIVATE) {
+            $this->reactivatePlayerWorkers($playerId);
+        }
     }
 }

@@ -53,19 +53,20 @@ trait WorkerTrait {
         return $currentAction != null ? $this->getWorkerById($currentAction->selectedWorker) : null;
     }
 
-    function gainTimeUnit(int $playerId, int $amount) { // TODO test
+    function gainTimeUnit(int $playerId, int $amount) {
         $workers = $this->getPlayerWorkers($playerId, 'table');
         $arm = $this->getArm();
         $movedWorkers = [];
 
         foreach ($workers as $worker) {
-            if ($worker->spot - 1 > $arm) { // TODO handle % if $arm >= $worker
+            if (($worker->spot - $amount + 7 % 7) != $arm) {
 
-                $moved = min($amount, $worker->spot - 1 - $arm);
+                $moved = min($amount, (($worker->spot - $amount + 8) % 8) - $arm);
+                self::notifyAllPlayers('log', "arm $arm, init spot $worker->spot, moved $moved, new spot ".($worker->spot - $moved), []);
                 $worker->spot -= $moved;
                 $this->DbQuery("UPDATE worker SET `spot` = $worker->spot WHERE `id` = $worker->id");
 
-                $movedWorkers = $worker;
+                $movedWorkers[] = $worker;
             }
         }
 
@@ -77,8 +78,22 @@ trait WorkerTrait {
         ]);
     }
 
-    function reactivatePlayerWorkers() {
-        $this->DbQuery("UPDATE worker SET `remaining_workforce` = `workforce`");
+    function reactivatePlayerWorkers(?int $playerId) {
+        $sql = "UPDATE worker SET `remaining_workforce` = `workforce`";
+        if ($playerId !== null) {
+            $sql .= " WHERE `player_id` = $playerId";
+
+        }
+        $this->DbQuery($sql);
+
+        $message = $playerId !== null ?
+            clienttranslate('${player_name} reactivates table workers') :
+            clienttranslate('All players reactivates table workers');
+
+        self::notifyAllPlayers('reactivateWorkers', $message, [
+            'playerId' => $playerId,
+            'player_name' => $playerId !== null ? $this->getPlayerName($playerId) : null,
+        ]);
     }
     
     function moveWorkerToTable(int $playerId,  Worker $worker, int $spot) {

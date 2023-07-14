@@ -134,7 +134,6 @@ Dépensez des ressources*/
     function getPlayerIcons(int $playerId) {
         $allTiles = $this->getTilesByLocation('player', $playerId);
         $tiles = array_values(array_filter($allTiles, fn($tile) => $tile->production != null));
-        //$this->debug($tiles);
 
         $icons = [ELECTRICITY => 0, 1 => 0, 2 => 0, 3 => 0, 11 => 0, 12 => 0, 13 => 0];
 
@@ -142,10 +141,6 @@ Dépensez des ressources*/
             $production = $tile->production[$tile->r];
 
             foreach ($production as $type => $amount) {
-                if ($type == ELECTRICITY) {
-                    //$this->debug($amount);
-                    self::notifyAllPlayers('log', "$playerId, tileId $tile->id, r $tile->r, type $type, amount $amount production ".json_encode($production), []);
-                }
                 $icons[$type] += $amount;
             }
         }

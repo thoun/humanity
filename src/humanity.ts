@@ -149,10 +149,6 @@ class Humanity implements HumanityGame {
         }
     }
 
-    private onEnteringEndRound() {
-        this.playersTables.forEach(playerTable => playerTable.reactivateWorkers());
-    }
-
     private onEnteringMoveWorker(args: EnteringMoveWorkerArgs) {
         this.getCurrentPlayerTable()?.setSelectableTileSpots(args.possibleCoordinates);
     }
@@ -599,6 +595,7 @@ class Humanity implements HumanityGame {
             ['newTableTile', ANIMATION_MS],
             ['moveArm', ANIMATION_MS],
             ['newTableResearch', ANIMATION_MS],
+            ['reactivateWorkers', ANIMATION_MS],
         ];
     
         notifs.forEach((notif) => {
@@ -711,7 +708,19 @@ class Humanity implements HumanityGame {
 
     notif_newTableResearch(args: NotifNewTableResearchArgs) {
         this.tableCenter.newResearch(args.tableResearch);
-    }    
+    }   
+
+    notif_reactivateWorkers(args: NotifReactivateWorkersArgs) {
+        if (args.playerId) {
+            this.getPlayerTable(args.playerId).reactivateWorkers();
+        } else {
+            this.playersTables.forEach(playerTable => playerTable.reactivateWorkers());
+        }
+    } 
+
+    private onEnteringEndRound() {
+        this.playersTables.forEach(playerTable => playerTable.reactivateWorkers());
+    }  
 
     private setWorkerDisabled(worker: Worker, disabled: boolean) {
         document.getElementById(`worker-${worker.id}`).classList.toggle('disabled-worker', disabled);

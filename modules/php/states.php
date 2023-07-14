@@ -155,7 +155,7 @@ trait StateTrait {
     }
 
     function stAfterEndRound() {
-        $this->reactivatePlayerWorkers();
+        $this->reactivatePlayerWorkers(null);
 
         $this->gamestate->nextState('nextRound');
     }

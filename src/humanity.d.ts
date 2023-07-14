@@ -203,3 +203,8 @@ interface NotifMoveArmArgs {
 interface NotifNewTableResearchArgs {
     tableResearch: Research[];
 }
+
+// reactivateWorkers
+interface NotifReactivateWorkersArgs {
+    playerId: number | null;
+}
