@@ -85,6 +85,20 @@ $playerActionsGameStates = [
         ],
         "transitions" => [
             "activate" => ST_PLAYER_ACTIVATE_TILE,
+            "chooseRadarColor" => ST_PLAYER_CHOOSE_RADAR_COLOR,
+            "pay" => ST_PLAYER_PAY,
+        ],
+    ],
+
+    ST_PLAYER_CHOOSE_RADAR_COLOR => [
+        "name" => "chooseRadarColor",
+        "description" => clienttranslate('${actplayer} must choose radar color'),
+        "descriptionmyturn" => clienttranslate('${you} must choose radar color'),
+        "type" => "activeplayer",    
+        "possibleactions" => [ 
+            "chooseRadarColor",
+        ],
+        "transitions" => [
             "pay" => ST_PLAYER_PAY,
         ],
     ],

@@ -166,7 +166,7 @@ trait StateTrait {
         // gain science points based on year research
         foreach($playersIds as $playerId) {
             $sciencePoints = 0;
-            $playerResearchSpot = $this->getPlayer($playerId)->researchSpot;
+            $playerResearchSpot = $this->getPlayer($playerId)->researchPoints;
             foreach (SCIENCE_BY_RESEARCH_SPOT as $inc => $minSpot) {
                 if ($playerResearchSpot >= $minSpot) {
                     $sciencePoints = $inc;
@@ -175,8 +175,8 @@ trait StateTrait {
 
             $this->incPlayerScience($playerId, $sciencePoints, '${player_name} gains ${inc} science points with year research');
 
-            $this->DbQuery("UPDATE player SET `player_research_spot` = 0 WHERE player_id = $playerId");                
-            $this->notifyAllPlayers('researchSpot', '', [
+            $this->DbQuery("UPDATE player SET `player_research_points` = 0 WHERE player_id = $playerId");                
+            $this->notifyAllPlayers('researchPoints', '', [
                 'playerId' => $playerId,
                 'player_name' => $this->getPlayerName($playerId),
                 'new' => 0,

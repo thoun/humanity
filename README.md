@@ -33,7 +33,8 @@ Also add one auto-FTP upload extension (for example https://marketplace.visualst
 Make sure ftp-sync.json and node_modules are in .gitignore
 
 # Rules
-Silver coins objective gain is always one coin, not one for each viking over 3
 
-About objective activation, rules aren't very clear. It makes :
-*Trade* =>  Action ==> Check artefacts except weathervane / amulet ==> *Trade* ==> Check artefacts weathervane / amulet
+
+# TODO TOCHECK
+selon votre choix, parmi les modules de communication supplémentaires de l’année en cours.
+TOCHECK année en cours ou research points de la tuile sélectionnée ?

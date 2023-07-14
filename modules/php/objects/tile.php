@@ -7,18 +7,18 @@ class TileType {
     public array $cost;
     public ?int $workforce;
     public ?array $production;
-    public int $adjacentScience;
-    public int $science;
+    public int $adjacentResearchPoints;
+    public int $researchPoints;
     public int $points;
     public ?int $matchType; // power for blue/orange, color for research, shape for green
   
-    public function __construct(int $color, array $cost, ?int $workforce = null, ?array $production = null, int $adjacentScience = 0, int $science = 0, ?int $matchType = null, int $points = 0) {
+    public function __construct(int $color, array $cost, ?int $workforce = null, ?array $production = null, int $adjacentResearchPoints = 0, int $researchPoints = 0, ?int $matchType = null, int $points = 0) {
         $this->color = $color;
         $this->cost = $cost;
         $this->workforce = $workforce;
         $this->production = $production;
-        $this->adjacentScience = $adjacentScience;
-        $this->science = $science;
+        $this->adjacentResearchPoints = $adjacentResearchPoints;
+        $this->researchPoints = $researchPoints;
         $this->points = $points;
         $this->matchType = $matchType;
     } 
@@ -37,8 +37,8 @@ class OrangeTileType extends TileType {
 }
 
 class PurpleTileType extends TileType {
-    public function __construct(array $cost, ?int $adjacentScience = null, ?int $science = null, ?int $searchColor = null) {
-        parent::__construct(PURPLE, $cost, null, null, $adjacentScience, $science, $searchColor);
+    public function __construct(array $cost, ?int $adjacentResearchPoints = null, ?int $researchPoints = null, ?int $searchColor = null) {
+        parent::__construct(PURPLE, $cost, null, null, $adjacentResearchPoints, $researchPoints, $searchColor);
     } 
 }
 
@@ -75,8 +75,8 @@ class Tile extends TileType {
             $this->cost = $objectiveType->cost;
             $this->workforce = $objectiveType->workforce;
             $this->production = $objectiveType->production;
-            $this->adjacentScience = $objectiveType->adjacentScience;
-            $this->science = $objectiveType->science;
+            $this->adjacentResearchPoints = $objectiveType->adjacentResearchPoints;
+            $this->researchPoints = $objectiveType->researchPoints;
             $this->points = $objectiveType->points;
             $this->matchType = $objectiveType->matchType;
         }

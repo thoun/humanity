@@ -107,15 +107,15 @@ trait UtilTrait {
         ] + $args);
     }
 
-    function incPlayerResearchSpot(int $playerId, int $amount, $message = '', $args = []) {
+    function incPlayerResearchPoints(int $playerId, int $amount, $message = '', $args = []) {
         if ($amount != 0) {
-            $this->DbQuery("UPDATE player SET `player_research_spot` = `player_research_spot` + $amount WHERE player_id = $playerId");
+            $this->DbQuery("UPDATE player SET `player_research_points` = `player_research_points` + $amount WHERE player_id = $playerId");
         }
             
-        $this->notifyAllPlayers('researchSpot', $message, [
+        $this->notifyAllPlayers('researchPoints', $message, [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'new' => $this->getPlayer($playerId)->researchSpot,
+            'new' => $this->getPlayer($playerId)->researchPoints,
             'inc' => $amount,
             'absInc' => abs($amount),
         ] + $args);

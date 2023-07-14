@@ -2201,7 +2201,7 @@ var ResearchBoard = /** @class */ (function () {
         dojo.place(html, 'research-board');
         players.forEach(function (player) {
             _this.vp.set(Number(player.id), Number(player.score));
-            _this.sciencePoints.set(Number(player.id), Math.min(14, Number(player.researchSpot)));
+            _this.sciencePoints.set(Number(player.id), Math.min(14, Number(player.researchPoints)));
         });
         this.moveVP();
         this.moveResearch();
@@ -2317,8 +2317,8 @@ var ResearchBoard = /** @class */ (function () {
             markerDiv.style.transform = "translateX(".concat(left + leftShift, "px) translateY(").concat(top + topShift, "px)");
         });
     };
-    ResearchBoard.prototype.setResearchSpot = function (playerId, researchSpot) {
-        this.sciencePoints.set(playerId, researchSpot);
+    ResearchBoard.prototype.setResearchSpot = function (playerId, researchPoints) {
+        this.sciencePoints.set(playerId, researchPoints);
         this.moveResearch();
     };
     ResearchBoard.prototype.getResearchSpot = function (playerId) {
@@ -2700,9 +2700,12 @@ var Humanity = /** @class */ (function () {
                 case 'activateTile':
                     this.addActionButton("endTurn_button", _("End turn"), function () { return _this.endTurn(); });
                     break;
+                case 'chooseRadarColor':
+                    this.addActionButton("blue_button", _("Blue"), function () { return _this.chooseRadarColor(2); });
+                    this.addActionButton("orange_button", _("Orange"), function () { return _this.chooseRadarColor(1); });
+                    break;
                 case 'confirmMoveWorkers':
                     this.addActionButton("confirmMoveWorkers_button", _("Confirm"), function () { return _this.confirmMoveWorkers(); });
-                    //}
                     break;
             }
         }
@@ -2926,6 +2929,14 @@ var Humanity = /** @class */ (function () {
             id: id
         });
     };
+    Humanity.prototype.chooseRadarColor = function (color) {
+        if (!this.checkAction('chooseRadarColor')) {
+            return;
+        }
+        this.takeAction('chooseRadarColor', {
+            color: color
+        });
+    };
     Humanity.prototype.chooseNewResearch = function (id) {
         if (!this.checkAction('chooseNewResearch')) {
             return;
@@ -2984,7 +2995,7 @@ var Humanity = /** @class */ (function () {
             ['deployTile', undefined],
             ['deployResearch', undefined],
             ['score', 1],
-            ['researchSpot', 1],
+            ['researchPoints', 1],
             ['science', 1],
             ['newFirstPlayer', ANIMATION_MS],
             ['removeTableTile', ANIMATION_MS],

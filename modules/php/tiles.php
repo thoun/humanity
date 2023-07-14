@@ -50,6 +50,10 @@ trait TileTrait {
             $this->tiles->pickCardForLocation('deck1', 'table', $spot);
         }
 
+        foreach ($this->TILES[8] as $subType => $tileType) {
+            $this->tiles->createCards([[ 'type' => 8, 'type_arg' => $subType, 'nbr' => 2 ]], 'radar');
+        }
+
         foreach ($players as $playerId => $player) {
             $tiles = [];
             foreach ($this->TILES[0] as $subType => $tileType) {
@@ -94,8 +98,16 @@ trait TileTrait {
     }
 
     function deployTile(int $playerId, /*CurrentAction*/ $currentAction, Worker $worker) {
-        $this->moveWorkerToTable($playerId, $worker, $currentAction->spot);
-        $tile = $this->getTileById($currentAction->tile);
+        $this->moveWorkerToTable($playerId, $worker, $currentAction->workerSpot);
+        $tile = $this->getTileById($currentAction->addTileId);
+
+        if ($currentAction->addTileId != $currentAction->removeTileId) {
+            $this->tiles->moveCard($currentAction->removeTileId, 'void');
+
+            self::notifyAllPlayers('removeTableTile', '', [
+                'tile' => $this->getTileById($currentAction->removeTileId),
+            ]);
+        }
 
         $r = $tile->production != null ? 1 : 0;
         $this->DbQuery("UPDATE tile SET card_location = 'player', card_location_arg = $playerId, `x` = $worker->x, `y` = $worker->y, `r` = $r WHERE `card_id` = $tile->id");
@@ -129,23 +141,23 @@ trait TileTrait {
         if ($points > 0) {
             $this->incPlayerScore($playerId, $tile->points, clienttranslate('${player_name} gains ${inc} points with placed tile'));
         }
-        $science = $tile->science;
+        $researchPoints = $tile->researchPoints;
 
         $adjacentTiles = $this->getAdjacentTiles($playerTiles, $tile);
-        if ($tile->adjacentScience !== null) {
+        if ($tile->adjacentResearchPoints !== null) {
             $validAdjacentTiles = $tile->matchType == ANY_COLOR ? $adjacentTiles : array_values(array_filter($adjacentTiles, fn($t) => $t->color == $tile->matchType));
-            $science += $tile->adjacentScience * count($validAdjacentTiles);
+            $researchPoints += $tile->adjacentResearchPoints * count($validAdjacentTiles);
         }
 
         // if new tile match adjacent already placed purple tile
         foreach ($adjacentTiles as $adjacentTile) {
-            if ($adjacentTile->adjacentScience !== null && ($adjacentTile->matchType == ANY_COLOR || $adjacentTile->matchType == $tile->color)) {
-                $science += $tile->adjacentScience;
+            if ($adjacentTile->adjacentResearchPoints !== null && ($adjacentTile->matchType == ANY_COLOR || $adjacentTile->matchType == $tile->color)) {
+                $researchPoints += $tile->adjacentResearchPoints;
             }
         }
 
-        if ($science > 0) {
-            $this->incPlayerScience($playerId, $tile->points, clienttranslate('${player_name} gains ${inc} science points with placed tile'));
+        if ($researchPoints > 0) {
+            $this->incPlayerResearchPoints($playerId, $researchPoints, clienttranslate('${player_name} gains ${inc} research points with placed tile'));
         }
 
         return $squareResult['upgrade'];

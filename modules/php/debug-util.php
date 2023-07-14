@@ -19,7 +19,6 @@ trait DebugUtilTrait {
         //$this->debugAddDestinations(2343492, 'B', 10);
 
         //$this->tiles->pickCardsForLocation(13, 'deck', 'void');
-        $this->setGlobalVariable(OBJECTIVES, [1, 6, 7]);
         
         //$this->debugLastTurn();
     }

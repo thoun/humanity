@@ -187,9 +187,12 @@ class Humanity implements HumanityGame {
                 case 'activateTile':
                     (this as any).addActionButton(`endTurn_button`, _("End turn"), () => this.endTurn());
                     break;
+                case 'chooseRadarColor':
+                    (this as any).addActionButton(`blue_button`, _("Blue"), () => this.chooseRadarColor(2));
+                    (this as any).addActionButton(`orange_button`, _("Orange"), () => this.chooseRadarColor(1));
+                    break;
                 case 'confirmMoveWorkers':
                     (this as any).addActionButton(`confirmMoveWorkers_button`, _("Confirm"), () => this.confirmMoveWorkers());
-                    //}
                     break;
             }
         }
@@ -519,6 +522,16 @@ class Humanity implements HumanityGame {
         });
     }
   	
+    public chooseRadarColor(color: number) {
+        if(!(this as any).checkAction('chooseRadarColor')) {
+            return;
+        }
+
+        this.takeAction('chooseRadarColor', {
+            color
+        });
+    }
+  	
     public chooseNewResearch(id: number) {
         if(!(this as any).checkAction('chooseNewResearch')) {
             return;
@@ -587,7 +600,7 @@ class Humanity implements HumanityGame {
             ['deployTile', undefined],
             ['deployResearch', undefined],
             ['score', 1],
-            ['researchSpot', 1],
+            ['researchPoints', 1],
             ['science', 1],
             ['newFirstPlayer', ANIMATION_MS],
             ['removeTableTile', ANIMATION_MS],

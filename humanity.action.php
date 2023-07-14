@@ -66,6 +66,15 @@
         self::ajaxResponse();
     }
 
+    public function chooseRadarColor() {
+        self::setAjaxMode();     
+
+        $color = self::getArg("color", AT_posint, true);
+        $this->game->chooseRadarColor($color);
+
+        self::ajaxResponse();
+    }
+
     public function chooseNewResearch() {
         self::setAjaxMode();     
 

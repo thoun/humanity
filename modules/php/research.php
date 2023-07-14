@@ -53,7 +53,7 @@ trait ResearchTrait {
     }
 
     function deployResearch(int $playerId, /*CurrentAction*/ $currentAction, Worker $worker) {
-        $this->moveWorkerToTable($playerId, $worker, $currentAction->spot);
+        $this->moveWorkerToTable($playerId, $worker, $currentAction->workerSpot);
 
         $playerResearches = $this->getResearchsByLocation('player', $playerId);
         $tile = $this->getResearchById($currentAction->research);
@@ -83,12 +83,12 @@ trait ResearchTrait {
             }
         }
 
-        if ($tile->science > 0) {
-            $this->incPlayerScience($playerId, $tile->science, clienttranslate('${player_name} gains ${inc} science points from the played research'));
+        if ($tile->researchPoints > 0) {
+            $this->incPlayerResearchPoints($playerId, $tile->researchPoints, clienttranslate('${player_name} gains ${inc} research points from the played research'));
         }
 
         if ($tile->points > 0) {
-            $this->incPlayerScience($playerId, $tile->points, clienttranslate('${player_name} gains ${inc} points from the played research'));
+            $this->incPlayerScore($playerId, $tile->points, clienttranslate('${player_name} gains ${inc} points from the played research'));
         }
 
         $this->DbQuery("UPDATE research SET `card_location` = 'player', `card_location_arg` = $playerId, `line` = $line WHERE `card_id` = $tile->id");

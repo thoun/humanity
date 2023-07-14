@@ -22,7 +22,7 @@ class ResearchBoard {
         dojo.place(html, 'research-board');
         players.forEach(player => {
             this.vp.set(Number(player.id), Number(player.score));
-            this.sciencePoints.set(Number(player.id), Math.min(14, Number(player.researchSpot)));
+            this.sciencePoints.set(Number(player.id), Math.min(14, Number(player.researchPoints)));
         });
         this.moveVP();
         this.moveResearch();
@@ -143,8 +143,8 @@ class ResearchBoard {
         });
     }
     
-    public setResearchSpot(playerId: number, researchSpot: number) {
-        this.sciencePoints.set(playerId, researchSpot);
+    public setResearchSpot(playerId: number, researchPoints: number) {
+        this.sciencePoints.set(playerId, researchPoints);
         this.moveResearch();
     }
     

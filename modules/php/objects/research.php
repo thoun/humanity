@@ -5,14 +5,14 @@ require_once(__DIR__.'/../constants.inc.php');
 class ResearchType {
     public int $extremity;
     public array $cost;
-    public int $science;
+    public int $researchPoints;
     public ?int $effect;
     public ?int $points;
   
-    public function __construct(int $extremity, array $cost, ?int $science, ?int $effect = null, ?int $points = 0) {
+    public function __construct(int $extremity, array $cost, ?int $researchPoints, ?int $effect = null, ?int $points = 0) {
         $this->extremity = $extremity;
         $this->cost = $cost;
-        $this->science = $science;
+        $this->researchPoints = $researchPoints;
         $this->effect = $effect;
         $this->points = $points;
     } 
@@ -39,7 +39,7 @@ class Research extends ResearchType {
             $objectiveType = $RESEARCH[$this->year][$this->number];
             $this->extremity = $objectiveType->extremity;
             $this->cost = $objectiveType->cost;
-            $this->science = $objectiveType->science;
+            $this->researchPoints = $objectiveType->researchPoints;
             $this->effect = $objectiveType->effect;
             $this->points = $objectiveType->points;
         }

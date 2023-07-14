@@ -169,7 +169,7 @@ class Humanity extends Table {
     
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
-        $sql = "SELECT player_id id, player_score score, player_no playerNo, player_research_spot researchSpot, player_science science, player_science science FROM player ";
+        $sql = "SELECT player_id id, player_score score, player_no playerNo, player_research_points researchPoints, player_science science, player_science science FROM player ";
         $result['players'] = self::getCollectionFromDb( $sql );
   
         // Gather all information about current game situation (visible by player $current_player_id).
@@ -180,7 +180,7 @@ class Humanity extends Table {
             $player['playerNo'] = intval($player['playerNo']);
             
             $player['workers'] = $this->getPlayerWorkers($playerId);
-            $player['researchSpot'] = intval($player['researchSpot']);
+            $player['researchPoints'] = intval($player['researchPoints']);
             $player['science'] = $isEndScore || $playerId == $currentPlayerId ? intval($player['science']) : null;
             $player['tiles'] = $this->getTilesByLocation('player', $playerId);
             $player['research'] = $this->getResearchsByLocation('player', $playerId);

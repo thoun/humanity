@@ -3,8 +3,9 @@
 class CurrentAction {
     public string $type; // 'tile', 'research', 'activate'
     public ?int $selectedWorker;
-    public ?int $spot;
-    public ?int $tile;
+    public ?int $workerSpot;
+    public ?int $addTileId;
+    public ?int $removeTileId;
     public ?int $research;
 
     public function __construct(string $type) {

@@ -98,9 +98,9 @@ trait ActionTrait {
         if ($tile->type == 9 && $tile->r == 3) {
             $this->DbQuery("DELETE from tile WHERE `card_id` = $tile->id");
 
-            $this->incPlayerScience($playerId, 3, '');
+            $this->incPlayerResearchPoints($playerId, 3);
 
-            self::notifyAllPlayers('removeTile', clienttranslate('${player_name} removes an obstacle and gain 3 science points'), [
+            self::notifyAllPlayers('removeTile', clienttranslate('${player_name} removes an obstacle and gain 3 research points'), [
                 'playerId' => $playerId,
                 'player_name' => $this->getPlayerName($playerId),
                 'tile' => $tile,
@@ -117,9 +117,30 @@ trait ActionTrait {
     public function chooseNewTile(int $id) {
         self::checkAction('chooseNewTile');
 
+        $tile = $this->getTileById($id);
+
         $currentAction = new CurrentAction('tile');
-        $currentAction->tile = $id;
-        $currentAction->spot = 1; // TODO
+        $currentAction->addTileId = $id;
+        $currentAction->removeTileId = $id;
+        $currentAction->workerSpot = $tile->locationArg;
+        $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
+
+        $this->gamestate->nextState($tile->color == BLUE_OR_ORANGE ? 'chooseRadarColor' : 'pay');
+    }
+
+    public function chooseRadarColor(int $color) {
+        self::checkAction('chooseRadarColor');
+
+        if (!in_array($color, [BLUE, ORANGE])) {
+            throw new BgaUserException("Invalid color");
+        }
+
+        $radarTiles = $this->getTilesByLocation('radar');
+        $year = $this->getYear();
+        $tile = $this->array_find($radarTiles, fn($t) => $t->color == $color && $t->researchPoints == $year + 2);
+
+        $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
+        $currentAction->addTileId = $tile->id;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
         $this->gamestate->nextState('pay');
@@ -128,9 +149,11 @@ trait ActionTrait {
     public function chooseNewResearch(int $id) {
         self::checkAction('chooseNewResearch');
 
+        $tile = $this->getResearchById($id);
+
         $currentAction = new CurrentAction('research');
         $currentAction->research = $id;
-        $currentAction->spot = 2; // TODO
+        $currentAction->workerSpot = ($tile->locationArg + $this->getArm()) % 8;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
         $this->gamestate->nextState('pay');

@@ -15,7 +15,8 @@ interface Tile {
     cost: { [type: number]:number };
     workforce?: number;
     production: { [type: number]:number }[];
-    adjacentScience: number;
+    adjacentResearchPoints: number;
+    researchPoints: number;
     points: number;
     matchType: number;
 }
@@ -68,7 +69,7 @@ interface HumanityPlayer extends Player {
     workers: Worker[];
     tiles: Tile[];
     research: Research[];
-    researchSpot: number;
+    researchPoints: number;
     science?: number;
     objectives: Objective[];
 
@@ -176,7 +177,7 @@ interface NotifDeployResearchArgs {
     research: Research;
 }
 
-// score, researchSpot, science
+// score, researchPoints, science
 interface NotifScoreArgs {
     playerId: number;
     new: number;

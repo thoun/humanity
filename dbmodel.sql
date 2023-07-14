@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS `objective` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
 -- Example 2: add a custom field to the standard "player" table
-ALTER TABLE `player` ADD `player_research_spot` smallint UNSIGNED NOT NULL DEFAULT 0;
+ALTER TABLE `player` ADD `player_research_points` smallint UNSIGNED NOT NULL DEFAULT 0;
 ALTER TABLE `player` ADD `player_science` smallint UNSIGNED NOT NULL DEFAULT 0;
 
 CREATE TABLE IF NOT EXISTS `worker` (
