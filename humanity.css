@@ -1245,6 +1245,21 @@ body > .card {
 #research-board #objectives .slot[data-slot-id="3"] {
   top: 336px;
 }
+#research-board .objective-science-token {
+  position: absolute;
+  left: 618px;
+  width: 48px;
+  height: 48px;
+}
+#research-board .objective-science-token[data-slot-id="1"] {
+  top: 164px;
+}
+#research-board .objective-science-token[data-slot-id="2"] {
+  top: 299px;
+}
+#research-board .objective-science-token[data-slot-id="3"] {
+  top: 433px;
+}
 
 .player-board {
   background-color: white;
@@ -1265,6 +1280,17 @@ body > .card {
 }
 .player-board .counters > div {
   flex: 1;
+}
+.player-board .counters.with-tokens {
+  font-size: 16pt;
+  font-family: "conthrax-sb";
+}
+.player-board .counters.with-tokens > div {
+  display: flex;
+  align-items: center;
+}
+.player-board .counters.with-tokens .science-counter {
+  color: #653771;
 }
 
 .player-table {

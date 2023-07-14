@@ -2239,6 +2239,7 @@ var ResearchBoard = /** @class */ (function () {
             mapCardToSlot: function (card) { return card.locationArg; },
         });
         this.objectives.addCards(gamedatas.tableObjectives);
+        this.setObjectiveScienceTokens();
     }
     ResearchBoard.prototype.getVPCoordinates = function (points) {
         var cases = Math.min(points, 40);
@@ -2356,6 +2357,16 @@ var ResearchBoard = /** @class */ (function () {
     ResearchBoard.prototype.resetObjectives = function (objectives) {
         this.objectives.removeAll();
         this.objectives.addCards(objectives);
+        this.setObjectiveScienceTokens();
+    };
+    ResearchBoard.prototype.setObjectiveScienceTokens = function () {
+        this.objectives.getCards().forEach(function (objective) {
+            var token = document.createElement('div');
+            token.id = "objective-science-token-".concat(objective.id);
+            token.classList.add('science', 'icon', 'objective-science-token');
+            token.dataset.slotId = "".concat(objective.locationArg);
+            document.getElementById('research-board').appendChild(token);
+        });
     };
     // TODO keep?
     ResearchBoard.prototype.highlightPlayerTokens = function (playerId) {
@@ -2587,6 +2598,9 @@ var PlayerTable = /** @class */ (function () {
     PlayerTable.prototype.resetObjectives = function (objectives) {
         this.objectives.removeAll();
         this.objectives.addCards(objectives);
+    };
+    PlayerTable.prototype.addObjective = function (objective) {
+        return this.objectives.addCard(objective);
     };
     return PlayerTable;
 }());
@@ -2859,7 +2873,7 @@ var Humanity = /** @class */ (function () {
         var _this = this;
         Object.values(gamedatas.players).forEach(function (player) {
             var playerId = Number(player.id);
-            var html = "<div class=\"counters\">            \n                <div id=\"vp-counter-wrapper-".concat(player.id, "\" class=\"science-counter\">\n                    <div class=\"vp icon\"></div>\n                    <span id=\"vp-counter-").concat(player.id, "\"></span>\n                </div>\n                <div id=\"science-counter-wrapper-").concat(player.id, "\" class=\"science-counter\">\n                    <div class=\"science icon\"></div>\n                    <span id=\"science-counter-").concat(player.id, "\">?</span>\n                </div>\n            </div>\n            \n            <div class=\"icons counters\">");
+            var html = "<div class=\"counters with-tokens\">            \n                <div id=\"vp-counter-wrapper-".concat(player.id, "\" class=\"vp-counter\">\n                    <div class=\"vp icon\"></div>\n                    <span id=\"vp-counter-").concat(player.id, "\"></span>\n                </div>\n                <div id=\"science-counter-wrapper-").concat(player.id, "\" class=\"science-counter\">\n                    <div class=\"science icon\"></div>\n                    <span id=\"science-counter-").concat(player.id, "\">?</span>\n                </div>\n            </div>\n            \n            <div class=\"icons counters\">");
             html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type, "-counter-wrapper-").concat(player.id, "\">\n                    <div class=\"resource-icon\" data-type=\"").concat(type, "\"></div>\n                    <span id=\"type-").concat(type, "-counter-").concat(player.id, "\"></span>\n                </div>\n            "); }).join('');
             html += "</div>\n            <div class=\"icons counters\">";
             html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type + 10, "-counter-wrapper-").concat(player.id, "\">\n                ").concat(type == 0 ? '' : "<div class=\"resource-icon\" data-type=\"".concat(type, "\"></div>\n                    <span id=\"type-").concat(type + 10, "-counter-").concat(player.id, "\"></span>"), "\n                </div>\n            "); }).join('');
@@ -3129,6 +3143,7 @@ var Humanity = /** @class */ (function () {
             ['reactivateWorkers', ANIMATION_MS],
             ['upgradeWorker', 50],
             ['year', ANIMATION_MS],
+            ['gainObjective', undefined],
             ['restartTurn', 1],
         ];
         notifs.forEach(function (notif) {
@@ -3240,6 +3255,14 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.notif_year = function (args) {
         this.yearCounter.toValue(+args.year);
+    };
+    Humanity.prototype.notif_gainObjective = function (args) {
+        var _a;
+        var playerId = args.playerId, objective = args.objective, fromPlayerId = args.fromPlayerId;
+        if (fromPlayerId === null) {
+            (_a = document.getElementById("objective-science-token-".concat(objective.id))) === null || _a === void 0 ? void 0 : _a.remove();
+        }
+        return this.getPlayerTable(playerId).addObjective(objective);
     };
     Humanity.prototype.notif_restartTurn = function (args) {
         var _this = this;

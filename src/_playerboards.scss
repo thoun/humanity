@@ -20,6 +20,20 @@
     >div {
       flex: 1;
     }
+
+    &.with-tokens {
+      font-size: 16pt;
+      font-family: "conthrax-sb";
+      
+      >div {
+        display: flex;
+        align-items: center;
+      }
+
+      .science-counter {
+        color: #653771;
+      }
+    }
   }
 
 }

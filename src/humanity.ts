@@ -328,8 +328,8 @@ class Humanity implements HumanityGame {
         Object.values(gamedatas.players).forEach(player => {
             const playerId = Number(player.id);
 
-            let html = `<div class="counters">            
-                <div id="vp-counter-wrapper-${player.id}" class="science-counter">
+            let html = `<div class="counters with-tokens">            
+                <div id="vp-counter-wrapper-${player.id}" class="vp-counter">
                     <div class="vp icon"></div>
                     <span id="vp-counter-${player.id}"></span>
                 </div>
@@ -708,6 +708,7 @@ class Humanity implements HumanityGame {
             ['reactivateWorkers', ANIMATION_MS],
             ['upgradeWorker', 50],
             ['year', ANIMATION_MS],
+            ['gainObjective', undefined],
             ['restartTurn', 1],
         ];
     
@@ -849,6 +850,15 @@ class Humanity implements HumanityGame {
     notif_year(args: NotifYearArgs) {
         this.yearCounter.toValue(+args.year);
     }
+
+    notif_gainObjective(args: NotifGainObjectiveArgs) {
+        const { playerId, objective, fromPlayerId } = args;
+        if (fromPlayerId === null) {
+            document.getElementById(`objective-science-token-${objective.id}`)?.remove();
+        }
+        return this.getPlayerTable(playerId).addObjective(objective);
+    }
+    
 
     notif_restartTurn(args: NotifRestartTurnArgs) {
         const { playerId, undo } = args;

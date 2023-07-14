@@ -112,4 +112,21 @@
       }
     }
   }
+
+  .objective-science-token {
+    position: absolute;
+    left: 618px;
+    width: 48px;
+    height: 48px;
+
+    &[data-slot-id="1"] {
+      top: 164px;
+    }
+    &[data-slot-id="2"] {
+      top: 299px;
+    }
+    &[data-slot-id="3"] {
+      top: 433px;
+    }
+}
 }

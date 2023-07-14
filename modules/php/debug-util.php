@@ -11,23 +11,16 @@ trait DebugUtilTrait {
             return;
         } 
 
-        $this->debugSetR();
+        $this->debugR();
+        $this->debugWorkforce();
     }
 
-    function debugSetR() {
+    function debugR() {
 		$this->DbQuery("UPDATE tile SET `r` = 3 WHERE card_location = 'player'");
     }
     
-    function debugEmpty() {
-		$this->tiles->moveAllCardsInLocation('deck', 'void');
-        $this->tiles->moveAllCardsInLocation('discard', 'void');
-    }
-
-    function debugAddDestinations($playerId, $letter, $number) {
-        for ($i = 0; $i < $number; $i++) {
-            $researchIndex = intval($this->research->countCardInLocation('played'.$playerId));
-            $this->research->pickCardForLocation('deck'.$letter, 'played'.$playerId, $researchIndex);
-        }
+    function debugWorkforce() {
+		$this->DbQuery("UPDATE worker SET `workforce` = 10, `remaining_workforce` = 10");
     }
 
     public function debugReplacePlayersIds() {

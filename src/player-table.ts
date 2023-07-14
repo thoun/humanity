@@ -266,4 +266,8 @@ class PlayerTable {
         this.objectives.removeAll();
         this.objectives.addCards(objectives);
     }
+
+    public addObjective(objective: Objective): Promise<any> {
+        return this.objectives.addCard(objective);
+    }
 }

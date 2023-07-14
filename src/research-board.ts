@@ -32,6 +32,7 @@ class ResearchBoard {
             mapCardToSlot: card => card.locationArg,
         });
         this.objectives.addCards(gamedatas.tableObjectives);
+        this.setObjectiveScienceTokens();
     }
 
     private getVPCoordinates(points: number) {
@@ -155,6 +156,17 @@ class ResearchBoard {
     public resetObjectives(objectives: Objective[]) {
         this.objectives.removeAll();
         this.objectives.addCards(objectives);
+        this.setObjectiveScienceTokens();
+    }
+
+    public setObjectiveScienceTokens() {
+        this.objectives.getCards().forEach(objective => {
+            const token = document.createElement('div');
+            token.id = `objective-science-token-${objective.id}`;
+            token.classList.add('science', 'icon', 'objective-science-token');
+            token.dataset.slotId = `${objective.locationArg}`;
+            document.getElementById('research-board').appendChild(token);
+        })
     }
 
     // TODO keep?

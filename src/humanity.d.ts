@@ -227,6 +227,13 @@ interface NotifYearArgs {
     year: number | string;
 }
 
+// gainObjective
+interface NotifGainObjectiveArgs {
+    playerId: number;
+    objective: Objective;
+    fromPlayerId: number | null;
+}
+
 interface Undo {
     tiles: Tile[];
     research: Research[];
