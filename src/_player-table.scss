@@ -39,56 +39,10 @@
     }
   }
 
-  .visible-cards {
-    display: flex;
-    justify-content: center;
-    gap: 5px;
-    margin: 10px;
-
-    .cards {
+  .research-lines {
+    .slot {      
       width: 150px;
-
-      .card {
-        &:not(:first-child) {
-            margin-top: calc(-1 * var(--card-overlap));
-        }
-      }
+      height: 100px;
     }
   }
-
-  .research {
-    flex-direction: column-reverse;
-    width: 221px;
-
-    .card {
-      &:not(:last-child) {
-          margin-top: calc(-1 * var(--card-overlap));
-      }
-    }
-  }
-
-  .col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    &.col2 {
-      display: none;
-    }
-  }
-}
-
-.double-player-column {
-  .cols {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 10px;
-
-    .col2 {
-      display: flex;
-    }
-  }
-  
 }

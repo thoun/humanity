@@ -25,6 +25,7 @@ class Research extends ResearchType {
     public int $locationArg;
     public ?int $year; // 1..3
     public ?int $number; // 1..9
+    public ?int $line;
 
     public function __construct($dbCard, $RESEARCH) {
         $this->id = intval($dbCard['card_id'] ?? $dbCard['id']);
@@ -32,9 +33,11 @@ class Research extends ResearchType {
         $this->locationArg = intval($dbCard['card_location_arg'] ?? $dbCard['location_arg']);
         $this->year = array_key_exists('card_type', $dbCard) || array_key_exists('type', $dbCard) ? intval($dbCard['card_type'] ?? $dbCard['type']) : null;
         $this->number = array_key_exists('card_type_arg', $dbCard) || array_key_exists('type_arg', $dbCard) ? intval($dbCard['card_type_arg'] ?? $dbCard['type_arg']) : null;
+        $this->line = array_key_exists('line', $dbCard) ? intval($dbCard['line']) : null;
 
         if ($this->number !== null) {
             $objectiveType = $RESEARCH[$this->year][$this->number];
+            $this->extremity = $objectiveType->extremity;
             $this->cost = $objectiveType->cost;
             $this->sciencePoints = $objectiveType->sciencePoints;
             $this->effect = $objectiveType->effect;

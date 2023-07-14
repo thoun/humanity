@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS `research` (
    `card_type_arg` tinyint(2) NOT NULL,
    `card_location` varchar(16) NOT NULL,
    `card_location_arg` int(11) NOT NULL,
+   `line` smallint(2) NULL,
    PRIMARY KEY (`card_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
@@ -51,9 +52,8 @@ CREATE TABLE IF NOT EXISTS `objective` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
 -- Example 2: add a custom field to the standard "player" table
-ALTER TABLE `player` ADD `player_science` smallint UNSIGNED NOT NULL DEFAULT 0;
 ALTER TABLE `player` ADD `player_research_spot` smallint UNSIGNED NOT NULL DEFAULT 0;
-ALTER TABLE `player` ADD `player_science_points` smallint UNSIGNED NOT NULL DEFAULT 0;
+ALTER TABLE `player` ADD `player_science` smallint UNSIGNED NOT NULL DEFAULT 0;
 
 CREATE TABLE IF NOT EXISTS `worker` (
   `id` TINYINT unsigned NOT NULL AUTO_INCREMENT,

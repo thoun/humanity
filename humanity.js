@@ -2048,29 +2048,6 @@ var DestinationsManager = /** @class */ (function (_super) {
         _this.game = game;
         return _this;
     }
-    DestinationsManager.prototype.getCost = function (cost) {
-        var _this = this;
-        var keys = Object.keys(cost).map(function (c) { return Number(c); });
-        if (keys.length == 1 && keys[0] == DIFFERENT) {
-            return _("${number} different color cards").replace('${number}', "<strong>".concat(cost[keys[0]], "</strong>"));
-        }
-        else if (keys.length == 1 && keys[0] == EQUAL) {
-            return _("${number} cards of the same color").replace('${number}', "<strong>".concat(cost[keys[0]], "</strong>"));
-        }
-        else {
-            return keys.map(function (color) { return _("${number} ${color} cards").replace('${number}', "<strong>".concat(cost[color], "</strong>")).replace('${color}', _this.game.getTooltipColor(color)); }).join(', ');
-        }
-    };
-    DestinationsManager.prototype.getGains = function (gains) {
-        var _this = this;
-        return Object.entries(gains).map(function (entry) { return "<strong>".concat(entry[1], "</strong> ").concat(_this.game.getTooltipGain(Number(entry[0]))); }).join(', ');
-    };
-    DestinationsManager.prototype.getType = function (type) {
-        switch (type) {
-            case 1: return _("Trading Lands");
-            case 2: return _("Lands of Influence");
-        }
-    };
     DestinationsManager.prototype.getTooltip = function (research) {
         var message = "TODO"; /*
         <strong>${_("Exploration cost:")}</strong> ${this.getCost(research.cost)} (recruits can be used as jokers)
@@ -2343,9 +2320,10 @@ var PlayerTable = /** @class */ (function () {
     function PlayerTable(game, player) {
         var _this = this;
         this.game = game;
+        this.researchLines = [];
         this.playerId = Number(player.id);
         this.currentPlayer = this.playerId == this.game.getPlayerId();
-        var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.playerId, "-tiles\" class=\"tiles\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-research\" class=\"research\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-objective\" class=\"objective\"></div>\n        </div>\n        ");
+        var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.playerId, "-tiles\" class=\"tiles\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-research-lines\" class=\"research-lines\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-objective\" class=\"objective\"></div>\n        </div>\n        ");
         dojo.place(html, document.getElementById('tables'));
         var slotsIds = [];
         var xs = player.tiles.map(function (tile) { return tile.x; });
@@ -2370,9 +2348,7 @@ var PlayerTable = /** @class */ (function () {
         this.tiles.addCards(player.tiles);
         player.tiles.filter(function (tile) { return tile.type == 9; }).forEach(function (tile) { return _this.game.tilesManager.getCardElement(tile).dataset.playerColor = player.color; });
         this.voidStock = new VoidStock(this.game.tilesManager, document.getElementById("player-table-".concat(this.playerId, "-name")));
-        var researchDiv = document.getElementById("player-table-".concat(this.playerId, "-research"));
-        this.research = new LineStock(this.game.researchManager, researchDiv);
-        this.research.addCards(player.research);
+        player.research.forEach(function (researchTile) { return _this.addResearch(researchTile); });
         var objectiveDiv = document.getElementById("player-table-".concat(this.playerId, "-objective"));
         this.objectives = new LineStock(this.game.objectivesManager, objectiveDiv);
         this.objectives.addCards(player.objectives);
@@ -2392,8 +2368,26 @@ var PlayerTable = /** @class */ (function () {
         var tileDiv = this.game.tilesManager.getCardElement(tile);
         tileDiv.dataset.r = "".concat(tile.r);
     };
+    PlayerTable.prototype.addTile = function (tile) {
+        return this.tiles.addCard(tile);
+    };
     PlayerTable.prototype.removeTile = function (tile) {
         this.tiles.removeCard(tile);
+    };
+    PlayerTable.prototype.createResearchLine = function (line) {
+        var lineDiv = document.createElement('div');
+        document.getElementById("player-table-".concat(this.playerId, "-research-lines")).insertAdjacentElement('beforeend', lineDiv);
+        this.researchLines[line] = new SlotStock(this.game.researchManager, lineDiv, {
+            gap: '0',
+            slotsIds: [1, 2, 3],
+            mapCardToSlot: function (card) { return card.extremity; },
+        });
+    };
+    PlayerTable.prototype.addResearch = function (research) {
+        if (!this.researchLines[research.line]) {
+            this.createResearchLine(research.line);
+        }
+        return this.researchLines[research.line].addCard(research);
     };
     PlayerTable.prototype.reactivateWorkers = function () {
         document.getElementById("player-table-".concat(this.playerId, "-tiles")).querySelectorAll('.worker').forEach(function (worker) {
@@ -2406,20 +2400,10 @@ var ANIMATION_MS = 500;
 var ACTION_TIMER_DURATION = 5;
 var LOCAL_STORAGE_ZOOM_KEY = 'Humanity-zoom';
 var LOCAL_STORAGE_JUMP_TO_FOLDED_KEY = 'Humanity-jump-to-folded';
-var VP_BY_RESEARCH = {
-    0: 0,
-    3: 1,
-    6: 2,
-    10: 3,
-    14: 5,
-};
-function getVpByResearch(research) {
-    return Object.entries(VP_BY_RESEARCH).findLast(function (entry) { return research >= Number(entry[0]); })[1];
-}
 var Humanity = /** @class */ (function () {
     function Humanity() {
         this.playersTables = [];
-        this.researchCounters = [];
+        this.scienceCounters = [];
         this.recruitCounters = [];
         this.braceletCounters = [];
         this.TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
@@ -2649,26 +2633,20 @@ var Humanity = /** @class */ (function () {
             var playerId = Number(player.id);
             document.getElementById("player_score_".concat(player.id)).insertAdjacentHTML('beforebegin', "<div class=\"vp icon\"></div>");
             document.getElementById("icon_point_".concat(player.id)).remove();
-            var html = "<div class=\"counters\">\n            \n                <div id=\"research-counter-wrapper-".concat(player.id, "\" class=\"research-counter\">\n                    <div class=\"research icon\"></div>\n                    <span id=\"research-counter-").concat(player.id, "\"></span> <span class=\"research-legend\"><div class=\"vp icon\"></div> / ").concat(_('round'), "</span>\n                </div>\n\n            </div><div class=\"counters\">\n            \n                <div id=\"recruit-counter-wrapper-").concat(player.id, "\" class=\"recruit-counter\">\n                    <div class=\"recruit icon\"></div>\n                    <span id=\"recruit-counter-").concat(player.id, "\"></span>\n                </div>\n            \n                <div id=\"bracelet-counter-wrapper-").concat(player.id, "\" class=\"bracelet-counter\">\n                    <div class=\"bracelet icon\"></div>\n                    <span id=\"bracelet-counter-").concat(player.id, "\"></span>\n                </div>\n                \n            </div>");
+            var html = "<div class=\"counters\">\n            \n                <div id=\"science-counter-wrapper-".concat(player.id, "\" class=\"science-counter\">\n                    <div class=\"science icon\"></div>\n                    <span id=\"science-counter-").concat(player.id, "\">?</span>\n                </div>\n\n            </div>");
             dojo.place(html, "player_board_".concat(player.id));
-            _this.researchCounters[playerId] = new ebg.counter();
-            _this.researchCounters[playerId].create("research-counter-".concat(playerId));
-            _this.researchCounters[playerId].setValue(getVpByResearch(player.research));
-            _this.recruitCounters[playerId] = new ebg.counter();
-            _this.recruitCounters[playerId].create("recruit-counter-".concat(playerId));
-            _this.recruitCounters[playerId].setValue(player.recruit);
-            _this.braceletCounters[playerId] = new ebg.counter();
-            _this.braceletCounters[playerId].create("bracelet-counter-".concat(playerId));
-            _this.braceletCounters[playerId].setValue(player.bracelet);
+            _this.scienceCounters[playerId] = new ebg.counter();
+            _this.scienceCounters[playerId].create("science-counter-".concat(playerId));
+            if (gamedatas.isEnd || playerId == _this.getPlayerId()) {
+                _this.scienceCounters[playerId].setValue(player.science);
+            }
             // first player token
             dojo.place("<div id=\"player_board_".concat(player.id, "_firstPlayerWrapper\" class=\"firstPlayerWrapper\"></div>"), "player_board_".concat(player.id));
             if (gamedatas.firstPlayerId === playerId) {
                 _this.placeFirstPlayerToken(gamedatas.firstPlayerId);
             }
         });
-        this.setTooltipToClass('research-counter', _('Research'));
-        this.setTooltipToClass('recruit-counter', _('Recruits'));
-        this.setTooltipToClass('bracelet-counter', _('Bracelets'));
+        this.setTooltipToClass('science-counter', _('Science'));
     };
     Humanity.prototype.createPlayerTables = function (gamedatas) {
         var _this = this;
@@ -2741,9 +2719,8 @@ var Humanity = /** @class */ (function () {
         (_a = this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.toValue(score);
         this.researchBoard.setScore(playerId, score);
     };
-    Humanity.prototype.setSciencePoints = function (playerId, count) {
-        this.researchCounters[playerId].toValue(count);
-        this.researchBoard.setResearchSpot(playerId, count);
+    Humanity.prototype.setScience = function (playerId, count) {
+        this.scienceCounters[playerId].toValue(count);
     };
     Humanity.prototype.setResearchSpot = function (playerId, count) {
         this.researchBoard.setResearchSpot(playerId, count);
@@ -2861,6 +2838,11 @@ var Humanity = /** @class */ (function () {
             ['disableWorker', ANIMATION_MS],
             ['gainTimeUnit', ANIMATION_MS],
             ['moveWorkerToTable', ANIMATION_MS],
+            ['deployTile', undefined],
+            ['deployResearch', undefined],
+            ['score', 1],
+            ['researchSpot', 1],
+            ['science', 1],
         ];
         notifs.forEach(function (notif) {
             dojo.subscribe(notif[0], _this, function (notifDetails) {
@@ -2909,6 +2891,25 @@ var Humanity = /** @class */ (function () {
         var worker = args.worker;
         this.setWorkerDisabled(worker, false);
         this.tableCenter.moveWorker(worker);
+    };
+    Humanity.prototype.notif_deployTile = function (args) {
+        var playerId = args.playerId, tile = args.tile;
+        return this.getPlayerTable(playerId).addTile(tile);
+    };
+    Humanity.prototype.notif_deployResearch = function (args) {
+        var playerId = args.playerId, research = args.research;
+        return this.getPlayerTable(playerId).addResearch(research);
+    };
+    Humanity.prototype.notif_score = function (args) {
+        this.setScore(args.playerId, +args.new);
+    };
+    Humanity.prototype.notif_researchSpot = function (args) {
+        this.setResearchSpot(args.playerId, args.new);
+    };
+    Humanity.prototype.notif_science = function (args) {
+        if (!args.private || args.playerId == this.getPlayerId()) {
+            this.setScience(args.playerId, args.new);
+        }
     };
     Humanity.prototype.setWorkerDisabled = function (worker, disabled) {
         document.getElementById("worker-".concat(worker.id)).classList.toggle('disabled-worker', disabled);

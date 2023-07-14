@@ -11,18 +11,6 @@ const ACTION_TIMER_DURATION = 5;
 const LOCAL_STORAGE_ZOOM_KEY = 'Humanity-zoom';
 const LOCAL_STORAGE_JUMP_TO_FOLDED_KEY = 'Humanity-jump-to-folded';
 
-const VP_BY_RESEARCH = {
-    0: 0,
-    3: 1,
-    6: 2,
-    10: 3,
-    14: 5,
-};
-
-function getVpByResearch(research: number) {
-    return Object.entries(VP_BY_RESEARCH).findLast(entry => research >= Number(entry[0]))[1];
-}
-
 class Humanity implements HumanityGame {
     public tilesManager: TilesManager;
     public researchManager: DestinationsManager;
@@ -34,7 +22,7 @@ class Humanity implements HumanityGame {
     private tableCenter: TableCenter;
     private researchBoard: ResearchBoard;
     private playersTables: PlayerTable[] = [];
-    private researchCounters: Counter[] = [];
+    private scienceCounters: Counter[] = [];
     private recruitCounters: Counter[] = [];
     private braceletCounters: Counter[] = [];
     
@@ -304,38 +292,20 @@ class Humanity implements HumanityGame {
 
             let html = `<div class="counters">
             
-                <div id="research-counter-wrapper-${player.id}" class="research-counter">
-                    <div class="research icon"></div>
-                    <span id="research-counter-${player.id}"></span> <span class="research-legend"><div class="vp icon"></div> / ${_('round')}</span>
+                <div id="science-counter-wrapper-${player.id}" class="science-counter">
+                    <div class="science icon"></div>
+                    <span id="science-counter-${player.id}">?</span>
                 </div>
 
-            </div><div class="counters">
-            
-                <div id="recruit-counter-wrapper-${player.id}" class="recruit-counter">
-                    <div class="recruit icon"></div>
-                    <span id="recruit-counter-${player.id}"></span>
-                </div>
-            
-                <div id="bracelet-counter-wrapper-${player.id}" class="bracelet-counter">
-                    <div class="bracelet icon"></div>
-                    <span id="bracelet-counter-${player.id}"></span>
-                </div>
-                
             </div>`;
 
             dojo.place(html, `player_board_${player.id}`);
 
-            this.researchCounters[playerId] = new ebg.counter();
-            this.researchCounters[playerId].create(`research-counter-${playerId}`);
-            this.researchCounters[playerId].setValue(getVpByResearch(player.research));
-
-            this.recruitCounters[playerId] = new ebg.counter();
-            this.recruitCounters[playerId].create(`recruit-counter-${playerId}`);
-            this.recruitCounters[playerId].setValue(player.recruit);
-
-            this.braceletCounters[playerId] = new ebg.counter();
-            this.braceletCounters[playerId].create(`bracelet-counter-${playerId}`);
-            this.braceletCounters[playerId].setValue(player.bracelet);    
+            this.scienceCounters[playerId] = new ebg.counter();
+            this.scienceCounters[playerId].create(`science-counter-${playerId}`);
+            if (gamedatas.isEnd || playerId == this.getPlayerId()) {
+                this.scienceCounters[playerId].setValue(player.science);
+            } 
 
             // first player token
             dojo.place(`<div id="player_board_${player.id}_firstPlayerWrapper" class="firstPlayerWrapper"></div>`, `player_board_${player.id}`);
@@ -345,9 +315,7 @@ class Humanity implements HumanityGame {
             }
         });
 
-        this.setTooltipToClass('research-counter', _('Research'));
-        this.setTooltipToClass('recruit-counter', _('Recruits'));
-        this.setTooltipToClass('bracelet-counter', _('Bracelets'));
+        this.setTooltipToClass('science-counter', _('Science'));
     }
 
     private createPlayerTables(gamedatas: HumanityGamedatas) {
@@ -432,9 +400,8 @@ class Humanity implements HumanityGame {
         this.researchBoard.setScore(playerId, score);
     }
 
-    private setSciencePoints(playerId: number, count: number) {
-        this.researchCounters[playerId].toValue(count);
-        this.researchBoard.setResearchSpot(playerId, count);
+    private setScience(playerId: number, count: number) {
+        this.scienceCounters[playerId].toValue(count);
     }
 
     private setResearchSpot(playerId: number, count: number) {
@@ -610,6 +577,11 @@ class Humanity implements HumanityGame {
             ['disableWorker', ANIMATION_MS],
             ['gainTimeUnit', ANIMATION_MS],
             ['moveWorkerToTable', ANIMATION_MS],
+            ['deployTile', undefined],
+            ['deployResearch', undefined],
+            ['score', 1],
+            ['researchSpot', 1],
+            ['science', 1],
         ];
     
         notifs.forEach((notif) => {
@@ -670,6 +642,30 @@ class Humanity implements HumanityGame {
         const { worker } = args;
         this.setWorkerDisabled(worker, false);
         this.tableCenter.moveWorker(worker);
+    }
+
+    notif_deployTile(args: NotifDeployTileArgs) {
+        const { playerId, tile } = args;
+        return this.getPlayerTable(playerId).addTile(tile);
+    }
+
+    notif_deployResearch(args: NotifDeployResearchArgs) {
+        const { playerId, research } = args;
+        return this.getPlayerTable(playerId).addResearch(research);
+    }
+
+    notif_score(args: NotifScoreArgs) {
+        this.setScore(args.playerId, +args.new);
+    }
+
+    notif_researchSpot(args: NotifScoreArgs) {
+        this.setResearchSpot(args.playerId, args.new);
+    }
+
+    notif_science(args: NotifScoreArgs) {
+        if (!args.private || args.playerId == this.getPlayerId()) {
+            this.setScience(args.playerId, args.new);
+        }
     }
 
     private setWorkerDisabled(worker: Worker, disabled: boolean) {

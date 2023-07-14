@@ -1348,43 +1348,9 @@ body > .card {
   justify-content: center;
   align-items: center;
 }
-.player-table .visible-cards {
-  display: flex;
-  justify-content: center;
-  gap: 5px;
-  margin: 10px;
-}
-.player-table .visible-cards .cards {
+.player-table .research-lines .slot {
   width: 150px;
-}
-.player-table .visible-cards .cards .card:not(:first-child) {
-  margin-top: calc(-1 * var(--card-overlap));
-}
-.player-table .research {
-  flex-direction: column-reverse;
-  width: 221px;
-}
-.player-table .research .card:not(:last-child) {
-  margin-top: calc(-1 * var(--card-overlap));
-}
-.player-table .col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.player-table .col.col2 {
-  display: none;
-}
-
-.double-player-column .cols {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 10px;
-}
-.double-player-column .cols .col2 {
-  display: flex;
+  height: 100px;
 }
 
 .color-help-folded-content {

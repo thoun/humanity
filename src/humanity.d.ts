@@ -31,6 +31,7 @@ interface Research {
     sciencePoints: number;
     effect?: number;
     points: number;
+    line?: number;
 }
 
 interface Objective {
@@ -66,7 +67,7 @@ interface HumanityPlayer extends Player {
     tiles: Tile[];
     research: Research[];
     researchSpot: number;
-    sciencePoints?: number;
+    science?: number;
     objectives: Objective[];
 }
 
@@ -96,6 +97,7 @@ interface HumanityGamedatas {
     tableResearch: Research[];
     objectives?: number[];
     firstPlayerId: number;
+    isEnd: boolean;
 }
 
 interface HumanityGame extends Game {
@@ -159,4 +161,24 @@ interface NotifGainTimeUnitArgs {
 interface NotifMoveWorkerToTableArgs {
     playerId: number;
     worker: Worker;
+}
+
+// deployTile
+interface NotifDeployTileArgs {
+    playerId: number;
+    tile: Tile;
+}
+
+// deployResearch
+interface NotifDeployResearchArgs {
+    playerId: number;
+    research: Research;
+}
+
+// score, researchSpot, science
+interface NotifScoreArgs {
+    playerId: number;
+    new: number;
+    inc: number;
+    private?: boolean;
 }

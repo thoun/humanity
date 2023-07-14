@@ -27,6 +27,10 @@ require_once('modules/php/objects/current-action.php');
 require_once('modules/php/objects/undo.php');
 require_once('modules/php/constants.inc.php');
 require_once('modules/php/utils.php');
+require_once('modules/php/workers.php');
+require_once('modules/php/tiles.php');
+require_once('modules/php/objectives.php');
+require_once('modules/php/research.php');
 require_once('modules/php/actions.php');
 require_once('modules/php/states.php');
 require_once('modules/php/args.php');
@@ -34,6 +38,10 @@ require_once('modules/php/debug-util.php');
 
 class Humanity extends Table {
     use UtilTrait;
+    use WorkerTrait;
+    use TileTrait;
+    use ObjectiveTrait;
+    use ResearchTrait;
     use ActionTrait;
     use StateTrait;
     use ArgsTrait;
@@ -156,7 +164,7 @@ class Humanity extends Table {
     
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
-        $sql = "SELECT player_id id, player_score score, player_no playerNo, player_research_spot researchSpot, player_science_points sciencePoints, player_science science FROM player ";
+        $sql = "SELECT player_id id, player_score score, player_no playerNo, player_research_spot researchSpot, player_science science, player_science science FROM player ";
         $result['players'] = self::getCollectionFromDb( $sql );
   
         // Gather all information about current game situation (visible by player $current_player_id).
@@ -169,8 +177,7 @@ class Humanity extends Table {
             
             $player['workers'] = $this->getPlayerWorkers($playerId);
             $player['researchSpot'] = intval($player['researchSpot']);
-            $player['sciencePoints'] = $isEndScore || $playerId == $currentPlayerId ? intval($player['sciencePoints']) : null;
-            $player['science'] = intval($player['science']);
+            $player['science'] = $isEndScore || $playerId == $currentPlayerId ? intval($player['science']) : null;
             $player['tiles'] = $this->getTilesByLocation('player', $playerId);
             $player['research'] = $this->getResearchsByLocation('player', $playerId);
             $player['objectives'] = $this->getObjectivesByLocation('player', $playerId);
@@ -181,6 +188,7 @@ class Humanity extends Table {
         $result['tableObjectives'] = $this->getObjectivesByLocation('table');      
 
         $result['firstPlayerId'] = $firstPlayerId;
+        $result['isEnd'] = $isEndScore;
   
         return $result;
     }
