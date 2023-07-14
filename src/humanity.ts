@@ -173,49 +173,13 @@ class Humanity implements HumanityGame {
         
         if ((this as any).isCurrentPlayerActive()) {
             switch (stateName) {
-                case 'chooseAction':
-                    const chooseActionArgs = args as EnteringChooseActionArgs;
-                    
-                    if (!chooseActionArgs.noActionYet) { // TODO
+                case 'activateTile':                    
+                    //const chooseActionArgs = args as EnteringChooseActionArgs;
+                        
+                    //if (!chooseActionArgs.noActionYet) { // TODO
                         (this as any).addActionButton(`endTurn_button`, _("End turn"), () => this.endTurn());
-                    }
-                    break;
-                case 'chooseNewCard':
-                    const chooseNewCardArgs = args as EnteringChooseNewCardArgs;
-                    [1, 2, 3, 4, 5].forEach(color => {
-                        const free = chooseNewCardArgs.allFree || color == chooseNewCardArgs.freeColor;
-                        (this as any).addActionButton(`chooseNewCard${color}_button`, _("Take ${color}").replace('${color}', `<div class="color" data-color="${color}"></div>`) + ` (${free ? _('free') : `1 <div class="recruit icon"></div>`})`, () => this.chooseNewCard(chooseNewCardArgs.centerCards.find(card => card.locationArg == color).id), null, null, free ? undefined : 'gray');
-                        if (!free && chooseNewCardArgs.recruits < 1) {
-                            document.getElementById(`chooseNewCard${color}_button`).classList.add('disabled');
-                        }
-                    });
-                    break;
-                case 'payDestination':
-                    (this as any).addActionButton(`payDestination_button`, '', () => this.payDestination());
-                    this.setPayDestinationLabelAndState(args);
-
-                    (this as any).addActionButton(`cancel_button`, _("Cancel"), () => this.cancel(), null, null, 'gray');
-                    break;
-                case 'trade':
-                    const tradeArgs = args as EnteringTradeArgs;
-                    [1, 2, 3].forEach(number => {
-                        (this as any).addActionButton(`trade${number}_button`, _("Trade ${number} bracelet(s)").replace('${number}', number), () => this.trade(number, tradeArgs.gainsByBracelets));
-                        const button = document.getElementById(`trade${number}_button`);
-                        if (tradeArgs.bracelets < number) {
-                            button.classList.add('disabled');
-                        } else {
-                            button.addEventListener('mouseenter', () => this.getCurrentPlayerTable().showColumns(number));
-                            button.addEventListener('mouseleave', () => this.getCurrentPlayerTable().showColumns(0));
-                        }
-                    });
-                    (this as any).addActionButton(`cancel_button`, _("Cancel"), () => this.cancel(), null, null, 'gray');
-                    break;
-
-                // multiplayer state    
-                case 'discardCard':
-                    this.onEnteringDiscardCard(args);
-                    break;
-                    
+                    //}
+                    break;                    
             }
         }
     }
@@ -582,6 +546,7 @@ class Humanity implements HumanityGame {
             ['score', 1],
             ['researchSpot', 1],
             ['science', 1],
+            ['newFirstPlayer', ANIMATION_MS],
         ];
     
         notifs.forEach((notif) => {
@@ -668,22 +633,12 @@ class Humanity implements HumanityGame {
         }
     }
 
+    notif_newFirstPlayer(args: NotifNewFirstPlayerArgs) {
+        this.placeFirstPlayerToken(args.playerId);
+    }
+
     private setWorkerDisabled(worker: Worker, disabled: boolean) {
         document.getElementById(`worker-${worker.id}`).classList.toggle('disabled-worker', disabled);
-    }
-
-    public getGain(type: number): string {
-        switch (type) {
-            case 1: return _("Victory Point");
-            case 2: return _("Bracelet");
-            case 3: return _("Recruit");
-            case 4: return _("Research");
-            case 5: return _("Card");
-        }
-    }
-
-    public getTooltipGain(type: number): string {
-        return `${this.getGain(type)} (<div class="icon" data-type="${type}"></div>)`;
     }
 
     public getColor(color: number): string {

@@ -95,7 +95,11 @@ class Humanity extends Table {
         $sql = "INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar) VALUES ";
         $values = [];
 
+        $firstPlayer = null;
         foreach( $players as $player_id => $player ) {
+            if ($firstPlayer === null) {
+                $firstPlayer = $player_id;
+            }
             $color = array_shift( $default_colors );
 
             $values[] = "('".$player_id."','$color','".$player['player_canal']."','".addslashes( $player['player_name'] )."','".addslashes( $player['player_avatar'] )."')";
@@ -108,6 +112,7 @@ class Humanity extends Table {
         /************ Start the game initialization *****/
 
         // Init global values with their initial values
+        $this->setGlobalVariable(FIRST_PLAYER, $firstPlayer);
         
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -169,7 +174,6 @@ class Humanity extends Table {
   
         // Gather all information about current game situation (visible by player $current_player_id).
 
-        $firstPlayerId = null;
         $isEndScore = intval($this->gamestate->state_id()) >= ST_END_SCORE;
         
         foreach($result['players'] as $playerId => &$player) {
@@ -187,7 +191,7 @@ class Humanity extends Table {
         $result['tableResearch'] = $this->getResearchsByLocation('table');
         $result['tableObjectives'] = $this->getObjectivesByLocation('table');      
 
-        $result['firstPlayerId'] = $firstPlayerId;
+        $result['firstPlayerId'] = $this->getGlobalVariable(FIRST_PLAYER);
         $result['isEnd'] = $isEndScore;
   
         return $result;

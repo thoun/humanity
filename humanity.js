@@ -2535,45 +2535,11 @@ var Humanity = /** @class */ (function () {
         var _this = this;
         if (this.isCurrentPlayerActive()) {
             switch (stateName) {
-                case 'chooseAction':
-                    var chooseActionArgs = args;
-                    if (!chooseActionArgs.noActionYet) { // TODO
-                        this.addActionButton("endTurn_button", _("End turn"), function () { return _this.endTurn(); });
-                    }
-                    break;
-                case 'chooseNewCard':
-                    var chooseNewCardArgs_1 = args;
-                    [1, 2, 3, 4, 5].forEach(function (color) {
-                        var free = chooseNewCardArgs_1.allFree || color == chooseNewCardArgs_1.freeColor;
-                        _this.addActionButton("chooseNewCard".concat(color, "_button"), _("Take ${color}").replace('${color}', "<div class=\"color\" data-color=\"".concat(color, "\"></div>")) + " (".concat(free ? _('free') : "1 <div class=\"recruit icon\"></div>", ")"), function () { return _this.chooseNewCard(chooseNewCardArgs_1.centerCards.find(function (card) { return card.locationArg == color; }).id); }, null, null, free ? undefined : 'gray');
-                        if (!free && chooseNewCardArgs_1.recruits < 1) {
-                            document.getElementById("chooseNewCard".concat(color, "_button")).classList.add('disabled');
-                        }
-                    });
-                    break;
-                case 'payDestination':
-                    this.addActionButton("payDestination_button", '', function () { return _this.payDestination(); });
-                    this.setPayDestinationLabelAndState(args);
-                    this.addActionButton("cancel_button", _("Cancel"), function () { return _this.cancel(); }, null, null, 'gray');
-                    break;
-                case 'trade':
-                    var tradeArgs_1 = args;
-                    [1, 2, 3].forEach(function (number) {
-                        _this.addActionButton("trade".concat(number, "_button"), _("Trade ${number} bracelet(s)").replace('${number}', number), function () { return _this.trade(number, tradeArgs_1.gainsByBracelets); });
-                        var button = document.getElementById("trade".concat(number, "_button"));
-                        if (tradeArgs_1.bracelets < number) {
-                            button.classList.add('disabled');
-                        }
-                        else {
-                            button.addEventListener('mouseenter', function () { return _this.getCurrentPlayerTable().showColumns(number); });
-                            button.addEventListener('mouseleave', function () { return _this.getCurrentPlayerTable().showColumns(0); });
-                        }
-                    });
-                    this.addActionButton("cancel_button", _("Cancel"), function () { return _this.cancel(); }, null, null, 'gray');
-                    break;
-                // multiplayer state    
-                case 'discardCard':
-                    this.onEnteringDiscardCard(args);
+                case 'activateTile':
+                    //const chooseActionArgs = args as EnteringChooseActionArgs;
+                    //if (!chooseActionArgs.noActionYet) { // TODO
+                    this.addActionButton("endTurn_button", _("End turn"), function () { return _this.endTurn(); });
+                    //}
                     break;
             }
         }
@@ -2843,6 +2809,7 @@ var Humanity = /** @class */ (function () {
             ['score', 1],
             ['researchSpot', 1],
             ['science', 1],
+            ['newFirstPlayer', ANIMATION_MS],
         ];
         notifs.forEach(function (notif) {
             dojo.subscribe(notif[0], _this, function (notifDetails) {
@@ -2911,20 +2878,11 @@ var Humanity = /** @class */ (function () {
             this.setScience(args.playerId, args.new);
         }
     };
+    Humanity.prototype.notif_newFirstPlayer = function (args) {
+        this.placeFirstPlayerToken(args.playerId);
+    };
     Humanity.prototype.setWorkerDisabled = function (worker, disabled) {
         document.getElementById("worker-".concat(worker.id)).classList.toggle('disabled-worker', disabled);
-    };
-    Humanity.prototype.getGain = function (type) {
-        switch (type) {
-            case 1: return _("Victory Point");
-            case 2: return _("Bracelet");
-            case 3: return _("Recruit");
-            case 4: return _("Research");
-            case 5: return _("Card");
-        }
-    };
-    Humanity.prototype.getTooltipGain = function (type) {
-        return "".concat(this.getGain(type), " (<div class=\"icon\" data-type=\"").concat(type, "\"></div>)");
     };
     Humanity.prototype.getColor = function (color) {
         switch (color) {

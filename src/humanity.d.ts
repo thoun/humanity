@@ -107,9 +107,7 @@ interface HumanityGame extends Game {
 
     getPlayerId(): number;
     getPlayer(playerId: number): HumanityPlayer;
-    //getGain(type: number): string;
     //getColor(color: number): string;
-    getTooltipGain(type: number): string;
     getTooltipColor(color: number): string;
     getGameStateName(): string;
     getCurrentPlayerTable(): PlayerTable | null;
@@ -182,3 +180,8 @@ interface NotifScoreArgs {
     inc: number;
     private?: boolean;
 }
+
+// newFirstPlayer
+interface NotifNewFirstPlayerArgs {
+    playerId: number;
+}  

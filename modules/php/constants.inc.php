@@ -76,6 +76,7 @@ const END_SCORE = 100;
 /*
  * Global variables
  */
+const FIRST_PLAYER = 'FIRST_PLAYER';
 const YEAR = 'YEAR';
 const ARM = 'ARM';
 const CURRENT_ACTION = 'CURRENT_ACTION';

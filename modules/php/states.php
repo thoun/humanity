@@ -57,19 +57,29 @@ trait StateTrait {
     }
 
     function stEndRound() {
-        /* TODO
-1 Passez le pion écusson à la personne suivante dans le sens
-horaire.
+        $newFirstPlayer = intval($this->getPlayerAfter($this->getGlobalVariable(FIRST_PLAYER)));
+        $this->setGlobalVariable(FIRST_PLAYER, $newFirstPlayer);
+        $this->gamestate->changeActivePlayer($newFirstPlayer);
+        self::notifyAllPlayers('newFirstPlayer', '', [
+            'playerId' => $newFirstPlayer,
+            'player_name' => $this->getPlayerName($newFirstPlayer),
+        ]);
+        
+// TODO
+/*
 2 Si les deux premiers modules, placés sous les croix blanches,
-n’ont pas été déployés, ils sont retirés du jeu.
+n’ont pas été déployés, ils sont retirés du jeu.*/
+/*
 3 Décalez en sens horaire les modules restant autour du
 plateau principal sans laisser de hangar vide entre eux.
 Tournez le bras articulé en sens horaire jusqu’à le placer sur le
-dernier hangar vide.
+dernier hangar vide.*/
+/*
 4 Tous les astronautes dépassés par le bras articulé vous sont
 restitués. Les astronautes en face du bras articulé (comme
 l’astronaute vert sur l’exemple) ainsi que tous ceux qui n’ont
-pas été dépassés restent bloqués autour du plateau principal.
+pas été dépassés restent bloqués autour du plateau principal.*/
+/*
 5 Remplissez les hangars vides dans le sens horaire avec les
 modules de l’année en cours. Il ne faut pas toucher à la roue
 des expériences, elle reste en l’état jusqu’à la fin de l’année.
@@ -82,7 +92,8 @@ les hangars, ce n’est pas encore la fin d’année.*/
 $canRefillTiles = true;
 
         if ($canRefillTiles) {
-             /* TODO
+            // TODO
+             /* 
 6 Replacez dans votre base les astronautes que vous
 avez récupérés. Un astronaute doit être placé adjacent
 orthogonalement à au moins un module (les obstacles ne
@@ -102,23 +113,29 @@ les prochains modules pourront être construits.
     }
 
     function stEndYear() {
-        /* TODO
+        // TODO
+        /* 
         6 Gagnez autant de pions science que le plus grand chiffre que
 vous avez atteint sur la piste de recherche, puis autant que
 le nombre de marqueurs de recherche derrière vous sur la
 piste de recherche (à deux, celui ou celle qui est en tête gagne
 deux pions science). Placez-les derrière votre aide de jeu et
-replacez votre marqueur de recherche au début de la piste.
+replacez votre marqueur de recherche au début de la piste.*/
+/*
 7 Retirez toutes les expériences du plateau principal et
-remplacez-les par 7 expériences de la nouvelle année.
+remplacez-les par 7 expériences de la nouvelle année.*/
+/*
 8 Complétez le remplissage des hangars avec des modules de
 la nouvelle année. Les modules de l’année précédente restent
-autour du plateau principal.
+autour du plateau principal.*/
+/*
 9 Replacez dans votre base les astronautes que vous avez
 récupérés. Un astronaute doit toujours être placé actif et
-adjacent orthogonalement à au moins un module.
+adjacent orthogonalement à au moins un module.*/
+/*
 10 Tous les astronautes déjà présents dans votre base restent à
-leur place et sont rendus actifs.
+leur place et sont rendus actifs.*/
+/*
 11 Un nouveau tour de jeu peut commencer.
 Important : à la fin de l’année 3, la partie est terminée. Résolvez
 le décompte de la piste de recherche (voir le point 6 ci-dessus),
