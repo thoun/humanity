@@ -2021,10 +2021,7 @@ var TilesManager = /** @class */ (function (_super) {
                 div.dataset.type = '' + card.type;
                 div.dataset.r = '' + card.r;
             },
-            setupFrontDiv: function (card, div) {
-                div.dataset.number = '' + card.number;
-                game.setTooltip(div.id, _this.getTooltip(card));
-            },
+            setupFrontDiv: function (card, div) { return _this.setupFrontDiv(card, div); },
             isCardVisible: function (card) { return Boolean(card.number) || [0, 8, 9].includes(card.type); },
             cardWidth: 150,
             cardHeight: 150,
@@ -2032,6 +2029,13 @@ var TilesManager = /** @class */ (function (_super) {
         _this.game = game;
         return _this;
     }
+    TilesManager.prototype.setupFrontDiv = function (card, div, ignoreTooltip) {
+        if (ignoreTooltip === void 0) { ignoreTooltip = false; }
+        div.dataset.number = '' + card.number;
+        if (!ignoreTooltip) {
+            this.game.setTooltip(div.id, this.getTooltip(card));
+        }
+    };
     TilesManager.prototype.getTooltip = function (card) {
         var message = "x ".concat(card.x, "<br>\n        y ").concat(card.y); /*
         <strong>${_("Color:")}</strong> ${this.game.getTooltipColor(card.color)}
@@ -2039,6 +2043,17 @@ var TilesManager = /** @class */ (function (_super) {
         <strong>${_("Gain:")}</strong> <strong>1</strong> ${this.game.getTooltipGain(card.gain)}
         `;*/
         return message;
+    };
+    TilesManager.prototype.setForHelp = function (tile, divId) {
+        var div = document.getElementById(divId);
+        div.classList.add('card', 'tile');
+        div.dataset.side = 'front';
+        div.innerHTML = "\n        <div class=\"card-sides\">\n            <div class=\"card-side front\">\n            </div>\n            <div class=\"card-side back\">\n            </div>\n        </div>";
+        this.setupFrontDiv(tile, div.querySelector('.front'), true);
+    };
+    TilesManager.prototype.getHtml = function (tile) {
+        var html = "<div class=\"card tile\" data-side=\"front\" data-type=\"".concat(tile.type, "\" data-r=\"").concat(tile.r, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(tile.number, "\">\n                </div>\n                <div class=\"card-side back\">\n                </div>\n            </div>\n        </div>");
+        return html;
     };
     return TilesManager;
 }(CardManager));
@@ -3316,11 +3331,14 @@ var Humanity = /** @class */ (function () {
                 if (args.cost && (typeof args.cost !== 'string' || args.cost[0] !== '<')) {
                     args.cost = getCostStr(args.cost);
                 }
-                for (var property in args) {
-                    if (['number', 'color', 'card_color', 'card_type', 'objective_name'].includes(property) && args[property][0] != '<') {
-                        args[property] = "<strong>".concat(_(args[property]), "</strong>");
-                    }
+                if (args.tile_image === '' && args.tile) {
+                    args.tile_image = "<div class=\"log-image\">".concat(this.tilesManager.getHtml(args.tile), "</div>");
                 }
+                /* TODO DELETE ? for (const property in args) {
+                    if (['number', 'color', 'card_color', 'card_type', 'objective_name'].includes(property) && args[property][0] != '<') {
+                        args[property] = `<strong>${_(args[property])}</strong>`;
+                    }
+                }*/
             }
         }
         catch (e) {

@@ -92,7 +92,7 @@ trait ActionTrait {
             if ($tile->matchType == RESEARCH_POWER_TIME) {
                 $this->gainTimeUnit($playerId, 1);
             }
-            $message = clienttranslate('${player_name} activates a tile to trigger TODO POWER TIME effect');
+            $message = clienttranslate('${player_name} activates a tile to trigger TODO POWER TIME effect ${tile_image}');
         } else {
             if ($tile->r >= 3) {
                 throw new BgaUserException("You cannot activate this tile (already fully activated)");
@@ -101,20 +101,22 @@ trait ActionTrait {
             $this->DbQuery("UPDATE tile SET `r` = $tile->r WHERE `card_id` = $tile->id");
 
             if ($tile->type == 9) {
-                $message = clienttranslate('${player_name} activates an obstacle to reduce resistance to ${resistance}');
+                $message = clienttranslate('${player_name} activates an obstacle to reduce resistance to ${resistance} ${tile_image}');
                 $args['resistance'] = 3 - $tile->r;
             } else {
-                $message = clienttranslate('${player_name} activates a tile to produce 1 more ${type_icons}');
-                $args['type_icon'] = $this->getResourceName(array_keys($tile->getProduction()));
-                $args['i18n'] = ['type_icon'];
+                $message = clienttranslate('${player_name} activates a tile to produce 1 more ${types_icons} ${tile_image}');
+                $args['types_icons'] = implode(' ', array_map(fn($icon) => $this->getResourceName($icon), array_keys($tile->getProduction())));
+                $args['i18n'] = ['types_icons'];
             }
         }
 
-        self::notifyAllPlayers('activateTile', $message, [
+        self::notifyAllPlayers('activateTile', $message, $args + [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
             'tile' => $tile,
             'icons' => $this->getPlayerIcons($playerId),
+            'tile_image' => '',
+            'preserve' => ['tile'],
         ]);
 
         if ($tile->type == 9 && $tile->r == 3) {

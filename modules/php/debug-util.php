@@ -11,7 +11,7 @@ trait DebugUtilTrait {
             return;
         } 
 
-        $this->debugR();
+        //$this->debugR();
         $this->debugWorkforce();
     }
 

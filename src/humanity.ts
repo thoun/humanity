@@ -918,11 +918,15 @@ class Humanity implements HumanityGame {
                     args.cost = getCostStr(args.cost);
                 }
 
-                for (const property in args) {
+                if (args.tile_image === '' && args.tile) {
+                    args.tile_image = `<div class="log-image">${this.tilesManager.getHtml(args.tile)}</div>`;
+                }
+
+                /* TODO DELETE ? for (const property in args) {
                     if (['number', 'color', 'card_color', 'card_type', 'objective_name'].includes(property) && args[property][0] != '<') {
                         args[property] = `<strong>${_(args[property])}</strong>`;
                     }
-                }
+                }*/
             }
         } catch (e) {
             console.error(log,args,"Exception thrown", e.stack);
