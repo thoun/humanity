@@ -356,7 +356,7 @@ trait ActionTrait {
         $playerId = intval($this->getCurrentPlayerId());
 
         $movedWorkers = $this->getGlobalVariable(MOVED_WORKERS);
-        $playerMovedWorkers = array_values(array_filter($movedWorkers, fn($worker) => $worker->playerId));
+        $playerMovedWorkers = array_values(array_filter($movedWorkers, fn($worker) => $worker->playerId == $playerId));
 
         foreach ($playerMovedWorkers as $worker) {
             $this->DbQuery("UPDATE worker SET `location` = 'player', `spot` = null, `x` = $worker->x, `y` = $worker->y WHERE `id` = $worker->id");

@@ -101,30 +101,50 @@ trait StateTrait {
             }
         }
 
-        // shift remaining modules
-        for ($spot = 7; $spot >= 0; $spot--) {
+        $orderedTilesDesc = []; // remaining tiles, from farest to closest from arm
+        for ($i = 1; $i <= 7; $i++) {
+            $spot = ($armBefore + $i) % 8;
             $spotTile = $this->array_find($tableTiles, fn($tableTile) => $tableTile->locationArg == $spot);
-            if (!$spotTile) {
-                $lowerTiles = array_values(array_filter($tableTiles, fn($tableTile) => $tableTile->locationArg < $spot));
-                if (count($lowerTiles)) {
-                    usort($lowerTiles, fn($a, $b) => $b->locationArg - $a->locationArg);
-                    $newTile = $lowerTiles[0];
-                    $newTile->locationArg = $spot;
-                    $this->tiles->moveCard($newTile->id, 'table', $spot);
-
-                    self::notifyAllPlayers('shiftTableTile', '', [
-                        'tile' => $newTile,
-                    ]);
-                }
+            if ($spotTile) {
+                array_unshift($orderedTilesDesc, $spotTile);
             }
         }
 
+        $shifted = 0;
+        // shift remaining modules
+        for ($i = 0; $i < count($orderedTilesDesc); $i++) {
+            $spot = ($armBefore + 7 - $i) % 8;
+            if ($orderedTilesDesc[$i]->locationArg != $spot) {
+                $orderedTilesDesc[$i]->locationArg = $spot;
+                $this->tiles->moveCard($orderedTilesDesc[$i]->id, 'table', $spot);
+                $shifted++;
+
+                self::notifyAllPlayers('shiftTableTile', '', [
+                    'tile' => $orderedTilesDesc[$i],
+                ]);
+            }
+        }
+
+        if ($shifted > 0) {
+            self::notifyAllPlayers('log', clienttranslate('${diff} tiles were shifted on the free spots before the arm'), [
+                'diff' => $shifted,
+            ]);
+        }
+
         // move arm
-        $minSpot = min(array_map(fn($tile) => $tile->locationArg, $tableTiles));
-        $armAfter = $minSpot - 1;
+        $tableTiles = $this->getTilesByLocation('table');
+        $armAfter = $armBefore;
+        while (!$this->array_some($tableTiles, fn($tableTile) => $tableTile->locationArg == (($armAfter + 1) % 8))) {
+            $armAfter = ($armAfter + 1) % 8;
+        }
         $this->setGlobalVariable(ARM, $armAfter);
-        self::notifyAllPlayers('moveArm', '', [
+        $diff = $armAfter - $armBefore;
+        if ($diff < 0) {
+            $diff += 8;
+        }
+        self::notifyAllPlayers('moveArm', clienttranslate('Arm moves ${diff} hangars'), [
             'arm' => $armAfter,
+            'diff' => $diff
         ]);
 
         // reset workers in arm range
@@ -151,8 +171,10 @@ trait StateTrait {
                     $this->gamestate->nextState('endYear');
                     return;
                 } else {
-                    self::notifyAllPlayers('newTableTile', '', [
+                    self::notifyAllPlayers('newTableTile', clienttranslate('A new tile is added to the board to fill an empty hangar ${tile_image}'), [
                         'tile' => $newTile,
+                        'tile_image' => '',
+                        'preserve' => ['tile'],
                     ]);
                 }
             }

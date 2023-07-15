@@ -12,7 +12,7 @@ trait DebugUtilTrait {
         } 
 
         //$this->debugR(3);
-        $this->debugWorkforce();
+        //$this->debugWorkforce();
     }
 
     function debugR($r) {

@@ -153,12 +153,12 @@ trait ObjectiveTrait {
             $fromPlayerId = $objective->locationArg;
         }
 
-        $this->objective->moveCard($objective->id, 'player', $playerId);
+        $this->objectives->moveCard($objective->id, 'player', $playerId);
 
         if ($fromPlayerId !== null) {
             $this->incPlayerVP($fromPlayerId, -3, clienttranslate('${player_name} loses ${absInc} points for lost objective (to ${player_name2})'), [ 'player_name2' => $this->getPlayerName($playerId) ]);
         } else {
-            $this->incPlayerScience($playerId, 1);
+            $this->incPlayerScience($playerId, 1, clienttranslate('${player_name} gains ${inc} science point for being the first player to complete this objective'));
         } 
         $this->incPlayerVP($playerId, 3, clienttranslate('${player_name} gains ${inc} points for completed objective'));
 
