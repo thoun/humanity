@@ -206,8 +206,10 @@ $playerActionsGameStates = [
         "name" => "confirmMoveWorkers",
         "descriptionmyturn" => clienttranslate('${you} must confirm moved workers'),
         "type" => "private",
-        "possibleactions" => [ "confirmMoveWorkers" ],
-        "transitions" => [],
+        "possibleactions" => [ "confirmMoveWorkers", "restartMoveWorkers" ],
+        "transitions" => [
+            'restart' => ST_PRIVATE_MOVE_WORKER,
+        ],
     ],
 ];
 

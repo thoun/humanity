@@ -82,6 +82,14 @@ class Humanity implements HumanityGame {
         this.yearCounter = new ebg.counter();
         this.yearCounter.create(`year`);
         this.yearCounter.setValue(gamedatas.year);
+
+        gamedatas.movedWorkers?.forEach(worker => {
+            if (worker.location == 'table' && worker.x !== null) {
+                worker.location = 'player';
+                this.moveWorkerDiv(worker.playerId, worker);
+                this.setWorkerToConfirm(worker, true);
+            }
+        })
         
         this.zoomManager = new ZoomManager({
             element: document.getElementById('table'),
@@ -244,6 +252,7 @@ class Humanity implements HumanityGame {
                     break;
                 case 'confirmMoveWorkers':
                     (this as any).addActionButton(`confirmMoveWorkers_button`, _("Confirm"), () => this.confirmMoveWorkers());
+                    (this as any).addActionButton(`restartMoveWorkers_button`, _("Restart"), () => this.restartMoveWorkers(), null, null, 'red');
                     break;
             }
 
@@ -651,6 +660,14 @@ class Humanity implements HumanityGame {
 
         this.takeAction('confirmMoveWorkers');
     }
+  	
+    public restartMoveWorkers() {
+        if(!(this as any).checkAction('restartMoveWorkers')) {
+            return;
+        }
+
+        this.takeAction('restartMoveWorkers');
+    }
 
     public takeAction(action: string, data?: any) {
         data = data || {};
@@ -697,6 +714,8 @@ class Humanity implements HumanityGame {
             ['upgradeWorker', 50],
             ['year', ANIMATION_MS],
             ['gainObjective', undefined],
+            ['moveWorker', ANIMATION_MS],
+            ['confirmMoveWorkers', 1],
             ['restartTurn', 1],
         ];
     
@@ -870,21 +889,42 @@ class Humanity implements HumanityGame {
         }
     }
 
-    private resetWorker(playerId: number, worker: Worker) {
+    notif_moveWorker(args: NotifMoveWorkerArgs) {
+        const { playerId, worker, toConfirm } = args;
+        worker.location = worker.x !== null ? 'player' : 'table';
+        this.moveWorkerDiv(playerId, worker);
+        this.setWorkerToConfirm(worker, toConfirm);
+    }
+
+    notif_confirmMoveWorkers(args: NotifConfirmMoveWorkersArgs) {
+        const { workers } = args;
+        workers.forEach(worker => this.setWorkerToConfirm(worker, false));
+    }
+
+    private moveWorkerDiv(playerId: number, worker: Worker) {
         const workerDiv = document.getElementById(`worker-${worker.id}`);
         if (worker.location == 'player') {
             const tilesDiv = document.getElementById(`player-table-${playerId}-tiles`);
+            this.getPlayerTable(playerId).makeSlotForCoordinates(worker.x, worker.y);
             tilesDiv.querySelector(`[data-slot-id="${worker.x}_${worker.y}"]`).appendChild(workerDiv);
         } else if (worker.location == 'table') {
             const tableWorkers = document.getElementById('table-workers');
             tableWorkers.querySelector(`.slot[data-slot-id="${worker.spot}"]`).appendChild(workerDiv);
         }
-        workerDiv.classList.toggle('disabled-worker', !worker.remainingWorkforce);
+    }
+
+    private resetWorker(playerId: number, worker: Worker) {
+        this.moveWorkerDiv(playerId, worker);
+        document.getElementById(`worker-${worker.id}`).classList.toggle('disabled-worker', !worker.remainingWorkforce);
         document.getElementById(`worker-${worker.id}-force`).dataset.workforce = `${worker.workforce}`;
     }
 
     private setWorkerDisabled(worker: Worker, disabled: boolean) {
         document.getElementById(`worker-${worker.id}`).classList.toggle('disabled-worker', disabled);
+    }
+
+    private setWorkerToConfirm(worker: Worker, toConfirm: boolean) {
+        document.getElementById(`worker-${worker.id}`).classList.toggle('to-confirm', toConfirm);
     }
 
     public getColor(color: number, blueOrOrange: boolean): string {

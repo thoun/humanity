@@ -142,6 +142,14 @@
 
         self::ajaxResponse();
     }
+
+    public function restartMoveWorkers() {
+        self::setAjaxMode();     
+
+        $this->game->restartMoveWorkers();
+
+        self::ajaxResponse();
+    }
   }
   
 

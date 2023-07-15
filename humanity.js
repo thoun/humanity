@@ -2657,6 +2657,7 @@ var Humanity = /** @class */ (function () {
     */
     Humanity.prototype.setup = function (gamedatas) {
         var _this = this;
+        var _a;
         log("Starting game setup");
         this.gamedatas = gamedatas;
         log('gamedatas', gamedatas);
@@ -2681,6 +2682,13 @@ var Humanity = /** @class */ (function () {
         this.yearCounter = new ebg.counter();
         this.yearCounter.create("year");
         this.yearCounter.setValue(gamedatas.year);
+        (_a = gamedatas.movedWorkers) === null || _a === void 0 ? void 0 : _a.forEach(function (worker) {
+            if (worker.location == 'table' && worker.x !== null) {
+                worker.location = 'player';
+                _this.moveWorkerDiv(worker.playerId, worker);
+                _this.setWorkerToConfirm(worker, true);
+            }
+        });
         this.zoomManager = new ZoomManager({
             element: document.getElementById('table'),
             smooth: false,
@@ -2829,6 +2837,7 @@ var Humanity = /** @class */ (function () {
                     break;
                 case 'confirmMoveWorkers':
                     this.addActionButton("confirmMoveWorkers_button", _("Confirm"), function () { return _this.confirmMoveWorkers(); });
+                    this.addActionButton("restartMoveWorkers_button", _("Restart"), function () { return _this.restartMoveWorkers(); }, null, null, 'red');
                     break;
             }
             if (['chooseRadarColor', 'pay', 'chooseWorker', 'upgradeWorker', 'activateTile', 'confirmTurn'].includes(stateName)) {
@@ -3115,6 +3124,12 @@ var Humanity = /** @class */ (function () {
         }
         this.takeAction('confirmMoveWorkers');
     };
+    Humanity.prototype.restartMoveWorkers = function () {
+        if (!this.checkAction('restartMoveWorkers')) {
+            return;
+        }
+        this.takeAction('restartMoveWorkers');
+    };
     Humanity.prototype.takeAction = function (action, data) {
         data = data || {};
         data.lock = true;
@@ -3158,6 +3173,8 @@ var Humanity = /** @class */ (function () {
             ['upgradeWorker', 50],
             ['year', ANIMATION_MS],
             ['gainObjective', undefined],
+            ['moveWorker', ANIMATION_MS],
+            ['confirmMoveWorkers', 1],
             ['restartTurn', 1],
         ];
         notifs.forEach(function (notif) {
@@ -3295,21 +3312,39 @@ var Humanity = /** @class */ (function () {
             this.setScience(playerId, undo.science);
         }
     };
-    Humanity.prototype.resetWorker = function (playerId, worker) {
+    Humanity.prototype.notif_moveWorker = function (args) {
+        var playerId = args.playerId, worker = args.worker, toConfirm = args.toConfirm;
+        worker.location = worker.x !== null ? 'player' : 'table';
+        this.moveWorkerDiv(playerId, worker);
+        this.setWorkerToConfirm(worker, toConfirm);
+    };
+    Humanity.prototype.notif_confirmMoveWorkers = function (args) {
+        var _this = this;
+        var workers = args.workers;
+        workers.forEach(function (worker) { return _this.setWorkerToConfirm(worker, false); });
+    };
+    Humanity.prototype.moveWorkerDiv = function (playerId, worker) {
         var workerDiv = document.getElementById("worker-".concat(worker.id));
         if (worker.location == 'player') {
             var tilesDiv = document.getElementById("player-table-".concat(playerId, "-tiles"));
+            this.getPlayerTable(playerId).makeSlotForCoordinates(worker.x, worker.y);
             tilesDiv.querySelector("[data-slot-id=\"".concat(worker.x, "_").concat(worker.y, "\"]")).appendChild(workerDiv);
         }
         else if (worker.location == 'table') {
             var tableWorkers = document.getElementById('table-workers');
             tableWorkers.querySelector(".slot[data-slot-id=\"".concat(worker.spot, "\"]")).appendChild(workerDiv);
         }
-        workerDiv.classList.toggle('disabled-worker', !worker.remainingWorkforce);
+    };
+    Humanity.prototype.resetWorker = function (playerId, worker) {
+        this.moveWorkerDiv(playerId, worker);
+        document.getElementById("worker-".concat(worker.id)).classList.toggle('disabled-worker', !worker.remainingWorkforce);
         document.getElementById("worker-".concat(worker.id, "-force")).dataset.workforce = "".concat(worker.workforce);
     };
     Humanity.prototype.setWorkerDisabled = function (worker, disabled) {
         document.getElementById("worker-".concat(worker.id)).classList.toggle('disabled-worker', disabled);
+    };
+    Humanity.prototype.setWorkerToConfirm = function (worker, toConfirm) {
+        document.getElementById("worker-".concat(worker.id)).classList.toggle('to-confirm', toConfirm);
     };
     Humanity.prototype.getColor = function (color, blueOrOrange) {
         switch (color) {

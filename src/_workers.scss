@@ -30,6 +30,10 @@
         transform: rotate(180deg);
     }
 
+    &.to-confirm {
+        opacity: 0.7;
+    }
+
     .workforce {
         position: absolute;
         display: inline-block;

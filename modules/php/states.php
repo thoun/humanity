@@ -197,6 +197,7 @@ trait StateTrait {
     }
 
     function stAfterEndRound() {
+        $this->deleteGlobalVariable(MOVED_WORKERS);
         $this->reactivatePlayerWorkers(null);
 
         $this->gamestate->nextState('nextRound');

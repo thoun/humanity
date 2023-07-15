@@ -531,6 +531,9 @@ body > .card {
 .worker.disabled-worker {
   transform: rotate(180deg);
 }
+.worker.to-confirm {
+  opacity: 0.7;
+}
 .worker .workforce {
   position: absolute;
   display: inline-block;

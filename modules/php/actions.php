@@ -343,7 +343,13 @@ trait ActionTrait {
         $movedWorker->x = $x;
         $movedWorker->y = $y;
         $this->setGlobalVariable(MOVED_WORKERS, $movedWorkers);
-        // TODO notif
+
+        self::notifyAllPlayers('moveWorker', '', [
+            'playerId' => $playerId,
+            'player_name' => $this->getPlayerName($playerId),
+            'worker' => $movedWorker,
+            'toConfirm' => true,
+        ]);
 
         $remaining = count(array_filter($arg['playerMovedWorkers'], fn($w) => $w->x === null)) > 1;
 
@@ -360,10 +366,42 @@ trait ActionTrait {
 
         foreach ($playerMovedWorkers as $worker) {
             $this->DbQuery("UPDATE worker SET `location` = 'player', `spot` = null, `x` = $worker->x, `y` = $worker->y WHERE `id` = $worker->id");
-            // TODO notif
         }
 
+        self::notifyAllPlayers('confirmMoveWorkers', '', [
+            'playerId' => $playerId,
+            'player_name' => $this->getPlayerName($playerId),
+            'workers' => $playerMovedWorkers,
+        ]);
+
         $this->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    }
+
+    public function restartMoveWorkers() {
+        self::checkAction('restartMoveWorkers');
+
+        $playerId = intval($this->getCurrentPlayerId());
+
+        $movedWorkers = $this->getGlobalVariable(MOVED_WORKERS);
+        $playerMovedWorkers = array_values(array_filter($movedWorkers, fn($worker) => $worker->playerId == $playerId));
+
+        foreach ($playerMovedWorkers as $worker) {
+            if ($worker->x !== null) {
+                $movedWorker = $this->array_find($movedWorkers, fn($w) => ((object)$w)->id == ((object)$worker)->id);
+                $movedWorker->x = null;
+                $movedWorker->y = null;
+
+                self::notifyAllPlayers('moveWorker', '', [
+                    'playerId' => $playerId,
+                    'player_name' => $this->getPlayerName($playerId),
+                    'worker' => $movedWorker,
+                    'toConfirm' => false,
+                ]);
+            }
+        }
+        $this->setGlobalVariable(MOVED_WORKERS, $movedWorkers);
+
+        $this->gamestate->nextPrivateState($playerId, 'restart');
     }
 
     public function restartTurn() {

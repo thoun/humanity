@@ -224,7 +224,7 @@ class PlayerTable {
         });
     }
 
-    private makeSlotForCoordinates(x: number, y: number) {
+    public makeSlotForCoordinates(x: number, y: number) {
         while (x < this.tileMinX) {
             this.addLeftCol();
         }

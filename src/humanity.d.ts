@@ -97,6 +97,8 @@ interface HumanityGamedatas {
     year: number;
     firstPlayerId: number;
     isEnd: boolean;
+
+    movedWorkers?: Worker[];
 }
 
 interface HumanityGame extends Game {
@@ -250,3 +252,17 @@ interface NotifRestartTurnArgs {
     playerId: number;
     undo: Undo;
 }
+
+// moveWorker
+interface NotifMoveWorkerArgs {
+    playerId: number;
+    worker: Worker;
+    toConfirm: boolean;
+}
+
+// confirmMoveWorkers
+interface NotifConfirmMoveWorkersArgs {
+    playerId: number;
+    workers: Worker[];
+}
+

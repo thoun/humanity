@@ -198,6 +198,8 @@ class Humanity extends Table {
         $result['year'] = $this->getYear();
         $result['firstPlayerId'] = $this->getGlobalVariable(FIRST_PLAYER);
         $result['isEnd'] = $isEndScore;
+
+        $result['movedWorkers'] = $this->getGlobalVariable(MOVED_WORKERS);
   
         return $result;
     }
