@@ -2090,6 +2090,10 @@ var DestinationsManager = /** @class */ (function (_super) {
         `;*/
         return message;
     };
+    DestinationsManager.prototype.getHtml = function (tile) {
+        var html = "<div class=\"card research\" data-side=\"front\" data-year=\"".concat(tile.year, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(tile.number, "\">\n                </div>\n                <div class=\"card-side back\">\n                </div>\n            </div>\n        </div>");
+        return html;
+    };
     return DestinationsManager;
 }(CardManager));
 var ObjectivesManager = /** @class */ (function (_super) {
@@ -2158,6 +2162,10 @@ var ObjectivesManager = /** @class */ (function (_super) {
                 break;
         }
         return message;
+    };
+    ObjectivesManager.prototype.getHtml = function (tile) {
+        var html = "<div class=\"card objective\" data-side=\"front\" data-type=\"".concat(tile.type, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(tile.number, "\">\n                </div>\n                <div class=\"card-side back\">\n                </div>\n            </div>\n        </div>");
+        return html;
     };
     return ObjectivesManager;
 }(CardManager));
@@ -3328,11 +3336,19 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.format_string_recursive = function (log, args) {
         try {
             if (log && args && !args.processed) {
-                if (args.cost && (typeof args.cost !== 'string' || args.cost[0] !== '<')) {
-                    args.cost = getCostStr(args.cost);
-                }
+                ['cost', 'types'].forEach(function (argName) {
+                    if (args[argName] && (typeof args[argName] !== 'string' || args[argName][0] !== '<')) {
+                        args[argName] = getCostStr(args[argName]);
+                    }
+                });
                 if (args.tile_image === '' && args.tile) {
                     args.tile_image = "<div class=\"log-image\">".concat(this.tilesManager.getHtml(args.tile), "</div>");
+                }
+                if (args.research_image === '' && args.research) {
+                    args.research_image = "<div class=\"log-image\">".concat(this.researchManager.getHtml(args.research), "</div>");
+                }
+                if (args.objective_image === '' && args.objective) {
+                    args.objective_image = "<div class=\"log-image\">".concat(this.objectivesManager.getHtml(args.objective), "</div>");
                 }
                 /* TODO DELETE ? for (const property in args) {
                     if (['number', 'color', 'card_color', 'card_type', 'objective_name'].includes(property) && args[property][0] != '<') {

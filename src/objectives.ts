@@ -37,4 +37,16 @@ class ObjectivesManager extends CardManager<Objective> {
         return message;
         
     }
+    
+    public getHtml(tile: Objective): string {
+        let html = `<div class="card objective" data-side="front" data-type="${tile.type}">
+            <div class="card-sides">
+                <div class="card-side front" data-number="${tile.number}">
+                </div>
+                <div class="card-side back">
+                </div>
+            </div>
+        </div>`;
+        return html;
+    }
 }

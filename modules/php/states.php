@@ -79,7 +79,7 @@ trait StateTrait {
         $newFirstPlayer = intval($this->getPlayerAfter($this->getGlobalVariable(FIRST_PLAYER)));
         $this->setGlobalVariable(FIRST_PLAYER, $newFirstPlayer);
         $this->gamestate->changeActivePlayer($newFirstPlayer);
-        self::notifyAllPlayers('newFirstPlayer', '', [
+        self::notifyAllPlayers('newFirstPlayer', clienttranslate('${player_name} is the new first player'), [
             'playerId' => $newFirstPlayer,
             'player_name' => $this->getPlayerName($newFirstPlayer),
         ]);
@@ -92,8 +92,10 @@ trait StateTrait {
             $spotTile = $this->array_find($tableTiles, fn($tableTile) => $tableTile->locationArg == $spot);
             if ($spotTile) {
                 $this->tiles->moveCard($spotTile->id, 'void');
-                self::notifyAllPlayers('removeTableTile', '', [
+                self::notifyAllPlayers('removeTableTile', clienttranslate('There is a tile remaining under a white cross, the tile is removed ${tile_image}'), [
                     'tile' => $spotTile,
+                    'tile_image' => '',
+                    'preserve' => ['tile'],
                 ]);
                 $tableTiles = array_values(array_filter($tableTiles, fn($tableTile) => $tableTile->id != $spotTile->id));
             }

@@ -11,12 +11,12 @@ trait DebugUtilTrait {
             return;
         } 
 
-        //$this->debugR();
+        //$this->debugR(3);
         $this->debugWorkforce();
     }
 
-    function debugR() {
-		$this->DbQuery("UPDATE tile SET `r` = 3 WHERE card_location = 'player'");
+    function debugR($r) {
+		$this->DbQuery("UPDATE tile SET `r` = $r WHERE card_location = 'player'");
     }
     
     function debugWorkforce() {

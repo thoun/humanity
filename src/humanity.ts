@@ -914,12 +914,22 @@ class Humanity implements HumanityGame {
     public format_string_recursive(log: string, args: any) {
         try {
             if (log && args && !args.processed) {
-                if (args.cost && (typeof args.cost !== 'string' || args.cost[0] !== '<')) {
-                    args.cost = getCostStr(args.cost);
-                }
+                ['cost', 'types'].forEach(argName => {
+                    if (args[argName] && (typeof args[argName] !== 'string' || args[argName][0] !== '<')) {
+                        args[argName] = getCostStr(args[argName]);
+                    }
+                });
 
                 if (args.tile_image === '' && args.tile) {
                     args.tile_image = `<div class="log-image">${this.tilesManager.getHtml(args.tile)}</div>`;
+                }
+
+                if (args.research_image === '' && args.research) {
+                    args.research_image = `<div class="log-image">${this.researchManager.getHtml(args.research)}</div>`;
+                }
+
+                if (args.objective_image === '' && args.objective) {
+                    args.objective_image = `<div class="log-image">${this.objectivesManager.getHtml(args.objective)}</div>`;
                 }
 
                 /* TODO DELETE ? for (const property in args) {

@@ -203,8 +203,17 @@ trait UtilTrait {
         return $payWith;
     }
 
-    function getResourceName(int $color) {
+    function getColorName(int $color) {
         switch ($color) {
+            case 1: return clienttranslate("Orange");
+            case 2: return clienttranslate("Blue");
+            case 3: return clienttranslate("Purple");
+            case 4: return clienttranslate("Green");
+        }
+    }
+
+    function getResourceName(int $type) {
+        switch ($type) {
             case 0: return clienttranslate("Electricity");
             case 1: return clienttranslate("Ice");
             case 2: return clienttranslate("Methan");

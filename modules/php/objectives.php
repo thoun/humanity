@@ -163,8 +163,8 @@ trait ObjectiveTrait {
         $this->incPlayerVP($playerId, 3, clienttranslate('${player_name} gains ${inc} points for completed objective'));
 
         $message = $fromPlayerId === null ?
-            clienttranslate('${player_name} gains an objective card and 1 science point') :
-            clienttranslate('${player_name} gains an objective card previously owned by ${player_name2}');
+            clienttranslate('${player_name} gains an objective card and 1 science point ${objective_image}') :
+            clienttranslate('${player_name} gains an objective card previously owned by ${player_name2} ${objective_image}');
 
         self::notifyAllPlayers('gainObjective', $message, [
             'playerId' => $playerId,
@@ -172,6 +172,8 @@ trait ObjectiveTrait {
             'objective' => $objective,
             'fromPlayerId' => $fromPlayerId,
             'player_name2' => $fromPlayerId !== null ? $this->getPlayerName($fromPlayerId) : null, // for logs
+            'objective_image' => '',
+            'preserve' => ['objective'],
         ]);
     }
 }

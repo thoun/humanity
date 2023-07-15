@@ -103,10 +103,9 @@ trait ActionTrait {
             if ($tile->type == 9) {
                 $message = clienttranslate('${player_name} activates an obstacle to reduce resistance to ${resistance} ${tile_image}');
                 $args['resistance'] = 3 - $tile->r;
-            } else {
-                $message = clienttranslate('${player_name} activates a tile to produce 1 more ${types_icons} ${tile_image}');
-                $args['types_icons'] = implode(' ', array_map(fn($icon) => $this->getResourceName($icon), array_keys($tile->getProduction())));
-                $args['i18n'] = ['types_icons'];
+            } else {                
+                $message = clienttranslate('${player_name} activates a tile to set its production to ${types} ${tile_image}');
+                $args['types'] = $tile->getProduction();
             }
         }
 
@@ -141,6 +140,7 @@ trait ActionTrait {
     public function chooseNewTile(int $id) {
         self::checkAction('chooseNewTile');
 
+        $playerId = intval($this->getActivePlayerId());
         $tile = $this->getTileById($id);
 
         $currentAction = new CurrentAction('tile');
@@ -149,6 +149,14 @@ trait ActionTrait {
         $currentAction->remainingCost = $tile->cost;
         $currentAction->workerSpot = $tile->locationArg;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
+
+        self::notifyAllPlayers('log', clienttranslate('${player_name} chooses a tile to deploy ${tile_image}'), [
+            'playerId' => $playerId,
+            'player_name' => $this->getPlayerName($playerId),
+            'tile' => $tile,
+            'tile_image' => '',
+            'preserve' => ['tile'],
+        ]);
 
         $this->gamestate->nextState($tile->color == BLUE_OR_ORANGE ? 'chooseRadarColor' : 'pay');
     }
@@ -160,6 +168,7 @@ trait ActionTrait {
             throw new BgaUserException("Invalid color");
         }
 
+        $playerId = intval($this->getActivePlayerId());
         $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
 
         $radarTiles = $this->getTilesByLocation('radar');
@@ -169,12 +178,23 @@ trait ActionTrait {
         $currentAction->addTileId = $tile->id;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
+        self::notifyAllPlayers('log', clienttranslate('${player_name} chooses a ${color} radar to replace the selected tile ${tile_image}'), [
+            'playerId' => $playerId,
+            'player_name' => $this->getPlayerName($playerId),
+            'tile' => $tile,
+            'color' => $this->getColorName($color),
+            'tile_image' => '',
+            'preserve' => ['tile'],
+            'i18n' => ['color'],
+        ]);
+
         $this->gamestate->nextState('pay');
     }
 
     public function chooseNewResearch(int $id) {
         self::checkAction('chooseNewResearch');
 
+        $playerId = intval($this->getActivePlayerId());
         $tile = $this->getResearchById($id);
 
         $currentAction = new CurrentAction('research');
@@ -182,6 +202,14 @@ trait ActionTrait {
         $currentAction->remainingCost = $tile->cost;
         $currentAction->workerSpot = ($tile->locationArg + $this->getArm()) % 8;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
+
+        self::notifyAllPlayers('log', clienttranslate('${player_name} chooses a research tile to deploy ${research_image}'), [
+            'playerId' => $playerId,
+            'player_name' => $this->getPlayerName($playerId),
+            'research' => $tile,
+            'research_image' => '',
+            'preserve' => ['tile'],
+        ]);
 
         $this->gamestate->nextState('pay');
     }
@@ -225,6 +253,12 @@ trait ActionTrait {
                 }
             }
         }
+
+        self::notifyAllPlayers('log', clienttranslate('${player_name} pays ${cost} to deploy the tile'), [
+            'playerId' => $playerId,
+            'player_name' => $this->getPlayerName($playerId),
+            'cost' => $pay,
+        ]);
 
         $this->gamestate->nextState('next');
     }

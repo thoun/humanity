@@ -30,4 +30,16 @@ class DestinationsManager extends CardManager<Research> {
  
         return message;
     }
+    
+    public getHtml(tile: Research): string {
+        let html = `<div class="card research" data-side="front" data-year="${tile.year}">
+            <div class="card-sides">
+                <div class="card-side front" data-number="${tile.number}">
+                </div>
+                <div class="card-side back">
+                </div>
+            </div>
+        </div>`;
+        return html;
+    }
 }
