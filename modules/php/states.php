@@ -158,13 +158,13 @@ trait StateTrait {
         $this->setGlobalVariable(MOVED_ASTRONAUTS, $movedAstronauts);
 
         // place new modules
-        $age = $this->getYear();
+        $year = $this->getYear();
         $tableModules = $this->getModulesByLocation('table');
         for ($i = 1; $i < 8; $i++) {
             $spot = ($armAfter + $i) % 8;
             $spotModule = $this->array_find($tableModules, fn($tableModule) => $tableModule->locationArg == $spot);
             if (!$spotModule) {
-                $newModule = $this->getModuleFromDb($this->modules->pickCardForLocation('deck'.$age, 'table', $spot));
+                $newModule = $this->getModuleFromDb($this->modules->pickCardForLocation('deck'.$year, 'table', $spot));
                 if ($newModule == null) {
                     self::notifyAllPlayers('log', clienttranslate('Impossible to refill the modules, moving to next year'), []);
                     
@@ -248,7 +248,7 @@ trait StateTrait {
             'tableExperiment' => $this->getExperimentsByLocation('table'),
         ]);
 
-        // continue to fill modules with new age modules
+        // continue to fill modules with new year modules
         $arm = $this->getArm();
         $tableModules = $this->getModulesByLocation('table');
         for ($i = 1; $i < 8; $i++) {

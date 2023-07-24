@@ -37,13 +37,13 @@ trait ModuleTrait {
     }
 
     function setupModules(array $players) {
-        foreach ([1, 2, 3] as $age => $modulesType) {
+        foreach ([1, 2, 3] as $year => $modulesType) {
             $modules = [];
-            foreach ($this->TILES[$age] as $subType => $moduleType) {
-                $modules[] = [ 'type' => $age, 'type_arg' => $subType, 'nbr' => 1 ];
+            foreach ($this->TILES[$year] as $subType => $moduleType) {
+                $modules[] = [ 'type' => $year, 'type_arg' => $subType, 'nbr' => 1 ];
             }
-            $this->modules->createCards($modules, 'deck'.$age);
-            $this->modules->shuffle('deck'.$age);
+            $this->modules->createCards($modules, 'deck'.$year);
+            $this->modules->shuffle('deck'.$year);
         }
 
         foreach ([1, 2, 3, 4, 5, 6, 7] as $spot) {

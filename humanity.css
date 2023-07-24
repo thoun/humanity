@@ -600,7 +600,7 @@ body > .card {
   background-position-x: 100%;
 }
 .module[data-type="1"] .front {
-  background-image: url("img/modules-ages.png");
+  background-image: url("img/modules-years.png");
   background-size: auto 300%;
   background-position-y: 0%;
 }
@@ -650,7 +650,7 @@ body > .card {
   background-position-x: 100%;
 }
 .module[data-type="2"] .front {
-  background-image: url("img/modules-ages.png");
+  background-image: url("img/modules-years.png");
   background-size: auto 300%;
   background-position-y: 50%;
 }
@@ -700,7 +700,7 @@ body > .card {
   background-position-x: 100%;
 }
 .module[data-type="3"] .front {
-  background-image: url("img/modules-ages.png");
+  background-image: url("img/modules-years.png");
   background-size: auto 300%;
   background-position-y: 100%;
 }
@@ -801,13 +801,13 @@ body > .card {
   border-radius: 25px;
 }
 .card.experiment[data-year="1"] .front {
-  background-image: url("img/experiments-age1.png");
+  background-image: url("img/experiments-year1.png");
 }
 .card.experiment[data-year="2"] .front {
-  background-image: url("img/experiments-age2.png");
+  background-image: url("img/experiments-year2.png");
 }
 .card.experiment[data-year="3"] .front {
-  background-image: url("img/experiments-age3.png");
+  background-image: url("img/experiments-year3.png");
 }
 .card.experiment .card-sides .card-side {
   box-shadow: none;
