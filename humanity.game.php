@@ -114,26 +114,29 @@ class Humanity extends Table {
         
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
+
         $this->initStat('table', 'roundNumber', 0);
-        foreach(['table', 'player'] as $type) {
-            foreach([
-                "sciencePoints", 
-                // cards
-                "playedCards", 
-                "assetsCollectedByPlayedCards", "assetsCollectedByPlayedCards1", "assetsCollectedByPlayedCards2", "assetsCollectedByPlayedCards3", "assetsCollectedByPlayedCards4", 
-                "recruitsUsedToChooseCard", "discardedCards",
-                // research
-                "discoveredDestinations", "discoveredDestinations1", "discoveredDestinations2",
-                "assetsCollectedByDestination", "assetsCollectedByDestination1", "assetsCollectedByDestination2", "assetsCollectedByDestination3", "assetsCollectedByDestination4", "assetsCollectedByDestination5",
-                "recruitsUsedToPayDestination",
-                // trade
-                "tradeActions", "tradeActions1", "tradeActions2", "tradeActions3", "braceletsUsed",
-                "assetsCollectedByTrade", "assetsCollectedByTrade1", "assetsCollectedByTrade2", "assetsCollectedByTrade3", "assetsCollectedByTrade4", "assetsCollectedByTrade5",
-                //	miscellaneous
-                "recruitsMissed", "braceletsMissed",
-            ] as $name) {
-                $this->initStat($type, $name, 0);
-            }
+        // Statistics existing for each player
+        foreach([
+            //18+ obstacles
+            "removedObstacles",
+            // 20+ modules
+            "deployedModules", "deployedModules".ORANGE, "deployedModules".BLUE, "deployedModules".PURPLE, "deployedModules".GREEN,            
+            "deployedModulesYear1", "deployedModulesYear2", "deployedModulesYear3",    
+            "activatedModules", "spentModules",    
+            // 30+ experiments
+            "deployedExperiments", "deployedExperiments".LEFT, "deployedExperiments".CENTRAL, "deployedExperiments".RIGHT,
+            "completeExperimentLines", "uncompleteExperimentLines2", "uncompleteExperimentLines1",
+            // 40+ missions
+            "gainedMissions", "gainedMissionsFromDeck", "gainedMissionsFromPlayer", "lostMissions", "endMissions",
+            // 50+ astronauts
+            "upgradedAstronauts", "power".EXPERIMENT_POWER_REACTIVATE, "power".EXPERIMENT_POWER_REACTIVATE."result", "power".EXPERIMENT_POWER_TIME, "power".EXPERIMENT_POWER_TIME."result",
+            "skippedAstronaut",    
+            // 60+ points
+            "sciencePoints", "researchPoints", "researchPointsByScience", 
+            "vpWithModules", "vpWithExperiments", "vpWithMissions", "vpWithRemainingResources",
+        ] as $name) {
+            $this->initStat('player', $name, 0);
         }
 
         // setup the initial game situation here

@@ -77,9 +77,11 @@ trait ExperimentTrait {
             if ($alreadyBuildForSameLine == 1) {
                 $args['rank'] = clienttranslate('second');
                 $this->incPlayerVP($playerId, 1, $message, $args);
+                $this->incStat(1, 'vpWithExperiments', $playerId);
             } else if ($alreadyBuildForSameLine == 2) {
                 $args['rank'] = clienttranslate('third');
                 $this->incPlayerVP($playerId, 2, $message, $args);
+                $this->incStat(2, 'vpWithExperiments', $playerId);
             }
         }
 
@@ -89,6 +91,7 @@ trait ExperimentTrait {
 
         if ($module->points > 0) {
             $this->incPlayerVP($playerId, $module->points, clienttranslate('${player_name} gains ${inc} points from the played experiment'));
+            $this->incStat($module->points, 'vpWithExperiments', $playerId);
         }
 
         $this->DbQuery("UPDATE experiment SET `card_location` = 'player', `card_location_arg` = $playerId, `line` = $line WHERE `card_id` = $module->id");
@@ -102,10 +105,18 @@ trait ExperimentTrait {
             'experiment' => $module,
         ]);
 
+        $this->incStat(1, 'deployedExperiments', $playerId);
+        $this->incStat(1, 'deployedExperiments'.$module->side, $playerId);
+
         if ($module->effect == EXPERIMENT_POWER_TIME) {
             $this->gainTimeUnit($playerId, 2);
         } else if ($module->effect == EXPERIMENT_POWER_REACTIVATE) {
-            $this->reactivatePlayerAstronauts($playerId);
+            $count = $this->getUniqueValueFromDB("SELECT count(*) FROM `astronaut` WHERE `player_id` = $playerId AND `remaining_workforce` = 0");
+
+            $this->reactivatePlayerAstronauts($playerId);            
+
+            $this->incStat(1, "power".EXPERIMENT_POWER_REACTIVATE, $playerId);
+            $this->incStat($count, "power".EXPERIMENT_POWER_REACTIVATE."result", $playerId);
         }
     }
 }

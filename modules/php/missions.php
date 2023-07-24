@@ -170,10 +170,12 @@ trait MissionTrait {
 
         if ($fromPlayerId !== null) {
             $this->incPlayerVP($fromPlayerId, -3, clienttranslate('${player_name} loses ${absInc} points for lost mission (to ${player_name2})'), [ 'player_name2' => $this->getPlayerName($playerId) ]);
+            $this->incStat(-3, 'vpWithMissions', $fromPlayerId);
         } else {
             $this->incPlayerScience($playerId, 1, clienttranslate('${player_name} gains ${inc} science point for being the first player to complete this mission'));
         } 
         $this->incPlayerVP($playerId, 3, clienttranslate('${player_name} gains ${inc} points for completed mission'));
+        $this->incStat(3, 'vpWithMissions', $playerId);
 
         $message = $fromPlayerId === null ?
             clienttranslate('${player_name} gains an mission card and 1 science point ${mission_image}') :
@@ -188,5 +190,13 @@ trait MissionTrait {
             'mission_image' => '',
             'preserve' => ['mission'],
         ]);
+        
+        $this->incStat(1, 'gainedMissions', $playerId);
+        if ($fromPlayerId !== null) {
+            $this->incStat(1, 'gainedMissionsFromPlayer', $playerId);
+            $this->incStat(1, 'lostMissions', $fromPlayerId);
+        } else {
+            $this->incStat(1, 'gainedMissionsFromDeck', $playerId);
+        }
     }
 }

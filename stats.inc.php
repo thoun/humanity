@@ -47,189 +47,11 @@
     
 */
 
-// TODO
-$commonStats = [
-    // repuration
-    "sciencePoints" => [
-        "id" => 20,
-        "name" => totranslate("Points gained with research"),
-        "type" => "int"
-    ],
-
-    // played cards
-    "playedCards" => [
-        "id" => 21,
-        "name" => totranslate("Played cards"),
-        "type" => "int"
-    ],
-    "assetsCollectedByPlayedCards" => [
-        "id" => 22,
-        "name" => totranslate("Assets gained by played cards"),
-        "type" => "int"
-    ],
-    "assetsCollectedByPlayedCards1" => [
-        "id" => 23,
-        "name" => totranslate("Victory points gained by played cards"),
-        "type" => "int"
-    ],
-    "assetsCollectedByPlayedCards2" => [
-        "id" => 24,
-        "name" => totranslate("Bracelets gained by played cards"),
-        "type" => "int"
-    ],
-    "assetsCollectedByPlayedCards3" => [
-        "id" => 25,
-        "name" => totranslate("Recruits gained by played cards"),
-        "type" => "int"
-    ],
-    "assetsCollectedByPlayedCards4" => [
-        "id" => 26,
-        "name" => totranslate("Experiment gained by played cards"),
-        "type" => "int"
-    ],
-    "recruitsUsedToChooseCard" => [
-        "id" => 30,
-        "name" => totranslate("Recruits used to choose card"),
-        "type" => "int"
-    ],
-    "discardedCards" => [
-        "id" => 39,
-        "name" => totranslate("Discarded cards to reform deck"),
-        "type" => "int"
-    ],
-    
-    // research
-    "discoveredDestinations" => [
-        "id" => 40,
-        "name" => totranslate("Discovered research"),
-        "type" => "int"
-    ],    
-    "discoveredDestinations1" => [
-        "id" => 41,
-        "name" => totranslate("Discovered trading Lands"),
-        "type" => "int"
-    ],    
-    "discoveredDestinations2" => [
-        "id" => 42,
-        "name" => totranslate("Discovered Lands of influence"),
-        "type" => "int"
-    ],
-    "assetsCollectedByDestination" => [
-        "id" => 43,
-        "name" => totranslate("Assets gained by research"),
-        "type" => "int"
-    ],
-    "assetsCollectedByDestination1" => [
-        "id" => 44,
-        "name" => totranslate("Victory points gained by research"),
-        "type" => "int"
-    ],
-    "assetsCollectedByDestination2" => [
-        "id" => 45,
-        "name" => totranslate("Bracelets gained by research"),
-        "type" => "int"
-    ],
-    "assetsCollectedByDestination3" => [
-        "id" => 46,
-        "name" => totranslate("Recruits gained by research"),
-        "type" => "int"
-    ],
-    "assetsCollectedByDestination4" => [
-        "id" => 47,
-        "name" => totranslate("Experiment gained by research"),
-        "type" => "int"
-    ],
-    "assetsCollectedByDestination5" => [
-        "id" => 48,
-        "name" => totranslate("Cards gained by research"),
-        "type" => "int"
-    ],
-    "recruitsUsedToPayDestination" => [
-        "id" => 50,
-        "name" => totranslate("Recruits used to take a research"),
-        "type" => "int"
-    ],
-
-    // trade
-    "tradeActions" => [
-        "id" => 60,
-        "name" => totranslate("Trade actions"),
-        "type" => "int"
-    ],   
-    "tradeActions1" => [
-        "id" => 61,
-        "name" => totranslate("Trade actions with 1 bracelet"),
-        "type" => "int"
-    ],  
-    "tradeActions2" => [
-        "id" => 62,
-        "name" => totranslate("Trade actions with 2 bracelets"),
-        "type" => "int"
-    ],  
-    "tradeActions3" => [
-        "id" => 63,
-        "name" => totranslate("Trade actions with 3 bracelets"),
-        "type" => "int"
-    ], 
-    "braceletsUsed" => [
-        "id" => 64,
-        "name" => totranslate("Bracelets used for trade"),
-        "type" => "int"
-    ], 
-    "assetsCollectedByTrade" => [
-        "id" => 65,
-        "name" => totranslate("Assets gained by trade"),
-        "type" => "int"
-    ],
-    "assetsCollectedByTrade1" => [
-        "id" => 66,
-        "name" => totranslate("Victory points gained by trade"),
-        "type" => "int"
-    ],
-    "assetsCollectedByTrade2" => [
-        "id" => 67,
-        "name" => totranslate("Bracelets gained by trade"),
-        "type" => "int"
-    ],
-    "assetsCollectedByTrade3" => [
-        "id" => 68,
-        "name" => totranslate("Recruits gained by trade"),
-        "type" => "int"
-    ],
-    "assetsCollectedByTrade4" => [
-        "id" => 69,
-        "name" => totranslate("Experiment gained by trade"),
-        "type" => "int"
-    ],
-    "assetsCollectedByTrade5" => [
-        "id" => 70,
-        "name" => totranslate("Cards gained by trade"),
-        "type" => "int"
-    ],  
-
-    // missions
-    "activatedMissions" => [
-        "id" => 80,
-        "name" => totranslate("Activated missions"),
-        "type" => "int"
-    ],
-    
-    //	miscellaneous
-    "recruitsMissed" => [
-        "id" => 90,
-        "name" => totranslate("Recruits missed (already at 3)"),
-        "type" => "int"
-    ],
-    "braceletsMissed" => [
-        "id" => 91,
-        "name" => totranslate("Bracelets missed (already at 3)"),
-        "type" => "int"
-    ],
-];
+require_once("modules/php/constants.inc.php");
 
 $stats_type = [
     // Statistics global to table
-    "table" => $commonStats + [
+    "table" => [
         "roundNumber" => [
             "id" => 10,
             "name" => totranslate("Number of rounds"),
@@ -238,6 +60,202 @@ $stats_type = [
     ],
     
     // Statistics existing for each player
-    "player" => $commonStats + [
+    "player" => [
+            
+        // 18+ obstacles
+        "removedObstacles" => [
+            "id" => 18,
+            "name" => totranslate("Removed obstacles"),
+            "type" => "int"
+        ],
+
+        // 20+ modules
+        "deployedModules" => [
+            "id" => 20,
+            "name" => totranslate("Deployed modules"),
+            "type" => "int"
+        ],
+        "deployedModules".ORANGE => [
+            "id" => 20 + ORANGE,
+            "name" => totranslate("Deployed orange modules"),
+            "type" => "int"
+        ],
+        "deployedModules".BLUE => [
+            "id" => 20 + BLUE,
+            "name" => totranslate("Deployed blue modules"),
+            "type" => "int"
+        ],
+        "deployedModules".PURPLE => [
+            "id" => 20 + PURPLE,
+            "name" => totranslate("Deployed purple modules"),
+            "type" => "int"
+        ],
+        "deployedModules".GREEN => [
+            "id" => 20 + GREEN,
+            "name" => totranslate("Deployed green modules"),
+            "type" => "int"
+        ],
+        
+        "deployedModulesYear1" => [
+            "id" => 24 + 1,
+            "name" => totranslate("Deployed modules of year 1"),
+            "type" => "int"
+        ],
+        "deployedModulesYear2" => [
+            "id" => 24 + 2,
+            "name" => totranslate("Deployed modules of year 2"),
+            "type" => "int"
+        ],
+        "deployedModulesYear3" => [
+            "id" => 24 + 3,
+            "name" => totranslate("Deployed modules of year 3"),
+            "type" => "int"
+        ],
+
+        "activatedModules" => [
+            "id" => 28,
+            "name" => totranslate("Activated modules"),
+            "type" => "int"
+        ],
+
+        "spentModules" => [
+            "id" => 29,
+            "name" => totranslate("Spent modules"),
+            "type" => "int"
+        ],
+
+        // 30+ experiments
+        "deployedExperiments" => [
+            "id" => 30,
+            "name" => totranslate("Deployed experiments"),
+            "type" => "int"
+        ],
+        "deployedExperiments".LEFT => [
+            "id" => 30 + LEFT,
+            "name" => totranslate("Deployed left side experiments"),
+            "type" => "int"
+        ],
+        "deployedExperiments".CENTRAL => [
+            "id" => 30 + CENTRAL,
+            "name" => totranslate("Deployed center experiments"),
+            "type" => "int"
+        ],
+        "deployedExperiments".RIGHT => [
+            "id" => 30 + RIGHT,
+            "name" => totranslate("Deployed right side experiments"),
+            "type" => "int"
+        ],
+
+        "completeExperimentLines" => [
+            "id" => 34,
+            "name" => totranslate("Complete experiment lines"),
+            "type" => "int"
+        ],
+        "uncompleteExperimentLines2" => [
+            "id" => 35,
+            "name" => totranslate("Uncomplete experiment lines (2 tiles)"),
+            "type" => "int"
+        ],
+        "uncompleteExperimentLines1" => [
+            "id" => 36,
+            "name" => totranslate("Unomplete experiment lines (1 tile)"),
+            "type" => "int"
+        ],
+        
+        // 40+ missions
+        "gainedMissions" => [
+            "id" => 40,
+            "name" => totranslate("Gained missions"),
+            "type" => "int"
+        ],    
+        "gainedMissionsFromDeck" => [
+            "id" => 41,
+            "name" => totranslate("Gained missions (from research board)"),
+            "type" => "int"
+        ],   
+        "gainedMissionsFromPlayer" => [
+            "id" => 42,
+            "name" => totranslate("Gained missions (from another player)"),
+            "type" => "int"
+        ],    
+        "lostMissions" => [
+            "id" => 43,
+            "name" => totranslate("Lost missions"),
+            "type" => "int"
+        ], 
+        "endMissions" => [
+            "id" => 44,
+            "name" => totranslate("Missions at the end of the game"),
+            "type" => "int"
+        ],
+
+        // 50+ astronauts
+        "upgradedAstronauts" => [
+            "id" => 50,
+            "name" => totranslate("Upgraded astronauts"),
+            "type" => "int"
+        ],   
+        "power".EXPERIMENT_POWER_REACTIVATE => [
+            "id" => 51,
+            "name" => totranslate("Use of reactivate astronauts effect"),
+            "type" => "int"
+        ],   
+        "power".EXPERIMENT_POWER_REACTIVATE."result" => [
+            "id" => 52,
+            "name" => totranslate("Reactivated astronauts with effect"),
+            "type" => "int"
+        ],    
+        "power".EXPERIMENT_POWER_TIME => [
+            "id" => 53,
+            "name" => totranslate("Use of time units effect"),
+            "type" => "int"
+        ],   
+        "power".EXPERIMENT_POWER_TIME."result" => [
+            "id" => 54,
+            "name" => totranslate("Moved astronauts with time units effect"),
+            "type" => "int"
+        ], 
+        "skippedAstronaut" => [
+            "id" => 55,
+            "name" => totranslate("Astronaut skipped with remaining work value"),
+            "type" => "int"
+        ], 
+
+        // 60+ points
+        "sciencePoints" => [
+            "id" => 60,
+            "name" => totranslate("Points gained with science"),
+            "type" => "int"
+        ],   
+        "researchPoints" => [
+            "id" => 61,
+            "name" => totranslate("Gained research points"),
+            "type" => "int"
+        ],
+        "researchPointsByScience" => [
+            "id" => 62,
+            "name" => totranslate("Research points cost per science"),
+            "type" => "float"
+        ],  
+        "vpWithModules" => [
+            "id" => 63,
+            "name" => totranslate("VP gained with modules"),
+            "type" => "int"
+        ],   
+        "vpWithExperiments" => [
+            "id" => 64,
+            "name" => totranslate("VP gained with experiments"),
+            "type" => "int"
+        ],   
+        "vpWithMissions" => [
+            "id" => 65,
+            "name" => totranslate("VP gained with missions"),
+            "type" => "int"
+        ],     
+        "vpWithRemainingResources" => [
+            "id" => 66,
+            "name" => totranslate("VP gained with remaining resources"),
+            "type" => "int"
+        ], 
     ],
 ];

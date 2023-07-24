@@ -78,6 +78,9 @@ trait AstronautTrait {
             'astronauts' => $movedAstronauts,
             'amount' => $amount, // for logs
         ]);
+
+        $this->incStat(1, "power".EXPERIMENT_POWER_TIME, $playerId);
+        $this->incStat(count($movedAstronauts), "power".EXPERIMENT_POWER_TIME."result", $playerId);
     }
 
     function reactivatePlayerAstronauts(?int $playerId) {

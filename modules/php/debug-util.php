@@ -22,6 +22,13 @@ trait DebugUtilTrait {
     function debugWorkforce() {
 		$this->DbQuery("UPDATE astronaut SET `workforce` = 10, `remaining_workforce` = 10");
     }
+    
+    // debugEndYear(1)
+    // debugEndYear(2)
+    // debugEndYear(3)
+    function debugEndYear($year) {
+		$this->DbQuery("UPDATE module SET `card_location` = 'void' WHERE `card_location` = 'deck$year'");
+    }
 
     public function debugReplacePlayersIds() {
         if ($this->getBgaEnvironment() != 'studio') { 

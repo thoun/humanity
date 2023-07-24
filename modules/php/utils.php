@@ -119,6 +119,8 @@ trait UtilTrait {
             'inc' => $amount,
             'absInc' => abs($amount),
         ] + $args);
+
+        $this->incStat($amount, 'researchPoints', $playerId);
     }
 
     function incPlayerScience(int $playerId, int $amount, $message = '', $args = []) {

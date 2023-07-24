@@ -22,6 +22,7 @@ trait StateTrait {
             $this->getModulesByLocation('table'),
             $this->getExperimentsByLocation('table'),
             $this->getMissionsByLocation(),
+            $this->getCollectionFromDb("SELECT stats_id, stats_value FROM `stats` WHERE stats_player_id = $playerId", true)
         ));
         
         $this->gamestate->nextState('next');
@@ -77,6 +78,8 @@ trait StateTrait {
     }
 
     function stEndRound() {
+        $this->incStat(1, 'roundNumber');
+
         // change first player
         $newFirstPlayer = intval($this->getPlayerAfter($this->getGlobalVariable(FIRST_PLAYER)));
         $this->setGlobalVariable(FIRST_PLAYER, $newFirstPlayer);
@@ -281,14 +284,17 @@ trait StateTrait {
 
             // score science points
             $this->incPlayerVP($playerId, $player->science, clienttranslate('${player_name} gains ${inc} points from with ${inc} science points'));
+            $this->setStat($player->science, 'sciencePoints', $playerId);
+            $this->setStat($player->science == 0 ? 0 : $this->getStat('researchPoints', $playerId) / $player->science, 'researchPointsByScience', $playerId);
             
-            // socre remaining sets of 5 resources
+            // score remaining sets of 5 resources
             $icons = $this->getPlayerIcons($playerId);
             $iconsSum = array_reduce($icons, fn($a, $b) => $a + $b);
             $iconPoints = floor($iconsSum / 5);
             $this->incPlayerVP($playerId, $iconPoints, clienttranslate('${player_name} gains ${inc} points from with ${resources} remaining resources'), [
                 'resources' => $iconsSum,
             ]);
+            $this->setStat($iconPoints, 'vpWithRemainingResources', $playerId);
 
             // final score & tiebreak
             $scoreAux1 = $icons[ELECTRICITY];
@@ -301,6 +307,24 @@ trait StateTrait {
                 'playerId' => $playerId,
                 'new' => $this->getPlayer($playerId)->score,
             ]);
+
+            $playerExperiments = $this->getExperimentsByLocation('player', $playerId);
+            $playerExperimentsLines = array_map(fn($experiment) => $experiment->line, $playerExperiments);
+
+            $linesWithAtLeast = [0 => 0, 1 => 0, 2 => 0, 3 => 0];
+            if (count($playerExperimentsLines) > 0) {
+                for ($i = 0; $i <= max($playerExperimentsLines); $i++) {
+                    $experimentsInLine = count(array_filter($playerExperimentsLines, fn($line) => $line == $i));
+                    $linesWithAtLeast[$experimentsInLine]++;
+                }
+            }        
+
+            $this->setStat($linesWithAtLeast[3], 'completeExperimentLines', $playerId);
+            $this->setStat($linesWithAtLeast[2], 'uncompleteExperimentLines2', $playerId);
+            $this->setStat($linesWithAtLeast[1], 'uncompleteExperimentLines1', $playerId);
+
+            $playerMissions = $this->getMissionsByLocation('player', $playerId);
+            $this->setStat(count($playerMissions), 'endMissions', $playerId);
         }
 
         $this->gamestate->nextState('endGame');

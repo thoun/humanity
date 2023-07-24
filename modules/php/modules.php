@@ -140,6 +140,7 @@ trait ModuleTrait {
         
         if ($points > 0) {
             $this->incPlayerVP($playerId, $points, clienttranslate('${player_name} gains ${inc} points with placed module'));
+            $this->incStat($points, 'vpWithModules', $playerId);
         }
         $researchPoints = $module->researchPoints;
 
@@ -159,6 +160,10 @@ trait ModuleTrait {
         if ($researchPoints > 0) {
             $this->incPlayerResearchPoints($playerId, $researchPoints, clienttranslate('${player_name} gains ${inc} research points with placed module'));
         }
+            
+        $this->incStat(1, 'deployedModules', $playerId);
+        $this->incStat(1, 'deployedModules'.$module->color, $playerId);
+        $this->incStat(1, 'deployedModulesYear'.$module->type, $playerId);
 
         return $squareResult['upgrade'];
     }

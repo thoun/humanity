@@ -20,17 +20,19 @@ trait ActionTrait {
     public function chooseAstronaut(int $id) {
         self::checkAction('chooseAstronaut');
 
-        $args = $this->argChooseAstronaut();
-        $astronaut = $this->array_find($args['astronauts'], fn($astronaut) => $astronaut->id == $id);
+        $playerId = intval($this->getActivePlayerId());
+        $stateId = intval($this->gamestate->state_id());
+        $fromChooseAction = $stateId == ST_PLAYER_CHOOSE_ACTION;
+
+        $astronauts = $fromChooseAction ? $this->getPlayerAstronauts($playerId, 'player', true) : $this->argChooseAstronaut()['astronauts'];
+        $astronaut = $this->array_find($astronauts, fn($astronaut) => $astronaut->id == $id);
 
         if ($astronaut == null) {
             throw new BgaUserException("Invalid astronaut");
         }
         
-        $playerId = intval($this->getActivePlayerId());
-        $stateId = intval($this->gamestate->state_id());
         
-        if ($stateId == ST_PLAYER_CHOOSE_ACTION) {
+        if ($fromChooseAction) {
             $currentAction = new CurrentAction('activate');
             $currentAction->selectedAstronaut = $id;
             $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
@@ -128,7 +130,10 @@ trait ActionTrait {
                 'player_name' => $this->getPlayerName($playerId),
                 'module' => $module,
             ]);
+            
+            $this->incStat(1, 'removedObstacles', $playerId);
         }
+        $this->incStat(1, 'activatedModules', $playerId);
 
         if ($astronaut->remainingWorkforce > 0) {
             $this->gamestate->nextState('stay');
@@ -240,6 +245,8 @@ trait ActionTrait {
                 'module' => $module,
                 'icons' => $playerIcons,
             ]);
+
+            $this->incStat($rotate, 'spentModules', $playerId);
         }
 
         self::notifyAllPlayers('log', clienttranslate('${player_name} pays ${cost} to deploy the module'), [
@@ -254,10 +261,16 @@ trait ActionTrait {
     public function endTurn() {
         self::checkAction('endTurn');
 
+        $playerId = intval($this->getActivePlayerId());
+
         $astronaut = $this->getSelectedAstronaut();
         if ($astronaut == null) {
             throw new BgaUserException("No active astronaut");
         }
+
+        $playerId = intval($this->getActivePlayerId());
+
+        $this->incStat(1, 'skippedAstronaut', $playerId);
 
         $playerId = intval($this->getActivePlayerId());
         $this->applyEndOfActivation($playerId, $astronaut);
@@ -312,6 +325,8 @@ trait ActionTrait {
             'from' => $astronaut->workforce - 1, // for logs
             'to' => $astronaut->workforce, // for logs
         ]);
+        
+        $this->incStat(1, 'upgradedAstronauts', $playerId);
 
         $this->gamestate->nextState($currentAction->upgrade > 0 ? 'stay' : 'endTurn');
     }
@@ -392,6 +407,12 @@ trait ActionTrait {
         $this->gamestate->nextPrivateState($playerId, 'restart');
     }
 
+    private function restoreStats(int $playerId, array $stats) {
+        foreach ($stats as $key => $value) {
+            $this->DbQuery("UPDATE `stats` SET `stats_value` = $value WHERE `stats_player_id` = $playerId AND `stats_id` = $key");
+        }
+    }
+
     public function restartTurn() {
         $playerId = intval($this->getActivePlayerId());
         $undo = $this->getGlobalVariable(UNDO);
@@ -420,6 +441,7 @@ trait ActionTrait {
         }
 
         $this->DbQuery("UPDATE player SET `player_vp` = $undo->vp, `player_research_points` = $undo->researchPoints, `player_science` = $undo->science WHERE `player_id` = $playerId");
+        $this->restoreStats($playerId, $undo->stats);
 
         self::notifyAllPlayers('restartTurn', clienttranslate('${player_name} restarts its turn'), [
             'playerId' => $playerId,
