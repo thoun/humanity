@@ -77,20 +77,20 @@ trait ModuleTrait {
         }
     }
 
-    function getAdjacentModules(array $modules, Module $fromModule, bool $diagonal = false) {
+    function getAdjacentModules(array $modules, /*Module | Astronau*/ $fromModuleOrAstronaut, bool $diagonal = false) {
         $adjacentModules = [];
         for ($x = -1; $x <= 1; $x++) {
             for ($y = -1; $y <= 1; $y++) {
-                if ($x == 0 && $y == 0) { continue; }
-                if (!$diagonal && $x != 0 && $y != 0) { continue; }
-            }
+                if ($x === 0 && $y === 0) { continue; }
+                if (!$diagonal && $x !== 0 && $y !== 0) { continue; }
 
-            $adjacentModule = $this->array_find($modules, fn($module) => 
-                $module->x == $fromModule->x + $x && $module->y == $fromModule->y + $y
-            );
+                $adjacentModule = $this->array_find($modules, fn($module) => 
+                    $module->x === $fromModuleOrAstronaut->x + $x && $module->y === $fromModuleOrAstronaut->y + $y
+                );
 
-            if ($adjacentModule != null){
-                $adjacentModules[] = $adjacentModule;
+                if ($adjacentModule != null) {
+                    $adjacentModules[] = $adjacentModule;
+                }
             }
         }
 
@@ -211,5 +211,24 @@ trait ModuleTrait {
             'points' => $points,
             'upgrade' => $upgrade,
         ];
+    }
+
+    function canPlaceGreenhouse(int $playerId, Module $module, Astronaut $astronaut) {
+        $playerModulesAndObstacles = $this->getModulesByLocation('player', $playerId);
+        $playerModules = array_values(array_filter($playerModulesAndObstacles, fn($t) => $t->type != 9));
+        $greenModules = array_values(array_filter($playerModules, fn($t) => $t->color == GREEN));
+
+        $adjacentGreenhousesTypes = [];
+        $adjacentModules = $this->getAdjacentModules($greenModules, $astronaut, false);
+        foreach ($adjacentModules as $adjacentModule) {
+            $adjacentGreenhousesTypes[] = $adjacentModule->matchType;
+            
+            $adjacentModulesLevel2 = $this->getAdjacentModules($greenModules, $adjacentModule, false);
+            foreach ($adjacentModulesLevel2 as $adjacentModuleLevel2) {
+                $adjacentGreenhousesTypes[] = $adjacentModuleLevel2->matchType;
+            }
+        }
+
+        return !in_array($module->matchType, $adjacentGreenhousesTypes) && count(array_unique($adjacentGreenhousesTypes)) <= 3;
     }
 }

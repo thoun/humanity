@@ -52,7 +52,7 @@ const RIGHT = 3;
 /*
  * Green shapes
  */
-const SHAPE_JOKER = 3;
+const SHAPE_JOKER = 0;
 const SHAPE_ROUND = 1;
 const SHAPE_RECTANGULAR = 2;
 const SHAPE_OCTAGONAL = 3;

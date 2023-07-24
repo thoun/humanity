@@ -20,6 +20,15 @@ class ModulesManager extends CardManager<Module> {
             this.game.setTooltip(div.id, this.getTooltip(card));
         }
     }
+    
+    private getGreenhouseShape(shape: number): string {
+        switch (shape) {
+            case 0: return _("Wild");
+            case 1: return _("Round");
+            case 2: return _("Rectangular");
+            case 3: return _("Octagonal");
+        }
+    }
 
     private getTooltip(module: Module): string {
         let message = `
@@ -51,6 +60,10 @@ class ModulesManager extends CardManager<Module> {
         if (module.points) {
             message += `<br>
             <strong>${_("Victory points:")}</strong> ${module.points}`;
+        }
+        if (module.color == 4) { // greenhouse
+            message += `<br>
+            <strong>${_("Greenhouse shape:")}</strong> ${this.getGreenhouseShape(module.matchType)}`;
         }
  
         return message;

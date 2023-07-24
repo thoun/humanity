@@ -2036,6 +2036,14 @@ var ModulesManager = /** @class */ (function (_super) {
             this.game.setTooltip(div.id, this.getTooltip(card));
         }
     };
+    ModulesManager.prototype.getGreenhouseShape = function (shape) {
+        switch (shape) {
+            case 0: return _("Wild");
+            case 1: return _("Round");
+            case 2: return _("Rectangular");
+            case 3: return _("Octagonal");
+        }
+    };
     ModulesManager.prototype.getTooltip = function (module) {
         var message = "\n        <strong>".concat(_("Color:"), "</strong> ").concat(this.game.getColor(module.color, true), "\n        <br>\n        <strong>").concat(_("Resources needed:"), "</strong> ").concat(getCostStr(module.cost));
         if (module.workforce) {
@@ -2056,6 +2064,9 @@ var ModulesManager = /** @class */ (function (_super) {
         }
         if (module.points) {
             message += "<br>\n            <strong>".concat(_("Victory points:"), "</strong> ").concat(module.points);
+        }
+        if (module.color == 4) { // greenhouse
+            message += "<br>\n            <strong>".concat(_("Greenhouse shape:"), "</strong> ").concat(this.getGreenhouseShape(module.matchType));
         }
         return message;
     };
