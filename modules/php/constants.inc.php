@@ -1,6 +1,6 @@
 <?php
 
-const SCIENCE_BY_RESEARCH_SPOT = [
+const SCIENCE_BY_EXPERIMENT_SPOT = [
     0 => 0,
     1 => 8,
     2 => 15,
@@ -58,10 +58,10 @@ const SHAPE_RECTANGULAR = 2;
 const SHAPE_OCTOGONAL = 3;
 
 /*
- * RESEARCH POWERS
+ * EXPERIMENT POWERS
  */
-const RESEARCH_POWER_REACTIVATE = 1;
-const RESEARCH_POWER_TIME = 2;
+const EXPERIMENT_POWER_REACTIVATE = 1;
+const EXPERIMENT_POWER_TIME = 2;
 
 /*
  * State constants

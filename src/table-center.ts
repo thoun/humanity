@@ -1,21 +1,14 @@
 class TableCenter {
-    public research: SlotStock<Research>;
+    public experiments: SlotStock<Experiment>;
     public modules: SlotStock<Module>;
         
     constructor(private game: HumanityGame, gamedatas: HumanityGamedatas) {
-        /*this.researchDecks = new Deck<Destination>(game.researchManager, document.getElementById(`table-research-${letter}-deck`), {
-            cardNumber: gamedatas.centerDestinationsDeckCount,
-            topCard: gamedatas.centerDestinationsDeckTop,
-            counter: {
-                position: 'right',
-            },
-        });*/
-        this.research = new SlotStock<Research>(game.researchManager, document.getElementById(`table-research`), {
+        this.experiments = new SlotStock<Experiment>(game.experimentsManager, document.getElementById(`table-experiments`), {
             slotsIds: [0, 1, 2, 3, 4, 5, 6, 7],
             mapCardToSlot: card => card.locationArg,
         });
-        this.research.addCards(gamedatas.tableResearch);
-        this.research.onCardClick = (card: Research) => this.game.onTableResearchClick(card);
+        this.experiments.addCards(gamedatas.tableExperiments);
+        this.experiments.onCardClick = (card: Experiment) => this.game.onTableExperimentClick(card);
 
         this.modules = new SlotStock<Module>(game.modulesManager, document.getElementById(`table-modules`), {
             slotsIds: [0, 1, 2, 3, 4, 5, 6, 7],
@@ -61,17 +54,17 @@ class TableCenter {
         document.getElementById('board-2').style.setProperty('--r', `${arm}`);
     }
     
-    public newResearch(tableResearch: Research[]) {
-        this.research.removeAll();
-        this.research.addCards(tableResearch);
+    public newExperiments(tableExperiments: Experiment[]) {
+        this.experiments.removeAll();
+        this.experiments.addCards(tableExperiments);
     }
     
     public setSelectableModules(selectableModules: Module[] | null) {
         this.modules.setSelectionMode(selectableModules ? 'single' : 'none', selectableModules);
     }
     
-    public setSelectableResearch(selectableResearch: Research[] | null) {
-        this.research.setSelectionMode(selectableResearch ? 'single' : 'none', selectableResearch);
+    public setSelectableExperiments(selectableExperiments: Experiment[] | null) {
+        this.experiments.setSelectionMode(selectableExperiments ? 'single' : 'none', selectableExperiments);
     }
     
     public resetModules(modules: Module[]) {

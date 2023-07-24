@@ -84,11 +84,11 @@
         self::ajaxResponse();
     }
 
-    public function chooseNewResearch() {
+    public function chooseNewExperiment() {
         self::setAjaxMode();     
 
         $id = self::getArg("id", AT_posint, true);
-        $this->game->chooseNewResearch($id);
+        $this->game->chooseNewExperiment($id);
 
         self::ajaxResponse();
     }

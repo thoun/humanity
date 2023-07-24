@@ -1,12 +1,12 @@
 <?php
 
 class CurrentAction {
-    public string $type; // 'module', 'research', 'activate'
+    public string $type; // 'module', 'experiment', 'activate'
     public ?int $selectedWorker;
     public ?int $workerSpot;
     public ?int $addModuleId;
     public ?int $removeModuleId;
-    public ?int $research;
+    public ?int $experiment;
     public ?array $remainingCost;
     public ?int $upgrade;
 

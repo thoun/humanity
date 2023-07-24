@@ -31,7 +31,7 @@
         "node_modules/bga-cards/src/sort.ts",
         "node_modules/bga-cards/src/card-manager.ts",
         "src/modules.ts",
-        "src/research.ts",
+        "src/experiments.ts",
         "src/objectives.ts",
         "src/table-center.ts",
         "src/research-board.ts",

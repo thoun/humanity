@@ -2,7 +2,7 @@
 
 require_once(__DIR__.'/../constants.inc.php');
 
-class ResearchType {
+class ExperimentType {
     public int $extremity;
     public array $cost;
     public int $researchPoints;
@@ -18,7 +18,7 @@ class ResearchType {
     } 
 }
 
-class Research extends ResearchType {
+class Experiment extends ExperimentType {
 
     public int $id;
     public string $location;
@@ -27,7 +27,7 @@ class Research extends ResearchType {
     public ?int $number; // 1..9
     public ?int $line;
 
-    public function __construct($dbCard, $RESEARCH) {
+    public function __construct($dbCard, $EXPERIMENT) {
         $this->id = intval($dbCard['card_id'] ?? $dbCard['id']);
         $this->location = $dbCard['card_location'] ?? $dbCard['location'];
         $this->locationArg = intval($dbCard['card_location_arg'] ?? $dbCard['location_arg']);
@@ -36,7 +36,7 @@ class Research extends ResearchType {
         $this->line = array_key_exists('line', $dbCard) ? intval($dbCard['line']) : null;
 
         if ($this->number !== null) {
-            $objectiveType = $RESEARCH[$this->year][$this->number];
+            $objectiveType = $EXPERIMENT[$this->year][$this->number];
             $this->extremity = $objectiveType->extremity;
             $this->cost = $objectiveType->cost;
             $this->researchPoints = $objectiveType->researchPoints;
@@ -45,21 +45,21 @@ class Research extends ResearchType {
         }
     } 
 
-    public static function onlyId(?Research $research) {
-        if ($research == null) {
+    public static function onlyId(?Experiment $experiment) {
+        if ($experiment == null) {
             return null;
         }
         
-        return new Research([
-            'card_id' => $research->id,
-            'card_location' => $research->location,
-            'card_location_arg' => $research->locationArg,
-            'card_type' => $research->year,
+        return new Experiment([
+            'card_id' => $experiment->id,
+            'card_location' => $experiment->location,
+            'card_location_arg' => $experiment->locationArg,
+            'card_type' => $experiment->year,
         ], null);
     }
 
-    public static function onlyIds(array $researches) {
-        return array_map(fn($research) => self::onlyId($research), $researches);
+    public static function onlyIds(array $experiments) {
+        return array_map(fn($experiment) => self::onlyId($experiment), $experiments);
     }
 }
 

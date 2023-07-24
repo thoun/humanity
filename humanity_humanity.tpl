@@ -5,7 +5,7 @@
         <div id="table-center-wrapper">
             <div id="board-1">
                 <div id="board-2">
-                    <div id="table-research"></div>
+                    <div id="table-experiments"></div>
                 </div>
                 <div id="table-modules"></div>
                 <div id="table-workers"></div>

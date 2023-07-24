@@ -20,7 +20,7 @@ class PlayerTable {
     public playerId: number;
     public voidStock: VoidStock<Module>;
     public modules: ModuleStock;
-    public researchLines: SlotStock<Research>[] = [];
+    public experimentsLines: SlotStock<Experiment>[] = [];
     public objectives: LineStock<Objective>;
 
     private currentPlayer: boolean;
@@ -37,7 +37,7 @@ class PlayerTable {
         <div id="player-table-${this.playerId}" class="player-table" style="--player-color: #${player.color};">
             <div id="player-table-${this.playerId}-name" class="name-wrapper">${player.name}</div>
             <div id="player-table-${this.playerId}-modules" class="modules"></div>
-            <div id="player-table-${this.playerId}-research-lines" class="research-lines"></div>
+            <div id="player-table-${this.playerId}-experiments-lines" class="experiments-lines"></div>
             <div id="player-table-${this.playerId}-objective" class="objective"></div>
         </div>
         `;
@@ -79,7 +79,7 @@ class PlayerTable {
 
         this.voidStock = new VoidStock<Module>(this.game.modulesManager, document.getElementById(`player-table-${this.playerId}-name`));
           
-        player.research.forEach(researchModule => this.addResearch(researchModule));
+        player.experiments.forEach(experiment => this.addExperiment(experiment));
         
         const objectiveDiv = document.getElementById(`player-table-${this.playerId}-objective`);
         this.objectives = new LineStock<Objective>(this.game.objectivesManager, objectiveDiv);
@@ -126,21 +126,21 @@ class PlayerTable {
         this.modules.removeCard(module);
     }
 
-    private createResearchLine(line: number) {
+    private createExperimentsLine(line: number) {
         const lineDiv = document.createElement('div');
-        document.getElementById(`player-table-${this.playerId}-research-lines`).insertAdjacentElement('beforeend', lineDiv);        
-        this.researchLines[line] = new SlotStock<Research>(this.game.researchManager, lineDiv, {
+        document.getElementById(`player-table-${this.playerId}-experiments-lines`).insertAdjacentElement('beforeend', lineDiv);        
+        this.experimentsLines[line] = new SlotStock<Experiment>(this.game.experimentsManager, lineDiv, {
             gap: '0',
             slotsIds: [1, 2, 3],
             mapCardToSlot: card => card.extremity,
         });
     }
     
-    public addResearch(research: Research): Promise<any> {
-        if (!this.researchLines[research.line]) {
-            this.createResearchLine(research.line);
+    public addExperiment(experiment: Experiment): Promise<any> {
+        if (!this.experimentsLines[experiment.line]) {
+            this.createExperimentsLine(experiment.line);
         }
-        return this.researchLines[research.line].addCard(research);
+        return this.experimentsLines[experiment.line].addCard(experiment);
     }
     
     public reactivateWorkers(): void {
@@ -256,10 +256,10 @@ class PlayerTable {
         this.modules.addCards(modules);
     }
 
-    public resetResearch(research: Research[]) {
-        document.getElementById(`player-table-${this.playerId}-research-lines`).innerHTML = ``;
-        this.researchLines = [];
-        research.forEach(researchModule => this.addResearch(researchModule));
+    public resetExperiments(experiments: Experiment[]) {
+        document.getElementById(`player-table-${this.playerId}-experiments-lines`).innerHTML = ``;
+        this.experimentsLines = [];
+        experiments.forEach(experiment => this.addExperiment(experiment));
     }
     
     public resetObjectives(objectives: Objective[]) {

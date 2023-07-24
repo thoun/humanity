@@ -21,7 +21,7 @@
 
 require_once(__DIR__.'/modules/php/constants.inc.php');
 require_once(__DIR__.'/modules/php/objects/module.php');
-require_once(__DIR__.'/modules/php/objects/research.php');
+require_once(__DIR__.'/modules/php/objects/experiment.php');
 require_once(__DIR__.'/modules/php/objects/objective.php');
 
 $this->STARTING_TILE_POSITIONS = [
@@ -37,48 +37,41 @@ $this->OBSTACLE_POSITIONS = [
     2 => [1, 1],
 ];
 
-$this->VP_BY_RESEARCH = [
-    3 => 1,
-    6 => 2,
-    10 => 3,
-    14 => 5,
-];
-
-$this->RESEARCH = [
+$this->EXPERIMENT = [
     1 => [
-        1 => new ResearchType(CENTRAL, [INSECT => 1, ICE => 1], 2, RESEARCH_POWER_REACTIVATE),
-        2 => new ResearchType(CENTRAL, [INSECT => 1, METHAN => 1], 2, RESEARCH_POWER_TIME),
-        3 => new ResearchType(LEFT, [ICE => 1, METHAN => 1], 2, RESEARCH_POWER_TIME),
-        4 => new ResearchType(RIGHT, [INSECT => 1, METHAN => 1], 4),
-        5 => new ResearchType(LEFT, [INSECT => 1, METHAN => 1], 2, RESEARCH_POWER_REACTIVATE),
-        6 => new ResearchType(LEFT, [INSECT => 1, ICE => 1], 4),
-        7 => new ResearchType(CENTRAL,[ICE => 1, METHAN => 1], 4),
-        8 => new ResearchType(RIGHT, [ICE => 1, METHAN => 1], 2, RESEARCH_POWER_REACTIVATE),
-        9 => new ResearchType(RIGHT, [INSECT => 1, ICE => 1], 2, RESEARCH_POWER_TIME),
+        1 => new ExperimentType(CENTRAL, [INSECT => 1, ICE => 1], 2, EXPERIMENT_POWER_REACTIVATE),
+        2 => new ExperimentType(CENTRAL, [INSECT => 1, METHAN => 1], 2, EXPERIMENT_POWER_TIME),
+        3 => new ExperimentType(LEFT, [ICE => 1, METHAN => 1], 2, EXPERIMENT_POWER_TIME),
+        4 => new ExperimentType(RIGHT, [INSECT => 1, METHAN => 1], 4),
+        5 => new ExperimentType(LEFT, [INSECT => 1, METHAN => 1], 2, EXPERIMENT_POWER_REACTIVATE),
+        6 => new ExperimentType(LEFT, [INSECT => 1, ICE => 1], 4),
+        7 => new ExperimentType(CENTRAL,[ICE => 1, METHAN => 1], 4),
+        8 => new ExperimentType(RIGHT, [ICE => 1, METHAN => 1], 2, EXPERIMENT_POWER_REACTIVATE),
+        9 => new ExperimentType(RIGHT, [INSECT => 1, ICE => 1], 2, EXPERIMENT_POWER_TIME),
     ],
 
     2 => [
-        1 => new ResearchType(LEFT, [AIRCARBON => 1], 5),
-        2 => new ResearchType(LEFT, [OXYGEN => 1], 3, RESEARCH_POWER_REACTIVATE),
-        3 => new ResearchType(LEFT, [PROTEIN => 1], 3, RESEARCH_POWER_TIME),
-        4 => new ResearchType(CENTRAL, [AIRCARBON => 1], 3, RESEARCH_POWER_TIME),
-        5 => new ResearchType(CENTRAL, [OXYGEN => 1], 5),
-        6 => new ResearchType(RIGHT, [OXYGEN => 1], 3, RESEARCH_POWER_TIME),
-        7 => new ResearchType(RIGHT, [AIRCARBON => 1], 3, RESEARCH_POWER_REACTIVATE),
-        8 => new ResearchType(RIGHT, [PROTEIN => 1], 5),
-        9 => new ResearchType(CENTRAL, [PROTEIN => 1], 3, RESEARCH_POWER_REACTIVATE),
+        1 => new ExperimentType(LEFT, [AIRCARBON => 1], 5),
+        2 => new ExperimentType(LEFT, [OXYGEN => 1], 3, EXPERIMENT_POWER_REACTIVATE),
+        3 => new ExperimentType(LEFT, [PROTEIN => 1], 3, EXPERIMENT_POWER_TIME),
+        4 => new ExperimentType(CENTRAL, [AIRCARBON => 1], 3, EXPERIMENT_POWER_TIME),
+        5 => new ExperimentType(CENTRAL, [OXYGEN => 1], 5),
+        6 => new ExperimentType(RIGHT, [OXYGEN => 1], 3, EXPERIMENT_POWER_TIME),
+        7 => new ExperimentType(RIGHT, [AIRCARBON => 1], 3, EXPERIMENT_POWER_REACTIVATE),
+        8 => new ExperimentType(RIGHT, [PROTEIN => 1], 5),
+        9 => new ExperimentType(CENTRAL, [PROTEIN => 1], 3, EXPERIMENT_POWER_REACTIVATE),
     ],
 
     3 => [
-        1 => new ResearchType(LEFT, [OXYGEN => 1, METHAN => 1], 6, null, 1),
-        2 => new ResearchType(LEFT, [PROTEIN => 1, METHAN => 1], 4, RESEARCH_POWER_REACTIVATE, 1),
-        3 => new ResearchType(LEFT, [AIRCARBON => 1, METHAN => 1], 4, RESEARCH_POWER_TIME, 1),
-        4 => new ResearchType(CENTRAL, [PROTEIN => 1, INSECT => 1], 6, null, 1),
-        5 => new ResearchType(CENTRAL, [INSECT => 1, AIRCARBON => 1], 4, RESEARCH_POWER_REACTIVATE, 1),
-        6 => new ResearchType(CENTRAL, [INSECT => 1, OXYGEN => 1], 4, RESEARCH_POWER_TIME, 1),
-        7 => new ResearchType(RIGHT, [ICE => 1, AIRCARBON => 1], 6, null, 1),
-        8 => new ResearchType(RIGHT, [OXYGEN => 1, ICE => 1], 4, RESEARCH_POWER_REACTIVATE, 1),
-        9 => new ResearchType(RIGHT, [PROTEIN => 1, ICE => 1], 4, RESEARCH_POWER_TIME, 1),
+        1 => new ExperimentType(LEFT, [OXYGEN => 1, METHAN => 1], 6, null, 1),
+        2 => new ExperimentType(LEFT, [PROTEIN => 1, METHAN => 1], 4, EXPERIMENT_POWER_REACTIVATE, 1),
+        3 => new ExperimentType(LEFT, [AIRCARBON => 1, METHAN => 1], 4, EXPERIMENT_POWER_TIME, 1),
+        4 => new ExperimentType(CENTRAL, [PROTEIN => 1, INSECT => 1], 6, null, 1),
+        5 => new ExperimentType(CENTRAL, [INSECT => 1, AIRCARBON => 1], 4, EXPERIMENT_POWER_REACTIVATE, 1),
+        6 => new ExperimentType(CENTRAL, [INSECT => 1, OXYGEN => 1], 4, EXPERIMENT_POWER_TIME, 1),
+        7 => new ExperimentType(RIGHT, [ICE => 1, AIRCARBON => 1], 6, null, 1),
+        8 => new ExperimentType(RIGHT, [OXYGEN => 1, ICE => 1], 4, EXPERIMENT_POWER_REACTIVATE, 1),
+        9 => new ExperimentType(RIGHT, [PROTEIN => 1, ICE => 1], 4, EXPERIMENT_POWER_TIME, 1),
     ],
 ];
 
@@ -93,7 +86,7 @@ $this->TILES = [ //public int $type; // 0 start, 1..3 year, 8 communication, 9 o
     1 => [
         1 => new ModuleType(BLUE_OR_ORANGE, [INSECT => 1, ICE => 1, METHAN => 1], null, null, 0, 3),
         2 => new ModuleType(BLUE_OR_ORANGE, [INSECT => 1, ICE => 1, METHAN => 1], null, null, 0, 3),
-        3 => new OrangeModuleType([INSECT => 1, ICE => 1, METHAN => 1], null, null, RESEARCH_POWER_TIME),
+        3 => new OrangeModuleType([INSECT => 1, ICE => 1, METHAN => 1], null, null, EXPERIMENT_POWER_TIME),
         4 => new OrangeModuleType([ICE => 2], 1, [[], [INSECT => 1, METHAN => 1], [INSECT => 2, METHAN => 2], [INSECT => 3, METHAN => 3]]),
         5 => new OrangeModuleType([METHAN => 2], 1, [[], [INSECT => 1, ICE => 1], [INSECT => 2, ICE => 2], [INSECT => 3, ICE => 3]]),
         6 => new OrangeModuleType([INSECT => 2], 1, [[], [METHAN => 1, ICE => 1], [METHAN => 2, ICE => 2], [METHAN => 3, ICE => 3]]),
@@ -111,7 +104,7 @@ $this->TILES = [ //public int $type; // 0 start, 1..3 year, 8 communication, 9 o
     2 => [
         1 => new ModuleType(BLUE_OR_ORANGE, [OXYGEN => 1, ICE => 1, METHAN => 1], null, null, 0, 4),
         2 => new ModuleType(BLUE_OR_ORANGE, [PROTEIN => 1, INSECT => 1, METHAN => 1], null, null, 0, 4),
-        3 => new OrangeModuleType([PROTEIN => 1, ICE => 1, METHAN => 1], null, null, RESEARCH_POWER_TIME),
+        3 => new OrangeModuleType([PROTEIN => 1, ICE => 1, METHAN => 1], null, null, EXPERIMENT_POWER_TIME),
         4 => new OrangeModuleType([INSECT => 1, OXYGEN => 1], 1, [[], [ELECTRICITY => 1], [ELECTRICITY => 2], [ELECTRICITY => 3]]),
         5 => new OrangeModuleType([INSECT => 1, AIRCARBON => 1], 1, [[], [ELECTRICITY => 1], [ELECTRICITY => 2], [ELECTRICITY => 3]]),
         6 => new BlueModuleType([INSECT => 2, ICE => 2], 2, [[], [PROTEIN => 1, OXYGEN => 1], [PROTEIN => 2, OXYGEN => 2], [PROTEIN => 3, OXYGEN => 3]]),

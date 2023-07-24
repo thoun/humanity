@@ -20,7 +20,7 @@ function getCostStr(cost: Icons) {
 
 class Humanity implements HumanityGame {
     public modulesManager: ModulesManager;
-    public researchManager: DestinationsManager;
+    public experimentsManager: ExperimentsManager;
     public objectivesManager: ObjectivesManager;
 
     private zoomManager: ZoomManager;
@@ -60,7 +60,7 @@ class Humanity implements HumanityGame {
         log('gamedatas', gamedatas);
 
         this.modulesManager = new ModulesManager(this);
-        this.researchManager = new DestinationsManager(this);        
+        this.experimentsManager = new ExperimentsManager(this);        
         this.objectivesManager = new ObjectivesManager(this);
         this.animationManager = new AnimationManager(this);
         new JumpToManager(this, {
@@ -158,7 +158,7 @@ class Humanity implements HumanityGame {
         if ((this as any).isCurrentPlayerActive()) {
             this.getCurrentPlayerTable()?.setSelectableWorkers(args.workers);
             this.tableCenter.setSelectableModules(args.selectableModules);
-            this.tableCenter.setSelectableResearch(args.selectableResearch);
+            this.tableCenter.setSelectableExperiments(args.selectableExperiments);
         }
     }
     
@@ -193,7 +193,7 @@ class Humanity implements HumanityGame {
             case 'chooseAction':
                 this.onLeavingChooseWorker();
                 this.tableCenter.setSelectableModules(null);
-                this.tableCenter.setSelectableResearch(null);
+                this.tableCenter.setSelectableExperiments(null);
                 break;
             case 'activateModule':
                 this.onLeavingActivateModule();
@@ -524,9 +524,9 @@ class Humanity implements HumanityGame {
         }
     }
     
-    public onTableResearchClick(research: Research): void {
+    public onTableExperimentClick(experiment: Experiment): void {
         if (this.gamedatas.gamestate.name == 'chooseAction') {
-            this.chooseNewResearch(research.id);
+            this.chooseNewExperiment(experiment.id);
         }
     }
 
@@ -604,12 +604,12 @@ class Humanity implements HumanityGame {
         });
     }
   	
-    public chooseNewResearch(id: number) {
-        if(!(this as any).checkAction('chooseNewResearch')) {
+    public chooseNewExperiment(id: number) {
+        if(!(this as any).checkAction('chooseNewExperiment')) {
             return;
         }
 
-        this.takeAction('chooseNewResearch', {
+        this.takeAction('chooseNewExperiment', {
             id
         });
     }
@@ -699,7 +699,7 @@ class Humanity implements HumanityGame {
             ['gainTimeUnit', ANIMATION_MS],
             ['moveWorkerToTable', ANIMATION_MS],
             ['deployModule', undefined],
-            ['deployResearch', undefined],
+            ['deployExperiment', undefined],
             ['score', 1],
             ['researchPoints', 1],
             ['vp', 1],
@@ -709,7 +709,7 @@ class Humanity implements HumanityGame {
             ['shiftTableModule', ANIMATION_MS],
             ['newTableModule', ANIMATION_MS],
             ['moveArm', ANIMATION_MS],
-            ['newTableResearch', ANIMATION_MS],
+            ['newTableExperiments', ANIMATION_MS],
             ['reactivateWorkers', ANIMATION_MS],
             ['upgradeWorker', 50],
             ['year', ANIMATION_MS],
@@ -795,9 +795,9 @@ class Humanity implements HumanityGame {
         return this.getPlayerTable(playerId).addModule(module);
     }
 
-    notif_deployResearch(args: NotifDeployResearchArgs) {
-        const { playerId, research } = args;
-        return this.getPlayerTable(playerId).addResearch(research);
+    notif_deployExperiment(args: NotifDeployExperimentArgs) {
+        const { playerId, experiment } = args;
+        return this.getPlayerTable(playerId).addExperiment(experiment);
     }
 
     notif_score(args: NotifScoreArgs) {
@@ -838,8 +838,8 @@ class Humanity implements HumanityGame {
         this.tableCenter.moveArm(args.arm);
     }   
 
-    notif_newTableResearch(args: NotifNewTableResearchArgs) {
-        this.tableCenter.newResearch(args.tableResearch);
+    notif_newTableExperiments(args: NotifNewTableExperimentArgs) {
+        this.tableCenter.newExperiments(args.tableExperiments);
     }   
 
     notif_reactivateWorkers(args: NotifReactivateWorkersArgs) {
@@ -871,14 +871,14 @@ class Humanity implements HumanityGame {
         const { playerId, undo } = args;
 
         this.tableCenter.resetModules(undo.tableModules);
-        this.tableCenter.newResearch(undo.tableResearch);
+        this.tableCenter.newExperiments(undo.tableExperiments);
         this.researchBoard.resetObjectives(undo.allObjectives.filter(objective => objective.location == 'table'));
 
         this.playersTables.forEach(playerTable => playerTable.resetObjectives(undo.allObjectives.filter(objective => objective.location == 'player' && objective.locationArg == playerTable.playerId)));
 
         const table = this.getPlayerTable(playerId);
         table.resetModules(undo.modules);
-        table.resetResearch(undo.research);
+        table.resetExperiments(undo.experiments);
 
         undo.workers.forEach(worker => this.resetWorker(playerId, worker));
 
@@ -964,8 +964,8 @@ class Humanity implements HumanityGame {
                     args.module_image = `<div class="log-image">${this.modulesManager.getHtml(args.module)}</div>`;
                 }
 
-                if (args.research_image === '' && args.research) {
-                    args.research_image = `<div class="log-image">${this.researchManager.getHtml(args.research)}</div>`;
+                if (args.experiment_image === '' && args.experiment) {
+                    args.experiment_image = `<div class="log-image">${this.experimentsManager.getHtml(args.experiment)}</div>`;
                 }
 
                 if (args.objective_image === '' && args.objective) {

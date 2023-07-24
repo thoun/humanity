@@ -74,14 +74,14 @@ $playerActionsGameStates = [
 
     ST_PLAYER_CHOOSE_ACTION => [
         "name" => "chooseAction",
-        "description" => clienttranslate('${actplayer} must select a worker to activate modules, or select a module or research to deploy'),
-        "descriptionmyturn" => clienttranslate('${you} must select a worker to activate modules, or select a module or research to deploy'),
+        "description" => clienttranslate('${actplayer} must select a worker to activate modules, or select a module or experiment to deploy'),
+        "descriptionmyturn" => clienttranslate('${you} must select a worker to activate modules, or select a module or experiment to deploy'),
         "type" => "activeplayer",    
         "args" => "argChooseAction",
         "possibleactions" => [ 
             "chooseWorker",
             "chooseNewModule",
-            "chooseNewResearch",
+            "chooseNewExperiment",
         ],
         "transitions" => [
             "activate" => ST_PLAYER_ACTIVATE_TILE,

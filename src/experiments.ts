@@ -1,13 +1,13 @@
-class DestinationsManager extends CardManager<Research> {
+class ExperimentsManager extends CardManager<Experiment> {
     constructor (public game: HumanityGame) {
         super(game, {
-            getId: (card) => `research-${card.id}`,
-            setupDiv: (card: Research, div: HTMLElement) => {
-                div.classList.add('research');
+            getId: (card) => `experiment-${card.id}`,
+            setupDiv: (card: Experiment, div: HTMLElement) => {
+                div.classList.add('experiment');
                 div.dataset.cardId = ''+card.id;
                 div.dataset.year = ''+card.year;
             },
-            setupFrontDiv: (card: Research, div: HTMLElement) => { 
+            setupFrontDiv: (card: Experiment, div: HTMLElement) => { 
                 div.dataset.number = ''+card.number;
                 if (card.number) {
                     game.setTooltip(div.id, this.getTooltip(card));
@@ -19,7 +19,7 @@ class DestinationsManager extends CardManager<Research> {
         });
     }
 
-    private getTooltip(research: Research): string {
+    private getTooltip(experiment: Experiment): string {
         let message = `TODO`;/*
         <strong>${_("Exploration cost:")}</strong> ${this.getCost(research.cost)} (recruits can be used as jokers)
         <br>
@@ -31,8 +31,8 @@ class DestinationsManager extends CardManager<Research> {
         return message;
     }
     
-    public getHtml(module: Research): string {
-        let html = `<div class="card research" data-side="front" data-year="${module.year}">
+    public getHtml(module: Experiment): string {
+        let html = `<div class="card experiment" data-side="front" data-year="${module.year}">
             <div class="card-sides">
                 <div class="card-side front" data-number="${module.number}">
                 </div>

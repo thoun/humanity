@@ -2057,13 +2057,13 @@ var ModulesManager = /** @class */ (function (_super) {
     };
     return ModulesManager;
 }(CardManager));
-var DestinationsManager = /** @class */ (function (_super) {
-    __extends(DestinationsManager, _super);
-    function DestinationsManager(game) {
+var ExperimentsManager = /** @class */ (function (_super) {
+    __extends(ExperimentsManager, _super);
+    function ExperimentsManager(game) {
         var _this = _super.call(this, game, {
-            getId: function (card) { return "research-".concat(card.id); },
+            getId: function (card) { return "experiment-".concat(card.id); },
             setupDiv: function (card, div) {
-                div.classList.add('research');
+                div.classList.add('experiment');
                 div.dataset.cardId = '' + card.id;
                 div.dataset.year = '' + card.year;
             },
@@ -2080,7 +2080,7 @@ var DestinationsManager = /** @class */ (function (_super) {
         _this.game = game;
         return _this;
     }
-    DestinationsManager.prototype.getTooltip = function (research) {
+    ExperimentsManager.prototype.getTooltip = function (experiment) {
         var message = "TODO"; /*
         <strong>${_("Exploration cost:")}</strong> ${this.getCost(research.cost)} (recruits can be used as jokers)
         <br>
@@ -2090,11 +2090,11 @@ var DestinationsManager = /** @class */ (function (_super) {
         `;*/
         return message;
     };
-    DestinationsManager.prototype.getHtml = function (module) {
-        var html = "<div class=\"card research\" data-side=\"front\" data-year=\"".concat(module.year, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(module.number, "\">\n                </div>\n                <div class=\"card-side back\">\n                </div>\n            </div>\n        </div>");
+    ExperimentsManager.prototype.getHtml = function (module) {
+        var html = "<div class=\"card experiment\" data-side=\"front\" data-year=\"".concat(module.year, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(module.number, "\">\n                </div>\n                <div class=\"card-side back\">\n                </div>\n            </div>\n        </div>");
         return html;
     };
-    return DestinationsManager;
+    return ExperimentsManager;
 }(CardManager));
 var ObjectivesManager = /** @class */ (function (_super) {
     __extends(ObjectivesManager, _super);
@@ -2173,19 +2173,12 @@ var TableCenter = /** @class */ (function () {
     function TableCenter(game, gamedatas) {
         var _this = this;
         this.game = game;
-        /*this.researchDecks = new Deck<Destination>(game.researchManager, document.getElementById(`table-research-${letter}-deck`), {
-            cardNumber: gamedatas.centerDestinationsDeckCount,
-            topCard: gamedatas.centerDestinationsDeckTop,
-            counter: {
-                position: 'right',
-            },
-        });*/
-        this.research = new SlotStock(game.researchManager, document.getElementById("table-research"), {
+        this.experiments = new SlotStock(game.experimentsManager, document.getElementById("table-experiments"), {
             slotsIds: [0, 1, 2, 3, 4, 5, 6, 7],
             mapCardToSlot: function (card) { return card.locationArg; },
         });
-        this.research.addCards(gamedatas.tableResearch);
-        this.research.onCardClick = function (card) { return _this.game.onTableResearchClick(card); };
+        this.experiments.addCards(gamedatas.tableExperiments);
+        this.experiments.onCardClick = function (card) { return _this.game.onTableExperimentClick(card); };
         this.modules = new SlotStock(game.modulesManager, document.getElementById("table-modules"), {
             slotsIds: [0, 1, 2, 3, 4, 5, 6, 7],
             mapCardToSlot: function (card) { return card.locationArg; },
@@ -2218,15 +2211,15 @@ var TableCenter = /** @class */ (function () {
     TableCenter.prototype.moveArm = function (arm) {
         document.getElementById('board-2').style.setProperty('--r', "".concat(arm));
     };
-    TableCenter.prototype.newResearch = function (tableResearch) {
-        this.research.removeAll();
-        this.research.addCards(tableResearch);
+    TableCenter.prototype.newExperiments = function (tableExperiments) {
+        this.experiments.removeAll();
+        this.experiments.addCards(tableExperiments);
     };
     TableCenter.prototype.setSelectableModules = function (selectableModules) {
         this.modules.setSelectionMode(selectableModules ? 'single' : 'none', selectableModules);
     };
-    TableCenter.prototype.setSelectableResearch = function (selectableResearch) {
-        this.research.setSelectionMode(selectableResearch ? 'single' : 'none', selectableResearch);
+    TableCenter.prototype.setSelectableExperiments = function (selectableExperiments) {
+        this.experiments.setSelectionMode(selectableExperiments ? 'single' : 'none', selectableExperiments);
     };
     TableCenter.prototype.resetModules = function (modules) {
         this.modules.removeAll();
@@ -2422,10 +2415,10 @@ var PlayerTable = /** @class */ (function () {
     function PlayerTable(game, player) {
         var _this = this;
         this.game = game;
-        this.researchLines = [];
+        this.experimentsLines = [];
         this.playerId = Number(player.id);
         this.currentPlayer = this.playerId == this.game.getPlayerId();
-        var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.playerId, "-modules\" class=\"modules\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-research-lines\" class=\"research-lines\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-objective\" class=\"objective\"></div>\n        </div>\n        ");
+        var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.playerId, "-modules\" class=\"modules\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-experiments-lines\" class=\"experiments-lines\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-objective\" class=\"objective\"></div>\n        </div>\n        ");
         dojo.place(html, document.getElementById('tables'));
         var playerWorkers = player.workers.filter(function (worker) { return worker.location == 'player'; });
         var slotsIds = [];
@@ -2458,7 +2451,7 @@ var PlayerTable = /** @class */ (function () {
         this.modules.addCards(player.modules);
         player.modules.filter(function (module) { return module.type == 9; }).forEach(function (module) { return _this.game.modulesManager.getCardElement(module).dataset.playerColor = player.color; });
         this.voidStock = new VoidStock(this.game.modulesManager, document.getElementById("player-table-".concat(this.playerId, "-name")));
-        player.research.forEach(function (researchModule) { return _this.addResearch(researchModule); });
+        player.experiments.forEach(function (experiment) { return _this.addExperiment(experiment); });
         var objectiveDiv = document.getElementById("player-table-".concat(this.playerId, "-objective"));
         this.objectives = new LineStock(this.game.objectivesManager, objectiveDiv);
         this.objectives.addCards(player.objectives);
@@ -2495,20 +2488,20 @@ var PlayerTable = /** @class */ (function () {
     PlayerTable.prototype.removeModule = function (module) {
         this.modules.removeCard(module);
     };
-    PlayerTable.prototype.createResearchLine = function (line) {
+    PlayerTable.prototype.createExperimentsLine = function (line) {
         var lineDiv = document.createElement('div');
-        document.getElementById("player-table-".concat(this.playerId, "-research-lines")).insertAdjacentElement('beforeend', lineDiv);
-        this.researchLines[line] = new SlotStock(this.game.researchManager, lineDiv, {
+        document.getElementById("player-table-".concat(this.playerId, "-experiments-lines")).insertAdjacentElement('beforeend', lineDiv);
+        this.experimentsLines[line] = new SlotStock(this.game.experimentsManager, lineDiv, {
             gap: '0',
             slotsIds: [1, 2, 3],
             mapCardToSlot: function (card) { return card.extremity; },
         });
     };
-    PlayerTable.prototype.addResearch = function (research) {
-        if (!this.researchLines[research.line]) {
-            this.createResearchLine(research.line);
+    PlayerTable.prototype.addExperiment = function (experiment) {
+        if (!this.experimentsLines[experiment.line]) {
+            this.createExperimentsLine(experiment.line);
         }
-        return this.researchLines[research.line].addCard(research);
+        return this.experimentsLines[experiment.line].addCard(experiment);
     };
     PlayerTable.prototype.reactivateWorkers = function () {
         document.getElementById("player-table-".concat(this.playerId, "-modules")).querySelectorAll('.worker').forEach(function (worker) {
@@ -2612,11 +2605,11 @@ var PlayerTable = /** @class */ (function () {
         this.modules.removeAll(modules);
         this.modules.addCards(modules);
     };
-    PlayerTable.prototype.resetResearch = function (research) {
+    PlayerTable.prototype.resetExperiments = function (experiments) {
         var _this = this;
-        document.getElementById("player-table-".concat(this.playerId, "-research-lines")).innerHTML = "";
-        this.researchLines = [];
-        research.forEach(function (researchModule) { return _this.addResearch(researchModule); });
+        document.getElementById("player-table-".concat(this.playerId, "-experiments-lines")).innerHTML = "";
+        this.experimentsLines = [];
+        experiments.forEach(function (experiment) { return _this.addExperiment(experiment); });
     };
     PlayerTable.prototype.resetObjectives = function (objectives) {
         this.objectives.removeAll();
@@ -2662,7 +2655,7 @@ var Humanity = /** @class */ (function () {
         this.gamedatas = gamedatas;
         log('gamedatas', gamedatas);
         this.modulesManager = new ModulesManager(this);
-        this.researchManager = new DestinationsManager(this);
+        this.experimentsManager = new ExperimentsManager(this);
         this.objectivesManager = new ObjectivesManager(this);
         this.animationManager = new AnimationManager(this);
         new JumpToManager(this, {
@@ -2750,7 +2743,7 @@ var Humanity = /** @class */ (function () {
         if (this.isCurrentPlayerActive()) {
             (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableWorkers(args.workers);
             this.tableCenter.setSelectableModules(args.selectableModules);
-            this.tableCenter.setSelectableResearch(args.selectableResearch);
+            this.tableCenter.setSelectableExperiments(args.selectableExperiments);
         }
     };
     Humanity.prototype.onEnteringActivateModule = function (args) {
@@ -2781,7 +2774,7 @@ var Humanity = /** @class */ (function () {
             case 'chooseAction':
                 this.onLeavingChooseWorker();
                 this.tableCenter.setSelectableModules(null);
-                this.tableCenter.setSelectableResearch(null);
+                this.tableCenter.setSelectableExperiments(null);
                 break;
             case 'activateModule':
                 this.onLeavingActivateModule();
@@ -3013,9 +3006,9 @@ var Humanity = /** @class */ (function () {
             this.objectivesManager.setForHelp(i, "help-objective-".concat(i));
         }
     };
-    Humanity.prototype.onTableResearchClick = function (research) {
+    Humanity.prototype.onTableExperimentClick = function (experiment) {
         if (this.gamedatas.gamestate.name == 'chooseAction') {
-            this.chooseNewResearch(research.id);
+            this.chooseNewExperiment(experiment.id);
         }
     };
     Humanity.prototype.onPlayerModuleClick = function (card) {
@@ -3080,11 +3073,11 @@ var Humanity = /** @class */ (function () {
             color: color
         });
     };
-    Humanity.prototype.chooseNewResearch = function (id) {
-        if (!this.checkAction('chooseNewResearch')) {
+    Humanity.prototype.chooseNewExperiment = function (id) {
+        if (!this.checkAction('chooseNewExperiment')) {
             return;
         }
-        this.takeAction('chooseNewResearch', {
+        this.takeAction('chooseNewExperiment', {
             id: id
         });
     };
@@ -3158,7 +3151,7 @@ var Humanity = /** @class */ (function () {
             ['gainTimeUnit', ANIMATION_MS],
             ['moveWorkerToTable', ANIMATION_MS],
             ['deployModule', undefined],
-            ['deployResearch', undefined],
+            ['deployExperiment', undefined],
             ['score', 1],
             ['researchPoints', 1],
             ['vp', 1],
@@ -3168,7 +3161,7 @@ var Humanity = /** @class */ (function () {
             ['shiftTableModule', ANIMATION_MS],
             ['newTableModule', ANIMATION_MS],
             ['moveArm', ANIMATION_MS],
-            ['newTableResearch', ANIMATION_MS],
+            ['newTableExperiments', ANIMATION_MS],
             ['reactivateWorkers', ANIMATION_MS],
             ['upgradeWorker', 50],
             ['year', ANIMATION_MS],
@@ -3237,9 +3230,9 @@ var Humanity = /** @class */ (function () {
         var playerId = args.playerId, module = args.module;
         return this.getPlayerTable(playerId).addModule(module);
     };
-    Humanity.prototype.notif_deployResearch = function (args) {
-        var playerId = args.playerId, research = args.research;
-        return this.getPlayerTable(playerId).addResearch(research);
+    Humanity.prototype.notif_deployExperiment = function (args) {
+        var playerId = args.playerId, experiment = args.experiment;
+        return this.getPlayerTable(playerId).addExperiment(experiment);
     };
     Humanity.prototype.notif_score = function (args) {
         this.setScore(args.playerId, args.new);
@@ -3270,8 +3263,8 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_moveArm = function (args) {
         this.tableCenter.moveArm(args.arm);
     };
-    Humanity.prototype.notif_newTableResearch = function (args) {
-        this.tableCenter.newResearch(args.tableResearch);
+    Humanity.prototype.notif_newTableExperiments = function (args) {
+        this.tableCenter.newExperiments(args.tableExperiments);
     };
     Humanity.prototype.notif_reactivateWorkers = function (args) {
         if (args.playerId) {
@@ -3299,12 +3292,12 @@ var Humanity = /** @class */ (function () {
         var _this = this;
         var playerId = args.playerId, undo = args.undo;
         this.tableCenter.resetModules(undo.tableModules);
-        this.tableCenter.newResearch(undo.tableResearch);
+        this.tableCenter.newExperiments(undo.tableExperiments);
         this.researchBoard.resetObjectives(undo.allObjectives.filter(function (objective) { return objective.location == 'table'; }));
         this.playersTables.forEach(function (playerTable) { return playerTable.resetObjectives(undo.allObjectives.filter(function (objective) { return objective.location == 'player' && objective.locationArg == playerTable.playerId; })); });
         var table = this.getPlayerTable(playerId);
         table.resetModules(undo.modules);
-        table.resetResearch(undo.research);
+        table.resetExperiments(undo.experiments);
         undo.workers.forEach(function (worker) { return _this.resetWorker(playerId, worker); });
         this.setResearchPoints(playerId, undo.researchPoints);
         this.setVP(playerId, undo.vp);
@@ -3379,8 +3372,8 @@ var Humanity = /** @class */ (function () {
                 if (args.module_image === '' && args.module) {
                     args.module_image = "<div class=\"log-image\">".concat(this.modulesManager.getHtml(args.module), "</div>");
                 }
-                if (args.research_image === '' && args.research) {
-                    args.research_image = "<div class=\"log-image\">".concat(this.researchManager.getHtml(args.research), "</div>");
+                if (args.experiment_image === '' && args.experiment) {
+                    args.experiment_image = "<div class=\"log-image\">".concat(this.experimentsManager.getHtml(args.experiment), "</div>");
                 }
                 if (args.objective_image === '' && args.objective) {
                     args.objective_image = "<div class=\"log-image\">".concat(this.objectivesManager.getHtml(args.objective), "</div>");

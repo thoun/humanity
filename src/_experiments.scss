@@ -1,4 +1,4 @@
-.card.research {
+.card.experiment {
   display: inline-block;
   position: relative;
   width: 150px;
@@ -7,7 +7,7 @@
 
   @for $year from 1 through 3 {
       &[data-year="#{$year}"] .front {
-        background-image: url('img/research-age#{$year}.png');
+        background-image: url('img/experiments-age#{$year}.png');
       }
   }
 

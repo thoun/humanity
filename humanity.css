@@ -793,172 +793,172 @@ body > .card {
   outline: 5px solid red;
 }
 
-.card.research {
+.card.experiment {
   display: inline-block;
   position: relative;
   width: 150px;
   height: 100px;
   border-radius: 25px;
 }
-.card.research[data-year="1"] .front {
-  background-image: url("img/research-age1.png");
+.card.experiment[data-year="1"] .front {
+  background-image: url("img/experiments-age1.png");
 }
-.card.research[data-year="2"] .front {
-  background-image: url("img/research-age2.png");
+.card.experiment[data-year="2"] .front {
+  background-image: url("img/experiments-age2.png");
 }
-.card.research[data-year="3"] .front {
-  background-image: url("img/research-age3.png");
+.card.experiment[data-year="3"] .front {
+  background-image: url("img/experiments-age3.png");
 }
-.card.research .card-sides .card-side {
+.card.experiment .card-sides .card-side {
   box-shadow: none;
   background-size: 1000% 100%;
 }
-.card.research .card-sides .card-side[data-number="1"] {
+.card.experiment .card-sides .card-side[data-number="1"] {
   background-position-x: 11.1111111111%;
 }
-.card.research .card-sides .card-side[data-number="2"] {
+.card.experiment .card-sides .card-side[data-number="2"] {
   background-position-x: 22.2222222222%;
 }
-.card.research .card-sides .card-side[data-number="3"] {
+.card.experiment .card-sides .card-side[data-number="3"] {
   background-position-x: 33.3333333333%;
 }
-.card.research .card-sides .card-side[data-number="4"] {
+.card.experiment .card-sides .card-side[data-number="4"] {
   background-position-x: 44.4444444444%;
 }
-.card.research .card-sides .card-side[data-number="5"] {
+.card.experiment .card-sides .card-side[data-number="5"] {
   background-position-x: 55.5555555556%;
 }
-.card.research .card-sides .card-side[data-number="6"] {
+.card.experiment .card-sides .card-side[data-number="6"] {
   background-position-x: 66.6666666667%;
 }
-.card.research .card-sides .card-side[data-number="7"] {
+.card.experiment .card-sides .card-side[data-number="7"] {
   background-position-x: 77.7777777778%;
 }
-.card.research .card-sides .card-side[data-number="8"] {
+.card.experiment .card-sides .card-side[data-number="8"] {
   background-position-x: 88.8888888889%;
 }
-.card.research .card-sides .card-side[data-number="9"] {
+.card.experiment .card-sides .card-side[data-number="9"] {
   background-position-x: 100%;
 }
-.card.research .card-sides .card-side > * {
+.card.experiment .card-sides .card-side > * {
   pointer-events: none;
   user-select: none;
 }
-.card.research.bga-cards_selectable-card:not(.bga-cards_disabled-card):not(.bga-cards_selected-card) {
+.card.experiment.bga-cards_selectable-card:not(.bga-cards_disabled-card):not(.bga-cards_selected-card) {
   outline: 5px dashed red;
 }
-.card.research.bga-cards_selected-card:not(.bga-cards_disabled-card) {
+.card.experiment.bga-cards_selected-card:not(.bga-cards_disabled-card) {
   outline: 5px solid red;
 }
-.card.research[data-type="1"] .card-side {
+.card.experiment[data-type="1"] .card-side {
   background-position-x: 0%;
 }
-.card.research[data-type="2"] .card-side {
+.card.experiment[data-type="2"] .card-side {
   background-position-x: 100%;
 }
-.card.research[data-type="1"] .front[data-number="1"] {
+.card.experiment[data-type="1"] .front[data-number="1"] {
   background-position-y: 5%;
 }
-.card.research[data-type="1"] .front[data-number="2"] {
+.card.experiment[data-type="1"] .front[data-number="2"] {
   background-position-y: 10%;
 }
-.card.research[data-type="1"] .front[data-number="3"] {
+.card.experiment[data-type="1"] .front[data-number="3"] {
   background-position-y: 15%;
 }
-.card.research[data-type="1"] .front[data-number="4"] {
+.card.experiment[data-type="1"] .front[data-number="4"] {
   background-position-y: 20%;
 }
-.card.research[data-type="1"] .front[data-number="5"] {
+.card.experiment[data-type="1"] .front[data-number="5"] {
   background-position-y: 25%;
 }
-.card.research[data-type="1"] .front[data-number="6"] {
+.card.experiment[data-type="1"] .front[data-number="6"] {
   background-position-y: 30%;
 }
-.card.research[data-type="1"] .front[data-number="7"] {
+.card.experiment[data-type="1"] .front[data-number="7"] {
   background-position-y: 35%;
 }
-.card.research[data-type="1"] .front[data-number="8"] {
+.card.experiment[data-type="1"] .front[data-number="8"] {
   background-position-y: 40%;
 }
-.card.research[data-type="1"] .front[data-number="9"] {
+.card.experiment[data-type="1"] .front[data-number="9"] {
   background-position-y: 45%;
 }
-.card.research[data-type="1"] .front[data-number="10"] {
+.card.experiment[data-type="1"] .front[data-number="10"] {
   background-position-y: 50%;
 }
-.card.research[data-type="1"] .front[data-number="11"] {
+.card.experiment[data-type="1"] .front[data-number="11"] {
   background-position-y: 55%;
 }
-.card.research[data-type="1"] .front[data-number="12"] {
+.card.experiment[data-type="1"] .front[data-number="12"] {
   background-position-y: 60%;
 }
-.card.research[data-type="1"] .front[data-number="13"] {
+.card.experiment[data-type="1"] .front[data-number="13"] {
   background-position-y: 65%;
 }
-.card.research[data-type="1"] .front[data-number="14"] {
+.card.experiment[data-type="1"] .front[data-number="14"] {
   background-position-y: 70%;
 }
-.card.research[data-type="1"] .front[data-number="15"] {
+.card.experiment[data-type="1"] .front[data-number="15"] {
   background-position-y: 75%;
 }
-.card.research[data-type="1"] .front[data-number="16"] {
+.card.experiment[data-type="1"] .front[data-number="16"] {
   background-position-y: 80%;
 }
-.card.research[data-type="1"] .front[data-number="17"] {
+.card.experiment[data-type="1"] .front[data-number="17"] {
   background-position-y: 85%;
 }
-.card.research[data-type="1"] .front[data-number="18"] {
+.card.experiment[data-type="1"] .front[data-number="18"] {
   background-position-y: 90%;
 }
-.card.research[data-type="1"] .front[data-number="19"] {
+.card.experiment[data-type="1"] .front[data-number="19"] {
   background-position-y: 95%;
 }
-.card.research[data-type="1"] .front[data-number="20"] {
+.card.experiment[data-type="1"] .front[data-number="20"] {
   background-position-y: 100%;
 }
-.card.research[data-type="2"] .front[data-number="21"] {
+.card.experiment[data-type="2"] .front[data-number="21"] {
   background-position-y: 5%;
 }
-.card.research[data-type="2"] .front[data-number="22"] {
+.card.experiment[data-type="2"] .front[data-number="22"] {
   background-position-y: 10%;
 }
-.card.research[data-type="2"] .front[data-number="23"] {
+.card.experiment[data-type="2"] .front[data-number="23"] {
   background-position-y: 15%;
 }
-.card.research[data-type="2"] .front[data-number="24"] {
+.card.experiment[data-type="2"] .front[data-number="24"] {
   background-position-y: 20%;
 }
-.card.research[data-type="2"] .front[data-number="25"] {
+.card.experiment[data-type="2"] .front[data-number="25"] {
   background-position-y: 25%;
 }
-.card.research[data-type="2"] .front[data-number="26"] {
+.card.experiment[data-type="2"] .front[data-number="26"] {
   background-position-y: 30%;
 }
-.card.research[data-type="2"] .front[data-number="27"] {
+.card.experiment[data-type="2"] .front[data-number="27"] {
   background-position-y: 35%;
 }
-.card.research[data-type="2"] .front[data-number="28"] {
+.card.experiment[data-type="2"] .front[data-number="28"] {
   background-position-y: 40%;
 }
-.card.research[data-type="2"] .front[data-number="29"] {
+.card.experiment[data-type="2"] .front[data-number="29"] {
   background-position-y: 45%;
 }
-.card.research[data-type="2"] .front[data-number="30"] {
+.card.experiment[data-type="2"] .front[data-number="30"] {
   background-position-y: 50%;
 }
-.card.research[data-type="2"] .front[data-number="31"] {
+.card.experiment[data-type="2"] .front[data-number="31"] {
   background-position-y: 55%;
 }
-.card.research[data-type="2"] .front[data-number="32"] {
+.card.experiment[data-type="2"] .front[data-number="32"] {
   background-position-y: 60%;
 }
-.card.research[data-type="2"] .front[data-number="33"] {
+.card.experiment[data-type="2"] .front[data-number="33"] {
   background-position-y: 65%;
 }
-.card.research[data-type="2"] .front[data-number="34"] {
+.card.experiment[data-type="2"] .front[data-number="34"] {
   background-position-y: 70%;
 }
-.card.research[data-type="2"] .front[data-number="35"] {
+.card.experiment[data-type="2"] .front[data-number="35"] {
   background-position-y: 75%;
 }
 
@@ -1036,40 +1036,40 @@ body > .card {
   transition: transform 0.5s;
   transform: rotate(calc(var(--r) * 45deg));
 }
-#board-1 #board-2 #table-research {
+#board-1 #board-2 #table-experiments {
   position: absolute;
   left: 221px;
   top: 235px;
   width: 150px;
   height: 100px;
 }
-#board-1 #board-2 #table-research .slot {
+#board-1 #board-2 #table-experiments .slot {
   position: absolute;
   width: 150px;
   height: 100px;
 }
-#board-1 #board-2 #table-research .slot[data-slot-id="0"] {
+#board-1 #board-2 #table-experiments .slot[data-slot-id="0"] {
   transform: rotate(0deg) translateY(191px) rotate(-90deg);
 }
-#board-1 #board-2 #table-research .slot[data-slot-id="1"] {
+#board-1 #board-2 #table-experiments .slot[data-slot-id="1"] {
   transform: rotate(45deg) translateY(191px) rotate(-90deg);
 }
-#board-1 #board-2 #table-research .slot[data-slot-id="2"] {
+#board-1 #board-2 #table-experiments .slot[data-slot-id="2"] {
   transform: rotate(90deg) translateY(191px) rotate(-90deg);
 }
-#board-1 #board-2 #table-research .slot[data-slot-id="3"] {
+#board-1 #board-2 #table-experiments .slot[data-slot-id="3"] {
   transform: rotate(135deg) translateY(191px) rotate(-90deg);
 }
-#board-1 #board-2 #table-research .slot[data-slot-id="4"] {
+#board-1 #board-2 #table-experiments .slot[data-slot-id="4"] {
   transform: rotate(180deg) translateY(191px) rotate(-90deg);
 }
-#board-1 #board-2 #table-research .slot[data-slot-id="5"] {
+#board-1 #board-2 #table-experiments .slot[data-slot-id="5"] {
   transform: rotate(225deg) translateY(191px) rotate(-90deg);
 }
-#board-1 #board-2 #table-research .slot[data-slot-id="6"] {
+#board-1 #board-2 #table-experiments .slot[data-slot-id="6"] {
   transform: rotate(270deg) translateY(191px) rotate(-90deg);
 }
-#board-1 #board-2 #table-research .slot[data-slot-id="7"] {
+#board-1 #board-2 #table-experiments .slot[data-slot-id="7"] {
   transform: rotate(315deg) translateY(191px) rotate(-90deg);
 }
 #board-1 #table-modules {
@@ -1335,7 +1335,7 @@ body > .card {
   outline: 4px dashed red;
   cursor: pointer;
 }
-.player-table .research-lines .slot {
+.player-table .experiments-lines .slot {
   width: 150px;
   height: 100px;
 }

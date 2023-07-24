@@ -21,7 +21,7 @@ interface Module {
     matchType: number;
 }
 
-interface Research {
+interface Experiment {
     id: number;
     location: string;
     locationArg: number;
@@ -68,7 +68,7 @@ interface HumanityPlayer extends Player {
     
     workers: Worker[];
     modules: Module[];
-    research: Research[];
+    experiments: Experiment[];
     researchPoints: number;
     vp: number;
     science?: number;
@@ -91,7 +91,7 @@ interface HumanityGamedatas {
 
     // Add here variables you set up in getAllDatas
     tableModules: Module[];
-    tableResearch: Research[];
+    tableExperiments: Experiment[];
     tableObjectives: Objective[];
     arm: number;
     year: number;
@@ -103,7 +103,7 @@ interface HumanityGamedatas {
 
 interface HumanityGame extends Game {
     modulesManager: ModulesManager;
-    researchManager: DestinationsManager;
+    experimentsManager: ExperimentsManager;
     objectivesManager: ObjectivesManager;
 
     getPlayerId(): number;
@@ -114,7 +114,7 @@ interface HumanityGame extends Game {
     createWorker(worker: Worker): HTMLDivElement;
 
     setTooltip(id: string, html: string): void;
-    onTableResearchClick(research: Research): void;
+    onTableExperimentClick(experiment: Experiment): void;
     onPlayerModuleClick(card: Module): void;
     onPlayerModuleSpotClick(x: number, y: number): void;
     onTableModuleClick(card: Module): void;
@@ -126,7 +126,7 @@ interface EnteringChooseWorkerArgs {
 
 interface EnteringChooseActionArgs extends EnteringChooseWorkerArgs {
     selectableModules: Module[];
-    selectableResearch: Research[];
+    selectableExperiments: Experiment[];
 }
 
 interface EnteringPayArgs {
@@ -184,10 +184,10 @@ interface NotifDeployModuleArgs {
     module: Module;
 }
 
-// deployResearch
-interface NotifDeployResearchArgs {
+// deployExperiment
+interface NotifDeployExperimentArgs {
     playerId: number;
-    research: Research;
+    experiment: Experiment;
 }
 
 // score, researchPoints, science
@@ -213,9 +213,9 @@ interface NotifMoveArmArgs {
     arm: number;
 }
 
-// newTableResearch
-interface NotifNewTableResearchArgs {
-    tableResearch: Research[];
+// newTableExperiments
+interface NotifNewTableExperimentArgs {
+    tableExperiments: Experiment[];
 }
 
 // reactivateWorkers
@@ -237,13 +237,13 @@ interface NotifGainObjectiveArgs {
 
 interface Undo {
     modules: Module[];
-    research: Research[];
+    experiments: Experiment[];
     workers: Worker[];
     vp: number;
     researchPoints: number;
     science: number;
     tableModules: Module[];
-    tableResearch: Research[];
+    tableExperiments: Experiment[];
     allObjectives: Objective[];
 }
 

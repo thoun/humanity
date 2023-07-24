@@ -16,11 +16,11 @@ trait StateTrait {
 
         $this->setGlobalVariable(UNDO, new Undo(
             $this->getModulesByLocation('player', $playerId),
-            $this->getResearchsByLocation('player', $playerId),
+            $this->getExperimentsByLocation('player', $playerId),
             $this->getPlayerWorkers($playerId),
             $this->getPlayer($playerId),
             $this->getModulesByLocation('table'),
-            $this->getResearchsByLocation('table'),
+            $this->getExperimentsByLocation('table'),
             $this->getObjectivesByLocation(),
         ));
         
@@ -210,7 +210,7 @@ trait StateTrait {
         foreach($playersIds as $playerId) {
             $sciencePoints = 0;
             $playerResearchPoints = $this->getPlayer($playerId)->researchPoints;
-            foreach (SCIENCE_BY_RESEARCH_SPOT as $inc => $minSpot) {
+            foreach (SCIENCE_BY_EXPERIMENT_SPOT as $inc => $minSpot) {
                 if ($playerResearchPoints >= $minSpot) {
                     $sciencePoints = $inc;
                 }
@@ -239,13 +239,13 @@ trait StateTrait {
             'year' => $year,
         ]);
 
-        // replace all research modules
-        $this->research->moveAllCardsInLocation('table', 'void');
+        // replace all experiment tiles
+        $this->experiments->moveAllCardsInLocation('table', 'void');
         foreach ([1, 2, 3, 4, 5, 6, 7] as $spot) {
-            $this->research->pickCardForLocation('deck'.$year, 'table', $spot);
+            $this->experiments->pickCardForLocation('deck'.$year, 'table', $spot);
         }
-        self::notifyAllPlayers('newTableResearch', '', [
-            'tableResearch' => $this->getResearchsByLocation('table'),
+        self::notifyAllPlayers('newTableExperiments', '', [
+            'tableExperiment' => $this->getExperimentsByLocation('table'),
         ]);
 
         // continue to fill modules with new age modules

@@ -84,7 +84,7 @@ $commonStats = [
     ],
     "assetsCollectedByPlayedCards4" => [
         "id" => 26,
-        "name" => totranslate("Research gained by played cards"),
+        "name" => totranslate("Experiment gained by played cards"),
         "type" => "int"
     ],
     "recruitsUsedToChooseCard" => [
@@ -136,7 +136,7 @@ $commonStats = [
     ],
     "assetsCollectedByDestination4" => [
         "id" => 47,
-        "name" => totranslate("Research gained by research"),
+        "name" => totranslate("Experiment gained by research"),
         "type" => "int"
     ],
     "assetsCollectedByDestination5" => [
@@ -198,7 +198,7 @@ $commonStats = [
     ],
     "assetsCollectedByTrade4" => [
         "id" => 69,
-        "name" => totranslate("Research gained by trade"),
+        "name" => totranslate("Experiment gained by trade"),
         "type" => "int"
     ],
     "assetsCollectedByTrade5" => [

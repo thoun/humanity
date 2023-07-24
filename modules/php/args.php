@@ -32,14 +32,14 @@ trait ArgsTrait {
         $playerIcons = $this->getPlayerIcons($playerId);
 
         $tableModules = $this->getModulesByLocation('table');
-        $tableResearch = $this->getResearchsByLocation('table');
+        $tableExperiments = $this->getExperimentsByLocation('table');
 
         $selectableModules = array_values(array_filter($tableModules, fn($module) => $this->canPay($module->cost, $playerIcons) != null));
-        $selectableResearch = array_values(array_filter($tableResearch, fn($module) => $this->canPay($module->cost, $playerIcons) != null));
+        $selectableExperiments = array_values(array_filter($tableExperiments, fn($module) => $this->canPay($module->cost, $playerIcons) != null));
 
         return [
             'selectableModules' => $selectableModules,
-            'selectableResearch' => $selectableResearch,
+            'selectableExperiments' => $selectableExperiments,
         ] + $this->argChooseWorker();
     }
 

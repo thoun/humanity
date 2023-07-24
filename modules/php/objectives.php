@@ -77,7 +77,8 @@ trait ObjectiveTrait {
         $modulesOfColor = array_values(array_filter($modules, fn($module) => $module->color == $color));
 
         if ($adjacent) {
-            return max(array_map(fn($fromModule) => $this->getAdjacentModulesCount($modulesOfColor, $fromModule, $diagonal, [$fromModule]), $modulesOfColor));
+            $maxes = array_map(fn($fromModule) => $this->getAdjacentModulesCount($modulesOfColor, $fromModule, $diagonal, [$fromModule]), $modulesOfColor);
+            return count($maxes) > 0 ? max($maxes) : 0;
         } else {
             return count($modulesOfColor);
         }
@@ -113,25 +114,25 @@ trait ObjectiveTrait {
         }
     }
 
-    function getResearchTypeIcons(int $playerId, int $baseType) {
-        $researchModules = $this->getResearchsByLocation('player', $playerId);
+    function getExperimentTypeIcons(int $playerId, int $baseType) {
+        $experiments = $this->getExperimentsByLocation('player', $playerId);
         $count = 0;
 
-        foreach ($researchModules as $researchModule) {
-            if (array_key_exists($baseType, $researchModule->cost)) {
-                $count += $researchModule->cost[$baseType];
+        foreach ($experiments as $experiment) {
+            if (array_key_exists($baseType, $experiment->cost)) {
+                $count += $experiment->cost[$baseType];
             }
-            if (array_key_exists($baseType + 10, $researchModule->cost)) {
-                $count += $researchModule->cost[$baseType + 10];
+            if (array_key_exists($baseType + 10, $experiment->cost)) {
+                $count += $experiment->cost[$baseType + 10];
             }
         }
 
         return $count;
     }
 
-    function getResearchExtremities(int $playerId, int $extremity) {
-        $researchModules = $this->getResearchsByLocation('player', $playerId);
-        return count(array_filter($researchModules, fn($researchModule) => $researchModule->extremity == $extremity));
+    function getExperimentExtremities(int $playerId, int $extremity) {
+        $experiments = $this->getExperimentsByLocation('player', $playerId);
+        return count(array_filter($experiments, fn($experiment) => $experiment->extremity == $extremity));
     }
     
     function fulfillObjective(int $playerId, Objective $objective) {
@@ -140,9 +141,9 @@ trait ObjectiveTrait {
         } else if ($objective->direction !== null) {
             return $this->getMaxModulesInDirection($playerId, $objective->direction, $objective->sameColor) >= $objective->minimum;
         } else if ($objective->baseType !== null) {
-            return $this->getResearchTypeIcons($playerId, $objective->baseType) >= $objective->minimum;
+            return $this->getExperimentTypeIcons($playerId, $objective->baseType) >= $objective->minimum;
         } else if ($objective->extremity !== null) {
-            return $this->getResearchExtremities($playerId, $objective->extremity) >= $objective->minimum;
+            return $this->getExperimentExtremities($playerId, $objective->extremity) >= $objective->minimum;
         }
         return false;
     }

@@ -51,8 +51,8 @@ trait ActionTrait {
             $upgrade = 0;
             if ($currentAction->type == 'module') {
                 $upgrade = $this->deployModule($playerId, $currentAction, $worker);
-            } else if ($currentAction->type == 'research') {
-                $this->deployResearch($playerId, $currentAction, $worker);
+            } else if ($currentAction->type == 'experiment') {
+                $this->deployExperiment($playerId, $currentAction, $worker);
             }
 
             if ($upgrade > 0) {
@@ -89,7 +89,7 @@ trait ActionTrait {
         $message = null;
         $args = [];
         if ($module->matchType) {
-            if ($module->matchType == RESEARCH_POWER_TIME) {
+            if ($module->matchType == EXPERIMENT_POWER_TIME) {
                 $this->gainTimeUnit($playerId, 1);
             }
             $message = clienttranslate('${player_name} activates a module to trigger TODO POWER TIME effect ${module_image}');
@@ -191,23 +191,23 @@ trait ActionTrait {
         $this->gamestate->nextState('pay');
     }
 
-    public function chooseNewResearch(int $id) {
-        self::checkAction('chooseNewResearch');
+    public function chooseNewExperiment(int $id) {
+        self::checkAction('chooseNewExperiment');
 
         $playerId = intval($this->getActivePlayerId());
-        $module = $this->getResearchById($id);
+        $module = $this->getExperimentById($id);
 
-        $currentAction = new CurrentAction('research');
-        $currentAction->research = $id;
+        $currentAction = new CurrentAction('experiment');
+        $currentAction->experiment = $id;
         $currentAction->remainingCost = $module->cost;
         $currentAction->workerSpot = ($module->locationArg + $this->getArm()) % 8;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
-        self::notifyAllPlayers('log', clienttranslate('${player_name} chooses a research module to deploy ${research_image}'), [
+        self::notifyAllPlayers('log', clienttranslate('${player_name} chooses an experiment to deploy ${experiment_image}'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'research' => $module,
-            'research_image' => '',
+            'experiment' => $module,
+            'experiment_image' => '',
             'preserve' => ['module'],
         ]);
 
@@ -415,16 +415,16 @@ trait ActionTrait {
         foreach ($undo->tableModules as $module) {
             $this->DbQuery("UPDATE `module` SET `card_location` = '$module->location', `card_location_arg` = $module->locationArg, `x` = NULL, `y` = NULL, `r` = 0 WHERE `card_id` = $module->id");
         }
-        foreach ($undo->tableResearch as $module) {
-            $this->DbQuery("UPDATE `research` SET `card_location` = '$module->location', `card_location_arg` = $module->locationArg, `line` = NULL WHERE `card_id` = $module->id");
+        foreach ($undo->tableExperiments as $experiment) {
+            $this->DbQuery("UPDATE `experiment` SET `card_location` = '$experiment->location', `card_location_arg` = $experiment->locationArg, `line` = NULL WHERE `card_id` = $experiment->id");
         }
        
         $this->DbQuery("UPDATE `module` SET `card_location` = 'radar' WHERE `card_type` = 8 && `card_location` = 'player' AND `card_location_arg` = $playerId");
         foreach ($undo->modules as $module) {            
             $this->DbQuery("UPDATE `module` SET `card_location` = '$module->location', `card_location_arg` = $module->locationArg, `x` = $module->x, `y` = $module->y, `r` = $module->r WHERE `card_id` = $module->id");
         }
-        foreach ($undo->research as $module) {
-            $this->DbQuery("UPDATE `research` SET `card_location` = '$module->location', `card_location_arg` = $module->locationArg, `line` = $module->line WHERE `card_id` = $module->id");
+        foreach ($undo->experiments as $experiment) {
+            $this->DbQuery("UPDATE `experiment` SET `card_location` = '$module->experiment', `card_location_arg` = $experiment->locationArg, `line` = $experiment->line WHERE `card_id` = $experiment->id");
         }
 
         foreach ($undo->workers as $worker) {

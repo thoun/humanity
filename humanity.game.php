@@ -20,8 +20,9 @@
 require_once(APP_GAMEMODULE_PATH.'module/table/table.game.php');
 
 require_once('modules/php/objects/worker.php');
-require_once('modules/php/objects/card.php');
-require_once('modules/php/objects/research.php');
+require_once('modules/php/objects/module.php');
+require_once('modules/php/objects/experiment.php');
+require_once('modules/php/objects/objective.php');
 require_once('modules/php/objects/player.php');
 require_once('modules/php/objects/current-action.php');
 require_once('modules/php/objects/undo.php');
@@ -30,7 +31,7 @@ require_once('modules/php/utils.php');
 require_once('modules/php/workers.php');
 require_once('modules/php/modules.php');
 require_once('modules/php/objectives.php');
-require_once('modules/php/research.php');
+require_once('modules/php/experiments.php');
 require_once('modules/php/actions.php');
 require_once('modules/php/states.php');
 require_once('modules/php/args.php');
@@ -41,7 +42,7 @@ class Humanity extends Table {
     use WorkerTrait;
     use ModuleTrait;
     use ObjectiveTrait;
-    use ResearchTrait;
+    use ExperimentTrait;
     use ActionTrait;
     use StateTrait;
     use ArgsTrait;
@@ -61,8 +62,8 @@ class Humanity extends Table {
         $this->modules = $this->getNew("module.common.deck");
         $this->modules->init("module");
 		
-        $this->research = $this->getNew("module.common.deck");
-        $this->research->init("research");   
+        $this->experiments = $this->getNew("module.common.deck");
+        $this->experiments->init("experiment");   
 		
         $this->objectives = $this->getNew("module.common.deck");
         $this->objectives->init("objective");  
@@ -138,7 +139,7 @@ class Humanity extends Table {
         // setup the initial game situation here
         $this->setupWorkers(array_keys($players));
         $this->setupModules($players);
-        $this->setupResearches();
+        $this->setupExperiments();
         $this->setupObjectives();
 
         // Activate first player (which is in general a good idea :) )
@@ -181,7 +182,7 @@ class Humanity extends Table {
             $player['vp'] = intval($player['vp']);
             $player['science'] = $isEndScore || $playerId == $currentPlayerId ? intval($player['science']) : null;
             $player['modules'] = $this->getModulesByLocation('player', $playerId);
-            $player['research'] = $this->getResearchsByLocation('player', $playerId);
+            $player['experiments'] = $this->getExperimentsByLocation('player', $playerId);
             $player['objectives'] = $this->getObjectivesByLocation('player', $playerId);
             if ($isEndScore) {
                 $player['score'] = $player['vp'] + $player['science'];
@@ -191,7 +192,7 @@ class Humanity extends Table {
         }
 
         $result['tableModules'] = $this->getModulesByLocation('table');
-        $result['tableResearch'] = $this->getResearchsByLocation('table');
+        $result['tableExperiments'] = $this->getExperimentsByLocation('table');
         $result['tableObjectives'] = $this->getObjectivesByLocation('table');      
 
         $result['arm'] = $this->getArm();
