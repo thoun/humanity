@@ -35,10 +35,10 @@ trait ActionTrait {
             $currentAction->selectedAstronaut = $id;
             $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
-            self::notifyAllPlayers('log', clienttranslate('${player_name} selects a astronaut of workforce ${workforce} to activate modules'), [
+            self::notifyAllPlayers('log', clienttranslate('${player_name} selects a astronaut of work value ${work_value} to activate modules'), [
                 'playerId' => $playerId,
                 'player_name' => $this->getPlayerName($playerId),
-                'workforce' => $astronaut->workforce,
+                'work_value' => $astronaut->workforce,
             ]);
 
             $this->gamestate->nextState('activate');
@@ -81,7 +81,7 @@ trait ActionTrait {
         }
 
         if ($astronaut->remainingWorkforce < $module->workforce) {
-            throw new BgaUserException("Not enough remaining workforce");
+            throw new BgaUserException("Not enough remaining work value");
         }
         $astronaut->remainingWorkforce -= $module->workforce;
         $this->DbQuery("UPDATE astronaut SET `remaining_workforce` = $astronaut->remainingWorkforce WHERE `id` = $astronaut->id");
@@ -178,7 +178,7 @@ trait ActionTrait {
         $currentAction->addModuleId = $module->id;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
-        self::notifyAllPlayers('log', clienttranslate('${player_name} chooses a ${color} communication to replace the selected module ${module_image}'), [
+        self::notifyAllPlayers('log', clienttranslate('${player_name} chooses a ${color} communication module to replace the selected module ${module_image}'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
             'module' => $module,
@@ -317,7 +317,7 @@ trait ActionTrait {
         }
         $astronaut->workforce++;
 
-        self::notifyAllPlayers('upgradeAstronaut', clienttranslate('${player_name} upgrades a astronaut workforce from ${from} to ${to}'), [
+        self::notifyAllPlayers('upgradeAstronaut', clienttranslate('${player_name} upgrades a astronaut work value from ${from} to ${to}'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
             'astronaut' => $astronaut,

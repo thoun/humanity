@@ -36,7 +36,7 @@ const DIAGONAL = 3;
  */
 const ELECTRICITY = 0;
 const ICE = 1;
-const METHAN = 2;
+const METHANE = 2;
 const INSECT = 3;
 const OXYGEN = 11;
 const AIRCARBON = 12;
@@ -55,7 +55,7 @@ const RIGHT = 3;
 const SHAPE_JOKER = 3;
 const SHAPE_ROUND = 1;
 const SHAPE_RECTANGULAR = 2;
-const SHAPE_OCTOGONAL = 3;
+const SHAPE_OCTAGONAL = 3;
 
 /*
  * EXPERIMENT POWERS
@@ -75,7 +75,7 @@ const ST_PLAYER_CHOOSE_COMMUNICATION_COLOR = 11;
 
 const ST_PLAYER_ACTIVATE_TILE = 20;
 
-const ST_PLAYER_PAY = 30;
+const ST_PLAYER_SPEND_RESOURCES = 30;
 
 const ST_PLAYER_CHOOSE_ASTRONAUT = 40;
 

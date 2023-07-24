@@ -2823,7 +2823,7 @@ var Humanity = /** @class */ (function () {
                     this.addActionButton("orange_button", _("Orange"), function () { return _this.chooseCommunicationColor(1); });
                     break;
                 case 'pay':
-                    this.addActionButton("autoPay_button", _("Pay ${cost}").replace('${cost}', getCostStr(args.pay)), function () { return _this.autoPay(); });
+                    this.addActionButton("autoPay_button", _("Spend ${cost}").replace('${cost}', getCostStr(args.pay)), function () { return _this.autoPay(); });
                     break;
                 case 'confirmTurn':
                     this.addActionButton("confirmTurn_button", _("Confirm turn"), function () { return _this.confirmTurn(); });
@@ -3352,7 +3352,7 @@ var Humanity = /** @class */ (function () {
         switch (color) {
             case 0: return _("Electricity");
             case 1: return _("Ice");
-            case 2: return _("Methan");
+            case 2: return _("Methane");
             case 3: return _("Insect");
             case 11: return _("Oxygen");
             case 12: return _("Aircarbon");

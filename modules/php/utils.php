@@ -216,7 +216,7 @@ trait UtilTrait {
         switch ($type) {
             case 0: return clienttranslate("Electricity");
             case 1: return clienttranslate("Ice");
-            case 2: return clienttranslate("Methan");
+            case 2: return clienttranslate("Methane");
             case 3: return clienttranslate("Insect");
             case 11: return clienttranslate("Oxygen");
             case 12: return clienttranslate("Aircarbon");

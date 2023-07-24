@@ -74,8 +74,8 @@ $playerActionsGameStates = [
 
     ST_PLAYER_CHOOSE_ACTION => [
         "name" => "chooseAction",
-        "description" => clienttranslate('${actplayer} must select a astronaut to activate modules, or select a module or experiment to deploy'),
-        "descriptionmyturn" => clienttranslate('${you} must select a astronaut to activate modules, or select a module or experiment to deploy'),
+        "description" => clienttranslate('${actplayer} must select a astronaut to activate modules, a module to deploy or an experiment to carry out'),
+        "descriptionmyturn" => clienttranslate('${you} must select a astronaut to activate modules, a module to deploy or an experiment to carry out'),
         "type" => "activeplayer",    
         "args" => "argChooseAction",
         "possibleactions" => [ 
@@ -86,27 +86,27 @@ $playerActionsGameStates = [
         "transitions" => [
             "activate" => ST_PLAYER_ACTIVATE_TILE,
             "chooseCommunicationColor" => ST_PLAYER_CHOOSE_COMMUNICATION_COLOR,
-            "pay" => ST_PLAYER_PAY,
+            "pay" => ST_PLAYER_SPEND_RESOURCES,
         ],
     ],
 
     ST_PLAYER_CHOOSE_COMMUNICATION_COLOR => [
         "name" => "chooseCommunicationColor",
-        "description" => clienttranslate('${actplayer} must choose communication color'),
-        "descriptionmyturn" => clienttranslate('${you} must choose communication color'),
+        "description" => clienttranslate('${actplayer} must choose the communication module color'),
+        "descriptionmyturn" => clienttranslate('${you} must choose the communication module color'),
         "type" => "activeplayer",    
         "possibleactions" => [ 
             "chooseCommunicationColor",
         ],
         "transitions" => [
-            "pay" => ST_PLAYER_PAY,
+            "pay" => ST_PLAYER_SPEND_RESOURCES,
         ],
     ],
 
-    ST_PLAYER_PAY => [
+    ST_PLAYER_SPEND_RESOURCES => [
         "name" => "pay",
-        "description" => clienttranslate('${actplayer} must pay ${cost}'),
-        "descriptionmyturn" => clienttranslate('${you} must pay ${cost}'),
+        "description" => clienttranslate('${actplayer} must spend ${cost}'),
+        "descriptionmyturn" => clienttranslate('${you} must spend ${cost}'),
         "type" => "activeplayer",    
         "args" => "argPay",
         "possibleactions" => [ 
@@ -150,8 +150,8 @@ $playerActionsGameStates = [
 
     ST_PLAYER_ACTIVATE_TILE => [
         "name" => "activateModule",
-        "description" => clienttranslate('${actplayer} can activate some modules (${remaining} workforce remaining)'),
-        "descriptionmyturn" => clienttranslate('${you} can activate some modules (${remaining} workforce remaining)'),
+        "description" => clienttranslate('${actplayer} can activate some modules (${remaining} work force remaining)'),
+        "descriptionmyturn" => clienttranslate('${you} can activate some modules (${remaining} work force remaining)'),
         "type" => "activeplayer",
         "args" => "argActivateModule",
         "possibleactions" => [ 
