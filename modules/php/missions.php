@@ -135,15 +135,27 @@ trait MissionTrait {
         return count(array_filter($experiments, fn($experiment) => $experiment->extremity == $extremity));
     }
     
-    function fulfillMission(int $playerId, Mission $mission) {
+    function getMissionResultNumber(int $playerId, Mission $mission) {
         if ($mission->color !== null) {
-            return $this->countModulesOfColor($playerId, $mission->color, $mission->adjacent, $mission->diagonal) >= $mission->minimum;
+            return $this->countModulesOfColor($playerId, $mission->color, $mission->adjacent, $mission->diagonal);
         } else if ($mission->direction !== null) {
-            return $this->getMaxModulesInDirection($playerId, $mission->direction, $mission->sameColor) >= $mission->minimum;
+            return $this->getMaxModulesInDirection($playerId, $mission->direction, $mission->sameColor);
         } else if ($mission->baseType !== null) {
-            return $this->getExperimentTypeIcons($playerId, $mission->baseType) >= $mission->minimum;
+            return $this->getExperimentTypeIcons($playerId, $mission->baseType);
         } else if ($mission->extremity !== null) {
-            return $this->getExperimentExtremities($playerId, $mission->extremity) >= $mission->minimum;
+            return $this->getExperimentExtremities($playerId, $mission->extremity);
+        }
+        return 0;
+    }
+    
+    function shouldGainMission(int $playerId, Mission $mission) {
+        $resultNumber = $this->getMissionResultNumber($playerId, $mission);
+        if ($resultNumber >= $mission->minimum) {
+            if ($mission->location == 'player') {
+                return $resultNumber > $this->getMissionResultNumber($mission->locationArg, $mission);
+            } else {
+                return true;
+            }
         }
         return false;
     }

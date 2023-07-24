@@ -42,7 +42,7 @@ trait StateTrait {
 
         foreach($missions as $mission) {
             if ($mission->location != 'player' || $mission->locationArg != $playerId) {
-                if ($this->fulfillMission($playerId, $mission)) {
+                if ($this->shouldGainMission($playerId, $mission)) {
                     $this->gainMission($playerId, $mission);
                 }
             }
@@ -70,6 +70,8 @@ trait StateTrait {
             $this->gamestate->nextState('nextPlayer');
 
         } else {
+            self::notifyAllPlayers('log', clienttranslate('All astronauts are exhausted or around the AMBS'), []);
+
             $this->gamestate->nextState('endRound');
         }
     }
