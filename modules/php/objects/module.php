@@ -70,20 +70,16 @@ class Module extends ModuleType {
         $this->r = array_key_exists('r', $dbCard) ? intval($dbCard['r']) : null;
 
         if ($this->number !== null) {
-            $missionType = $TILES[$this->type][$this->number];
-            $this->color = $missionType->color;      
-            $this->cost = $missionType->cost;
-            $this->workforce = $missionType->workforce;
-            $this->production = $missionType->production;
-            $this->adjacentResearchPoints = $missionType->adjacentResearchPoints;
-            $this->researchPoints = $missionType->researchPoints;
-            $this->points = $missionType->points;
-            $this->matchType = $missionType->matchType;
+            $moduleType = $TILES[$this->type][$this->number];
+            $this->color = $moduleType->color;      
+            $this->cost = $moduleType->cost;
+            $this->workforce = $moduleType->workforce;
+            $this->production = $moduleType->production;
+            $this->adjacentResearchPoints = $moduleType->adjacentResearchPoints;
+            $this->researchPoints = $moduleType->researchPoints;
+            $this->points = $moduleType->points;
+            $this->matchType = $moduleType->matchType;
         }
-    } 
-
-    public function getProduction() {
-        return $this->production[$this->r];
     }
 
     public static function onlyId(?Module $module) {

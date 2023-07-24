@@ -45,7 +45,7 @@ class ModulesManager extends CardManager<Module> {
             }
         }
         if (module.production) {
-                const icons = Object.keys(module.production.find(production => Object.values(production).length)).map(type => `<div class="resource-icon" data-type="${type}"></div>`);
+                const icons = module.production.map(type => `<div class="resource-icon" data-type="${type}"></div>`);
                 message += `<br>
                 <strong>${_("Resources produced:")}</strong> ${icons.join(` ${_("or")} `)}`;
         }

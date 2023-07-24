@@ -353,7 +353,7 @@ class Humanity implements HumanityGame {
             <div class="icons counters">`;            
             html += ICONS_COUNTERS_TYPES.map(type => `
                 <div id="type-${type + 10}-counter-wrapper-${player.id}">
-                ${type == 0 ? '' : `<div class="resource-icon" data-type="${type + 10}"></div>
+                ${type == 0 ? `<i id="counter-warning-${player.id}" class="counter-warning fa fa-exclamation-triangle" aria-hidden="true" data-warning="${player.icons[-1]}"></i>` : `<div class="resource-icon" data-type="${type + 10}"></div>
                     <span id="type-${type + 10}-counter-${player.id}"></span>`}
                 </div>
             `).join('');
@@ -396,6 +396,7 @@ class Humanity implements HumanityGame {
 
         this.setTooltipToClass('vp-counter', _('Victory points'));
         this.setTooltipToClass('science-counter', _('Science points'));
+        this.setTooltipToClass('counter-warning', `${_('The counters display all possible resources.')}<br>${_('Some of your modules allow to choose between two types of resources, so when you will activate them, <strong>it will lower the counter for both resources</strong>!')}`);
     }
 
     private updateIcons(playerId: number, icons: Icons) {
@@ -406,6 +407,8 @@ class Humanity implements HumanityGame {
                 this.iconsCounters[playerId][type + 10].toValue(icons[type + 10]);
             }
         });
+
+        document.getElementById(`counter-warning-${playerId}`).dataset.warning = `${icons[-1]}`;
     }
 
     private createPlayerTables(gamedatas: HumanityGamedatas) {

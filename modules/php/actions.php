@@ -104,8 +104,8 @@ trait ActionTrait {
                 $message = clienttranslate('${player_name} activates an obstacle to reduce resistance to ${resistance} ${module_image}');
                 $args['resistance'] = 3 - $module->r;
             } else {                
-                $message = clienttranslate('${player_name} activates a module to set its production to ${types} ${module_image}');
-                $args['types'] = $module->getProduction();
+                $message = clienttranslate('${player_name} activates a module to set its production to ${number} ${module_image}');
+                $args['number'] = $module->r;
             }
         }
 
@@ -220,44 +220,32 @@ trait ActionTrait {
         $playerId = intval($this->getActivePlayerId());
         $playerIcons = $this->getPlayerIcons($playerId);
         $playerModules = $this->getModulesByLocation('player', $playerId);
-        $playerModules = array_values(array_filter($playerModules, fn($t) => $t->production !== null && $t->r > 0));
+        $modules = array_values(array_filter($playerModules, fn($t) => $t->production !== null && $t->r > 0));
 
         $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
         
-        $pay = $this->canPay((array)$currentAction->remainingCost, $playerIcons);
+        $pay = $this->canPay((array)$currentAction->remainingCost, $playerId);
         if ($pay == null) {
             throw new BgaVisibleSystemException("You cannot afford this module");
         }
 
-        foreach ($pay as $type => $amount) {
-            $remainingAmount = $amount;
+        foreach ($pay['rotate'] as $moduleId => $rotate) {
+            $module = $this->array_find($modules, fn($m) => $m->id == $moduleId);
+            $module->r -= $rotate;
+            $this->DbQuery("UPDATE module SET `r` = $module->r WHERE `card_id` = $module->id");
 
-            foreach ($playerModules as $produceModule) {
-                $produce = $produceModule->getProduction();
-                if (array_key_exists($type, $produce)) {
-                    $rotate = min($remainingAmount, $produce[$type]);
-                    $remainingAmount -= $rotate;
-                    $playerIcons[$type] -= $rotate;
-                    $produceModule->r -= $rotate;
-
-                    self::notifyAllPlayers('pay', '', [
-                        'playerId' => $playerId,
-                        'player_name' => $this->getPlayerName($playerId),
-                        'module' => $produceModule,
-                        'icons' => $playerIcons,
-                    ]);
-
-                    if ($remainingAmount == 0) {
-                        break;
-                    }
-                }
-            }
+            self::notifyAllPlayers('pay', '', [
+                'playerId' => $playerId,
+                'player_name' => $this->getPlayerName($playerId),
+                'module' => $module,
+                'icons' => $playerIcons,
+            ]);
         }
 
         self::notifyAllPlayers('log', clienttranslate('${player_name} pays ${cost} to deploy the module'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'cost' => $pay,
+            'cost' => $pay['payWith'],
         ]);
 
         $this->gamestate->nextState('next');

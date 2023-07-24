@@ -2053,7 +2053,7 @@ var ModulesManager = /** @class */ (function (_super) {
             }
         }
         if (module.production) {
-            var icons = Object.keys(module.production.find(function (production) { return Object.values(production).length; })).map(function (type) { return "<div class=\"resource-icon\" data-type=\"".concat(type, "\"></div>"); });
+            var icons = module.production.map(function (type) { return "<div class=\"resource-icon\" data-type=\"".concat(type, "\"></div>"); });
             message += "<br>\n                <strong>".concat(_("Resources produced:"), "</strong> ").concat(icons.join(" ".concat(_("or"), " ")));
         }
         if (module.adjacentResearchPoints) {
@@ -2902,7 +2902,7 @@ var Humanity = /** @class */ (function () {
             var html = "<div class=\"counters with-tokens\">            \n                <div id=\"vp-counter-wrapper-".concat(player.id, "\" class=\"vp-counter\">\n                    <div class=\"vp icon\"></div>\n                    <span id=\"vp-counter-").concat(player.id, "\"></span>\n                </div>\n                <div id=\"science-counter-wrapper-").concat(player.id, "\" class=\"science-counter\">\n                    <div class=\"science icon\"></div>\n                    <span id=\"science-counter-").concat(player.id, "\">?</span>\n                </div>\n            </div>\n            \n            <div class=\"icons counters\">");
             html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type, "-counter-wrapper-").concat(player.id, "\">\n                    <div class=\"resource-icon\" data-type=\"").concat(type, "\"></div>\n                    <span id=\"type-").concat(type, "-counter-").concat(player.id, "\"></span>\n                </div>\n            "); }).join('');
             html += "</div>\n            <div class=\"icons counters\">";
-            html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type + 10, "-counter-wrapper-").concat(player.id, "\">\n                ").concat(type == 0 ? '' : "<div class=\"resource-icon\" data-type=\"".concat(type + 10, "\"></div>\n                    <span id=\"type-").concat(type + 10, "-counter-").concat(player.id, "\"></span>"), "\n                </div>\n            "); }).join('');
+            html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type + 10, "-counter-wrapper-").concat(player.id, "\">\n                ").concat(type == 0 ? "<i id=\"counter-warning-".concat(player.id, "\" class=\"counter-warning fa fa-exclamation-triangle\" aria-hidden=\"true\" data-warning=\"").concat(player.icons[-1], "\"></i>") : "<div class=\"resource-icon\" data-type=\"".concat(type + 10, "\"></div>\n                    <span id=\"type-").concat(type + 10, "-counter-").concat(player.id, "\"></span>"), "\n                </div>\n            "); }).join('');
             html += "</div>";
             dojo.place(html, "player_board_".concat(player.id));
             _this.vpCounters[playerId] = new ebg.counter();
@@ -2934,6 +2934,7 @@ var Humanity = /** @class */ (function () {
         });
         this.setTooltipToClass('vp-counter', _('Victory points'));
         this.setTooltipToClass('science-counter', _('Science points'));
+        this.setTooltipToClass('counter-warning', "".concat(_('The counters display all possible resources.'), "<br>").concat(_('Some of your modules allow to choose between two types of resources, so when you will activate them, <strong>it will lower the counter for both resources</strong>!')));
     };
     Humanity.prototype.updateIcons = function (playerId, icons) {
         var _this = this;
@@ -2943,6 +2944,7 @@ var Humanity = /** @class */ (function () {
                 _this.iconsCounters[playerId][type + 10].toValue(icons[type + 10]);
             }
         });
+        document.getElementById("counter-warning-".concat(playerId)).dataset.warning = "".concat(icons[-1]);
     };
     Humanity.prototype.createPlayerTables = function (gamedatas) {
         var _this = this;

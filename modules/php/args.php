@@ -14,7 +14,6 @@ trait ArgsTrait {
    
     function argChooseAction() {
         $playerId = intval($this->getActivePlayerId());
-        $playerIcons = $this->getPlayerIcons($playerId);
 
         $astronauts = $this->getPlayerAstronauts($playerId, 'player', true);
 
@@ -22,10 +21,10 @@ trait ArgsTrait {
         $tableExperiments = $this->getExperimentsByLocation('table');
 
         $selectableModules = array_values(array_filter($tableModules, fn($module) => 
-            $this->canPay($module->cost, $playerIcons) != null && 
+            $this->canPay($module->cost, $playerId) != null && 
             ($module->color != GREEN || $this->array_some($astronauts, fn($astronaut) => $this->canPlaceGreenhouse($playerId, $module, $astronaut))))
         );
-        $selectableExperiments = array_values(array_filter($tableExperiments, fn($module) => $this->canPay($module->cost, $playerIcons) != null));
+        $selectableExperiments = array_values(array_filter($tableExperiments, fn($module) => $this->canPay($module->cost, $playerId) != null));
         
 
         return [
@@ -52,11 +51,10 @@ trait ArgsTrait {
 
     function argPay() {
         $playerId = intval($this->getActivePlayerId());
-        $playerIcons = $this->getPlayerIcons($playerId);
         
         $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
         
-        $pay = $this->canPay((array)$currentAction->remainingCost, $playerIcons);
+        $pay = $this->canPay((array)$currentAction->remainingCost, $playerId)['payWith'];
 
         return [
             'cost' => $currentAction->remainingCost,

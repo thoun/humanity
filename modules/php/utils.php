@@ -144,63 +144,122 @@ trait UtilTrait {
         return $this->getGlobalVariable(YEAR) ?? 1;
     }
 
-    function canPay(array $cost, array $icons) { // payment if can pay, null if cannot pay
-        $remainingIcons = $icons; // copy
+    private function incArray(array &$array, int $key, int $inc) {
+        if (array_key_exists($key, $array)) {
+            $array[$key] += $inc;
+        } else {
+            $array[$key] = $inc;
+        }
+    }
+
+    function canPay(array $cost, int $playerId) { // payment if can pay, null if cannot pay
+        $playerModules = $this->getModulesByLocation('player', $playerId);
+        $modules = array_values(array_filter($playerModules, fn($t) => $t->production !== null && $t->r > 0));
 
         $payWith = [
             ELECTRICITY => 0,
             1 => 0, 2 => 0, 3 => 0,
             11 => 0, 12 => 0, 13 => 0,
         ];
+        $rotate = [];
 
         if (array_key_exists(ELECTRICITY, $cost)) {
-            if ($cost[ELECTRICITY] > $remainingIcons[ELECTRICITY]) {
-                return null;
-            } else {
-                $payWith[ELECTRICITY] += $cost[ELECTRICITY];
-                $remainingIcons[ELECTRICITY] -= $cost[ELECTRICITY];
+            while ($cost[ELECTRICITY] > 0 && $this->array_some($modules, fn($module) => in_array(ELECTRICITY, $module->production) && $module->r > 0)) {
+                $module = $this->array_find($modules, fn($module) => in_array(ELECTRICITY, $module->production) && $module->r > 0);
+                $canUse = min($cost[ELECTRICITY], $module->r);
+                $module->r -= $canUse;
+                $cost[ELECTRICITY] -= $canUse;
+                $payWith[ELECTRICITY] += $canUse;
+                $this->incArray($rotate, $module->id, $canUse);
             }
+
+            if ($cost[ELECTRICITY] > 0) {
+                return null;
+            }
+        } else {
+            $cost[ELECTRICITY] = 0;
         }
 
         foreach([1, 2, 3] as $type) {
             if (array_key_exists($type, $cost)) {
-                $payWithType = min($cost[$type], $remainingIcons[$type]);
-                $payWith[$type] += $payWithType;
-                $remainingIcons[$type] -= $payWithType;
+                while ($cost[$type] > 0 && $this->array_some($modules, fn($m) => in_array($type, $m->production) && $m->r > 0)) {
+                    $module = $this->array_find($modules, fn($m) => in_array($type, $m->production) && count($m->production) == 1 && $m->r > 0);
+                    if ($module == null) {
+                        $module = $this->array_find($modules, fn($m) => in_array($type, $m->production) && $m->r > 0);
+                    }
+                    $canUse = min($cost[$type], $module->r);
+                    $module->r -= $canUse;
+                    $cost[$type] -= $canUse;
+                    $payWith[$type] += $canUse;
+                    $this->incArray($rotate, $module->id, $canUse);
+                }
 
-                $remainingOfType = $cost[$type] - $payWithType;
-                if ($remainingOfType > $remainingIcons[ELECTRICITY]) {
+                while ($cost[$type] > 0 && $this->array_some($modules, fn($m) => in_array(ELECTRICITY, $m->production) && $m->r > 0)) {
+                    $module = $this->array_find($modules, fn($m) => in_array(ELECTRICITY, $m->production) && $m->r > 0);
+                    $canUse = min($cost[$type], $module->r);
+                    $module->r -= $canUse;
+                    $cost[$type] -= $canUse;
+                    $payWith[ELECTRICITY] += $canUse;
+                    $this->incArray($rotate, $module->id, $canUse);
+                }
+    
+                if ($cost[$type] > 0) {
                     return null;
-                } else {
-                    $payWith[ELECTRICITY] += $remainingOfType;
-                    $remainingIcons[ELECTRICITY] -= $remainingOfType;
                 }
             }
         }
 
-        foreach([11, 12, 13] as $type) {
-            if (array_key_exists($type, $cost)) {
-                $baseType = $type - 10;
-                $payWithType = min($cost[$type], $remainingIcons[$type]);
-                $payWith[$type] -= $payWithType;
-                $remainingIcons[$type] -= $payWithType;
+        foreach([11, 12, 13] as $advancedType) {
+            if (array_key_exists($advancedType, $cost)) {
+                
+                while ($cost[$advancedType] > 0 && $this->array_some($modules, fn($module) => in_array($advancedType, $module->production) && $module->r > 0)) {
+                    $module = $this->array_find($modules, fn($m) => in_array($advancedType, $m->production) && count($m->production) == 1 && $m->r > 0);
+                    if ($module == null) {
+                        $module = $this->array_find($modules, fn($m) => in_array($advancedType, $m->production) && $m->r > 0);
+                    }
+                    $canUse = min($cost[$advancedType], $module->r);
+                    $module->r -= $canUse;
+                    $cost[$advancedType] -= $canUse;
+                    $payWith[$advancedType] += $canUse;
+                    $this->incArray($rotate, $module->id, $canUse);
+                }
 
-                $remainingOfType = $cost[$type] - $payWithType;
-                if ((3 * $remainingOfType) > ($remainingIcons[ELECTRICITY] + $remainingIcons[$baseType])) {
+                $baseType = $advancedType - 10;
+
+                while ($cost[$advancedType] > 0 && array_reduce(array_map(fn($m) => $m->r, array_filter($modules, fn($module) => (in_array($baseType, $module->production) || in_array(ELECTRICITY, $module->production)) && $module->r > 0)), fn($a, $b) => $a + $b, 0) >= 3) {
+
+                    $baseTypeToPay = 3;
+
+                    while ($baseTypeToPay > 0) {
+                        $payType = $baseType;
+                        $module = $this->array_find($modules, fn($m) => in_array($baseType, $m->production) && count($m->production) == 1 && $m->r > 0);
+                        if ($module == null) {
+                            $module = $this->array_find($modules, fn($m) => in_array($baseType, $m->production) && $m->r > 0);
+                        }
+                        if ($module == null) {
+                            $payType = ELECTRICITY;
+                            $module = $this->array_find($modules, fn($m) => in_array(ELECTRICITY, $m->production) && $m->r > 0);
+                        }
+                        if ($module == null) {
+                            return null; // shouldn't happen!
+                        }
+                        $canUse = min($baseTypeToPay, $module->r);
+                        $module->r -= $canUse;
+                        $payWith[$payType] += $canUse;
+                        $this->incArray($rotate, $module->id, $canUse);
+                        $baseTypeToPay -= $canUse;
+                    }
+
+                    $cost[$advancedType] -= 1;
+                }
+    
+                if ($cost[$advancedType] > 0) {
                     return null;
-                } else {
-                    $payWithBaseType = min(3 * $remainingOfType, $remainingIcons[$baseType]);
-                    $payWith[$baseType] -= $payWithBaseType;
-                    $remainingIcons[$baseType] -= $payWithBaseType;
-
-                    $payWithElectricity = (3 * $remainingOfType) - $payWithBaseType;
-                    $payWith[ELECTRICITY] += $payWithElectricity;
-                    $remainingIcons[ELECTRICITY] -= $payWithElectricity;
                 }
             }
         }
 
-        return $payWith;
+        return ['payWith' => $payWith, 'rotate' => $rotate];
     }
 
     function getColorName(int $color) {

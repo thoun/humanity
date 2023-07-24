@@ -14,7 +14,7 @@ interface Module {
     color: number;
     cost: { [type: number]:number };
     workforce?: number;
-    production: { [type: number]:number }[];
+    production: number[];
     adjacentResearchPoints: number;
     researchPoints: number;
     points: number;

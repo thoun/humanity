@@ -1295,6 +1295,13 @@ body > .card {
 .player-board .counters.with-tokens .science-counter {
   color: #653771;
 }
+.player-board .counter-warning {
+  color: orange;
+  font-size: 150%;
+}
+.player-board .counter-warning[data-warning="0"] {
+  display: none;
+}
 
 .player-table {
   min-width: 640px;
