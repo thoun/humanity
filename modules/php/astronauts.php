@@ -72,7 +72,7 @@ trait AstronautTrait {
             }
         }
 
-        self::notifyAllPlayers('gainTimeUnit', clienttranslate('${player_name} gains ${amount} time unit and shift its table astronauts'), [
+        self::notifyAllPlayers('gainTimeUnit', clienttranslate('${player_name} gains ${amount} Time Unit(s) and shift its table astronauts'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
             'astronauts' => $movedAstronauts,

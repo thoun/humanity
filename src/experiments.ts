@@ -20,13 +20,20 @@ class ExperimentsManager extends CardManager<Experiment> {
     }
 
     private getTooltip(experiment: Experiment): string {
-        let message = `TODO`;/*
-        <strong>${_("Exploration cost:")}</strong> ${this.getCost(research.cost)} (recruits can be used as jokers)
+        let message = `
+        <strong>${_("Side:")}</strong> ${this.game.getSide(experiment.side)}
         <br>
-        <strong>${_("Immediate gains:")}</strong> ${this.getGains(research.immediateGains)}
+        <strong>${_("Resources needed:")}</strong> ${getCostStr(experiment.cost)}
         <br>
-        <strong>${_("Type:")}</strong> ${this.getType(research.type)}
-        `;*/
+        <strong>${_("Research points:")}</strong> ${experiment.researchPoints}`;
+        if (experiment.effect) {
+            message += `<br>
+            <strong>${_("Effect:")}</strong> ${this.game.getPower(experiment.effect, 2)}`;
+        }
+        if (experiment.points) {
+            message += `<br>
+            <strong>${_("Victory points:")}</strong> ${experiment.points}`;
+        }
  
         return message;
     }

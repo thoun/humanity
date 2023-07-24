@@ -92,7 +92,7 @@ trait ActionTrait {
             if ($module->matchType == EXPERIMENT_POWER_TIME) {
                 $this->gainTimeUnit($playerId, 1);
             }
-            $message = clienttranslate('${player_name} activates a module to trigger TODO POWER TIME effect ${module_image}');
+            $message = clienttranslate('${player_name} activates a module to trigger Time Unit effect ${module_image}');
         } else {
             if ($module->r >= 3) {
                 throw new BgaUserException("You cannot activate this module (already fully activated)");

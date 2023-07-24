@@ -132,7 +132,7 @@ class PlayerTable {
         this.experimentsLines[line] = new SlotStock<Experiment>(this.game.experimentsManager, lineDiv, {
             gap: '0',
             slotsIds: [1, 2, 3],
-            mapCardToSlot: card => card.extremity,
+            mapCardToSlot: card => card.side,
         });
     }
     

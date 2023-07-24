@@ -86,7 +86,7 @@ $this->TILES = [ //public int $type; // 0 start, 1..3 year, 8 communication, 9 o
     1 => [
         1 => new ModuleType(BLUE_OR_ORANGE, [INSECT => 1, ICE => 1, METHANE => 1], null, null, 0, 3),
         2 => new ModuleType(BLUE_OR_ORANGE, [INSECT => 1, ICE => 1, METHANE => 1], null, null, 0, 3),
-        3 => new OrangeModuleType([INSECT => 1, ICE => 1, METHANE => 1], null, null, EXPERIMENT_POWER_TIME),
+        3 => new OrangeModuleType([INSECT => 1, ICE => 1, METHANE => 1], 1, null, EXPERIMENT_POWER_TIME),
         4 => new OrangeModuleType([ICE => 2], 1, [[], [INSECT => 1, METHANE => 1], [INSECT => 2, METHANE => 2], [INSECT => 3, METHANE => 3]]),
         5 => new OrangeModuleType([METHANE => 2], 1, [[], [INSECT => 1, ICE => 1], [INSECT => 2, ICE => 2], [INSECT => 3, ICE => 3]]),
         6 => new OrangeModuleType([INSECT => 2], 1, [[], [METHANE => 1, ICE => 1], [METHANE => 2, ICE => 2], [METHANE => 3, ICE => 3]]),
@@ -104,7 +104,7 @@ $this->TILES = [ //public int $type; // 0 start, 1..3 year, 8 communication, 9 o
     2 => [
         1 => new ModuleType(BLUE_OR_ORANGE, [OXYGEN => 1, ICE => 1, METHANE => 1], null, null, 0, 4),
         2 => new ModuleType(BLUE_OR_ORANGE, [PROTEIN => 1, INSECT => 1, METHANE => 1], null, null, 0, 4),
-        3 => new OrangeModuleType([PROTEIN => 1, ICE => 1, METHANE => 1], null, null, EXPERIMENT_POWER_TIME),
+        3 => new OrangeModuleType([PROTEIN => 1, ICE => 1, METHANE => 1], 1, null, EXPERIMENT_POWER_TIME),
         4 => new OrangeModuleType([INSECT => 1, OXYGEN => 1], 1, [[], [ELECTRICITY => 1], [ELECTRICITY => 2], [ELECTRICITY => 3]]),
         5 => new OrangeModuleType([INSECT => 1, AIRCARBON => 1], 1, [[], [ELECTRICITY => 1], [ELECTRICITY => 2], [ELECTRICITY => 3]]),
         6 => new BlueModuleType([INSECT => 2, ICE => 2], 2, [[], [PROTEIN => 1, OXYGEN => 1], [PROTEIN => 2, OXYGEN => 2], [PROTEIN => 3, OXYGEN => 3]]),

@@ -21,15 +21,40 @@ class ModulesManager extends CardManager<Module> {
         }
     }
 
-    private getTooltip(card: Module): string {
-        let message = `TODO`;/*
-        <strong>${_("Color:")}</strong> ${this.game.getTooltipColor(card.color)}
+    private getTooltip(module: Module): string {
+        let message = `
+        <strong>${_("Color:")}</strong> ${this.game.getColor(module.color, true)}
         <br>
-        <strong>${_("Gain:")}</strong> <strong>1</strong> ${this.game.getTooltipGain(card.gain)}
-        `;*/
+        <strong>${_("Resources needed:")}</strong> ${getCostStr(module.cost)}`;
+        if (module.workforce) {
+            message += `<br>
+            <strong>${_("Work points necessary to activate it:")}</strong> ${module.workforce}`;
+
+            if (module.matchType) {
+                message += `<br>
+                <strong>${_("Effect:")}</strong> ${this.game.getPower(module.matchType, 1)}`;
+            }
+        }
+        if (module.production) {
+                const icons = Object.keys(module.production.find(production => Object.values(production).length)).map(type => `<div class="resource-icon" data-type="${type}"></div>`);
+                message += `<br>
+                <strong>${_("Resources produced:")}</strong> ${icons.join(` ${_("or")} `)}`;
+        }
+        if (module.adjacentResearchPoints) {
+            message += `<br>
+            <strong>${_("Research point gained for ${color} adjacent Modules:").replace('${color}', this.game.getColor(module.matchType, false))}</strong> ${module.adjacentResearchPoints}`;
+        }
+        if (module.researchPoints) {
+            message += `<br>
+            <strong>${_("Immediate research point gain:")}</strong> ${module.researchPoints}`;
+        }
+        if (module.points) {
+            message += `<br>
+            <strong>${_("Victory points:")}</strong> ${module.points}`;
+        }
  
         return message;
-    }
+    } 
     
     public setForHelp(module: Module, divId: string): void {
         const div = document.getElementById(divId);

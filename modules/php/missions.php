@@ -130,9 +130,9 @@ trait MissionTrait {
         return $count;
     }
 
-    function getExperimentExtremities(int $playerId, int $extremity) {
+    function getExperimentSides(int $playerId, int $side) {
         $experiments = $this->getExperimentsByLocation('player', $playerId);
-        return count(array_filter($experiments, fn($experiment) => $experiment->extremity == $extremity));
+        return count(array_filter($experiments, fn($experiment) => $experiment->side == $side));
     }
     
     function getMissionResultNumber(int $playerId, Mission $mission) {
@@ -142,8 +142,8 @@ trait MissionTrait {
             return $this->getMaxModulesInDirection($playerId, $mission->direction, $mission->sameColor);
         } else if ($mission->baseType !== null) {
             return $this->getExperimentTypeIcons($playerId, $mission->baseType);
-        } else if ($mission->extremity !== null) {
-            return $this->getExperimentExtremities($playerId, $mission->extremity);
+        } else if ($mission->side !== null) {
+            return $this->getExperimentSides($playerId, $mission->side);
         }
         return 0;
     }

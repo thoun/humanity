@@ -2036,12 +2036,27 @@ var ModulesManager = /** @class */ (function (_super) {
             this.game.setTooltip(div.id, this.getTooltip(card));
         }
     };
-    ModulesManager.prototype.getTooltip = function (card) {
-        var message = "TODO"; /*
-        <strong>${_("Color:")}</strong> ${this.game.getTooltipColor(card.color)}
-        <br>
-        <strong>${_("Gain:")}</strong> <strong>1</strong> ${this.game.getTooltipGain(card.gain)}
-        `;*/
+    ModulesManager.prototype.getTooltip = function (module) {
+        var message = "\n        <strong>".concat(_("Color:"), "</strong> ").concat(this.game.getColor(module.color, true), "\n        <br>\n        <strong>").concat(_("Resources needed:"), "</strong> ").concat(getCostStr(module.cost));
+        if (module.workforce) {
+            message += "<br>\n            <strong>".concat(_("Work points necessary to activate it:"), "</strong> ").concat(module.workforce);
+            if (module.matchType) {
+                message += "<br>\n                <strong>".concat(_("Effect:"), "</strong> ").concat(this.game.getPower(module.matchType, 1));
+            }
+        }
+        if (module.production) {
+            var icons = Object.keys(module.production.find(function (production) { return Object.values(production).length; })).map(function (type) { return "<div class=\"resource-icon\" data-type=\"".concat(type, "\"></div>"); });
+            message += "<br>\n                <strong>".concat(_("Resources produced:"), "</strong> ").concat(icons.join(" ".concat(_("or"), " ")));
+        }
+        if (module.adjacentResearchPoints) {
+            message += "<br>\n            <strong>".concat(_("Research point gained for ${color} adjacent Modules:").replace('${color}', this.game.getColor(module.matchType, false)), "</strong> ").concat(module.adjacentResearchPoints);
+        }
+        if (module.researchPoints) {
+            message += "<br>\n            <strong>".concat(_("Immediate research point gain:"), "</strong> ").concat(module.researchPoints);
+        }
+        if (module.points) {
+            message += "<br>\n            <strong>".concat(_("Victory points:"), "</strong> ").concat(module.points);
+        }
         return message;
     };
     ModulesManager.prototype.setForHelp = function (module, divId) {
@@ -2081,13 +2096,13 @@ var ExperimentsManager = /** @class */ (function (_super) {
         return _this;
     }
     ExperimentsManager.prototype.getTooltip = function (experiment) {
-        var message = "TODO"; /*
-        <strong>${_("Exploration cost:")}</strong> ${this.getCost(research.cost)} (recruits can be used as jokers)
-        <br>
-        <strong>${_("Immediate gains:")}</strong> ${this.getGains(research.immediateGains)}
-        <br>
-        <strong>${_("Type:")}</strong> ${this.getType(research.type)}
-        `;*/
+        var message = "\n        <strong>".concat(_("Side:"), "</strong> ").concat(this.game.getSide(experiment.side), "\n        <br>\n        <strong>").concat(_("Resources needed:"), "</strong> ").concat(getCostStr(experiment.cost), "\n        <br>\n        <strong>").concat(_("Research points:"), "</strong> ").concat(experiment.researchPoints);
+        if (experiment.effect) {
+            message += "<br>\n            <strong>".concat(_("Effect:"), "</strong> ").concat(this.game.getPower(experiment.effect, 2));
+        }
+        if (experiment.points) {
+            message += "<br>\n            <strong>".concat(_("Victory points:"), "</strong> ").concat(experiment.points);
+        }
         return message;
     };
     ExperimentsManager.prototype.getHtml = function (module) {
@@ -2115,51 +2130,33 @@ var MissionsManager = /** @class */ (function (_super) {
         _this.game = game;
         return _this;
     }
+    MissionsManager.prototype.getDirection = function (direction) {
+        switch (direction) {
+            case 1: return _("vertical");
+            case 2: return _("horizontal");
+            case 3: return _("diagonal");
+        }
+    };
     MissionsManager.prototype.getTooltip = function (mission) {
-        var message = 'TODO';
-        switch (mission.number) {
-            case 1:
-                message = _("(+2) if you have 1 or 3 orange cards.");
-                break;
-            case 2:
-                message = _("(-2) if orange cards are in the scoring column with either value (1) or value (2).");
-                break;
-            case 3:
-                message = _("(+2) if you have 2 or 4 blue cards.");
-                break;
-            case 4:
-                message = _("(+2) if blue is the colour you have the most cards of (or if blue is tied).");
-                break;
-            case 5:
-                message = _("(-2) if you are the player with the least pink cards (or are tied for the least pink cards).");
-                break;
-            case 6:
-                message = _("(+2) if you are the player with the most pink cards (or are tied for the most pink cards).");
-                break;
-            case 7:
-                message = _("(+2) if no colour is on the right of the green column.");
-                break;
-            case 8:
-                message = _("(+2) if green cards are in the scoring column with either value (4) or value (5).");
-                break;
-            case 9:
-                message = _("(+2) if you have more purple cards than orange cards (or the same number).");
-                break;
-            case 10:
-                message = _("(-2) if you are the player with the most purple cards (or are tied for the most purple cards).");
-                break;
-            case 11:
-                message = _("(+2) if you have cards in all 5 colours.");
-                break;
-            case 12:
-                message = _("(+2) if you have exactly 3 colours.");
-                break;
-            case 13:
-                message = _("(-2) if you have at least 1 colour with exactly 3 cards.");
-                break;
-            case 14:
-                message = _("(+2) if you have at least 1 colour with exactly 4 cards.");
-                break;
+        var message = '';
+        if (mission.color !== null) {
+            message = mission.adjacent ? _("Have at least ${number} adjacent ${color} Modules.") : _("Have at least ${number} ${color} Modules in their base.");
+            message = message.replace('${number}', '' + mission.minimum).replace('${color}', this.game.getColor(mission.color, false));
+            if (mission.diagonal) {
+                message += "<br><br><span color=\"red\">".concat(_("Important: for this Mission only, diagonally adjacent Modules are also counted."), "</span>");
+            }
+        }
+        else if (mission.direction !== null) {
+            message = mission.sameColor ? _("Have a ${direction} line of at least ${number} adjacent Modules of the same color.") : _("Have a ${direction} line of at least ${number} adjacent Modules, whatever their color.");
+            message = message.replace('${number}', '' + mission.minimum).replace('${direction}', this.getDirection(mission.direction));
+        }
+        else if (mission.baseType !== null) {
+            message = _("Have at least ${number} ${base_icon} and/or ${advanced_icon} pictograms represented on the Experiments they have carried out.");
+            message = message.replace('${number}', '' + mission.minimum).replace('${base_icon}', "<div class=\"resource-icon\" data-type=\"".concat(mission.baseType, "\"></div>")).replace('${advanced_icon}', "<div class=\"resource-icon\" data-type=\"".concat(mission.baseType + 10, "\"></div>"));
+        }
+        else if (mission.side !== null) {
+            message = _("Have carried out at least ${number} Experiments from the ${side}");
+            message = message.replace('${number}', '' + mission.minimum).replace('${side}', this.game.getSide(mission.side));
         }
         return message;
     };
@@ -2494,7 +2491,7 @@ var PlayerTable = /** @class */ (function () {
         this.experimentsLines[line] = new SlotStock(this.game.experimentsManager, lineDiv, {
             gap: '0',
             slotsIds: [1, 2, 3],
-            mapCardToSlot: function (card) { return card.extremity; },
+            mapCardToSlot: function (card) { return card.side; },
         });
     };
     PlayerTable.prototype.addExperiment = function (experiment) {
@@ -3346,6 +3343,19 @@ var Humanity = /** @class */ (function () {
             case 2: return _("Blue");
             case 3: return _("Purple");
             case 4: return _("Green");
+        }
+    };
+    Humanity.prototype.getPower = function (power, timeUnits) {
+        switch (power) {
+            case 1: return _("All Astronauts in the player’s Base are immediately reactivated: They are turned around to face the player and can be used again to perform an action starting <strong>from their next turn</strong>. If the player has no Astronauts to reactivate, the effect is lost.");
+            case 2: return _("The player <strong>immediately</strong> gains ${number} Time units: <strong>All their Astronauts</strong> around the main board are moved 2 hangars counterclockwise (including the one who just carried out this Experiment). Astronauts cannot be moved beyond the articulated arm.").replace('${number}', timeUnits);
+        }
+    };
+    Humanity.prototype.getSide = function (side) {
+        switch (side) {
+            case 1: return _("left side");
+            case 2: return _("center");
+            case 3: return _("right side");
         }
     };
     Humanity.prototype.getResourceTooltip = function (color) {

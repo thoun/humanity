@@ -58,15 +58,15 @@ trait ExperimentTrait {
         $playerExperiments = $this->getExperimentsByLocation('player', $playerId);
         $module = $this->getExperimentById($currentAction->experiment);
 
-        $numberByExtremities = [LEFT => 0, CENTRAL => 0, RIGHT => 0];
+        $numberBySides = [LEFT => 0, CENTRAL => 0, RIGHT => 0];
         foreach ($playerExperiments as $playerExperiment) {
-            $numberByExtremities[$playerExperiment->extremity]++;
+            $numberBySides[$playerExperiment->side]++;
         }
-        $line = $numberByExtremities[$module->extremity];
+        $line = $numberBySides[$module->side];
 
         $alreadyBuildForSameLine = 0;
-        foreach (array_keys($numberByExtremities) as $extremity) {
-            if ($extremity != $module->extremity && $numberByExtremities[$extremity] > $line) {
+        foreach (array_keys($numberBySides) as $side) {
+            if ($side != $module->side && $numberBySides[$side] > $line) {
                 $alreadyBuildForSameLine++;
             }
         }

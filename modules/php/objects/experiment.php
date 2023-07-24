@@ -3,14 +3,14 @@
 require_once(__DIR__.'/../constants.inc.php');
 
 class ExperimentType {
-    public int $extremity;
+    public int $side;
     public array $cost;
     public int $researchPoints;
     public ?int $effect;
     public ?int $points;
   
-    public function __construct(int $extremity, array $cost, ?int $researchPoints, ?int $effect = null, ?int $points = 0) {
-        $this->extremity = $extremity;
+    public function __construct(int $side, array $cost, ?int $researchPoints, ?int $effect = null, ?int $points = 0) {
+        $this->side = $side;
         $this->cost = $cost;
         $this->researchPoints = $researchPoints;
         $this->effect = $effect;
@@ -37,7 +37,7 @@ class Experiment extends ExperimentType {
 
         if ($this->number !== null) {
             $missionType = $EXPERIMENT[$this->year][$this->number];
-            $this->extremity = $missionType->extremity;
+            $this->side = $missionType->side;
             $this->cost = $missionType->cost;
             $this->researchPoints = $missionType->researchPoints;
             $this->effect = $missionType->effect;

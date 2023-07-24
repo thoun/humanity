@@ -937,6 +937,21 @@ class Humanity implements HumanityGame {
         }
     }
 
+    public getPower(power: number, timeUnits: number): string {
+        switch (power) {
+            case 1: return _("All Astronauts in the player’s Base are immediately reactivated: They are turned around to face the player and can be used again to perform an action starting <strong>from their next turn</strong>. If the player has no Astronauts to reactivate, the effect is lost.");
+            case 2: return _("The player <strong>immediately</strong> gains ${number} Time units: <strong>All their Astronauts</strong> around the main board are moved 2 hangars counterclockwise (including the one who just carried out this Experiment). Astronauts cannot be moved beyond the articulated arm.").replace('${number}', timeUnits);
+        }
+    }
+
+    public getSide(side: number): string {
+        switch (side) {
+            case 1: return _("left side");
+            case 2: return _("center");
+            case 3: return _("right side");
+        }
+    }
+
     public getResourceTooltip(color: number): string {
         switch (color) {
             case 0: return _("Electricity");

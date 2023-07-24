@@ -27,9 +27,9 @@ interface Experiment {
     locationArg: number;
     year: number;
     number: number;
-    extremity: number;
+    side: number;
     cost: number[];
-    sciencePoints: number;
+    researchPoints: number;
     effect?: number;
     points: number;
     line?: number;
@@ -47,7 +47,8 @@ interface Mission {
     direction?: number;
     sameColor?: boolean;
     baseType?: number;
-    extremity?: number;
+    side?: number;
+    diagonal?: boolean;
 }
 
 interface Astronaut {
@@ -109,6 +110,8 @@ interface HumanityGame extends Game {
     getPlayerId(): number;
     getPlayer(playerId: number): HumanityPlayer;
     getColor(color: number, blueOrOrange: boolean): string;
+    getPower(power: number, timeUnits: number): string;
+    getSide(side: number): string;
     getGameStateName(): string;
     getCurrentPlayerTable(): PlayerTable | null;
     createAstronaut(astronaut: Astronaut): HTMLDivElement;

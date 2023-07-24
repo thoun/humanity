@@ -43,7 +43,7 @@ const AIRCARBON = 12;
 const PROTEIN = 13;
 
 /*
- * Extremity
+ * Side
  */
 const LEFT = 1;
 const CENTRAL = 2;

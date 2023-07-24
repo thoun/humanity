@@ -15,27 +15,33 @@ class MissionsManager extends CardManager<Mission> {
         });
     }
 
-    private getTooltip(mission: Mission): string {
-        let message = 'TODO';
-        switch (mission.number) {
-            case 1: message = _("(+2) if you have 1 or 3 orange cards."); break;
-            case 2: message = _("(-2) if orange cards are in the scoring column with either value (1) or value (2)."); break;
-            case 3: message = _("(+2) if you have 2 or 4 blue cards."); break;
-            case 4: message = _("(+2) if blue is the colour you have the most cards of (or if blue is tied)."); break;
-            case 5: message = _("(-2) if you are the player with the least pink cards (or are tied for the least pink cards)."); break;
-            case 6: message = _("(+2) if you are the player with the most pink cards (or are tied for the most pink cards)."); break;
-            case 7: message = _("(+2) if no colour is on the right of the green column."); break;
-            case 8: message = _("(+2) if green cards are in the scoring column with either value (4) or value (5)."); break;
-            case 9: message = _("(+2) if you have more purple cards than orange cards (or the same number)."); break;
-            case 10: message = _("(-2) if you are the player with the most purple cards (or are tied for the most purple cards)."); break;
-            case 11: message = _("(+2) if you have cards in all 5 colours."); break;
-            case 12: message = _("(+2) if you have exactly 3 colours."); break;
-            case 13: message = _("(-2) if you have at least 1 colour with exactly 3 cards."); break;
-            case 14: message = _("(+2) if you have at least 1 colour with exactly 4 cards."); break;
+    private getDirection(direction: number): string {
+        switch (direction) {
+            case 1: return _("vertical");
+            case 2: return _("horizontal");
+            case 3: return _("diagonal");
         }
+    }
 
+    private getTooltip(mission: Mission): string {
+        let message = '';
+        if (mission.color !== null) {
+            message = mission.adjacent ? _("Have at least ${number} adjacent ${color} Modules.") : _("Have at least ${number} ${color} Modules in their base.");
+            message = message.replace('${number}', ''+mission.minimum).replace('${color}', this.game.getColor(mission.color, false));
+            if (mission.diagonal) {
+                message += `<br><br><span color="red">${_("Important: for this Mission only, diagonally adjacent Modules are also counted.")}</span>`;
+            }
+        } else if (mission.direction !== null) {
+            message = mission.sameColor ? _("Have a ${direction} line of at least ${number} adjacent Modules of the same color.") : _("Have a ${direction} line of at least ${number} adjacent Modules, whatever their color.");
+            message = message.replace('${number}', ''+mission.minimum).replace('${direction}', this.getDirection(mission.direction));
+        } else if (mission.baseType !== null) {
+            message = _("Have at least ${number} ${base_icon} and/or ${advanced_icon} pictograms represented on the Experiments they have carried out.");
+            message = message.replace('${number}', ''+mission.minimum).replace('${base_icon}', `<div class="resource-icon" data-type="${mission.baseType}"></div>`).replace('${advanced_icon}', `<div class="resource-icon" data-type="${mission.baseType + 10}"></div>`);
+        } else if (mission.side !== null) {
+            message = _("Have carried out at least ${number} Experiments from the ${side}");
+            message = message.replace('${number}', ''+mission.minimum).replace('${side}', this.game.getSide(mission.side));
+        }
         return message;
-        
     }
     
     public getHtml(module: Mission): string {

@@ -10,9 +10,9 @@ class MissionType {
     public ?int $direction;
     public ?bool $sameColor;
     public ?int $baseType;
-    public ?int $extremity;
+    public ?int $side;
   
-    public function __construct(int $minimum, ?int $color, ?bool $adjacent, ?bool $diagonal, ?int $direction, ?bool $sameColor, ?int $baseType, ?int $extremity) {
+    public function __construct(int $minimum, ?int $color, ?bool $adjacent, ?bool $diagonal, ?int $direction, ?bool $sameColor, ?int $baseType, ?int $side) {
         $this->minimum = $minimum;
         $this->color = $color;
         $this->adjacent = $adjacent;
@@ -20,7 +20,7 @@ class MissionType {
         $this->direction = $direction;
         $this->sameColor = $sameColor;
         $this->baseType = $baseType;
-        $this->extremity = $extremity;
+        $this->side = $side;
     } 
 }
 
@@ -37,8 +37,8 @@ class MissionTypeB extends MissionType {
 }
 
 class MissionTypeC extends MissionType {  
-    public function __construct(int $minimum, ?int $baseType, ?int $extremity) {
-        parent::__construct($minimum, null, null, null, null, null, $baseType, $extremity);
+    public function __construct(int $minimum, ?int $baseType, ?int $side) {
+        parent::__construct($minimum, null, null, null, null, null, $baseType, $side);
     } 
 }
 
@@ -66,7 +66,7 @@ class Mission extends MissionType {
             $this->direction = $missionType->direction;
             $this->sameColor = $missionType->sameColor;
             $this->baseType = $missionType->baseType;
-            $this->extremity = $missionType->extremity;
+            $this->side = $missionType->side;
         }
     } 
 
