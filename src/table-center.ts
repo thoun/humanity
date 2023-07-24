@@ -18,24 +18,24 @@ class TableCenter {
         this.modules.onCardClick = card => this.game.onTableModuleClick(card);
         this.modules.addCards(gamedatas.tableModules);
 
-        const tableWorkers = document.getElementById('table-workers');
-        tableWorkers.insertAdjacentHTML('beforeend', 
+        const tableAstronauts = document.getElementById('table-astronauts');
+        tableAstronauts.insertAdjacentHTML('beforeend', 
             [0, 1, 2, 3, 4, 5, 6, 7].map(spot => `<div></div><div class="slot" data-slot-id="${spot}"></div>`).join('')
         );
 
-        Object.values(gamedatas.players).forEach(player => player.workers.filter(worker => worker.location == 'table').forEach(worker => 
-            tableWorkers.querySelector(`.slot[data-slot-id="${worker.spot}"]`).appendChild(this.game.createWorker(worker))
+        Object.values(gamedatas.players).forEach(player => player.astronauts.filter(astronaut => astronaut.location == 'table').forEach(astronaut => 
+            tableAstronauts.querySelector(`.slot[data-slot-id="${astronaut.spot}"]`).appendChild(this.game.createAstronaut(astronaut))
         ));
 
         this.moveArm(gamedatas.arm);
     }
     
-    public moveWorker(worker: Worker): void {
-        const workerDiv = document.getElementById(`worker-${worker.id}`);
-        workerDiv.classList.remove('selectable', 'selected');
+    public moveAstronaut(astronaut: Astronaut): void {
+        const astronautDiv = document.getElementById(`astronaut-${astronaut.id}`);
+        astronautDiv.classList.remove('selectable', 'selected');
 
-        const tableWorkers = document.getElementById('table-workers');
-        tableWorkers.querySelector(`.slot[data-slot-id="${worker.spot}"]`).appendChild(workerDiv);
+        const tableAstronauts = document.getElementById('table-astronauts');
+        tableAstronauts.querySelector(`.slot[data-slot-id="${astronaut.spot}"]`).appendChild(astronautDiv);
     }
     
     public removeModule(module: Module) {

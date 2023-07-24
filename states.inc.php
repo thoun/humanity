@@ -74,29 +74,29 @@ $playerActionsGameStates = [
 
     ST_PLAYER_CHOOSE_ACTION => [
         "name" => "chooseAction",
-        "description" => clienttranslate('${actplayer} must select a worker to activate modules, or select a module or experiment to deploy'),
-        "descriptionmyturn" => clienttranslate('${you} must select a worker to activate modules, or select a module or experiment to deploy'),
+        "description" => clienttranslate('${actplayer} must select a astronaut to activate modules, or select a module or experiment to deploy'),
+        "descriptionmyturn" => clienttranslate('${you} must select a astronaut to activate modules, or select a module or experiment to deploy'),
         "type" => "activeplayer",    
         "args" => "argChooseAction",
         "possibleactions" => [ 
-            "chooseWorker",
+            "chooseAstronaut",
             "chooseNewModule",
             "chooseNewExperiment",
         ],
         "transitions" => [
             "activate" => ST_PLAYER_ACTIVATE_TILE,
-            "chooseRadarColor" => ST_PLAYER_CHOOSE_RADAR_COLOR,
+            "chooseCommunicationColor" => ST_PLAYER_CHOOSE_COMMUNICATION_COLOR,
             "pay" => ST_PLAYER_PAY,
         ],
     ],
 
-    ST_PLAYER_CHOOSE_RADAR_COLOR => [
-        "name" => "chooseRadarColor",
-        "description" => clienttranslate('${actplayer} must choose radar color'),
-        "descriptionmyturn" => clienttranslate('${you} must choose radar color'),
+    ST_PLAYER_CHOOSE_COMMUNICATION_COLOR => [
+        "name" => "chooseCommunicationColor",
+        "description" => clienttranslate('${actplayer} must choose communication color'),
+        "descriptionmyturn" => clienttranslate('${you} must choose communication color'),
         "type" => "activeplayer",    
         "possibleactions" => [ 
-            "chooseRadarColor",
+            "chooseCommunicationColor",
         ],
         "transitions" => [
             "pay" => ST_PLAYER_PAY,
@@ -113,37 +113,37 @@ $playerActionsGameStates = [
             "autoPay",
         ],
         "transitions" => [
-            "next" => ST_PLAYER_CHOOSE_WORKER,
+            "next" => ST_PLAYER_CHOOSE_ASTRONAUT,
         ],
     ],
 
-    ST_PLAYER_CHOOSE_WORKER => [
-        "name" => "chooseWorker",
-        "description" => clienttranslate('${actplayer} must choose a worker'),
-        "descriptionmyturn" => clienttranslate('${you} must choose a worker'),
+    ST_PLAYER_CHOOSE_ASTRONAUT => [
+        "name" => "chooseAstronaut",
+        "description" => clienttranslate('${actplayer} must choose a astronaut'),
+        "descriptionmyturn" => clienttranslate('${you} must choose a astronaut'),
         "type" => "activeplayer",    
-        "args" => "argChooseWorker",
+        "args" => "argChooseAstronaut",
         "possibleactions" => [ 
-            "chooseWorker",
+            "chooseAstronaut",
         ],
         "transitions" => [
-            "upgrade" => ST_PLAYER_UPGRADE_WORKER,
+            "upgrade" => ST_PLAYER_UPGRADE_ASTRONAUT,
             "endTurn" => ST_CHECK_MISSIONS,
         ],
     ],
 
-    ST_PLAYER_UPGRADE_WORKER => [
-        "name" => "upgradeWorker",
-        "description" => clienttranslate('${actplayer} must choose a worker to upgrade (${remaining} upgrade(s) remaining)'),
-        "descriptionmyturn" => clienttranslate('${you} must choose a worker to upgrade (${remaining} upgrade(s) remaining)'),
+    ST_PLAYER_UPGRADE_ASTRONAUT => [
+        "name" => "upgradeAstronaut",
+        "description" => clienttranslate('${actplayer} must choose a astronaut to upgrade (${remaining} upgrade(s) remaining)'),
+        "descriptionmyturn" => clienttranslate('${you} must choose a astronaut to upgrade (${remaining} upgrade(s) remaining)'),
         "type" => "activeplayer",    
-        "args" => "argUpgradeWorker",
-        "action" => "stUpgradeWorkers",
+        "args" => "argUpgradeAstronaut",
+        "action" => "stUpgradeAstronauts",
         "possibleactions" => [ 
-            "upgradeWorker",
+            "upgradeAstronaut",
         ],
         "transitions" => [
-            "stay" => ST_PLAYER_UPGRADE_WORKER,
+            "stay" => ST_PLAYER_UPGRADE_ASTRONAUT,
             "endTurn" => ST_CHECK_MISSIONS,
         ],
     ],
@@ -177,38 +177,38 @@ $playerActionsGameStates = [
         ]
     ],    
 
-    ST_MULTIPLAYER_MOVE_WORKERS => [
-        "name" => "moveWorkers",
+    ST_MULTIPLAYER_MOVE_ASTRONAUTS => [
+        "name" => "moveAstronauts",
         "description" => clienttranslate('Waiting for other players'),
         "descriptionmyturn" => '',
         "type" => "multipleactiveplayer",
-        "action" => "stMoveWorkers",
-        "initialprivate" => ST_PRIVATE_MOVE_WORKER,
+        "action" => "stMoveAstronauts",
+        "initialprivate" => ST_PRIVATE_MOVE_ASTRONAUT,
         "possibleactions" => [ ],
         "transitions" => [
             "next" => ST_AFTER_END_ROUND,
         ],
     ],
 
-    ST_PRIVATE_MOVE_WORKER => [
-        "name" => "moveWorker",
-        "descriptionmyturn" => clienttranslate('Phase 2 : ${you} must choose a place for moved worker'),
+    ST_PRIVATE_MOVE_ASTRONAUT => [
+        "name" => "moveAstronaut",
+        "descriptionmyturn" => clienttranslate('Phase 2 : ${you} must choose a place for moved astronaut'),
         "type" => "private",
-        "args" => "argMoveWorker",
-        "possibleactions" => [ "moveWorker" ],
+        "args" => "argMoveAstronaut",
+        "possibleactions" => [ "moveAstronaut" ],
         "transitions" => [
-            'stay' => ST_PRIVATE_MOVE_WORKER,
-            'next' => ST_PRIVATE_CONFIRM_MOVE_WORKERS,
+            'stay' => ST_PRIVATE_MOVE_ASTRONAUT,
+            'next' => ST_PRIVATE_CONFIRM_MOVE_ASTRONAUTS,
         ],
     ],
 
-    ST_PRIVATE_CONFIRM_MOVE_WORKERS => [
-        "name" => "confirmMoveWorkers",
-        "descriptionmyturn" => clienttranslate('${you} must confirm moved workers'),
+    ST_PRIVATE_CONFIRM_MOVE_ASTRONAUTS => [
+        "name" => "confirmMoveAstronauts",
+        "descriptionmyturn" => clienttranslate('${you} must confirm moved astronauts'),
         "type" => "private",
-        "possibleactions" => [ "confirmMoveWorkers", "restartMoveWorkers" ],
+        "possibleactions" => [ "confirmMoveAstronauts", "restartMoveAstronauts" ],
         "transitions" => [
-            'restart' => ST_PRIVATE_MOVE_WORKER,
+            'restart' => ST_PRIVATE_MOVE_ASTRONAUT,
         ],
     ],
 ];
@@ -253,7 +253,7 @@ $gameGameStates = [
         "type" => "game",
         "action" => "stEndRound",
         "transitions" => [
-            "moveWorkers" => ST_MULTIPLAYER_MOVE_WORKERS,
+            "moveAstronauts" => ST_MULTIPLAYER_MOVE_ASTRONAUTS,
             "afterEndRound" => ST_AFTER_END_ROUND,
             "endYear" => ST_END_YEAR,
         ],
@@ -261,7 +261,7 @@ $gameGameStates = [
 
     ST_AFTER_END_ROUND => [
         "name" => "afterEndRound",
-        "description" => clienttranslate('Reactivating workers...'),
+        "description" => clienttranslate('Reactivating astronauts...'),
         "type" => "game",
         "action" => "stAfterEndRound",
         "updateGameProgression" => true,
@@ -278,7 +278,7 @@ $gameGameStates = [
         "action" => "stEndYear",
         "updateGameProgression" => true,
         "transitions" => [
-            "moveWorkers" => ST_MULTIPLAYER_MOVE_WORKERS,
+            "moveAstronauts" => ST_MULTIPLAYER_MOVE_ASTRONAUTS,
             "afterEndRound" => ST_AFTER_END_ROUND,
             "endScore" => ST_END_SCORE,
         ]

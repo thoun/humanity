@@ -2186,18 +2186,18 @@ var TableCenter = /** @class */ (function () {
         });
         this.modules.onCardClick = function (card) { return _this.game.onTableModuleClick(card); };
         this.modules.addCards(gamedatas.tableModules);
-        var tableWorkers = document.getElementById('table-workers');
-        tableWorkers.insertAdjacentHTML('beforeend', [0, 1, 2, 3, 4, 5, 6, 7].map(function (spot) { return "<div></div><div class=\"slot\" data-slot-id=\"".concat(spot, "\"></div>"); }).join(''));
-        Object.values(gamedatas.players).forEach(function (player) { return player.workers.filter(function (worker) { return worker.location == 'table'; }).forEach(function (worker) {
-            return tableWorkers.querySelector(".slot[data-slot-id=\"".concat(worker.spot, "\"]")).appendChild(_this.game.createWorker(worker));
+        var tableAstronauts = document.getElementById('table-astronauts');
+        tableAstronauts.insertAdjacentHTML('beforeend', [0, 1, 2, 3, 4, 5, 6, 7].map(function (spot) { return "<div></div><div class=\"slot\" data-slot-id=\"".concat(spot, "\"></div>"); }).join(''));
+        Object.values(gamedatas.players).forEach(function (player) { return player.astronauts.filter(function (astronaut) { return astronaut.location == 'table'; }).forEach(function (astronaut) {
+            return tableAstronauts.querySelector(".slot[data-slot-id=\"".concat(astronaut.spot, "\"]")).appendChild(_this.game.createAstronaut(astronaut));
         }); });
         this.moveArm(gamedatas.arm);
     }
-    TableCenter.prototype.moveWorker = function (worker) {
-        var workerDiv = document.getElementById("worker-".concat(worker.id));
-        workerDiv.classList.remove('selectable', 'selected');
-        var tableWorkers = document.getElementById('table-workers');
-        tableWorkers.querySelector(".slot[data-slot-id=\"".concat(worker.spot, "\"]")).appendChild(workerDiv);
+    TableCenter.prototype.moveAstronaut = function (astronaut) {
+        var astronautDiv = document.getElementById("astronaut-".concat(astronaut.id));
+        astronautDiv.classList.remove('selectable', 'selected');
+        var tableAstronauts = document.getElementById('table-astronauts');
+        tableAstronauts.querySelector(".slot[data-slot-id=\"".concat(astronaut.spot, "\"]")).appendChild(astronautDiv);
     };
     TableCenter.prototype.removeModule = function (module) {
         this.modules.removeCard(module);
@@ -2420,10 +2420,10 @@ var PlayerTable = /** @class */ (function () {
         this.currentPlayer = this.playerId == this.game.getPlayerId();
         var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.playerId, "-modules\" class=\"modules\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-experiments-lines\" class=\"experiments-lines\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-mission\" class=\"mission\"></div>\n        </div>\n        ");
         dojo.place(html, document.getElementById('tables'));
-        var playerWorkers = player.workers.filter(function (worker) { return worker.location == 'player'; });
+        var playerAstronauts = player.astronauts.filter(function (astronaut) { return astronaut.location == 'player'; });
         var slotsIds = [];
-        var xs = __spreadArray(__spreadArray([], player.modules.map(function (module) { return module.x; }), true), playerWorkers.map(function (worker) { return worker.x; }), true);
-        var ys = __spreadArray(__spreadArray([], player.modules.map(function (module) { return module.y; }), true), playerWorkers.map(function (worker) { return worker.y; }), true);
+        var xs = __spreadArray(__spreadArray([], player.modules.map(function (module) { return module.x; }), true), playerAstronauts.map(function (astronaut) { return astronaut.x; }), true);
+        var ys = __spreadArray(__spreadArray([], player.modules.map(function (module) { return module.y; }), true), playerAstronauts.map(function (astronaut) { return astronaut.y; }), true);
         this.moduleMinX = Math.min.apply(Math, xs);
         this.moduleMaxX = Math.max.apply(Math, xs);
         this.moduleMinY = Math.min.apply(Math, ys);
@@ -2455,21 +2455,21 @@ var PlayerTable = /** @class */ (function () {
         var missionDiv = document.getElementById("player-table-".concat(this.playerId, "-mission"));
         this.missions = new LineStock(this.game.missionsManager, missionDiv);
         this.missions.addCards(player.missions);
-        playerWorkers.forEach(function (worker) {
-            modulesDiv.querySelector("[data-slot-id=\"".concat(worker.x, "_").concat(worker.y, "\"]")).appendChild(_this.game.createWorker(worker));
-            if (!worker.remainingWorkforce) {
-                document.getElementById("worker-".concat(worker.id)).classList.add('disabled-worker');
+        playerAstronauts.forEach(function (astronaut) {
+            modulesDiv.querySelector("[data-slot-id=\"".concat(astronaut.x, "_").concat(astronaut.y, "\"]")).appendChild(_this.game.createAstronaut(astronaut));
+            if (!astronaut.remainingWorkforce) {
+                document.getElementById("astronaut-".concat(astronaut.id)).classList.add('disabled-astronaut');
             }
         });
     }
-    PlayerTable.prototype.setSelectableWorkers = function (workers) {
-        document.getElementById("player-table-".concat(this.playerId, "-modules")).querySelectorAll('.worker').forEach(function (worker) {
-            return worker.classList.toggle('selectable', workers.some(function (w) { return w.id == Number(worker.dataset.id); }));
+    PlayerTable.prototype.setSelectableAstronauts = function (astronauts) {
+        document.getElementById("player-table-".concat(this.playerId, "-modules")).querySelectorAll('.astronaut').forEach(function (astronaut) {
+            return astronaut.classList.toggle('selectable', astronauts.some(function (w) { return w.id == Number(astronaut.dataset.id); }));
         });
     };
-    PlayerTable.prototype.setSelectedWorker = function (selectedWorker) {
-        document.getElementById("player-table-".concat(this.playerId, "-modules")).querySelectorAll('.worker').forEach(function (worker) {
-            return worker.classList.toggle('selected', (selectedWorker === null || selectedWorker === void 0 ? void 0 : selectedWorker.id) == Number(worker.dataset.id));
+    PlayerTable.prototype.setSelectedAstronaut = function (selectedAstronaut) {
+        document.getElementById("player-table-".concat(this.playerId, "-modules")).querySelectorAll('.astronaut').forEach(function (astronaut) {
+            return astronaut.classList.toggle('selected', (selectedAstronaut === null || selectedAstronaut === void 0 ? void 0 : selectedAstronaut.id) == Number(astronaut.dataset.id));
         });
     };
     PlayerTable.prototype.setSelectableModules = function (selectableModules) {
@@ -2503,9 +2503,9 @@ var PlayerTable = /** @class */ (function () {
         }
         return this.experimentsLines[experiment.line].addCard(experiment);
     };
-    PlayerTable.prototype.reactivateWorkers = function () {
-        document.getElementById("player-table-".concat(this.playerId, "-modules")).querySelectorAll('.worker').forEach(function (worker) {
-            return worker.classList.remove('disabled-worker');
+    PlayerTable.prototype.reactivateAstronauts = function () {
+        document.getElementById("player-table-".concat(this.playerId, "-modules")).querySelectorAll('.astronaut').forEach(function (astronaut) {
+            return astronaut.classList.remove('disabled-astronaut');
         });
     };
     PlayerTable.prototype.updateGridTemplateAreas = function () {
@@ -2661,8 +2661,8 @@ var Humanity = /** @class */ (function () {
         new JumpToManager(this, {
             localStorageFoldedKey: LOCAL_STORAGE_JUMP_TO_FOLDED_KEY,
             topEntries: [
-                new JumpToEntry(_('Main board TODO rename'), 'board-1', { 'color': '#224757' }),
-                new JumpToEntry(_('Research board TODO rename'), 'research-board', { 'color': '#224757' }),
+                new JumpToEntry(_('AMBS'), 'board-1', { 'color': '#224757' }),
+                new JumpToEntry(_('Research track'), 'research-board', { 'color': '#224757' }),
             ],
             entryClasses: 'hexa-point',
             defaultFolded: false,
@@ -2675,11 +2675,11 @@ var Humanity = /** @class */ (function () {
         this.yearCounter = new ebg.counter();
         this.yearCounter.create("year");
         this.yearCounter.setValue(gamedatas.year);
-        (_a = gamedatas.movedWorkers) === null || _a === void 0 ? void 0 : _a.forEach(function (worker) {
-            if (worker.location == 'table' && worker.x !== null) {
-                worker.location = 'player';
-                _this.moveWorkerDiv(worker.playerId, worker);
-                _this.setWorkerToConfirm(worker, true);
+        (_a = gamedatas.movedAstronauts) === null || _a === void 0 ? void 0 : _a.forEach(function (astronaut) {
+            if (astronaut.location == 'table' && astronaut.x !== null) {
+                astronaut.location = 'player';
+                _this.moveAstronautDiv(astronaut.playerId, astronaut);
+                _this.setAstronautToConfirm(astronaut, true);
             }
         });
         this.zoomManager = new ZoomManager({
@@ -2727,21 +2727,21 @@ var Humanity = /** @class */ (function () {
             case 'activateModule':
                 this.onEnteringActivateModule(args.args);
                 break;
-            case 'chooseWorker':
-                this.onEnteringChooseWorker(args.args);
+            case 'chooseAstronaut':
+                this.onEnteringChooseAstronaut(args.args);
                 break;
-            case 'upgradeWorker':
-                this.onEnteringUpgradeWorker(args.args);
+            case 'upgradeAstronaut':
+                this.onEnteringUpgradeAstronaut(args.args);
                 break;
-            case 'moveWorker':
-                this.onEnteringMoveWorker(args.args);
+            case 'moveAstronaut':
+                this.onEnteringMoveAstronaut(args.args);
                 break;
         }
     };
     Humanity.prototype.onEnteringChooseAction = function (args) {
         var _a;
         if (this.isCurrentPlayerActive()) {
-            (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableWorkers(args.workers);
+            (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableAstronauts(args.astronauts);
             this.tableCenter.setSelectableModules(args.selectableModules);
             this.tableCenter.setSelectableExperiments(args.selectableExperiments);
         }
@@ -2749,22 +2749,22 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.onEnteringActivateModule = function (args) {
         if (this.isCurrentPlayerActive()) {
             var table = this.getCurrentPlayerTable();
-            table.setSelectedWorker(args.worker);
+            table.setSelectedAstronaut(args.astronaut);
             table.setSelectableModules(args.activatableModules);
         }
     };
-    Humanity.prototype.onEnteringChooseWorker = function (args) {
+    Humanity.prototype.onEnteringChooseAstronaut = function (args) {
         var _a;
         if (this.isCurrentPlayerActive()) {
-            (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableWorkers(args.workers);
+            (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableAstronauts(args.astronauts);
         }
     };
-    Humanity.prototype.onEnteringUpgradeWorker = function (args) {
+    Humanity.prototype.onEnteringUpgradeAstronaut = function (args) {
         if (this.isCurrentPlayerActive()) {
-            args.workers.forEach(function (worker) { return document.getElementById("worker-".concat(worker.id)).classList.add('selectable'); });
+            args.astronauts.forEach(function (astronaut) { return document.getElementById("astronaut-".concat(astronaut.id)).classList.add('selectable'); });
         }
     };
-    Humanity.prototype.onEnteringMoveWorker = function (args) {
+    Humanity.prototype.onEnteringMoveAstronaut = function (args) {
         var _a;
         (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableModuleSpots(args.possibleCoordinates);
     };
@@ -2772,41 +2772,41 @@ var Humanity = /** @class */ (function () {
         log('Leaving state: ' + stateName);
         switch (stateName) {
             case 'chooseAction':
-                this.onLeavingChooseWorker();
+                this.onLeavingChooseAstronaut();
                 this.tableCenter.setSelectableModules(null);
                 this.tableCenter.setSelectableExperiments(null);
                 break;
             case 'activateModule':
                 this.onLeavingActivateModule();
                 break;
-            case 'chooseWorker':
-                this.onLeavingChooseWorker();
+            case 'chooseAstronaut':
+                this.onLeavingChooseAstronaut();
                 break;
-            case 'moveWorker':
-                this.onLeavingMoveWorker();
+            case 'moveAstronaut':
+                this.onLeavingMoveAstronaut();
                 break;
-            case 'upgradeWorker':
-                this.onLeavingUpgradeWorker();
+            case 'upgradeAstronaut':
+                this.onLeavingUpgradeAstronaut();
                 break;
         }
     };
     Humanity.prototype.onLeavingActivateModule = function () {
         if (this.isCurrentPlayerActive()) {
             var table = this.getCurrentPlayerTable();
-            table.setSelectedWorker(null);
+            table.setSelectedAstronaut(null);
             table.setSelectableModules(null);
         }
     };
-    Humanity.prototype.onLeavingChooseWorker = function () {
+    Humanity.prototype.onLeavingChooseAstronaut = function () {
         var _a;
-        (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableWorkers([]);
+        (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableAstronauts([]);
     };
-    Humanity.prototype.onLeavingMoveWorker = function () {
+    Humanity.prototype.onLeavingMoveAstronaut = function () {
         var _a;
         (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableModuleSpots(null);
     };
-    Humanity.prototype.onLeavingUpgradeWorker = function () {
-        document.querySelectorAll('.worker.selectable').forEach(function (worker) { return worker.classList.remove('selectable'); });
+    Humanity.prototype.onLeavingUpgradeAstronaut = function () {
+        document.querySelectorAll('.astronaut.selectable').forEach(function (astronaut) { return astronaut.classList.remove('selectable'); });
     };
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
     //                        action status bar (ie: the HTML links in the status bar).
@@ -2818,9 +2818,9 @@ var Humanity = /** @class */ (function () {
                 case 'activateModule':
                     this.addActionButton("endTurn_button", _("End turn"), function () { return _this.endTurn(); });
                     break;
-                case 'chooseRadarColor':
-                    this.addActionButton("blue_button", _("Blue"), function () { return _this.chooseRadarColor(2); });
-                    this.addActionButton("orange_button", _("Orange"), function () { return _this.chooseRadarColor(1); });
+                case 'chooseCommunicationColor':
+                    this.addActionButton("blue_button", _("Blue"), function () { return _this.chooseCommunicationColor(2); });
+                    this.addActionButton("orange_button", _("Orange"), function () { return _this.chooseCommunicationColor(1); });
                     break;
                 case 'pay':
                     this.addActionButton("autoPay_button", _("Pay ${cost}").replace('${cost}', getCostStr(args.pay)), function () { return _this.autoPay(); });
@@ -2828,12 +2828,12 @@ var Humanity = /** @class */ (function () {
                 case 'confirmTurn':
                     this.addActionButton("confirmTurn_button", _("Confirm turn"), function () { return _this.confirmTurn(); });
                     break;
-                case 'confirmMoveWorkers':
-                    this.addActionButton("confirmMoveWorkers_button", _("Confirm"), function () { return _this.confirmMoveWorkers(); });
-                    this.addActionButton("restartMoveWorkers_button", _("Restart"), function () { return _this.restartMoveWorkers(); }, null, null, 'red');
+                case 'confirmMoveAstronauts':
+                    this.addActionButton("confirmMoveAstronauts_button", _("Confirm"), function () { return _this.confirmMoveAstronauts(); });
+                    this.addActionButton("restartMoveAstronauts_button", _("Restart"), function () { return _this.restartMoveAstronauts(); }, null, null, 'red');
                     break;
             }
-            if (['chooseRadarColor', 'pay', 'chooseWorker', 'upgradeWorker', 'activateModule', 'confirmTurn'].includes(stateName)) {
+            if (['chooseCommunicationColor', 'pay', 'chooseAstronaut', 'upgradeAstronaut', 'activateModule', 'confirmTurn'].includes(stateName)) {
                 this.addActionButton("restartTurn_button", _("Restart turn"), function () { return _this.restartTurn(); }, null, null, 'red');
             }
         }
@@ -2947,24 +2947,24 @@ var Humanity = /** @class */ (function () {
         var table = new PlayerTable(this, gamedatas.players[playerId]);
         this.playersTables.push(table);
     };
-    Humanity.prototype.createWorker = function (worker) {
+    Humanity.prototype.createAstronaut = function (astronaut) {
         var _this = this;
-        var workerDiv = document.createElement('div');
-        workerDiv.id = "worker-".concat(worker.id);
-        workerDiv.classList.add('worker');
-        workerDiv.dataset.id = "".concat(worker.id);
-        workerDiv.dataset.playerColor = this.getPlayer(worker.playerId).color;
-        workerDiv.addEventListener('click', function () {
-            if (workerDiv.classList.contains('selectable')) {
-                _this.onWorkerClick(worker);
+        var astronautDiv = document.createElement('div');
+        astronautDiv.id = "astronaut-".concat(astronaut.id);
+        astronautDiv.classList.add('astronaut');
+        astronautDiv.dataset.id = "".concat(astronaut.id);
+        astronautDiv.dataset.playerColor = this.getPlayer(astronaut.playerId).color;
+        astronautDiv.addEventListener('click', function () {
+            if (astronautDiv.classList.contains('selectable')) {
+                _this.onAstronautClick(astronaut);
             }
         });
         var workforceDiv = document.createElement('div');
-        workforceDiv.id = "".concat(workerDiv.id, "-force");
+        workforceDiv.id = "".concat(astronautDiv.id, "-force");
         workforceDiv.classList.add('workforce');
-        workforceDiv.dataset.workforce = "".concat(worker.workforce);
-        workerDiv.appendChild(workforceDiv);
-        return workerDiv;
+        workforceDiv.dataset.workforce = "".concat(astronaut.workforce);
+        astronautDiv.appendChild(workforceDiv);
+        return astronautDiv;
     };
     Humanity.prototype.placeFirstPlayerToken = function (playerId) {
         var firstPlayerToken = document.getElementById('firstPlayerToken');
@@ -3016,8 +3016,8 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.onPlayerModuleSpotClick = function (x, y) {
         var _a;
-        if (((_a = this.gamedatas.gamestate.private_state) === null || _a === void 0 ? void 0 : _a.name) == 'moveWorker') {
-            this.moveWorker(x, y);
+        if (((_a = this.gamedatas.gamestate.private_state) === null || _a === void 0 ? void 0 : _a.name) == 'moveAstronaut') {
+            this.moveAstronaut(x, y);
         }
     };
     Humanity.prototype.onTableModuleClick = function (module) {
@@ -3025,27 +3025,27 @@ var Humanity = /** @class */ (function () {
             this.chooseNewModule(module.id);
         }
     };
-    Humanity.prototype.onWorkerClick = function (worker) {
-        if (['chooseAction', 'chooseWorker'].includes(this.gamedatas.gamestate.name)) {
-            this.chooseWorker(worker.id);
+    Humanity.prototype.onAstronautClick = function (astronaut) {
+        if (['chooseAction', 'chooseAstronaut'].includes(this.gamedatas.gamestate.name)) {
+            this.chooseAstronaut(astronaut.id);
         }
-        else if (this.gamedatas.gamestate.name == 'upgradeWorker') {
-            this.upgradeWorker(worker.id);
+        else if (this.gamedatas.gamestate.name == 'upgradeAstronaut') {
+            this.upgradeAstronaut(astronaut.id);
         }
     };
-    Humanity.prototype.chooseWorker = function (id) {
-        if (!this.checkAction('chooseWorker')) {
+    Humanity.prototype.chooseAstronaut = function (id) {
+        if (!this.checkAction('chooseAstronaut')) {
             return;
         }
-        this.takeAction('chooseWorker', {
+        this.takeAction('chooseAstronaut', {
             id: id
         });
     };
-    Humanity.prototype.upgradeWorker = function (id) {
-        if (!this.checkAction('upgradeWorker')) {
+    Humanity.prototype.upgradeAstronaut = function (id) {
+        if (!this.checkAction('upgradeAstronaut')) {
             return;
         }
-        this.takeAction('upgradeWorker', {
+        this.takeAction('upgradeAstronaut', {
             id: id
         });
     };
@@ -3065,11 +3065,11 @@ var Humanity = /** @class */ (function () {
             id: id
         });
     };
-    Humanity.prototype.chooseRadarColor = function (color) {
-        if (!this.checkAction('chooseRadarColor')) {
+    Humanity.prototype.chooseCommunicationColor = function (color) {
+        if (!this.checkAction('chooseCommunicationColor')) {
             return;
         }
-        this.takeAction('chooseRadarColor', {
+        this.takeAction('chooseCommunicationColor', {
             color: color
         });
     };
@@ -3102,26 +3102,26 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.restartTurn = function () {
         this.takeAction('restartTurn');
     };
-    Humanity.prototype.moveWorker = function (x, y) {
-        if (!this.checkAction('moveWorker')) {
+    Humanity.prototype.moveAstronaut = function (x, y) {
+        if (!this.checkAction('moveAstronaut')) {
             return;
         }
-        this.takeAction('moveWorker', {
+        this.takeAction('moveAstronaut', {
             x: x + 1000,
             y: y + 1000,
         });
     };
-    Humanity.prototype.confirmMoveWorkers = function () {
-        if (!this.checkAction('confirmMoveWorkers')) {
+    Humanity.prototype.confirmMoveAstronauts = function () {
+        if (!this.checkAction('confirmMoveAstronauts')) {
             return;
         }
-        this.takeAction('confirmMoveWorkers');
+        this.takeAction('confirmMoveAstronauts');
     };
-    Humanity.prototype.restartMoveWorkers = function () {
-        if (!this.checkAction('restartMoveWorkers')) {
+    Humanity.prototype.restartMoveAstronauts = function () {
+        if (!this.checkAction('restartMoveAstronauts')) {
             return;
         }
-        this.takeAction('restartMoveWorkers');
+        this.takeAction('restartMoveAstronauts');
     };
     Humanity.prototype.takeAction = function (action, data) {
         data = data || {};
@@ -3147,9 +3147,9 @@ var Humanity = /** @class */ (function () {
             ['activateModule', ANIMATION_MS],
             ['pay', 50],
             ['removeModule', ANIMATION_MS],
-            ['disableWorker', ANIMATION_MS],
+            ['disableAstronaut', ANIMATION_MS],
             ['gainTimeUnit', ANIMATION_MS],
-            ['moveWorkerToTable', ANIMATION_MS],
+            ['moveAstronautToTable', ANIMATION_MS],
             ['deployModule', undefined],
             ['deployExperiment', undefined],
             ['score', 1],
@@ -3162,12 +3162,12 @@ var Humanity = /** @class */ (function () {
             ['newTableModule', ANIMATION_MS],
             ['moveArm', ANIMATION_MS],
             ['newTableExperiments', ANIMATION_MS],
-            ['reactivateWorkers', ANIMATION_MS],
-            ['upgradeWorker', 50],
+            ['reactivateAstronauts', ANIMATION_MS],
+            ['upgradeAstronaut', 50],
             ['year', ANIMATION_MS],
             ['gainMission', undefined],
-            ['moveWorker', ANIMATION_MS],
-            ['confirmMoveWorkers', 1],
+            ['moveAstronaut', ANIMATION_MS],
+            ['confirmMoveAstronauts', 1],
             ['restartTurn', 1],
         ];
         notifs.forEach(function (notif) {
@@ -3213,18 +3213,18 @@ var Humanity = /** @class */ (function () {
         var playerTable = this.getPlayerTable(playerId);
         playerTable.removeModule(args.module);
     };
-    Humanity.prototype.notif_disableWorker = function (args) {
-        this.setWorkerDisabled(args.worker, true);
+    Humanity.prototype.notif_disableAstronaut = function (args) {
+        this.setAstronautDisabled(args.astronaut, true);
     };
     Humanity.prototype.notif_gainTimeUnit = function (args) {
         var _this = this;
-        var workers = args.workers;
-        workers.forEach(function (worker) { return _this.tableCenter.moveWorker(worker); });
+        var astronauts = args.astronauts;
+        astronauts.forEach(function (astronaut) { return _this.tableCenter.moveAstronaut(astronaut); });
     };
-    Humanity.prototype.notif_moveWorkerToTable = function (args) {
-        var worker = args.worker;
-        this.setWorkerDisabled(worker, false);
-        this.tableCenter.moveWorker(worker);
+    Humanity.prototype.notif_moveAstronautToTable = function (args) {
+        var astronaut = args.astronaut;
+        this.setAstronautDisabled(astronaut, false);
+        this.tableCenter.moveAstronaut(astronaut);
     };
     Humanity.prototype.notif_deployModule = function (args) {
         var playerId = args.playerId, module = args.module;
@@ -3266,16 +3266,16 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_newTableExperiments = function (args) {
         this.tableCenter.newExperiments(args.tableExperiments);
     };
-    Humanity.prototype.notif_reactivateWorkers = function (args) {
+    Humanity.prototype.notif_reactivateAstronauts = function (args) {
         if (args.playerId) {
-            this.getPlayerTable(args.playerId).reactivateWorkers();
+            this.getPlayerTable(args.playerId).reactivateAstronauts();
         }
         else {
-            this.playersTables.forEach(function (playerTable) { return playerTable.reactivateWorkers(); });
+            this.playersTables.forEach(function (playerTable) { return playerTable.reactivateAstronauts(); });
         }
     };
-    Humanity.prototype.notif_upgradeWorker = function (args) {
-        document.getElementById("worker-".concat(args.worker.id, "-force")).dataset.workforce = "".concat(args.worker.workforce);
+    Humanity.prototype.notif_upgradeAstronaut = function (args) {
+        document.getElementById("astronaut-".concat(args.astronaut.id, "-force")).dataset.workforce = "".concat(args.astronaut.workforce);
     };
     Humanity.prototype.notif_year = function (args) {
         this.yearCounter.toValue(+args.year);
@@ -3298,46 +3298,46 @@ var Humanity = /** @class */ (function () {
         var table = this.getPlayerTable(playerId);
         table.resetModules(undo.modules);
         table.resetExperiments(undo.experiments);
-        undo.workers.forEach(function (worker) { return _this.resetWorker(playerId, worker); });
+        undo.astronauts.forEach(function (astronaut) { return _this.resetAstronaut(playerId, astronaut); });
         this.setResearchPoints(playerId, undo.researchPoints);
         this.setVP(playerId, undo.vp);
         if (args.playerId == this.getPlayerId()) {
             this.setScience(playerId, undo.science);
         }
     };
-    Humanity.prototype.notif_moveWorker = function (args) {
-        var playerId = args.playerId, worker = args.worker, toConfirm = args.toConfirm;
-        worker.location = worker.x !== null ? 'player' : 'table';
-        this.moveWorkerDiv(playerId, worker);
-        this.setWorkerToConfirm(worker, toConfirm);
+    Humanity.prototype.notif_moveAstronaut = function (args) {
+        var playerId = args.playerId, astronaut = args.astronaut, toConfirm = args.toConfirm;
+        astronaut.location = astronaut.x !== null ? 'player' : 'table';
+        this.moveAstronautDiv(playerId, astronaut);
+        this.setAstronautToConfirm(astronaut, toConfirm);
     };
-    Humanity.prototype.notif_confirmMoveWorkers = function (args) {
+    Humanity.prototype.notif_confirmMoveAstronauts = function (args) {
         var _this = this;
-        var workers = args.workers;
-        workers.forEach(function (worker) { return _this.setWorkerToConfirm(worker, false); });
+        var astronauts = args.astronauts;
+        astronauts.forEach(function (astronaut) { return _this.setAstronautToConfirm(astronaut, false); });
     };
-    Humanity.prototype.moveWorkerDiv = function (playerId, worker) {
-        var workerDiv = document.getElementById("worker-".concat(worker.id));
-        if (worker.location == 'player') {
+    Humanity.prototype.moveAstronautDiv = function (playerId, astronaut) {
+        var astronautDiv = document.getElementById("astronaut-".concat(astronaut.id));
+        if (astronaut.location == 'player') {
             var modulesDiv = document.getElementById("player-table-".concat(playerId, "-modules"));
-            this.getPlayerTable(playerId).makeSlotForCoordinates(worker.x, worker.y);
-            modulesDiv.querySelector("[data-slot-id=\"".concat(worker.x, "_").concat(worker.y, "\"]")).appendChild(workerDiv);
+            this.getPlayerTable(playerId).makeSlotForCoordinates(astronaut.x, astronaut.y);
+            modulesDiv.querySelector("[data-slot-id=\"".concat(astronaut.x, "_").concat(astronaut.y, "\"]")).appendChild(astronautDiv);
         }
-        else if (worker.location == 'table') {
-            var tableWorkers = document.getElementById('table-workers');
-            tableWorkers.querySelector(".slot[data-slot-id=\"".concat(worker.spot, "\"]")).appendChild(workerDiv);
+        else if (astronaut.location == 'table') {
+            var tableAstronauts = document.getElementById('table-astronauts');
+            tableAstronauts.querySelector(".slot[data-slot-id=\"".concat(astronaut.spot, "\"]")).appendChild(astronautDiv);
         }
     };
-    Humanity.prototype.resetWorker = function (playerId, worker) {
-        this.moveWorkerDiv(playerId, worker);
-        document.getElementById("worker-".concat(worker.id)).classList.toggle('disabled-worker', !worker.remainingWorkforce);
-        document.getElementById("worker-".concat(worker.id, "-force")).dataset.workforce = "".concat(worker.workforce);
+    Humanity.prototype.resetAstronaut = function (playerId, astronaut) {
+        this.moveAstronautDiv(playerId, astronaut);
+        document.getElementById("astronaut-".concat(astronaut.id)).classList.toggle('disabled-astronaut', !astronaut.remainingWorkforce);
+        document.getElementById("astronaut-".concat(astronaut.id, "-force")).dataset.workforce = "".concat(astronaut.workforce);
     };
-    Humanity.prototype.setWorkerDisabled = function (worker, disabled) {
-        document.getElementById("worker-".concat(worker.id)).classList.toggle('disabled-worker', disabled);
+    Humanity.prototype.setAstronautDisabled = function (astronaut, disabled) {
+        document.getElementById("astronaut-".concat(astronaut.id)).classList.toggle('disabled-astronaut', disabled);
     };
-    Humanity.prototype.setWorkerToConfirm = function (worker, toConfirm) {
-        document.getElementById("worker-".concat(worker.id)).classList.toggle('to-confirm', toConfirm);
+    Humanity.prototype.setAstronautToConfirm = function (astronaut, toConfirm) {
+        document.getElementById("astronaut-".concat(astronaut.id)).classList.toggle('to-confirm', toConfirm);
     };
     Humanity.prototype.getColor = function (color, blueOrOrange) {
         switch (color) {

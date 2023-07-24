@@ -44,11 +44,11 @@ class PlayerTable {
 
         dojo.place(html, document.getElementById('tables'));
 
-        const playerWorkers = player.workers.filter(worker => worker.location == 'player');
+        const playerAstronauts = player.astronauts.filter(astronaut => astronaut.location == 'player');
 
         const slotsIds = [];
-        const xs = [...player.modules.map(module => module.x), ...playerWorkers.map(worker => worker.x)];
-        const ys = [...player.modules.map(module => module.y), ...playerWorkers.map(worker => worker.y)];
+        const xs = [...player.modules.map(module => module.x), ...playerAstronauts.map(astronaut => astronaut.x)];
+        const ys = [...player.modules.map(module => module.y), ...playerAstronauts.map(astronaut => astronaut.y)];
         this.moduleMinX = Math.min(...xs);
         this.moduleMaxX = Math.max(...xs);
         this.moduleMinY = Math.min(...ys);
@@ -85,23 +85,23 @@ class PlayerTable {
         this.missions = new LineStock<Mission>(this.game.missionsManager, missionDiv);
         this.missions.addCards(player.missions);
 
-        playerWorkers.forEach(worker => {
-            modulesDiv.querySelector(`[data-slot-id="${worker.x}_${worker.y}"]`).appendChild(this.game.createWorker(worker));
-            if (!worker.remainingWorkforce) {
-                document.getElementById(`worker-${worker.id}`).classList.add('disabled-worker');
+        playerAstronauts.forEach(astronaut => {
+            modulesDiv.querySelector(`[data-slot-id="${astronaut.x}_${astronaut.y}"]`).appendChild(this.game.createAstronaut(astronaut));
+            if (!astronaut.remainingWorkforce) {
+                document.getElementById(`astronaut-${astronaut.id}`).classList.add('disabled-astronaut');
             }
         });
     }
     
-    public setSelectableWorkers(workers: Worker[]) {
-        document.getElementById(`player-table-${this.playerId}-modules`).querySelectorAll('.worker').forEach((worker: HTMLDivElement) => 
-            worker.classList.toggle('selectable', workers.some(w => w.id == Number(worker.dataset.id)))
+    public setSelectableAstronauts(astronauts: Astronaut[]) {
+        document.getElementById(`player-table-${this.playerId}-modules`).querySelectorAll('.astronaut').forEach((astronaut: HTMLDivElement) => 
+            astronaut.classList.toggle('selectable', astronauts.some(w => w.id == Number(astronaut.dataset.id)))
         );
     }
     
-    public setSelectedWorker(selectedWorker: Worker) {
-        document.getElementById(`player-table-${this.playerId}-modules`).querySelectorAll('.worker').forEach((worker: HTMLDivElement) => 
-            worker.classList.toggle('selected', selectedWorker?.id == Number(worker.dataset.id))
+    public setSelectedAstronaut(selectedAstronaut: Astronaut) {
+        document.getElementById(`player-table-${this.playerId}-modules`).querySelectorAll('.astronaut').forEach((astronaut: HTMLDivElement) => 
+            astronaut.classList.toggle('selected', selectedAstronaut?.id == Number(astronaut.dataset.id))
         );
     }
     
@@ -143,9 +143,9 @@ class PlayerTable {
         return this.experimentsLines[experiment.line].addCard(experiment);
     }
     
-    public reactivateWorkers(): void {
-        document.getElementById(`player-table-${this.playerId}-modules`).querySelectorAll('.worker').forEach((worker: HTMLDivElement) => 
-            worker.classList.remove('disabled-worker')
+    public reactivateAstronauts(): void {
+        document.getElementById(`player-table-${this.playerId}-modules`).querySelectorAll('.astronaut').forEach((astronaut: HTMLDivElement) => 
+            astronaut.classList.remove('disabled-astronaut')
         );
     }
 

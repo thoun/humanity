@@ -17,7 +17,7 @@ trait StateTrait {
         $this->setGlobalVariable(UNDO, new Undo(
             $this->getModulesByLocation('player', $playerId),
             $this->getExperimentsByLocation('player', $playerId),
-            $this->getPlayerWorkers($playerId),
+            $this->getPlayerAstronauts($playerId),
             $this->getPlayer($playerId),
             $this->getModulesByLocation('table'),
             $this->getExperimentsByLocation('table'),
@@ -27,10 +27,10 @@ trait StateTrait {
         $this->gamestate->nextState('next');
     }
 
-    function stUpgradeWorkers() {
-        $args = $this->argUpgradeWorker();
+    function stUpgradeAstronauts() {
+        $args = $this->argUpgradeAstronaut();
 
-        if (count($args['workers']) == 0) {
+        if (count($args['astronauts']) == 0) {
             $this->gamestate->nextState('endTurn');
         }
     }
@@ -56,11 +56,11 @@ trait StateTrait {
 
         $this->deleteGlobalVariables([CURRENT_ACTION]);
 
-        if ($this->countRemainingWorkers() > 0) {
+        if ($this->countRemainingAstronauts() > 0) {
 
             $this->activeNextPlayer();
             $playerId = $this->getActivePlayerId();
-            while ($this->countRemainingWorkers($playerId) == 0) {
+            while ($this->countRemainingAstronauts($playerId) == 0) {
                 $this->activeNextPlayer();
                 $playerId = $this->getActivePlayerId();
             }
@@ -147,15 +147,15 @@ trait StateTrait {
             'diff' => $diff
         ]);
 
-        // reset workers in arm range
-        $tableWorkers = $this->getTableWorkers();
-        $movedWorkers = [];
-        foreach ($tableWorkers as $worker) {
-            if ($worker->spot >= $armBefore && $worker->spot <= $armAfter) {
-                $movedWorkers[] = $worker;
+        // reset astronauts in arm range
+        $tableAstronauts = $this->getTableAstronauts();
+        $movedAstronauts = [];
+        foreach ($tableAstronauts as $astronaut) {
+            if ($astronaut->spot >= $armBefore && $astronaut->spot <= $armAfter) {
+                $movedAstronauts[] = $astronaut;
             }
         }
-        $this->setGlobalVariable(MOVED_WORKERS, $movedWorkers);
+        $this->setGlobalVariable(MOVED_ASTRONAUTS, $movedAstronauts);
 
         // place new modules
         $age = $this->getYear();
@@ -180,25 +180,25 @@ trait StateTrait {
             }
         }
 
-        // move workers
-        if (count($movedWorkers)) {
-            $this->gamestate->nextState('moveWorkers');
+        // move astronauts
+        if (count($movedAstronauts)) {
+            $this->gamestate->nextState('moveAstronauts');
         } else {
             $this->gamestate->nextState('afterEndRound');
         }
     }
 
-    function stMoveWorkers() {
-        $movedWorkers = $this->getGlobalVariable(MOVED_WORKERS);
-        $playersIds = array_values(array_unique(array_map(fn($worker) =>$worker->playerId, $movedWorkers)));
+    function stMoveAstronauts() {
+        $movedAstronauts = $this->getGlobalVariable(MOVED_ASTRONAUTS);
+        $playersIds = array_values(array_unique(array_map(fn($astronaut) =>$astronaut->playerId, $movedAstronauts)));
 
         $this->gamestate->setPlayersMultiactive($playersIds, 'next');
         $this->gamestate->initializePrivateStateForAllActivePlayers(); 
     }
 
     function stAfterEndRound() {
-        $this->deleteGlobalVariable(MOVED_WORKERS);
-        $this->reactivatePlayerWorkers(null);
+        $this->deleteGlobalVariable(MOVED_ASTRONAUTS);
+        $this->reactivatePlayerAstronauts(null);
 
         $this->gamestate->nextState('nextRound');
     }
@@ -262,10 +262,10 @@ trait StateTrait {
             }
         }
 
-        // move workers
-        $movedWorkers = $this->getGlobalVariable(MOVED_WORKERS);
-        if (count($movedWorkers)) {
-            $this->gamestate->nextState('moveWorkers');
+        // move astronauts
+        $movedAstronauts = $this->getGlobalVariable(MOVED_ASTRONAUTS);
+        if (count($movedAstronauts)) {
+            $this->gamestate->nextState('moveAstronauts');
         } else {
             $this->gamestate->nextState('afterEndRound');
         }

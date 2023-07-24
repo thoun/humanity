@@ -56,7 +56,7 @@ ALTER TABLE `player` ADD `player_research_points` smallint UNSIGNED NOT NULL DEF
 ALTER TABLE `player` ADD `player_vp` smallint UNSIGNED NOT NULL DEFAULT 0;
 ALTER TABLE `player` ADD `player_science` smallint UNSIGNED NOT NULL DEFAULT 0;
 
-CREATE TABLE IF NOT EXISTS `worker` (
+CREATE TABLE IF NOT EXISTS `astronaut` (
   `id` TINYINT unsigned NOT NULL AUTO_INCREMENT,
   `player_id` int(11) NOT NULL,
   `workforce` TINYINT unsigned NOT NULL DEFAULT 2,

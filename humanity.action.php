@@ -39,20 +39,20 @@
       }
   	}
 
-    public function chooseWorker() {
+    public function chooseAstronaut() {
         self::setAjaxMode();     
 
         $id = self::getArg("id", AT_posint, true);
-        $this->game->chooseWorker($id);
+        $this->game->chooseAstronaut($id);
 
         self::ajaxResponse();
     }
 
-    public function upgradeWorker() {
+    public function upgradeAstronaut() {
         self::setAjaxMode();     
 
         $id = self::getArg("id", AT_posint, true);
-        $this->game->upgradeWorker($id);
+        $this->game->upgradeAstronaut($id);
 
         self::ajaxResponse();
     }
@@ -75,11 +75,11 @@
         self::ajaxResponse();
     }
 
-    public function chooseRadarColor() {
+    public function chooseCommunicationColor() {
         self::setAjaxMode();     
 
         $color = self::getArg("color", AT_posint, true);
-        $this->game->chooseRadarColor($color);
+        $this->game->chooseCommunicationColor($color);
 
         self::ajaxResponse();
     }
@@ -125,28 +125,28 @@
         self::ajaxResponse();
     }
 
-    public function moveWorker() {
+    public function moveAstronaut() {
         self::setAjaxMode();     
 
         $x = self::getArg("x", AT_posint, true);
         $y = self::getArg("y", AT_posint, true);
-        $this->game->moveWorker($x - 1000, $y - 1000);
+        $this->game->moveAstronaut($x - 1000, $y - 1000);
 
         self::ajaxResponse();
     }
 
-    public function confirmMoveWorkers() {
+    public function confirmMoveAstronauts() {
         self::setAjaxMode();     
 
-        $this->game->confirmMoveWorkers();
+        $this->game->confirmMoveAstronauts();
 
         self::ajaxResponse();
     }
 
-    public function restartMoveWorkers() {
+    public function restartMoveAstronauts() {
         self::setAjaxMode();     
 
-        $this->game->restartMoveWorkers();
+        $this->game->restartMoveAstronauts();
 
         self::ajaxResponse();
     }

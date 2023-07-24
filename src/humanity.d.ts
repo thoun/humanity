@@ -50,7 +50,7 @@ interface Mission {
     extremity?: number;
 }
 
-interface Worker {
+interface Astronaut {
     id: number;
     playerId: number;
     workforce: number;
@@ -66,7 +66,7 @@ type Icons = { [type: number]: number };
 interface HumanityPlayer extends Player {
     playerNo: number;
     
-    workers: Worker[];
+    astronauts: Astronaut[];
     modules: Module[];
     experiments: Experiment[];
     researchPoints: number;
@@ -98,7 +98,7 @@ interface HumanityGamedatas {
     firstPlayerId: number;
     isEnd: boolean;
 
-    movedWorkers?: Worker[];
+    movedAstronauts?: Astronaut[];
 }
 
 interface HumanityGame extends Game {
@@ -111,7 +111,7 @@ interface HumanityGame extends Game {
     getColor(color: number, blueOrOrange: boolean): string;
     getGameStateName(): string;
     getCurrentPlayerTable(): PlayerTable | null;
-    createWorker(worker: Worker): HTMLDivElement;
+    createAstronaut(astronaut: Astronaut): HTMLDivElement;
 
     setTooltip(id: string, html: string): void;
     onTableExperimentClick(experiment: Experiment): void;
@@ -120,11 +120,11 @@ interface HumanityGame extends Game {
     onTableModuleClick(card: Module): void;
 }
 
-interface EnteringChooseWorkerArgs {
-    workers: Worker[];
+interface EnteringChooseAstronautArgs {
+    astronauts: Astronaut[];
 }
 
-interface EnteringChooseActionArgs extends EnteringChooseWorkerArgs {
+interface EnteringChooseActionArgs extends EnteringChooseAstronautArgs {
     selectableModules: Module[];
     selectableExperiments: Experiment[];
 }
@@ -135,12 +135,12 @@ interface EnteringPayArgs {
 }
 
 interface EnteringActivateModuleArgs {
-    worker: Worker;
+    astronaut: Astronaut;
     activatableModules: Module[];
 }
 
-interface EnteringMoveWorkerArgs {
-    worker: Worker;
+interface EnteringMoveAstronautArgs {
+    astronaut: Astronaut;
     possibleCoordinates: number[][];
 }
 
@@ -160,22 +160,22 @@ interface NotifRemoveModuleArgs {
     module: Module;
 }
 
-// disableWorker, upgradeWorker
-interface NotifWorkerArgs {
+// disableAstronaut, upgradeAstronaut
+interface NotifAstronautArgs {
     playerId: number;
-    worker: Worker;
+    astronaut: Astronaut;
 }
 
 // gainTimeUnit
 interface NotifGainTimeUnitArgs {
     playerId: number;
-    workers: Worker[];
+    astronauts: Astronaut[];
 }
 
-// moveWorkerToTable
-interface NotifMoveWorkerToTableArgs {
+// moveAstronautToTable
+interface NotifMoveAstronautToTableArgs {
     playerId: number;
-    worker: Worker;
+    astronaut: Astronaut;
 }
 
 // deployModule
@@ -218,8 +218,8 @@ interface NotifNewTableExperimentArgs {
     tableExperiments: Experiment[];
 }
 
-// reactivateWorkers
-interface NotifReactivateWorkersArgs {
+// reactivateAstronauts
+interface NotifReactivateAstronautsArgs {
     playerId: number | null;
 }
 
@@ -238,7 +238,7 @@ interface NotifGainMissionArgs {
 interface Undo {
     modules: Module[];
     experiments: Experiment[];
-    workers: Worker[];
+    astronauts: Astronaut[];
     vp: number;
     researchPoints: number;
     science: number;
@@ -253,16 +253,16 @@ interface NotifRestartTurnArgs {
     undo: Undo;
 }
 
-// moveWorker
-interface NotifMoveWorkerArgs {
+// moveAstronaut
+interface NotifMoveAstronautArgs {
     playerId: number;
-    worker: Worker;
+    astronaut: Astronaut;
     toConfirm: boolean;
 }
 
-// confirmMoveWorkers
-interface NotifConfirmMoveWorkersArgs {
+// confirmMoveAstronauts
+interface NotifConfirmMoveAstronautsArgs {
     playerId: number;
-    workers: Worker[];
+    astronauts: Astronaut[];
 }
 

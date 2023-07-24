@@ -17,12 +17,12 @@ trait ArgsTrait {
 
         $playerModules = $this->getModulesByLocation('player', $playerId);
 
-        $worker = $this->getSelectedWorker();
-        $activatableModules = array_values(array_filter($playerModules, fn($module) => $module->workforce != null && $module->r < 3 && $module->workforce <= $worker->remainingWorkforce));
+        $astronaut = $this->getSelectedAstronaut();
+        $activatableModules = array_values(array_filter($playerModules, fn($module) => $module->workforce != null && $module->r < 3 && $module->workforce <= $astronaut->remainingWorkforce));
 
         return [
-            'worker' => $worker,
-            'remaining' => $worker->remainingWorkforce, // for title
+            'astronaut' => $astronaut,
+            'remaining' => $astronaut->remainingWorkforce, // for title
             'activatableModules' => $activatableModules,
         ];
     }
@@ -40,7 +40,7 @@ trait ArgsTrait {
         return [
             'selectableModules' => $selectableModules,
             'selectableExperiments' => $selectableExperiments,
-        ] + $this->argChooseWorker();
+        ] + $this->argChooseAstronaut();
     }
 
     function argPay() {
@@ -57,41 +57,41 @@ trait ArgsTrait {
         ];
     }
 
-    function argChooseWorker() {
+    function argChooseAstronaut() {
         $playerId = intval($this->getActivePlayerId());
 
-        $workers = $this->getPlayerWorkers($playerId, 'player', true);
+        $astronauts = $this->getPlayerAstronauts($playerId, 'player', true);
 
         return [
-            'workers' => $workers,
+            'astronauts' => $astronauts,
         ];
     }
 
-    function argUpgradeWorker() {
+    function argUpgradeAstronaut() {
         $playerId = intval($this->getActivePlayerId());
 
-        $workers = $this->getPlayerWorkers($playerId);
-        $workers = array_values(array_filter($workers, fn($worker) => $worker->workforce < 4));
+        $astronauts = $this->getPlayerAstronauts($playerId);
+        $astronauts = array_values(array_filter($astronauts, fn($astronaut) => $astronaut->workforce < 4));
         
         $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
 
         return [
             'remaining' => $currentAction->upgrade, // for title
-            'workers' => $workers,
+            'astronauts' => $astronauts,
         ];
     }
 
-    function argMoveWorker(int $playerId) {
-        $movedWorkers = $this->getGlobalVariable(MOVED_WORKERS);
-        $playerMovedWorkers = array_values(array_filter($movedWorkers, fn($worker) => $worker->playerId == $playerId));
-        $alreadyMovedWorkers = array_values(array_filter($playerMovedWorkers, fn($worker) => $worker->x !== null));
-        $worker = $this->array_find($playerMovedWorkers, fn($worker) => $worker->x === null);
+    function argMoveAstronaut(int $playerId) {
+        $movedAstronauts = $this->getGlobalVariable(MOVED_ASTRONAUTS);
+        $playerMovedAstronauts = array_values(array_filter($movedAstronauts, fn($astronaut) => $astronaut->playerId == $playerId));
+        $alreadyMovedAstronauts = array_values(array_filter($playerMovedAstronauts, fn($astronaut) => $astronaut->x !== null));
+        $astronaut = $this->array_find($playerMovedAstronauts, fn($astronaut) => $astronaut->x === null);
 
-        $possibleCoordinates = $this->getWorkerPossibleCoordinates($playerId, $alreadyMovedWorkers);
+        $possibleCoordinates = $this->getAstronautPossibleCoordinates($playerId, $alreadyMovedAstronauts);
 
         return [
-            'playerMovedWorkers' => $playerMovedWorkers,
-            'worker' => $worker,
+            'playerMovedAstronauts' => $playerMovedAstronauts,
+            'astronaut' => $astronaut,
             'possibleCoordinates' => $possibleCoordinates,
         ];
     }

@@ -1,6 +1,6 @@
 <?php
 
-class Worker {
+class Astronaut {
     public int $id;
     public int $playerId;
     public int $workforce;

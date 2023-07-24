@@ -51,7 +51,7 @@ trait ModuleTrait {
         }
 
         foreach ($this->TILES[8] as $subType => $moduleType) {
-            $this->modules->createCards([[ 'type' => 8, 'type_arg' => $subType, 'nbr' => 2 ]], 'radar');
+            $this->modules->createCards([[ 'type' => 8, 'type_arg' => $subType, 'nbr' => 2 ]], 'communication');
         }
 
         foreach ($players as $playerId => $player) {
@@ -97,8 +97,8 @@ trait ModuleTrait {
         return $adjacentModules;
     }
 
-    function deployModule(int $playerId, /*CurrentAction*/ $currentAction, Worker $worker) {
-        $this->moveWorkerToTable($playerId, $worker, $currentAction->workerSpot);
+    function deployModule(int $playerId, /*CurrentAction*/ $currentAction, Astronaut $astronaut) {
+        $this->moveAstronautToTable($playerId, $astronaut, $currentAction->astronautSpot);
         $module = $this->getModuleById($currentAction->addModuleId);
 
         if ($currentAction->addModuleId != $currentAction->removeModuleId) {
@@ -110,11 +110,11 @@ trait ModuleTrait {
         }
 
         $r = $module->production != null ? 1 : 0;
-        $this->DbQuery("UPDATE module SET card_location = 'player', card_location_arg = $playerId, `x` = $worker->x, `y` = $worker->y, `r` = $r WHERE `card_id` = $module->id");
+        $this->DbQuery("UPDATE module SET card_location = 'player', card_location_arg = $playerId, `x` = $astronaut->x, `y` = $astronaut->y, `r` = $r WHERE `card_id` = $module->id");
         $module->location = 'player';
         $module->locationArg = $playerId;
-        $module->x = $worker->x;
-        $module->y = $worker->y;
+        $module->x = $astronaut->x;
+        $module->y = $astronaut->y;
         $module->r = $r;
 
         self::notifyAllPlayers('deployModule', '', [

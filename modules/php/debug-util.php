@@ -20,7 +20,7 @@ trait DebugUtilTrait {
     }
     
     function debugWorkforce() {
-		$this->DbQuery("UPDATE worker SET `workforce` = 10, `remaining_workforce` = 10");
+		$this->DbQuery("UPDATE astronaut SET `workforce` = 10, `remaining_workforce` = 10");
     }
 
     public function debugReplacePlayersIds() {

@@ -33,8 +33,8 @@ Also add one auto-FTP upload extension (for example https://marketplace.visualst
 Make sure ftp-sync.json and node_modules are in .gitignore
 
 # Rules & comments from publisher
-No automatic actions like selecting last worker
+No automatic actions like selecting last astronaut
 
 You can mix electricity with a base resource when you want to use 3 base resources instead of a advanced resource
 
-You take a radar of the same research point value, no matter the current year
+You take a communication of the same research point value, no matter the current year

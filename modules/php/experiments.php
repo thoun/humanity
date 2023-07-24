@@ -52,8 +52,8 @@ trait ExperimentTrait {
         }
     }
 
-    function deployExperiment(int $playerId, /*CurrentAction*/ $currentAction, Worker $worker) {
-        $this->moveWorkerToTable($playerId, $worker, $currentAction->workerSpot);
+    function deployExperiment(int $playerId, /*CurrentAction*/ $currentAction, Astronaut $astronaut) {
+        $this->moveAstronautToTable($playerId, $astronaut, $currentAction->astronautSpot);
 
         $playerExperiments = $this->getExperimentsByLocation('player', $playerId);
         $module = $this->getExperimentById($currentAction->experiment);
@@ -105,7 +105,7 @@ trait ExperimentTrait {
         if ($module->effect == EXPERIMENT_POWER_TIME) {
             $this->gainTimeUnit($playerId, 2);
         } else if ($module->effect == EXPERIMENT_POWER_REACTIVATE) {
-            $this->reactivatePlayerWorkers($playerId);
+            $this->reactivatePlayerAstronauts($playerId);
         }
     }
 }

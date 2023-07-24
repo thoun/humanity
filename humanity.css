@@ -497,44 +497,44 @@ body > .card {
   top: calc((var(--height) + var(--shift)) * var(--order));
 }
 
-.worker {
+.astronaut {
   position: relative;
   display: inline-block;
   width: 88px;
   height: 100px;
-  background-image: url("img/workers.png");
+  background-image: url("img/astronauts.png");
   background-size: auto 100%;
   transition: transform 0.5s;
   flex-shrink: 0;
 }
-.worker[data-player-color=f0db6c], .worker[data-player-color=f0db6c] .workforce {
+.astronaut[data-player-color=f0db6c], .astronaut[data-player-color=f0db6c] .workforce {
   background-position-x: 0%;
 }
-.worker[data-player-color="62bce6"], .worker[data-player-color="62bce6"] .workforce {
+.astronaut[data-player-color="62bce6"], .astronaut[data-player-color="62bce6"] .workforce {
   background-position-x: 33.3333333333%;
 }
-.worker[data-player-color="70c499"], .worker[data-player-color="70c499"] .workforce {
+.astronaut[data-player-color="70c499"], .astronaut[data-player-color="70c499"] .workforce {
   background-position-x: 66.6666666667%;
 }
-.worker[data-player-color=ddbdd7], .worker[data-player-color=ddbdd7] .workforce {
+.astronaut[data-player-color=ddbdd7], .astronaut[data-player-color=ddbdd7] .workforce {
   background-position-x: 100%;
 }
-.worker.selectable {
+.astronaut.selectable {
   outline: 5px dashed red;
   border-radius: 15px;
   cursor: pointer;
 }
-.worker.selected {
+.astronaut.selected {
   outline: 5px solid red;
   border-radius: 15px;
 }
-.worker.disabled-worker {
+.astronaut.disabled-astronaut {
   transform: rotate(180deg);
 }
-.worker.to-confirm {
+.astronaut.to-confirm {
   opacity: 0.7;
 }
-.worker .workforce {
+.astronaut .workforce {
   position: absolute;
   display: inline-block;
   width: 40px;
@@ -544,13 +544,13 @@ body > .card {
   background-image: url("img/workforces.png");
   background-size: auto 300%;
 }
-.worker .workforce[data-workforce="2"] {
+.astronaut .workforce[data-workforce="2"] {
   background-position-y: 0%;
 }
-.worker .workforce[data-workforce="3"] {
+.astronaut .workforce[data-workforce="3"] {
   background-position-y: 50%;
 }
-.worker .workforce[data-workforce="4"] {
+.astronaut .workforce[data-workforce="4"] {
   background-position-y: 100%;
 }
 
@@ -750,7 +750,7 @@ body > .card {
   background-position-x: 100%;
 }
 .module[data-type="8"] .front {
-  background-image: url("img/modules-radar.png");
+  background-image: url("img/modules-communication.png");
   background-size: auto 200%;
 }
 .module[data-type="8"] .front[data-number="1"] {
@@ -1108,42 +1108,42 @@ body > .card {
 #board-1 #table-modules .slot[data-slot-id="7"] {
   transform: rotate(315deg) translateY(380px);
 }
-#board-1 #table-workers {
+#board-1 #table-astronauts {
   position: absolute;
   left: 390px;
   top: 440px;
   width: 200px;
   height: 100px;
 }
-#board-1 #table-workers .slot {
+#board-1 #table-astronauts .slot {
   position: absolute;
   width: 200px;
   height: 100px;
   display: flex;
   justify-content: center;
 }
-#board-1 #table-workers .slot[data-slot-id="0"] {
+#board-1 #table-astronauts .slot[data-slot-id="0"] {
   transform: rotate(0deg) translateY(540px) rotate(180deg);
 }
-#board-1 #table-workers .slot[data-slot-id="1"] {
+#board-1 #table-astronauts .slot[data-slot-id="1"] {
   transform: rotate(45deg) translateY(540px) rotate(180deg);
 }
-#board-1 #table-workers .slot[data-slot-id="2"] {
+#board-1 #table-astronauts .slot[data-slot-id="2"] {
   transform: rotate(90deg) translateY(540px) rotate(180deg);
 }
-#board-1 #table-workers .slot[data-slot-id="3"] {
+#board-1 #table-astronauts .slot[data-slot-id="3"] {
   transform: rotate(135deg) translateY(540px) rotate(180deg);
 }
-#board-1 #table-workers .slot[data-slot-id="4"] {
+#board-1 #table-astronauts .slot[data-slot-id="4"] {
   transform: rotate(180deg) translateY(540px) rotate(180deg);
 }
-#board-1 #table-workers .slot[data-slot-id="5"] {
+#board-1 #table-astronauts .slot[data-slot-id="5"] {
   transform: rotate(225deg) translateY(540px) rotate(180deg);
 }
-#board-1 #table-workers .slot[data-slot-id="6"] {
+#board-1 #table-astronauts .slot[data-slot-id="6"] {
   transform: rotate(270deg) translateY(540px) rotate(180deg);
 }
-#board-1 #table-workers .slot[data-slot-id="7"] {
+#board-1 #table-astronauts .slot[data-slot-id="7"] {
   transform: rotate(315deg) translateY(540px) rotate(180deg);
 }
 

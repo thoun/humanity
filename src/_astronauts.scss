@@ -1,9 +1,9 @@
-.worker {
+.astronaut {
     position: relative;
     display: inline-block;
     width: 88px;
     height: 100px;
-    background-image: url('img/workers.png');
+    background-image: url('img/astronauts.png');
     background-size: auto 100%;
     transition: transform 0.5s;
     flex-shrink: 0;
@@ -26,7 +26,7 @@
         border-radius: 15px;
     }
 
-    &.disabled-worker {
+    &.disabled-astronaut {
         transform: rotate(180deg);
     }
 

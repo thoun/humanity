@@ -19,7 +19,7 @@
 
 require_once(APP_GAMEMODULE_PATH.'module/table/table.game.php');
 
-require_once('modules/php/objects/worker.php');
+require_once('modules/php/objects/astronaut.php');
 require_once('modules/php/objects/module.php');
 require_once('modules/php/objects/experiment.php');
 require_once('modules/php/objects/mission.php');
@@ -28,7 +28,7 @@ require_once('modules/php/objects/current-action.php');
 require_once('modules/php/objects/undo.php');
 require_once('modules/php/constants.inc.php');
 require_once('modules/php/utils.php');
-require_once('modules/php/workers.php');
+require_once('modules/php/astronauts.php');
 require_once('modules/php/modules.php');
 require_once('modules/php/missions.php');
 require_once('modules/php/experiments.php');
@@ -39,7 +39,7 @@ require_once('modules/php/debug-util.php');
 
 class Humanity extends Table {
     use UtilTrait;
-    use WorkerTrait;
+    use AstronautTrait;
     use ModuleTrait;
     use MissionTrait;
     use ExperimentTrait;
@@ -137,7 +137,7 @@ class Humanity extends Table {
         }
 
         // setup the initial game situation here
-        $this->setupWorkers(array_keys($players));
+        $this->setupAstronauts(array_keys($players));
         $this->setupModules($players);
         $this->setupExperiments();
         $this->setupMissions();
@@ -177,7 +177,7 @@ class Humanity extends Table {
         foreach($result['players'] as $playerId => &$player) {
             $player['playerNo'] = intval($player['playerNo']);
             
-            $player['workers'] = $this->getPlayerWorkers($playerId);
+            $player['astronauts'] = $this->getPlayerAstronauts($playerId);
             $player['researchPoints'] = intval($player['researchPoints']);
             $player['vp'] = intval($player['vp']);
             $player['science'] = $isEndScore || $playerId == $currentPlayerId ? intval($player['science']) : null;
@@ -200,7 +200,7 @@ class Humanity extends Table {
         $result['firstPlayerId'] = $this->getGlobalVariable(FIRST_PLAYER);
         $result['isEnd'] = $isEndScore;
 
-        $result['movedWorkers'] = $this->getGlobalVariable(MOVED_WORKERS);
+        $result['movedAstronauts'] = $this->getGlobalVariable(MOVED_ASTRONAUTS);
   
         return $result;
     }

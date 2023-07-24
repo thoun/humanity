@@ -2,8 +2,8 @@
 
 class CurrentAction {
     public string $type; // 'module', 'experiment', 'activate'
-    public ?int $selectedWorker;
-    public ?int $workerSpot;
+    public ?int $selectedAstronaut;
+    public ?int $astronautSpot;
     public ?int $addModuleId;
     public ?int $removeModuleId;
     public ?int $experiment;

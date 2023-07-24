@@ -66,8 +66,8 @@ class Humanity implements HumanityGame {
         new JumpToManager(this, {
             localStorageFoldedKey: LOCAL_STORAGE_JUMP_TO_FOLDED_KEY,
             topEntries: [
-                new JumpToEntry(_('Main board TODO rename'), 'board-1', { 'color': '#224757' }),
-                new JumpToEntry(_('Research board TODO rename'), 'research-board', { 'color': '#224757' }),
+                new JumpToEntry(_('AMBS'), 'board-1', { 'color': '#224757' }),
+                new JumpToEntry(_('Research track'), 'research-board', { 'color': '#224757' }),
             ],
             entryClasses: 'hexa-point',
             defaultFolded: false,
@@ -83,11 +83,11 @@ class Humanity implements HumanityGame {
         this.yearCounter.create(`year`);
         this.yearCounter.setValue(gamedatas.year);
 
-        gamedatas.movedWorkers?.forEach(worker => {
-            if (worker.location == 'table' && worker.x !== null) {
-                worker.location = 'player';
-                this.moveWorkerDiv(worker.playerId, worker);
-                this.setWorkerToConfirm(worker, true);
+        gamedatas.movedAstronauts?.forEach(astronaut => {
+            if (astronaut.location == 'table' && astronaut.x !== null) {
+                astronaut.location = 'player';
+                this.moveAstronautDiv(astronaut.playerId, astronaut);
+                this.setAstronautToConfirm(astronaut, true);
             }
         })
         
@@ -142,21 +142,21 @@ class Humanity implements HumanityGame {
             case 'activateModule':
                 this.onEnteringActivateModule(args.args);
                 break;
-            case 'chooseWorker':
-                this.onEnteringChooseWorker(args.args);
+            case 'chooseAstronaut':
+                this.onEnteringChooseAstronaut(args.args);
                 break;
-            case 'upgradeWorker':
-                this.onEnteringUpgradeWorker(args.args);
+            case 'upgradeAstronaut':
+                this.onEnteringUpgradeAstronaut(args.args);
                 break;
-            case 'moveWorker':
-                this.onEnteringMoveWorker(args.args);
+            case 'moveAstronaut':
+                this.onEnteringMoveAstronaut(args.args);
                 break;
         }
     }
 
     private onEnteringChooseAction(args: EnteringChooseActionArgs) {
         if ((this as any).isCurrentPlayerActive()) {
-            this.getCurrentPlayerTable()?.setSelectableWorkers(args.workers);
+            this.getCurrentPlayerTable()?.setSelectableAstronauts(args.astronauts);
             this.tableCenter.setSelectableModules(args.selectableModules);
             this.tableCenter.setSelectableExperiments(args.selectableExperiments);
         }
@@ -165,24 +165,24 @@ class Humanity implements HumanityGame {
     public onEnteringActivateModule(args: EnteringActivateModuleArgs) {
         if ((this as any).isCurrentPlayerActive()) {
             const table = this.getCurrentPlayerTable();
-            table.setSelectedWorker(args.worker);
+            table.setSelectedAstronaut(args.astronaut);
             table.setSelectableModules(args.activatableModules);
         }
     }
 
-    private onEnteringChooseWorker(args: EnteringChooseWorkerArgs) {
+    private onEnteringChooseAstronaut(args: EnteringChooseAstronautArgs) {
         if ((this as any).isCurrentPlayerActive()) {
-            this.getCurrentPlayerTable()?.setSelectableWorkers(args.workers);
+            this.getCurrentPlayerTable()?.setSelectableAstronauts(args.astronauts);
         }
     }
 
-    private onEnteringUpgradeWorker(args: EnteringChooseWorkerArgs) {
+    private onEnteringUpgradeAstronaut(args: EnteringChooseAstronautArgs) {
         if ((this as any).isCurrentPlayerActive()) {
-            args.workers.forEach(worker => document.getElementById(`worker-${worker.id}`).classList.add('selectable'));
+            args.astronauts.forEach(astronaut => document.getElementById(`astronaut-${astronaut.id}`).classList.add('selectable'));
         }
     }
 
-    private onEnteringMoveWorker(args: EnteringMoveWorkerArgs) {
+    private onEnteringMoveAstronaut(args: EnteringMoveAstronautArgs) {
         this.getCurrentPlayerTable()?.setSelectableModuleSpots(args.possibleCoordinates);
     }
 
@@ -191,21 +191,21 @@ class Humanity implements HumanityGame {
 
         switch (stateName) {
             case 'chooseAction':
-                this.onLeavingChooseWorker();
+                this.onLeavingChooseAstronaut();
                 this.tableCenter.setSelectableModules(null);
                 this.tableCenter.setSelectableExperiments(null);
                 break;
             case 'activateModule':
                 this.onLeavingActivateModule();
                 break;
-            case 'chooseWorker':
-                this.onLeavingChooseWorker();
+            case 'chooseAstronaut':
+                this.onLeavingChooseAstronaut();
                 break;
-            case 'moveWorker':
-                this.onLeavingMoveWorker();
+            case 'moveAstronaut':
+                this.onLeavingMoveAstronaut();
                 break;
-            case 'upgradeWorker':
-                this.onLeavingUpgradeWorker();
+            case 'upgradeAstronaut':
+                this.onLeavingUpgradeAstronaut();
                 break;
         }
     }
@@ -213,21 +213,21 @@ class Humanity implements HumanityGame {
     public onLeavingActivateModule() {
         if ((this as any).isCurrentPlayerActive()) {
             const table = this.getCurrentPlayerTable();
-            table.setSelectedWorker(null);
+            table.setSelectedAstronaut(null);
             table.setSelectableModules(null);
         }
     }
 
-    private onLeavingChooseWorker() {
-        this.getCurrentPlayerTable()?.setSelectableWorkers([]);
+    private onLeavingChooseAstronaut() {
+        this.getCurrentPlayerTable()?.setSelectableAstronauts([]);
     }
 
-    private onLeavingMoveWorker() {
+    private onLeavingMoveAstronaut() {
         this.getCurrentPlayerTable()?.setSelectableModuleSpots(null);
     }
 
-    private onLeavingUpgradeWorker() {
-        document.querySelectorAll('.worker.selectable').forEach(worker => worker.classList.remove('selectable'));
+    private onLeavingUpgradeAstronaut() {
+        document.querySelectorAll('.astronaut.selectable').forEach(astronaut => astronaut.classList.remove('selectable'));
     }
 
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
@@ -240,9 +240,9 @@ class Humanity implements HumanityGame {
                 case 'activateModule':
                     (this as any).addActionButton(`endTurn_button`, _("End turn"), () => this.endTurn());
                     break;
-                case 'chooseRadarColor':
-                    (this as any).addActionButton(`blue_button`, _("Blue"), () => this.chooseRadarColor(2));
-                    (this as any).addActionButton(`orange_button`, _("Orange"), () => this.chooseRadarColor(1));
+                case 'chooseCommunicationColor':
+                    (this as any).addActionButton(`blue_button`, _("Blue"), () => this.chooseCommunicationColor(2));
+                    (this as any).addActionButton(`orange_button`, _("Orange"), () => this.chooseCommunicationColor(1));
                     break;
                 case 'pay':
                     (this as any).addActionButton(`autoPay_button`, _("Pay ${cost}").replace('${cost}', getCostStr(args.pay)), () => this.autoPay());
@@ -250,14 +250,14 @@ class Humanity implements HumanityGame {
                 case 'confirmTurn':
                     (this as any).addActionButton(`confirmTurn_button`, _("Confirm turn"), () => this.confirmTurn());
                     break;
-                case 'confirmMoveWorkers':
-                    (this as any).addActionButton(`confirmMoveWorkers_button`, _("Confirm"), () => this.confirmMoveWorkers());
-                    (this as any).addActionButton(`restartMoveWorkers_button`, _("Restart"), () => this.restartMoveWorkers(), null, null, 'red');
+                case 'confirmMoveAstronauts':
+                    (this as any).addActionButton(`confirmMoveAstronauts_button`, _("Confirm"), () => this.confirmMoveAstronauts());
+                    (this as any).addActionButton(`restartMoveAstronauts_button`, _("Restart"), () => this.restartMoveAstronauts(), null, null, 'red');
                     break;
             }
 
             
-            if (['chooseRadarColor', 'pay', 'chooseWorker', 'upgradeWorker', 'activateModule', 'confirmTurn'].includes(stateName)) {
+            if (['chooseCommunicationColor', 'pay', 'chooseAstronaut', 'upgradeAstronaut', 'activateModule', 'confirmTurn'].includes(stateName)) {
                 (this as any).addActionButton(`restartTurn_button`, _("Restart turn"), () => this.restartTurn(), null, null, 'red');
             }
         }
@@ -421,26 +421,26 @@ class Humanity implements HumanityGame {
         this.playersTables.push(table);
     }
 
-    public createWorker(worker: Worker): HTMLDivElement {
-        const workerDiv = document.createElement('div');
-        workerDiv.id = `worker-${worker.id}`;
-        workerDiv.classList.add('worker');
-        workerDiv.dataset.id = `${worker.id}`;
-        workerDiv.dataset.playerColor = this.getPlayer(worker.playerId).color;
+    public createAstronaut(astronaut: Astronaut): HTMLDivElement {
+        const astronautDiv = document.createElement('div');
+        astronautDiv.id = `astronaut-${astronaut.id}`;
+        astronautDiv.classList.add('astronaut');
+        astronautDiv.dataset.id = `${astronaut.id}`;
+        astronautDiv.dataset.playerColor = this.getPlayer(astronaut.playerId).color;
 
-        workerDiv.addEventListener('click', () => {
-            if (workerDiv.classList.contains('selectable')) {
-                this.onWorkerClick(worker);
+        astronautDiv.addEventListener('click', () => {
+            if (astronautDiv.classList.contains('selectable')) {
+                this.onAstronautClick(astronaut);
             }
         });
         
         const workforceDiv = document.createElement('div');
-        workforceDiv.id = `${workerDiv.id}-force`;
+        workforceDiv.id = `${astronautDiv.id}-force`;
         workforceDiv.classList.add('workforce');
-        workforceDiv.dataset.workforce = `${worker.workforce}`;
-        workerDiv.appendChild(workforceDiv);
+        workforceDiv.dataset.workforce = `${astronaut.workforce}`;
+        astronautDiv.appendChild(workforceDiv);
 
-        return workerDiv;
+        return astronautDiv;
     }
 
     placeFirstPlayerToken(playerId: number): Promise<any> {
@@ -535,8 +535,8 @@ class Humanity implements HumanityGame {
     }
     
     public onPlayerModuleSpotClick(x: number, y: number): void {
-        if (this.gamedatas.gamestate.private_state?.name == 'moveWorker') {
-            this.moveWorker(x, y);
+        if (this.gamedatas.gamestate.private_state?.name == 'moveAstronaut') {
+            this.moveAstronaut(x, y);
         }
     }
 
@@ -546,30 +546,30 @@ class Humanity implements HumanityGame {
         }
     }
 
-    public onWorkerClick(worker: Worker): void {
-        if (['chooseAction', 'chooseWorker'].includes(this.gamedatas.gamestate.name)) {
-            this.chooseWorker(worker.id);
-        } else if (this.gamedatas.gamestate.name == 'upgradeWorker') {
-            this.upgradeWorker(worker.id);
+    public onAstronautClick(astronaut: Astronaut): void {
+        if (['chooseAction', 'chooseAstronaut'].includes(this.gamedatas.gamestate.name)) {
+            this.chooseAstronaut(astronaut.id);
+        } else if (this.gamedatas.gamestate.name == 'upgradeAstronaut') {
+            this.upgradeAstronaut(astronaut.id);
         }
     }
   	
-    public chooseWorker(id: number) {
-        if(!(this as any).checkAction('chooseWorker')) {
+    public chooseAstronaut(id: number) {
+        if(!(this as any).checkAction('chooseAstronaut')) {
             return;
         }
 
-        this.takeAction('chooseWorker', {
+        this.takeAction('chooseAstronaut', {
             id
         });
     }
   	
-    public upgradeWorker(id: number) {
-        if(!(this as any).checkAction('upgradeWorker')) {
+    public upgradeAstronaut(id: number) {
+        if(!(this as any).checkAction('upgradeAstronaut')) {
             return;
         }
 
-        this.takeAction('upgradeWorker', {
+        this.takeAction('upgradeAstronaut', {
             id
         });
     }
@@ -594,12 +594,12 @@ class Humanity implements HumanityGame {
         });
     }
   	
-    public chooseRadarColor(color: number) {
-        if(!(this as any).checkAction('chooseRadarColor')) {
+    public chooseCommunicationColor(color: number) {
+        if(!(this as any).checkAction('chooseCommunicationColor')) {
             return;
         }
 
-        this.takeAction('chooseRadarColor', {
+        this.takeAction('chooseCommunicationColor', {
             color
         });
     }
@@ -642,31 +642,31 @@ class Humanity implements HumanityGame {
         this.takeAction('restartTurn');
     }
   	
-    public moveWorker(x: number, y: number) {
-        if(!(this as any).checkAction('moveWorker')) {
+    public moveAstronaut(x: number, y: number) {
+        if(!(this as any).checkAction('moveAstronaut')) {
             return;
         }
 
-        this.takeAction('moveWorker', {
+        this.takeAction('moveAstronaut', {
             x: x + 1000,
             y: y + 1000,
         });
     }
   	
-    public confirmMoveWorkers() {
-        if(!(this as any).checkAction('confirmMoveWorkers')) {
+    public confirmMoveAstronauts() {
+        if(!(this as any).checkAction('confirmMoveAstronauts')) {
             return;
         }
 
-        this.takeAction('confirmMoveWorkers');
+        this.takeAction('confirmMoveAstronauts');
     }
   	
-    public restartMoveWorkers() {
-        if(!(this as any).checkAction('restartMoveWorkers')) {
+    public restartMoveAstronauts() {
+        if(!(this as any).checkAction('restartMoveAstronauts')) {
             return;
         }
 
-        this.takeAction('restartMoveWorkers');
+        this.takeAction('restartMoveAstronauts');
     }
 
     public takeAction(action: string, data?: any) {
@@ -695,9 +695,9 @@ class Humanity implements HumanityGame {
             ['activateModule', ANIMATION_MS],
             ['pay', 50],
             ['removeModule', ANIMATION_MS],
-            ['disableWorker', ANIMATION_MS],
+            ['disableAstronaut', ANIMATION_MS],
             ['gainTimeUnit', ANIMATION_MS],
-            ['moveWorkerToTable', ANIMATION_MS],
+            ['moveAstronautToTable', ANIMATION_MS],
             ['deployModule', undefined],
             ['deployExperiment', undefined],
             ['score', 1],
@@ -710,12 +710,12 @@ class Humanity implements HumanityGame {
             ['newTableModule', ANIMATION_MS],
             ['moveArm', ANIMATION_MS],
             ['newTableExperiments', ANIMATION_MS],
-            ['reactivateWorkers', ANIMATION_MS],
-            ['upgradeWorker', 50],
+            ['reactivateAstronauts', ANIMATION_MS],
+            ['upgradeAstronaut', 50],
             ['year', ANIMATION_MS],
             ['gainMission', undefined],
-            ['moveWorker', ANIMATION_MS],
-            ['confirmMoveWorkers', 1],
+            ['moveAstronaut', ANIMATION_MS],
+            ['confirmMoveAstronauts', 1],
             ['restartTurn', 1],
         ];
     
@@ -775,19 +775,19 @@ class Humanity implements HumanityGame {
         playerTable.removeModule(args.module);
     }
 
-    notif_disableWorker(args: NotifWorkerArgs) {
-        this.setWorkerDisabled(args.worker, true);
+    notif_disableAstronaut(args: NotifAstronautArgs) {
+        this.setAstronautDisabled(args.astronaut, true);
     }
 
     notif_gainTimeUnit(args: NotifGainTimeUnitArgs) {
-        const { workers } = args;
-        workers.forEach(worker => this.tableCenter.moveWorker(worker));
+        const { astronauts } = args;
+        astronauts.forEach(astronaut => this.tableCenter.moveAstronaut(astronaut));
     }
 
-    notif_moveWorkerToTable(args: NotifMoveWorkerToTableArgs) {
-        const { worker } = args;
-        this.setWorkerDisabled(worker, false);
-        this.tableCenter.moveWorker(worker);
+    notif_moveAstronautToTable(args: NotifMoveAstronautToTableArgs) {
+        const { astronaut } = args;
+        this.setAstronautDisabled(astronaut, false);
+        this.tableCenter.moveAstronaut(astronaut);
     }
 
     notif_deployModule(args: NotifDeployModuleArgs) {
@@ -842,16 +842,16 @@ class Humanity implements HumanityGame {
         this.tableCenter.newExperiments(args.tableExperiments);
     }   
 
-    notif_reactivateWorkers(args: NotifReactivateWorkersArgs) {
+    notif_reactivateAstronauts(args: NotifReactivateAstronautsArgs) {
         if (args.playerId) {
-            this.getPlayerTable(args.playerId).reactivateWorkers();
+            this.getPlayerTable(args.playerId).reactivateAstronauts();
         } else {
-            this.playersTables.forEach(playerTable => playerTable.reactivateWorkers());
+            this.playersTables.forEach(playerTable => playerTable.reactivateAstronauts());
         }
     }
 
-    notif_upgradeWorker(args: NotifWorkerArgs) {
-        document.getElementById(`worker-${args.worker.id}-force`).dataset.workforce = `${args.worker.workforce}`;
+    notif_upgradeAstronaut(args: NotifAstronautArgs) {
+        document.getElementById(`astronaut-${args.astronaut.id}-force`).dataset.workforce = `${args.astronaut.workforce}`;
     }
 
     notif_year(args: NotifYearArgs) {
@@ -880,7 +880,7 @@ class Humanity implements HumanityGame {
         table.resetModules(undo.modules);
         table.resetExperiments(undo.experiments);
 
-        undo.workers.forEach(worker => this.resetWorker(playerId, worker));
+        undo.astronauts.forEach(astronaut => this.resetAstronaut(playerId, astronaut));
 
         this.setResearchPoints(playerId, undo.researchPoints);
         this.setVP(playerId, undo.vp);
@@ -889,42 +889,42 @@ class Humanity implements HumanityGame {
         }
     }
 
-    notif_moveWorker(args: NotifMoveWorkerArgs) {
-        const { playerId, worker, toConfirm } = args;
-        worker.location = worker.x !== null ? 'player' : 'table';
-        this.moveWorkerDiv(playerId, worker);
-        this.setWorkerToConfirm(worker, toConfirm);
+    notif_moveAstronaut(args: NotifMoveAstronautArgs) {
+        const { playerId, astronaut, toConfirm } = args;
+        astronaut.location = astronaut.x !== null ? 'player' : 'table';
+        this.moveAstronautDiv(playerId, astronaut);
+        this.setAstronautToConfirm(astronaut, toConfirm);
     }
 
-    notif_confirmMoveWorkers(args: NotifConfirmMoveWorkersArgs) {
-        const { workers } = args;
-        workers.forEach(worker => this.setWorkerToConfirm(worker, false));
+    notif_confirmMoveAstronauts(args: NotifConfirmMoveAstronautsArgs) {
+        const { astronauts } = args;
+        astronauts.forEach(astronaut => this.setAstronautToConfirm(astronaut, false));
     }
 
-    private moveWorkerDiv(playerId: number, worker: Worker) {
-        const workerDiv = document.getElementById(`worker-${worker.id}`);
-        if (worker.location == 'player') {
+    private moveAstronautDiv(playerId: number, astronaut: Astronaut) {
+        const astronautDiv = document.getElementById(`astronaut-${astronaut.id}`);
+        if (astronaut.location == 'player') {
             const modulesDiv = document.getElementById(`player-table-${playerId}-modules`);
-            this.getPlayerTable(playerId).makeSlotForCoordinates(worker.x, worker.y);
-            modulesDiv.querySelector(`[data-slot-id="${worker.x}_${worker.y}"]`).appendChild(workerDiv);
-        } else if (worker.location == 'table') {
-            const tableWorkers = document.getElementById('table-workers');
-            tableWorkers.querySelector(`.slot[data-slot-id="${worker.spot}"]`).appendChild(workerDiv);
+            this.getPlayerTable(playerId).makeSlotForCoordinates(astronaut.x, astronaut.y);
+            modulesDiv.querySelector(`[data-slot-id="${astronaut.x}_${astronaut.y}"]`).appendChild(astronautDiv);
+        } else if (astronaut.location == 'table') {
+            const tableAstronauts = document.getElementById('table-astronauts');
+            tableAstronauts.querySelector(`.slot[data-slot-id="${astronaut.spot}"]`).appendChild(astronautDiv);
         }
     }
 
-    private resetWorker(playerId: number, worker: Worker) {
-        this.moveWorkerDiv(playerId, worker);
-        document.getElementById(`worker-${worker.id}`).classList.toggle('disabled-worker', !worker.remainingWorkforce);
-        document.getElementById(`worker-${worker.id}-force`).dataset.workforce = `${worker.workforce}`;
+    private resetAstronaut(playerId: number, astronaut: Astronaut) {
+        this.moveAstronautDiv(playerId, astronaut);
+        document.getElementById(`astronaut-${astronaut.id}`).classList.toggle('disabled-astronaut', !astronaut.remainingWorkforce);
+        document.getElementById(`astronaut-${astronaut.id}-force`).dataset.workforce = `${astronaut.workforce}`;
     }
 
-    private setWorkerDisabled(worker: Worker, disabled: boolean) {
-        document.getElementById(`worker-${worker.id}`).classList.toggle('disabled-worker', disabled);
+    private setAstronautDisabled(astronaut: Astronaut, disabled: boolean) {
+        document.getElementById(`astronaut-${astronaut.id}`).classList.toggle('disabled-astronaut', disabled);
     }
 
-    private setWorkerToConfirm(worker: Worker, toConfirm: boolean) {
-        document.getElementById(`worker-${worker.id}`).classList.toggle('to-confirm', toConfirm);
+    private setAstronautToConfirm(astronaut: Astronaut, toConfirm: boolean) {
+        document.getElementById(`astronaut-${astronaut.id}`).classList.toggle('to-confirm', toConfirm);
     }
 
     public getColor(color: number, blueOrOrange: boolean): string {

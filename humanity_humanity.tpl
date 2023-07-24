@@ -8,7 +8,7 @@
                     <div id="table-experiments"></div>
                 </div>
                 <div id="table-modules"></div>
-                <div id="table-workers"></div>
+                <div id="table-astronauts"></div>
             </div>
             <div id="research-board">
                 <div id="missions"></div>

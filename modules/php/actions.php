@@ -17,14 +17,14 @@ trait ActionTrait {
         (note: each method below must match an input method in nicodemus.action.php)
     */
 
-    public function chooseWorker(int $id) {
-        self::checkAction('chooseWorker');
+    public function chooseAstronaut(int $id) {
+        self::checkAction('chooseAstronaut');
 
-        $args = $this->argChooseWorker();
-        $worker = $this->array_find($args['workers'], fn($worker) => $worker->id == $id);
+        $args = $this->argChooseAstronaut();
+        $astronaut = $this->array_find($args['astronauts'], fn($astronaut) => $astronaut->id == $id);
 
-        if ($worker == null) {
-            throw new BgaUserException("Invalid worker");
+        if ($astronaut == null) {
+            throw new BgaUserException("Invalid astronaut");
         }
         
         $playerId = intval($this->getActivePlayerId());
@@ -32,27 +32,27 @@ trait ActionTrait {
         
         if ($stateId == ST_PLAYER_CHOOSE_ACTION) {
             $currentAction = new CurrentAction('activate');
-            $currentAction->selectedWorker = $id;
+            $currentAction->selectedAstronaut = $id;
             $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
-            self::notifyAllPlayers('log', clienttranslate('${player_name} selects a worker of workforce ${workforce} to activate modules'), [
+            self::notifyAllPlayers('log', clienttranslate('${player_name} selects a astronaut of workforce ${workforce} to activate modules'), [
                 'playerId' => $playerId,
                 'player_name' => $this->getPlayerName($playerId),
-                'workforce' => $worker->workforce,
+                'workforce' => $astronaut->workforce,
             ]);
 
             $this->gamestate->nextState('activate');
         } else {
 
             $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
-            $currentAction->selectedWorker = $id;
+            $currentAction->selectedAstronaut = $id;
             $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
             $upgrade = 0;
             if ($currentAction->type == 'module') {
-                $upgrade = $this->deployModule($playerId, $currentAction, $worker);
+                $upgrade = $this->deployModule($playerId, $currentAction, $astronaut);
             } else if ($currentAction->type == 'experiment') {
-                $this->deployExperiment($playerId, $currentAction, $worker);
+                $this->deployExperiment($playerId, $currentAction, $astronaut);
             }
 
             if ($upgrade > 0) {
@@ -67,9 +67,9 @@ trait ActionTrait {
     public function activateModule(int $id) {
         self::checkAction('activateModule');
 
-        $worker = $this->getSelectedWorker();
-        if ($worker == null) {
-            throw new BgaUserException("No active worker");
+        $astronaut = $this->getSelectedAstronaut();
+        if ($astronaut == null) {
+            throw new BgaUserException("No active astronaut");
         }
 
         $playerId = intval($this->getActivePlayerId());
@@ -80,11 +80,11 @@ trait ActionTrait {
             throw new BgaUserException("You cannot activate this module");
         }
 
-        if ($worker->remainingWorkforce < $module->workforce) {
+        if ($astronaut->remainingWorkforce < $module->workforce) {
             throw new BgaUserException("Not enough remaining workforce");
         }
-        $worker->remainingWorkforce -= $module->workforce;
-        $this->DbQuery("UPDATE worker SET `remaining_workforce` = $worker->remainingWorkforce WHERE `id` = $worker->id");
+        $astronaut->remainingWorkforce -= $module->workforce;
+        $this->DbQuery("UPDATE astronaut SET `remaining_workforce` = $astronaut->remainingWorkforce WHERE `id` = $astronaut->id");
 
         $message = null;
         $args = [];
@@ -130,10 +130,10 @@ trait ActionTrait {
             ]);
         }
 
-        if ($worker->remainingWorkforce > 0) {
+        if ($astronaut->remainingWorkforce > 0) {
             $this->gamestate->nextState('stay');
         } else {
-            $this->applyEndOfActivation($playerId, $worker);
+            $this->applyEndOfActivation($playerId, $astronaut);
         }
     }
 
@@ -147,7 +147,7 @@ trait ActionTrait {
         $currentAction->addModuleId = $id;
         $currentAction->removeModuleId = $id;
         $currentAction->remainingCost = $module->cost;
-        $currentAction->workerSpot = $module->locationArg;
+        $currentAction->astronautSpot = $module->locationArg;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
         self::notifyAllPlayers('log', clienttranslate('${player_name} chooses a module to deploy ${module_image}'), [
@@ -158,11 +158,11 @@ trait ActionTrait {
             'preserve' => ['module'],
         ]);
 
-        $this->gamestate->nextState($module->color == BLUE_OR_ORANGE ? 'chooseRadarColor' : 'pay');
+        $this->gamestate->nextState($module->color == BLUE_OR_ORANGE ? 'chooseCommunicationColor' : 'pay');
     }
 
-    public function chooseRadarColor(int $color) {
-        self::checkAction('chooseRadarColor');
+    public function chooseCommunicationColor(int $color) {
+        self::checkAction('chooseCommunicationColor');
 
         if (!in_array($color, [BLUE, ORANGE])) {
             throw new BgaUserException("Invalid color");
@@ -171,14 +171,14 @@ trait ActionTrait {
         $playerId = intval($this->getActivePlayerId());
         $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
 
-        $radarModules = $this->getModulesByLocation('radar');
+        $communicationModules = $this->getModulesByLocation('communication');
         $module = $this->getModuleById($currentAction->removeModuleId);
-        $module = $this->array_find($radarModules, fn($t) => $t->color == $color && $t->researchPoints == $module->researchPoints);
+        $module = $this->array_find($communicationModules, fn($t) => $t->color == $color && $t->researchPoints == $module->researchPoints);
 
         $currentAction->addModuleId = $module->id;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
-        self::notifyAllPlayers('log', clienttranslate('${player_name} chooses a ${color} radar to replace the selected module ${module_image}'), [
+        self::notifyAllPlayers('log', clienttranslate('${player_name} chooses a ${color} communication to replace the selected module ${module_image}'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
             'module' => $module,
@@ -200,7 +200,7 @@ trait ActionTrait {
         $currentAction = new CurrentAction('experiment');
         $currentAction->experiment = $id;
         $currentAction->remainingCost = $module->cost;
-        $currentAction->workerSpot = ($module->locationArg + $this->getArm()) % 8;
+        $currentAction->astronautSpot = ($module->locationArg + $this->getArm()) % 8;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
         self::notifyAllPlayers('log', clienttranslate('${player_name} chooses an experiment to deploy ${experiment_image}'), [
@@ -266,13 +266,13 @@ trait ActionTrait {
     public function endTurn() {
         self::checkAction('endTurn');
 
-        $worker = $this->getSelectedWorker();
-        if ($worker == null) {
-            throw new BgaUserException("No active worker");
+        $astronaut = $this->getSelectedAstronaut();
+        if ($astronaut == null) {
+            throw new BgaUserException("No active astronaut");
         }
 
         $playerId = intval($this->getActivePlayerId());
-        $this->applyEndOfActivation($playerId, $worker);
+        $this->applyEndOfActivation($playerId, $astronaut);
     }
 
     public function confirmTurn() {
@@ -281,125 +281,125 @@ trait ActionTrait {
         $this->gamestate->nextState('endTurn');
     }
 
-    private function applyEndOfActivation(int $playerId, Worker $worker) {
-        if ($worker->remainingWorkforce > 0) {
-            $this->DbQuery("UPDATE worker SET `remaining_workforce` = 0 WHERE `id` = $worker->id");
+    private function applyEndOfActivation(int $playerId, Astronaut $astronaut) {
+        if ($astronaut->remainingWorkforce > 0) {
+            $this->DbQuery("UPDATE astronaut SET `remaining_workforce` = 0 WHERE `id` = $astronaut->id");
         }
 
-        self::notifyAllPlayers('disableWorker', '', [
+        self::notifyAllPlayers('disableAstronaut', '', [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'worker' => $worker,
+            'astronaut' => $astronaut,
         ]);
 
         $this->gamestate->nextState('endTurn');
     }
 
-    public function upgradeWorker(int $id) {
-        self::checkAction('upgradeWorker');
+    public function upgradeAstronaut(int $id) {
+        self::checkAction('upgradeAstronaut');
 
         $playerId = intval($this->getActivePlayerId());
 
-        $args = $this->argUpgradeWorker();
-        $worker = $this->array_find($args['workers'], fn($worker) => $worker->id == $id);
+        $args = $this->argUpgradeAstronaut();
+        $astronaut = $this->array_find($args['astronauts'], fn($astronaut) => $astronaut->id == $id);
 
-        if ($worker == null || $worker->workforce >= 4) {
-            throw new BgaUserException("Invalid worker");
+        if ($astronaut == null || $astronaut->workforce >= 4) {
+            throw new BgaUserException("Invalid astronaut");
         }        
         
         $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
         $currentAction->upgrade--;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
-        $this->DbQuery("UPDATE worker SET `workforce` = `workforce` + 1 WHERE `id` = $worker->id");
-        if ($worker->remainingWorkforce > 0) {
-            $this->DbQuery("UPDATE worker SET `remaining_workforce` = `remaining_workforce` + 1 WHERE `id` = $worker->id");
+        $this->DbQuery("UPDATE astronaut SET `workforce` = `workforce` + 1 WHERE `id` = $astronaut->id");
+        if ($astronaut->remainingWorkforce > 0) {
+            $this->DbQuery("UPDATE astronaut SET `remaining_workforce` = `remaining_workforce` + 1 WHERE `id` = $astronaut->id");
         }
-        $worker->workforce++;
+        $astronaut->workforce++;
 
-        self::notifyAllPlayers('upgradeWorker', clienttranslate('${player_name} upgrades a worker workforce from ${from} to ${to}'), [
+        self::notifyAllPlayers('upgradeAstronaut', clienttranslate('${player_name} upgrades a astronaut workforce from ${from} to ${to}'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'worker' => $worker,
-            'from' => $worker->workforce - 1, // for logs
-            'to' => $worker->workforce, // for logs
+            'astronaut' => $astronaut,
+            'from' => $astronaut->workforce - 1, // for logs
+            'to' => $astronaut->workforce, // for logs
         ]);
 
         $this->gamestate->nextState($currentAction->upgrade > 0 ? 'stay' : 'endTurn');
     }
 
-    public function moveWorker(int $x, int $y) {
-        self::checkAction('moveWorker');
+    public function moveAstronaut(int $x, int $y) {
+        self::checkAction('moveAstronaut');
 
         $playerId = intval($this->getCurrentPlayerId());
-        $arg = $this->argMoveWorker($playerId);
-        $worker = $arg['worker'];
+        $arg = $this->argMoveAstronaut($playerId);
+        $astronaut = $arg['astronaut'];
 
         if (!$this->array_some($arg['possibleCoordinates'], fn($coordinate) => $coordinate[0] == $x && $coordinate[1] == $y)) {
             throw new BgaUserException("Invalid coordinate");
         }
-        $movedWorkers = $this->getGlobalVariable(MOVED_WORKERS);
-        $movedWorker = $this->array_find($movedWorkers, fn($w) => ((object)$w)->id == ((object)$worker)->id);
-        $movedWorker->x = $x;
-        $movedWorker->y = $y;
-        $this->setGlobalVariable(MOVED_WORKERS, $movedWorkers);
+        $movedAstronauts = $this->getGlobalVariable(MOVED_ASTRONAUTS);
+        $movedAstronaut = $this->array_find($movedAstronauts, fn($w) => ((object)$w)->id == ((object)$astronaut)->id);
+        $movedAstronaut->x = $x;
+        $movedAstronaut->y = $y;
+        $this->setGlobalVariable(MOVED_ASTRONAUTS, $movedAstronauts);
 
-        self::notifyAllPlayers('moveWorker', '', [
+        self::notifyAllPlayers('moveAstronaut', '', [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'worker' => $movedWorker,
+            'astronaut' => $movedAstronaut,
             'toConfirm' => true,
         ]);
 
-        $remaining = count(array_filter($arg['playerMovedWorkers'], fn($w) => $w->x === null)) > 1;
+        $remaining = count(array_filter($arg['playerMovedAstronauts'], fn($w) => $w->x === null)) > 1;
 
         $this->gamestate->nextPrivateState($playerId, $remaining ? 'stay' : 'next');
     }
 
-    public function confirmMoveWorkers() {
-        self::checkAction('confirmMoveWorkers');
+    public function confirmMoveAstronauts() {
+        self::checkAction('confirmMoveAstronauts');
 
         $playerId = intval($this->getCurrentPlayerId());
 
-        $movedWorkers = $this->getGlobalVariable(MOVED_WORKERS);
-        $playerMovedWorkers = array_values(array_filter($movedWorkers, fn($worker) => $worker->playerId == $playerId));
+        $movedAstronauts = $this->getGlobalVariable(MOVED_ASTRONAUTS);
+        $playerMovedAstronauts = array_values(array_filter($movedAstronauts, fn($astronaut) => $astronaut->playerId == $playerId));
 
-        foreach ($playerMovedWorkers as $worker) {
-            $this->DbQuery("UPDATE worker SET `location` = 'player', `spot` = null, `x` = $worker->x, `y` = $worker->y WHERE `id` = $worker->id");
+        foreach ($playerMovedAstronauts as $astronaut) {
+            $this->DbQuery("UPDATE astronaut SET `location` = 'player', `spot` = null, `x` = $astronaut->x, `y` = $astronaut->y WHERE `id` = $astronaut->id");
         }
 
-        self::notifyAllPlayers('confirmMoveWorkers', '', [
+        self::notifyAllPlayers('confirmMoveAstronauts', '', [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'workers' => $playerMovedWorkers,
+            'astronauts' => $playerMovedAstronauts,
         ]);
 
         $this->gamestate->setPlayerNonMultiactive($playerId, 'next');
     }
 
-    public function restartMoveWorkers() {
-        self::checkAction('restartMoveWorkers');
+    public function restartMoveAstronauts() {
+        self::checkAction('restartMoveAstronauts');
 
         $playerId = intval($this->getCurrentPlayerId());
 
-        $movedWorkers = $this->getGlobalVariable(MOVED_WORKERS);
-        $playerMovedWorkers = array_values(array_filter($movedWorkers, fn($worker) => $worker->playerId == $playerId));
+        $movedAstronauts = $this->getGlobalVariable(MOVED_ASTRONAUTS);
+        $playerMovedAstronauts = array_values(array_filter($movedAstronauts, fn($astronaut) => $astronaut->playerId == $playerId));
 
-        foreach ($playerMovedWorkers as $worker) {
-            if ($worker->x !== null) {
-                $movedWorker = $this->array_find($movedWorkers, fn($w) => ((object)$w)->id == ((object)$worker)->id);
-                $movedWorker->x = null;
-                $movedWorker->y = null;
+        foreach ($playerMovedAstronauts as $astronaut) {
+            if ($astronaut->x !== null) {
+                $movedAstronaut = $this->array_find($movedAstronauts, fn($w) => ((object)$w)->id == ((object)$astronaut)->id);
+                $movedAstronaut->x = null;
+                $movedAstronaut->y = null;
 
-                self::notifyAllPlayers('moveWorker', '', [
+                self::notifyAllPlayers('moveAstronaut', '', [
                     'playerId' => $playerId,
                     'player_name' => $this->getPlayerName($playerId),
-                    'worker' => $movedWorker,
+                    'astronaut' => $movedAstronaut,
                     'toConfirm' => false,
                 ]);
             }
         }
-        $this->setGlobalVariable(MOVED_WORKERS, $movedWorkers);
+        $this->setGlobalVariable(MOVED_ASTRONAUTS, $movedAstronauts);
 
         $this->gamestate->nextPrivateState($playerId, 'restart');
     }
@@ -419,7 +419,7 @@ trait ActionTrait {
             $this->DbQuery("UPDATE `experiment` SET `card_location` = '$experiment->location', `card_location_arg` = $experiment->locationArg, `line` = NULL WHERE `card_id` = $experiment->id");
         }
        
-        $this->DbQuery("UPDATE `module` SET `card_location` = 'radar' WHERE `card_type` = 8 && `card_location` = 'player' AND `card_location_arg` = $playerId");
+        $this->DbQuery("UPDATE `module` SET `card_location` = 'communication' WHERE `card_type` = 8 && `card_location` = 'player' AND `card_location_arg` = $playerId");
         foreach ($undo->modules as $module) {            
             $this->DbQuery("UPDATE `module` SET `card_location` = '$module->location', `card_location_arg` = $module->locationArg, `x` = $module->x, `y` = $module->y, `r` = $module->r WHERE `card_id` = $module->id");
         }
@@ -427,8 +427,8 @@ trait ActionTrait {
             $this->DbQuery("UPDATE `experiment` SET `card_location` = '$module->experiment', `card_location_arg` = $experiment->locationArg, `line` = $experiment->line WHERE `card_id` = $experiment->id");
         }
 
-        foreach ($undo->workers as $worker) {
-            $this->DbQuery("UPDATE worker SET `location` = '$worker->location', `workforce` = $worker->workforce, `remaining_workforce` = $worker->remainingWorkforce, `spot` = ".($worker->spot === null ? 'NULL' : $worker->spot).", `x` = ".($worker->x === null ? 'NULL' : $worker->x).", `y` = ".($worker->y === null ? 'NULL' : $worker->y)." WHERE `id` = $worker->id");
+        foreach ($undo->astronauts as $astronaut) {
+            $this->DbQuery("UPDATE astronaut SET `location` = '$astronaut->location', `workforce` = $astronaut->workforce, `remaining_workforce` = $astronaut->remainingWorkforce, `spot` = ".($astronaut->spot === null ? 'NULL' : $astronaut->spot).", `x` = ".($astronaut->x === null ? 'NULL' : $astronaut->x).", `y` = ".($astronaut->y === null ? 'NULL' : $astronaut->y)." WHERE `id` = $astronaut->id");
         }
 
         $this->DbQuery("UPDATE player SET `player_vp` = $undo->vp, `player_research_points` = $undo->researchPoints, `player_science` = $undo->science WHERE `player_id` = $playerId");
