@@ -2096,13 +2096,13 @@ var ExperimentsManager = /** @class */ (function (_super) {
     };
     return ExperimentsManager;
 }(CardManager));
-var ObjectivesManager = /** @class */ (function (_super) {
-    __extends(ObjectivesManager, _super);
-    function ObjectivesManager(game) {
+var MissionsManager = /** @class */ (function (_super) {
+    __extends(MissionsManager, _super);
+    function MissionsManager(game) {
         var _this = _super.call(this, game, {
-            getId: function (card) { return "objective-".concat(card.id); },
+            getId: function (card) { return "mission-".concat(card.id); },
             setupDiv: function (card, div) {
-                div.classList.add('objective');
+                div.classList.add('mission');
                 game.setTooltip(div.id, _this.getTooltip(card));
                 div.dataset.type = '' + card.type;
             },
@@ -2115,9 +2115,9 @@ var ObjectivesManager = /** @class */ (function (_super) {
         _this.game = game;
         return _this;
     }
-    ObjectivesManager.prototype.getTooltip = function (objective) {
+    MissionsManager.prototype.getTooltip = function (mission) {
         var message = 'TODO';
-        switch (objective.number) {
+        switch (mission.number) {
             case 1:
                 message = _("(+2) if you have 1 or 3 orange cards.");
                 break;
@@ -2163,11 +2163,11 @@ var ObjectivesManager = /** @class */ (function (_super) {
         }
         return message;
     };
-    ObjectivesManager.prototype.getHtml = function (module) {
-        var html = "<div class=\"card objective\" data-side=\"front\" data-type=\"".concat(module.type, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(module.number, "\">\n                </div>\n                <div class=\"card-side back\">\n                </div>\n            </div>\n        </div>");
+    MissionsManager.prototype.getHtml = function (module) {
+        var html = "<div class=\"card mission\" data-side=\"front\" data-type=\"".concat(module.type, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(module.number, "\">\n                </div>\n                <div class=\"card-side back\">\n                </div>\n            </div>\n        </div>");
         return html;
     };
-    return ObjectivesManager;
+    return MissionsManager;
 }(CardManager));
 var TableCenter = /** @class */ (function () {
     function TableCenter(game, gamedatas) {
@@ -2250,12 +2250,12 @@ var ResearchBoard = /** @class */ (function () {
         });
         this.moveVP();
         this.moveResearch();
-        this.objectives = new SlotStock(this.game.objectivesManager, document.getElementById("objectives"), {
+        this.missions = new SlotStock(this.game.missionsManager, document.getElementById("missions"), {
             slotsIds: [1, 2, 3],
             mapCardToSlot: function (card) { return card.locationArg; },
         });
-        this.objectives.addCards(gamedatas.tableObjectives);
-        this.setObjectiveScienceTokens();
+        this.missions.addCards(gamedatas.tableMissions);
+        this.setMissionScienceTokens();
     }
     ResearchBoard.prototype.getVPCoordinates = function (points) {
         var cases = Math.min(points, 40);
@@ -2370,17 +2370,17 @@ var ResearchBoard = /** @class */ (function () {
     ResearchBoard.prototype.getResearchPoints = function (playerId) {
         return this.sciencePoints.get(playerId);
     };
-    ResearchBoard.prototype.resetObjectives = function (objectives) {
-        this.objectives.removeAll();
-        this.objectives.addCards(objectives);
-        this.setObjectiveScienceTokens();
+    ResearchBoard.prototype.resetMissions = function (missions) {
+        this.missions.removeAll();
+        this.missions.addCards(missions);
+        this.setMissionScienceTokens();
     };
-    ResearchBoard.prototype.setObjectiveScienceTokens = function () {
-        this.objectives.getCards().forEach(function (objective) {
+    ResearchBoard.prototype.setMissionScienceTokens = function () {
+        this.missions.getCards().forEach(function (mission) {
             var token = document.createElement('div');
-            token.id = "objective-science-token-".concat(objective.id);
-            token.classList.add('science', 'icon', 'objective-science-token');
-            token.dataset.slotId = "".concat(objective.locationArg);
+            token.id = "mission-science-token-".concat(mission.id);
+            token.classList.add('science', 'icon', 'mission-science-token');
+            token.dataset.slotId = "".concat(mission.locationArg);
             document.getElementById('research-board').appendChild(token);
         });
     };
@@ -2418,7 +2418,7 @@ var PlayerTable = /** @class */ (function () {
         this.experimentsLines = [];
         this.playerId = Number(player.id);
         this.currentPlayer = this.playerId == this.game.getPlayerId();
-        var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.playerId, "-modules\" class=\"modules\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-experiments-lines\" class=\"experiments-lines\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-objective\" class=\"objective\"></div>\n        </div>\n        ");
+        var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.playerId, "-modules\" class=\"modules\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-experiments-lines\" class=\"experiments-lines\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-mission\" class=\"mission\"></div>\n        </div>\n        ");
         dojo.place(html, document.getElementById('tables'));
         var playerWorkers = player.workers.filter(function (worker) { return worker.location == 'player'; });
         var slotsIds = [];
@@ -2452,9 +2452,9 @@ var PlayerTable = /** @class */ (function () {
         player.modules.filter(function (module) { return module.type == 9; }).forEach(function (module) { return _this.game.modulesManager.getCardElement(module).dataset.playerColor = player.color; });
         this.voidStock = new VoidStock(this.game.modulesManager, document.getElementById("player-table-".concat(this.playerId, "-name")));
         player.experiments.forEach(function (experiment) { return _this.addExperiment(experiment); });
-        var objectiveDiv = document.getElementById("player-table-".concat(this.playerId, "-objective"));
-        this.objectives = new LineStock(this.game.objectivesManager, objectiveDiv);
-        this.objectives.addCards(player.objectives);
+        var missionDiv = document.getElementById("player-table-".concat(this.playerId, "-mission"));
+        this.missions = new LineStock(this.game.missionsManager, missionDiv);
+        this.missions.addCards(player.missions);
         playerWorkers.forEach(function (worker) {
             modulesDiv.querySelector("[data-slot-id=\"".concat(worker.x, "_").concat(worker.y, "\"]")).appendChild(_this.game.createWorker(worker));
             if (!worker.remainingWorkforce) {
@@ -2611,12 +2611,12 @@ var PlayerTable = /** @class */ (function () {
         this.experimentsLines = [];
         experiments.forEach(function (experiment) { return _this.addExperiment(experiment); });
     };
-    PlayerTable.prototype.resetObjectives = function (objectives) {
-        this.objectives.removeAll();
-        this.objectives.addCards(objectives);
+    PlayerTable.prototype.resetMissions = function (missions) {
+        this.missions.removeAll();
+        this.missions.addCards(missions);
     };
-    PlayerTable.prototype.addObjective = function (objective) {
-        return this.objectives.addCard(objective);
+    PlayerTable.prototype.addMission = function (mission) {
+        return this.missions.addCard(mission);
     };
     return PlayerTable;
 }());
@@ -2656,7 +2656,7 @@ var Humanity = /** @class */ (function () {
         log('gamedatas', gamedatas);
         this.modulesManager = new ModulesManager(this);
         this.experimentsManager = new ExperimentsManager(this);
-        this.objectivesManager = new ObjectivesManager(this);
+        this.missionsManager = new MissionsManager(this);
         this.animationManager = new AnimationManager(this);
         new JumpToManager(this, {
             localStorageFoldedKey: LOCAL_STORAGE_JUMP_TO_FOLDED_KEY,
@@ -2994,16 +2994,16 @@ var Humanity = /** @class */ (function () {
         this.researchBoard.setResearchPoints(playerId, count);
     };
     Humanity.prototype.getHelpHtml = function () {
-        var html = "\n        <div id=\"help-popin\">\n            <h1>".concat(_("Assets"), "</h2>\n            <div class=\"help-section\">\n                <div class=\"icon vp\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Victory Point</strong>. The player moves their token forward 1 space on the Score Track."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon recruit\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Recruit</strong>: The player adds 1 Recruit token to their ship."), " ").concat(_("It is not possible to have more than 3."), " ").concat(_("A recruit allows a player to draw the Viking card of their choice when Recruiting or replaces a Viking card during Exploration."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon bracelet\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Silver Bracelet</strong>: The player adds 1 Silver Bracelet token to their ship."), " ").concat(_("It is not possible to have more than 3."), " ").concat(_("They are used for Trading."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon research\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Research Point</strong>: The player moves their token forward 1 space on the Research Track."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon take-card\"></div>\n                <div class=\"help-label\">").concat(_("Draw <strong>the first Viking card</strong> from the deck: It is placed in the player’s Crew Zone (without taking any assets)."), "</div>\n            </div>\n\n            <h1>").concat(_("Powers of the objectives (variant option)"), "</h1>\n        ");
+        var html = "\n        <div id=\"help-popin\">\n            <h1>".concat(_("Assets"), "</h2>\n            <div class=\"help-section\">\n                <div class=\"icon vp\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Victory Point</strong>. The player moves their token forward 1 space on the Score Track."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon recruit\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Recruit</strong>: The player adds 1 Recruit token to their ship."), " ").concat(_("It is not possible to have more than 3."), " ").concat(_("A recruit allows a player to draw the Viking card of their choice when Recruiting or replaces a Viking card during Exploration."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon bracelet\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Silver Bracelet</strong>: The player adds 1 Silver Bracelet token to their ship."), " ").concat(_("It is not possible to have more than 3."), " ").concat(_("They are used for Trading."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon research\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Research Point</strong>: The player moves their token forward 1 space on the Research Track."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon take-card\"></div>\n                <div class=\"help-label\">").concat(_("Draw <strong>the first Viking card</strong> from the deck: It is placed in the player’s Crew Zone (without taking any assets)."), "</div>\n            </div>\n\n            <h1>").concat(_("Powers of the missions (variant option)"), "</h1>\n        ");
         for (var i = 1; i <= 7; i++) {
-            html += "\n            <div class=\"help-section\">\n                <div id=\"help-objective-".concat(i, "\"></div>\n                <div>").concat(this.objectivesManager.getTooltip(i), "</div>\n            </div> ");
+            html += "\n            <div class=\"help-section\">\n                <div id=\"help-mission-".concat(i, "\"></div>\n                <div>").concat(this.missionsManager.getTooltip(i), "</div>\n            </div> ");
         }
         html += "</div>";
         return html;
     };
     Humanity.prototype.populateHelp = function () {
         for (var i = 1; i <= 7; i++) {
-            this.objectivesManager.setForHelp(i, "help-objective-".concat(i));
+            this.missionsManager.setForHelp(i, "help-mission-".concat(i));
         }
     };
     Humanity.prototype.onTableExperimentClick = function (experiment) {
@@ -3165,7 +3165,7 @@ var Humanity = /** @class */ (function () {
             ['reactivateWorkers', ANIMATION_MS],
             ['upgradeWorker', 50],
             ['year', ANIMATION_MS],
-            ['gainObjective', undefined],
+            ['gainMission', undefined],
             ['moveWorker', ANIMATION_MS],
             ['confirmMoveWorkers', 1],
             ['restartTurn', 1],
@@ -3280,21 +3280,21 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_year = function (args) {
         this.yearCounter.toValue(+args.year);
     };
-    Humanity.prototype.notif_gainObjective = function (args) {
+    Humanity.prototype.notif_gainMission = function (args) {
         var _a;
-        var playerId = args.playerId, objective = args.objective, fromPlayerId = args.fromPlayerId;
+        var playerId = args.playerId, mission = args.mission, fromPlayerId = args.fromPlayerId;
         if (fromPlayerId === null) {
-            (_a = document.getElementById("objective-science-token-".concat(objective.id))) === null || _a === void 0 ? void 0 : _a.remove();
+            (_a = document.getElementById("mission-science-token-".concat(mission.id))) === null || _a === void 0 ? void 0 : _a.remove();
         }
-        return this.getPlayerTable(playerId).addObjective(objective);
+        return this.getPlayerTable(playerId).addMission(mission);
     };
     Humanity.prototype.notif_restartTurn = function (args) {
         var _this = this;
         var playerId = args.playerId, undo = args.undo;
         this.tableCenter.resetModules(undo.tableModules);
         this.tableCenter.newExperiments(undo.tableExperiments);
-        this.researchBoard.resetObjectives(undo.allObjectives.filter(function (objective) { return objective.location == 'table'; }));
-        this.playersTables.forEach(function (playerTable) { return playerTable.resetObjectives(undo.allObjectives.filter(function (objective) { return objective.location == 'player' && objective.locationArg == playerTable.playerId; })); });
+        this.researchBoard.resetMissions(undo.allMissions.filter(function (mission) { return mission.location == 'table'; }));
+        this.playersTables.forEach(function (playerTable) { return playerTable.resetMissions(undo.allMissions.filter(function (mission) { return mission.location == 'player' && mission.locationArg == playerTable.playerId; })); });
         var table = this.getPlayerTable(playerId);
         table.resetModules(undo.modules);
         table.resetExperiments(undo.experiments);
@@ -3375,11 +3375,11 @@ var Humanity = /** @class */ (function () {
                 if (args.experiment_image === '' && args.experiment) {
                     args.experiment_image = "<div class=\"log-image\">".concat(this.experimentsManager.getHtml(args.experiment), "</div>");
                 }
-                if (args.objective_image === '' && args.objective) {
-                    args.objective_image = "<div class=\"log-image\">".concat(this.objectivesManager.getHtml(args.objective), "</div>");
+                if (args.mission_image === '' && args.mission) {
+                    args.mission_image = "<div class=\"log-image\">".concat(this.missionsManager.getHtml(args.mission), "</div>");
                 }
                 /* TODO DELETE ? for (const property in args) {
-                    if (['number', 'color', 'card_color', 'card_type', 'objective_name'].includes(property) && args[property][0] != '<') {
+                    if (['number', 'color', 'card_color', 'card_type', 'mission_name'].includes(property) && args[property][0] != '<') {
                         args[property] = `<strong>${_(args[property])}</strong>`;
                     }
                 }*/

@@ -21,7 +21,7 @@ class PlayerTable {
     public voidStock: VoidStock<Module>;
     public modules: ModuleStock;
     public experimentsLines: SlotStock<Experiment>[] = [];
-    public objectives: LineStock<Objective>;
+    public missions: LineStock<Mission>;
 
     private currentPlayer: boolean;
     private moduleMinX: number;
@@ -38,7 +38,7 @@ class PlayerTable {
             <div id="player-table-${this.playerId}-name" class="name-wrapper">${player.name}</div>
             <div id="player-table-${this.playerId}-modules" class="modules"></div>
             <div id="player-table-${this.playerId}-experiments-lines" class="experiments-lines"></div>
-            <div id="player-table-${this.playerId}-objective" class="objective"></div>
+            <div id="player-table-${this.playerId}-mission" class="mission"></div>
         </div>
         `;
 
@@ -81,9 +81,9 @@ class PlayerTable {
           
         player.experiments.forEach(experiment => this.addExperiment(experiment));
         
-        const objectiveDiv = document.getElementById(`player-table-${this.playerId}-objective`);
-        this.objectives = new LineStock<Objective>(this.game.objectivesManager, objectiveDiv);
-        this.objectives.addCards(player.objectives);
+        const missionDiv = document.getElementById(`player-table-${this.playerId}-mission`);
+        this.missions = new LineStock<Mission>(this.game.missionsManager, missionDiv);
+        this.missions.addCards(player.missions);
 
         playerWorkers.forEach(worker => {
             modulesDiv.querySelector(`[data-slot-id="${worker.x}_${worker.y}"]`).appendChild(this.game.createWorker(worker));
@@ -262,12 +262,12 @@ class PlayerTable {
         experiments.forEach(experiment => this.addExperiment(experiment));
     }
     
-    public resetObjectives(objectives: Objective[]) {
-        this.objectives.removeAll();
-        this.objectives.addCards(objectives);
+    public resetMissions(missions: Mission[]) {
+        this.missions.removeAll();
+        this.missions.addCards(missions);
     }
 
-    public addObjective(objective: Objective): Promise<any> {
-        return this.objectives.addCard(objective);
+    public addMission(mission: Mission): Promise<any> {
+        return this.missions.addCard(mission);
     }
 }

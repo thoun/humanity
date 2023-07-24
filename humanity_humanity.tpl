@@ -11,7 +11,7 @@
                 <div id="table-workers"></div>
             </div>
             <div id="research-board">
-                <div id="objectives"></div>
+                <div id="missions"></div>
             </div>
         </div>
         <div id="tables"></div>

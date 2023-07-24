@@ -35,7 +35,7 @@ interface Experiment {
     line?: number;
 }
 
-interface Objective {
+interface Mission {
     id: number;
     location: string;
     locationArg: number;
@@ -72,7 +72,7 @@ interface HumanityPlayer extends Player {
     researchPoints: number;
     vp: number;
     science?: number;
-    objectives: Objective[];
+    missions: Mission[];
 
     icons: Icons;
 }
@@ -92,7 +92,7 @@ interface HumanityGamedatas {
     // Add here variables you set up in getAllDatas
     tableModules: Module[];
     tableExperiments: Experiment[];
-    tableObjectives: Objective[];
+    tableMissions: Mission[];
     arm: number;
     year: number;
     firstPlayerId: number;
@@ -104,7 +104,7 @@ interface HumanityGamedatas {
 interface HumanityGame extends Game {
     modulesManager: ModulesManager;
     experimentsManager: ExperimentsManager;
-    objectivesManager: ObjectivesManager;
+    missionsManager: MissionsManager;
 
     getPlayerId(): number;
     getPlayer(playerId: number): HumanityPlayer;
@@ -228,10 +228,10 @@ interface NotifYearArgs {
     year: number | string;
 }
 
-// gainObjective
-interface NotifGainObjectiveArgs {
+// gainMission
+interface NotifGainMissionArgs {
     playerId: number;
-    objective: Objective;
+    mission: Mission;
     fromPlayerId: number | null;
 }
 
@@ -244,7 +244,7 @@ interface Undo {
     science: number;
     tableModules: Module[];
     tableExperiments: Experiment[];
-    allObjectives: Objective[];
+    allMissions: Mission[];
 }
 
 // restartTurn

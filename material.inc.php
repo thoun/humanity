@@ -22,7 +22,7 @@
 require_once(__DIR__.'/modules/php/constants.inc.php');
 require_once(__DIR__.'/modules/php/objects/module.php');
 require_once(__DIR__.'/modules/php/objects/experiment.php');
-require_once(__DIR__.'/modules/php/objects/objective.php');
+require_once(__DIR__.'/modules/php/objects/mission.php');
 
 $this->STARTING_TILE_POSITIONS = [
     1 => [-1, 0],
@@ -151,34 +151,34 @@ $this->TILES = [ //public int $type; // 0 start, 1..3 year, 8 communication, 9 o
     ],
 ];
 
-$this->OBJECTIVES = [
+$this->MISSIONS = [
     1 => [
-        1 => new ObjectiveTypeA(4, ORANGE, true),
-        2 => new ObjectiveTypeA(3, BLUE, true),
-        3 => new ObjectiveTypeA(3, PURPLE, true, true),
+        1 => new MissionTypeA(4, ORANGE, true),
+        2 => new MissionTypeA(3, BLUE, true),
+        3 => new MissionTypeA(3, PURPLE, true, true),
 
-        4 => new ObjectiveTypeA(6, ORANGE, false),
-        5 => new ObjectiveTypeA(4, BLUE, false),
-        6 => new ObjectiveTypeA(3, PURPLE, false),
+        4 => new MissionTypeA(6, ORANGE, false),
+        5 => new MissionTypeA(4, BLUE, false),
+        6 => new MissionTypeA(3, PURPLE, false),
     ],
 
     2 => [
-        1 => new ObjectiveTypeB(4, VERTICAL, false),
-        2 => new ObjectiveTypeB(5, HORIZONTAL, false),
-        3 => new ObjectiveTypeB(4, DIAGONAL, false),
+        1 => new MissionTypeB(4, VERTICAL, false),
+        2 => new MissionTypeB(5, HORIZONTAL, false),
+        3 => new MissionTypeB(4, DIAGONAL, false),
 
-        4 => new ObjectiveTypeB(3, VERTICAL, true),
-        5 => new ObjectiveTypeB(3, HORIZONTAL, true),
-        6 => new ObjectiveTypeB(3, DIAGONAL, true),
+        4 => new MissionTypeB(3, VERTICAL, true),
+        5 => new MissionTypeB(3, HORIZONTAL, true),
+        6 => new MissionTypeB(3, DIAGONAL, true),
     ],
 
     3 => [
-        1 => new ObjectiveTypeC(4, ICE, null),
-        2 => new ObjectiveTypeC(4, METHAN, null),
-        3 => new ObjectiveTypeC(4, INSECT, null),
+        1 => new MissionTypeC(4, ICE, null),
+        2 => new MissionTypeC(4, METHAN, null),
+        3 => new MissionTypeC(4, INSECT, null),
 
-        4 => new ObjectiveTypeC(3, null, LEFT),
-        5 => new ObjectiveTypeC(3, null, CENTRAL),
-        6 => new ObjectiveTypeC(3, null, RIGHT),
+        4 => new MissionTypeC(3, null, LEFT),
+        5 => new MissionTypeC(3, null, CENTRAL),
+        6 => new MissionTypeC(3, null, RIGHT),
     ],
 ];

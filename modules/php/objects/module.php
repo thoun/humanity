@@ -70,15 +70,15 @@ class Module extends ModuleType {
         $this->r = array_key_exists('r', $dbCard) ? intval($dbCard['r']) : null;
 
         if ($this->number !== null) {
-            $objectiveType = $TILES[$this->type][$this->number];
-            $this->color = $objectiveType->color;      
-            $this->cost = $objectiveType->cost;
-            $this->workforce = $objectiveType->workforce;
-            $this->production = $objectiveType->production;
-            $this->adjacentResearchPoints = $objectiveType->adjacentResearchPoints;
-            $this->researchPoints = $objectiveType->researchPoints;
-            $this->points = $objectiveType->points;
-            $this->matchType = $objectiveType->matchType;
+            $missionType = $TILES[$this->type][$this->number];
+            $this->color = $missionType->color;      
+            $this->cost = $missionType->cost;
+            $this->workforce = $missionType->workforce;
+            $this->production = $missionType->production;
+            $this->adjacentResearchPoints = $missionType->adjacentResearchPoints;
+            $this->researchPoints = $missionType->researchPoints;
+            $this->points = $missionType->points;
+            $this->matchType = $missionType->matchType;
         }
     } 
 

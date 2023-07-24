@@ -1,20 +1,20 @@
 <?php
 
-trait ObjectiveTrait {
+trait MissionTrait {
 
-    function getObjectiveFromDb(/*?array*/ $dbCard) {
+    function getMissionFromDb(/*?array*/ $dbCard) {
         if ($dbCard == null) {
             return null;
         }
-        return new Objective($dbCard, $this->OBJECTIVES);
+        return new Mission($dbCard, $this->MISSIONS);
     }
 
-    function getObjectivesFromDb(array $dbCards) {
-        return array_map(fn($dbCard) => $this->getObjectiveFromDb($dbCard), array_values($dbCards));
+    function getMissionsFromDb(array $dbCards) {
+        return array_map(fn($dbCard) => $this->getMissionFromDb($dbCard), array_values($dbCards));
     }
 
-    function getObjectivesByLocation(?string $location = null, ?int $location_arg = null, ?int $type = null, ?int $number = null) {
-        $sql = "SELECT * FROM `objective` WHERE";
+    function getMissionsByLocation(?string $location = null, ?int $location_arg = null, ?int $type = null, ?int $number = null) {
+        $sql = "SELECT * FROM `mission` WHERE";
         if ($location !== null) {
             $sql .= " `card_location` = '$location'";
         } else {
@@ -32,22 +32,22 @@ trait ObjectiveTrait {
         $sql .= " ORDER BY `card_location_arg`";
         $dbResults = $this->getCollectionFromDb($sql);
 
-        return array_map(fn($dbCard) => $this->getObjectiveFromDb($dbCard), array_values($dbResults));
+        return array_map(fn($dbCard) => $this->getMissionFromDb($dbCard), array_values($dbResults));
     }
 
-    function setupObjectives() {
+    function setupMissions() {
         $modules[] = ['A' => [], 'B' => [], 'C' => []];
         foreach (['A', 'B', 'C'] as $index => $letter) {
-            foreach ($this->OBJECTIVES[$index + 1] as $number => $objectiveType) {
+            foreach ($this->MISSIONS[$index + 1] as $number => $missionType) {
                 $modules[$letter][] = [ 'type' => $index + 1, 'type_arg' => $number, 'nbr' => 1 ];
             }
 
-            $this->objectives->createCards($modules[$letter], 'deck'.$letter);
-            $this->objectives->shuffle('deck'.$letter);
+            $this->missions->createCards($modules[$letter], 'deck'.$letter);
+            $this->missions->shuffle('deck'.$letter);
         }
 
         foreach (['A', 'B', 'C'] as $index => $letter) {
-            $this->objectives->pickCardForLocation('deck'.$letter, 'table', $index + 1);
+            $this->missions->pickCardForLocation('deck'.$letter, 'table', $index + 1);
         }
     }
 
@@ -135,46 +135,46 @@ trait ObjectiveTrait {
         return count(array_filter($experiments, fn($experiment) => $experiment->extremity == $extremity));
     }
     
-    function fulfillObjective(int $playerId, Objective $objective) {
-        if ($objective->color !== null) {
-            return $this->countModulesOfColor($playerId, $objective->color, $objective->adjacent, $objective->diagonal) >= $objective->minimum;
-        } else if ($objective->direction !== null) {
-            return $this->getMaxModulesInDirection($playerId, $objective->direction, $objective->sameColor) >= $objective->minimum;
-        } else if ($objective->baseType !== null) {
-            return $this->getExperimentTypeIcons($playerId, $objective->baseType) >= $objective->minimum;
-        } else if ($objective->extremity !== null) {
-            return $this->getExperimentExtremities($playerId, $objective->extremity) >= $objective->minimum;
+    function fulfillMission(int $playerId, Mission $mission) {
+        if ($mission->color !== null) {
+            return $this->countModulesOfColor($playerId, $mission->color, $mission->adjacent, $mission->diagonal) >= $mission->minimum;
+        } else if ($mission->direction !== null) {
+            return $this->getMaxModulesInDirection($playerId, $mission->direction, $mission->sameColor) >= $mission->minimum;
+        } else if ($mission->baseType !== null) {
+            return $this->getExperimentTypeIcons($playerId, $mission->baseType) >= $mission->minimum;
+        } else if ($mission->extremity !== null) {
+            return $this->getExperimentExtremities($playerId, $mission->extremity) >= $mission->minimum;
         }
         return false;
     }
     
-    function gainObjective(int $playerId, Objective $objective) {
+    function gainMission(int $playerId, Mission $mission) {
         $fromPlayerId = null;
-        if ($objective->location == 'player') {
-            $fromPlayerId = $objective->locationArg;
+        if ($mission->location == 'player') {
+            $fromPlayerId = $mission->locationArg;
         }
 
-        $this->objectives->moveCard($objective->id, 'player', $playerId);
+        $this->missions->moveCard($mission->id, 'player', $playerId);
 
         if ($fromPlayerId !== null) {
-            $this->incPlayerVP($fromPlayerId, -3, clienttranslate('${player_name} loses ${absInc} points for lost objective (to ${player_name2})'), [ 'player_name2' => $this->getPlayerName($playerId) ]);
+            $this->incPlayerVP($fromPlayerId, -3, clienttranslate('${player_name} loses ${absInc} points for lost mission (to ${player_name2})'), [ 'player_name2' => $this->getPlayerName($playerId) ]);
         } else {
-            $this->incPlayerScience($playerId, 1, clienttranslate('${player_name} gains ${inc} science point for being the first player to complete this objective'));
+            $this->incPlayerScience($playerId, 1, clienttranslate('${player_name} gains ${inc} science point for being the first player to complete this mission'));
         } 
-        $this->incPlayerVP($playerId, 3, clienttranslate('${player_name} gains ${inc} points for completed objective'));
+        $this->incPlayerVP($playerId, 3, clienttranslate('${player_name} gains ${inc} points for completed mission'));
 
         $message = $fromPlayerId === null ?
-            clienttranslate('${player_name} gains an objective card and 1 science point ${objective_image}') :
-            clienttranslate('${player_name} gains an objective card previously owned by ${player_name2} ${objective_image}');
+            clienttranslate('${player_name} gains an mission card and 1 science point ${mission_image}') :
+            clienttranslate('${player_name} gains an mission card previously owned by ${player_name2} ${mission_image}');
 
-        self::notifyAllPlayers('gainObjective', $message, [
+        self::notifyAllPlayers('gainMission', $message, [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'objective' => $objective,
+            'mission' => $mission,
             'fromPlayerId' => $fromPlayerId,
             'player_name2' => $fromPlayerId !== null ? $this->getPlayerName($fromPlayerId) : null, // for logs
-            'objective_image' => '',
-            'preserve' => ['objective'],
+            'mission_image' => '',
+            'preserve' => ['mission'],
         ]);
     }
 }

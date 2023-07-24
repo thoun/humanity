@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `experiment` (
    PRIMARY KEY (`card_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
-CREATE TABLE IF NOT EXISTS `objective` (
+CREATE TABLE IF NOT EXISTS `mission` (
    `card_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
    `card_type` tinyint(1) NOT NULL,
    `card_type_arg` tinyint(2) NOT NULL,

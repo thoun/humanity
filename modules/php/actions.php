@@ -408,8 +408,8 @@ trait ActionTrait {
         $playerId = intval($this->getActivePlayerId());
         $undo = $this->getGlobalVariable(UNDO);
 
-        foreach ($undo->allObjectives as $objective) {
-            $this->DbQuery("UPDATE `objective` SET `card_location` = '$objective->location', `card_location_arg` = $objective->locationArg WHERE `card_id` = $objective->id");
+        foreach ($undo->allMissions as $mission) {
+            $this->DbQuery("UPDATE `mission` SET `card_location` = '$mission->location', `card_location_arg` = $mission->locationArg WHERE `card_id` = $mission->id");
         }
 
         foreach ($undo->tableModules as $module) {

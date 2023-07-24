@@ -2,7 +2,7 @@
 
 require_once(__DIR__.'/../constants.inc.php');
 
-class ObjectiveType {
+class MissionType {
     public int $minimum;
     public ?int $color;
     public ?bool $adjacent;
@@ -24,25 +24,25 @@ class ObjectiveType {
     } 
 }
 
-class ObjectiveTypeA extends ObjectiveType {  
+class MissionTypeA extends MissionType {  
     public function __construct(int $minimum, ?int $color, ?bool $adjacent, bool $diagonal = false) {
         parent::__construct($minimum, $color, $adjacent, $diagonal, null, null, null, null);
     } 
 }
 
-class ObjectiveTypeB extends ObjectiveType {  
+class MissionTypeB extends MissionType {  
     public function __construct(int $minimum, ?int $direction, ?int $sameColor) {
         parent::__construct($minimum, null, null, null, $direction, $sameColor, null, null);
     } 
 }
 
-class ObjectiveTypeC extends ObjectiveType {  
+class MissionTypeC extends MissionType {  
     public function __construct(int $minimum, ?int $baseType, ?int $extremity) {
         parent::__construct($minimum, null, null, null, null, null, $baseType, $extremity);
     } 
 }
 
-class Objective extends ObjectiveType {
+class Mission extends MissionType {
 
     public int $id;
     public string $location;
@@ -50,7 +50,7 @@ class Objective extends ObjectiveType {
     public ?int $type; // A, B, C
     public ?int $number; // 1..6
 
-    public function __construct($dbCard, $OBJECTIVES) {
+    public function __construct($dbCard, $MISSIONS) {
         $this->id = intval($dbCard['card_id'] ?? $dbCard['id']);
         $this->location = $dbCard['card_location'] ?? $dbCard['location'];
         $this->locationArg = intval($dbCard['card_location_arg'] ?? $dbCard['location_arg']);
@@ -58,33 +58,33 @@ class Objective extends ObjectiveType {
         $this->number = array_key_exists('card_type_arg', $dbCard) || array_key_exists('type_arg', $dbCard) ? intval($dbCard['card_type_arg'] ?? $dbCard['type_arg']) : null;
 
         if ($this->number !== null) {
-            $objectiveType = $OBJECTIVES[$this->type][$this->number];        
-            $this->minimum = $objectiveType->minimum;
-            $this->color = $objectiveType->color;
-            $this->adjacent = $objectiveType->adjacent;
-            $this->diagonal = $objectiveType->diagonal;
-            $this->direction = $objectiveType->direction;
-            $this->sameColor = $objectiveType->sameColor;
-            $this->baseType = $objectiveType->baseType;
-            $this->extremity = $objectiveType->extremity;
+            $missionType = $MISSIONS[$this->type][$this->number];        
+            $this->minimum = $missionType->minimum;
+            $this->color = $missionType->color;
+            $this->adjacent = $missionType->adjacent;
+            $this->diagonal = $missionType->diagonal;
+            $this->direction = $missionType->direction;
+            $this->sameColor = $missionType->sameColor;
+            $this->baseType = $missionType->baseType;
+            $this->extremity = $missionType->extremity;
         }
     } 
 
-    public static function onlyId(?Objective $objective) {
-        if ($objective == null) {
+    public static function onlyId(?Mission $mission) {
+        if ($mission == null) {
             return null;
         }
         
-        return new Objective([
-            'card_id' => $objective->id,
-            'card_location' => $objective->location,
-            'card_location_arg' => $objective->locationArg,
-            'card_type' => $objective->type,
+        return new Mission([
+            'card_id' => $mission->id,
+            'card_location' => $mission->location,
+            'card_location_arg' => $mission->locationArg,
+            'card_type' => $mission->type,
         ], null);
     }
 
-    public static function onlyIds(array $objectives) {
-        return array_map(fn($objective) => self::onlyId($objective), $objectives);
+    public static function onlyIds(array $missions) {
+        return array_map(fn($mission) => self::onlyId($mission), $missions);
     }
 }
 

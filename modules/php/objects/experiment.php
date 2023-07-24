@@ -36,12 +36,12 @@ class Experiment extends ExperimentType {
         $this->line = array_key_exists('line', $dbCard) ? intval($dbCard['line']) : null;
 
         if ($this->number !== null) {
-            $objectiveType = $EXPERIMENT[$this->year][$this->number];
-            $this->extremity = $objectiveType->extremity;
-            $this->cost = $objectiveType->cost;
-            $this->researchPoints = $objectiveType->researchPoints;
-            $this->effect = $objectiveType->effect;
-            $this->points = $objectiveType->points;
+            $missionType = $EXPERIMENT[$this->year][$this->number];
+            $this->extremity = $missionType->extremity;
+            $this->cost = $missionType->cost;
+            $this->researchPoints = $missionType->researchPoints;
+            $this->effect = $missionType->effect;
+            $this->points = $missionType->points;
         }
     } 
 

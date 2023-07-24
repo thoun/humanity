@@ -1,13 +1,13 @@
-class ObjectivesManager extends CardManager<Objective> {
+class MissionsManager extends CardManager<Mission> {
     constructor (public game: HumanityGame) {
         super(game, {
-            getId: (card) => `objective-${card.id}`,
-            setupDiv: (card: Objective, div: HTMLElement) => { 
-                div.classList.add('objective');
+            getId: (card) => `mission-${card.id}`,
+            setupDiv: (card: Mission, div: HTMLElement) => { 
+                div.classList.add('mission');
                 game.setTooltip(div.id, this.getTooltip(card));
                 div.dataset.type = ''+card.type;
             },
-            setupFrontDiv: (card: Objective, div: HTMLElement) => { 
+            setupFrontDiv: (card: Mission, div: HTMLElement) => { 
                 div.dataset.number = ''+card.number;
             },
             cardWidth: 206,
@@ -15,9 +15,9 @@ class ObjectivesManager extends CardManager<Objective> {
         });
     }
 
-    private getTooltip(objective: Objective): string {
+    private getTooltip(mission: Mission): string {
         let message = 'TODO';
-        switch (objective.number) {
+        switch (mission.number) {
             case 1: message = _("(+2) if you have 1 or 3 orange cards."); break;
             case 2: message = _("(-2) if orange cards are in the scoring column with either value (1) or value (2)."); break;
             case 3: message = _("(+2) if you have 2 or 4 blue cards."); break;
@@ -38,8 +38,8 @@ class ObjectivesManager extends CardManager<Objective> {
         
     }
     
-    public getHtml(module: Objective): string {
-        let html = `<div class="card objective" data-side="front" data-type="${module.type}">
+    public getHtml(module: Mission): string {
+        let html = `<div class="card mission" data-side="front" data-type="${module.type}">
             <div class="card-sides">
                 <div class="card-side front" data-number="${module.number}">
                 </div>

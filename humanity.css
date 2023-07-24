@@ -962,48 +962,48 @@ body > .card {
   background-position-y: 75%;
 }
 
-.card.objective {
+.card.mission {
   display: inline-block;
   position: relative;
   width: 206px;
   height: 110px;
 }
-.card.objective[data-type="1"] .card-side {
+.card.mission[data-type="1"] .card-side {
   background-position-x: 0%;
 }
-.card.objective[data-type="2"] .card-side {
+.card.mission[data-type="2"] .card-side {
   background-position-x: 50%;
 }
-.card.objective[data-type="3"] .card-side {
+.card.mission[data-type="3"] .card-side {
   background-position-x: 100%;
 }
-.card.objective .card-sides .card-side {
+.card.mission .card-sides .card-side {
   box-shadow: none;
 }
-.card.objective .card-sides .card-side > * {
+.card.mission .card-sides .card-side > * {
   pointer-events: none;
   user-select: none;
 }
-.card.objective .card-sides .card-side.front {
+.card.mission .card-sides .card-side.front {
   background-size: 300% auto;
-  background-image: url("img/objectives.png");
+  background-image: url("img/missions.png");
 }
-.card.objective .card-sides .card-side.front[data-number="1"] {
+.card.mission .card-sides .card-side.front[data-number="1"] {
   background-position-y: 0%;
 }
-.card.objective .card-sides .card-side.front[data-number="2"] {
+.card.mission .card-sides .card-side.front[data-number="2"] {
   background-position-y: 20%;
 }
-.card.objective .card-sides .card-side.front[data-number="3"] {
+.card.mission .card-sides .card-side.front[data-number="3"] {
   background-position-y: 40%;
 }
-.card.objective .card-sides .card-side.front[data-number="4"] {
+.card.mission .card-sides .card-side.front[data-number="4"] {
   background-position-y: 60%;
 }
-.card.objective .card-sides .card-side.front[data-number="5"] {
+.card.mission .card-sides .card-side.front[data-number="5"] {
   background-position-y: 80%;
 }
-.card.objective .card-sides .card-side.front[data-number="6"] {
+.card.mission .card-sides .card-side.front[data-number="6"] {
   background-position-y: 100%;
 }
 
@@ -1231,36 +1231,36 @@ body > .card {
   border-radius: 50%;
   box-shadow: 0 0 5px 5px orange;
 }
-#research-board #objectives {
+#research-board #missions {
   position: absolute;
   left: 645px;
 }
-#research-board #objectives .slot {
+#research-board #missions .slot {
   position: absolute;
   left: 0;
 }
-#research-board #objectives .slot[data-slot-id="1"] {
+#research-board #missions .slot[data-slot-id="1"] {
   top: 64px;
 }
-#research-board #objectives .slot[data-slot-id="2"] {
+#research-board #missions .slot[data-slot-id="2"] {
   top: 200px;
 }
-#research-board #objectives .slot[data-slot-id="3"] {
+#research-board #missions .slot[data-slot-id="3"] {
   top: 336px;
 }
-#research-board .objective-science-token {
+#research-board .mission-science-token {
   position: absolute;
   left: 618px;
   width: 48px;
   height: 48px;
 }
-#research-board .objective-science-token[data-slot-id="1"] {
+#research-board .mission-science-token[data-slot-id="1"] {
   top: 164px;
 }
-#research-board .objective-science-token[data-slot-id="2"] {
+#research-board .mission-science-token[data-slot-id="2"] {
   top: 299px;
 }
-#research-board .objective-science-token[data-slot-id="3"] {
+#research-board .mission-science-token[data-slot-id="3"] {
   top: 433px;
 }
 
@@ -1504,10 +1504,10 @@ html, .mode_3d #game_play_area_background {
   background: url("img/first-player.png");
 }
 
-.objective-tooltip > div {
+.mission-tooltip > div {
   padding: 5px;
 }
-.objective-tooltip > div:not(:last-child) {
+.mission-tooltip > div:not(:last-child) {
   border-bottom: 1px solid gray;
 }
 

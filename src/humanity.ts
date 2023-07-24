@@ -21,7 +21,7 @@ function getCostStr(cost: Icons) {
 class Humanity implements HumanityGame {
     public modulesManager: ModulesManager;
     public experimentsManager: ExperimentsManager;
-    public objectivesManager: ObjectivesManager;
+    public missionsManager: MissionsManager;
 
     private zoomManager: ZoomManager;
     private animationManager: AnimationManager;
@@ -61,7 +61,7 @@ class Humanity implements HumanityGame {
 
         this.modulesManager = new ModulesManager(this);
         this.experimentsManager = new ExperimentsManager(this);        
-        this.objectivesManager = new ObjectivesManager(this);
+        this.missionsManager = new MissionsManager(this);
         this.animationManager = new AnimationManager(this);
         new JumpToManager(this, {
             localStorageFoldedKey: LOCAL_STORAGE_JUMP_TO_FOLDED_KEY,
@@ -503,14 +503,14 @@ class Humanity implements HumanityGame {
                 <div class="help-label">${_("Draw <strong>the first Viking card</strong> from the deck: It is placed in the player’s Crew Zone (without taking any assets).")}</div>
             </div>
 
-            <h1>${_("Powers of the objectives (variant option)")}</h1>
+            <h1>${_("Powers of the missions (variant option)")}</h1>
         `;
 
         for (let i = 1; i <=7; i++) {
             html += `
             <div class="help-section">
-                <div id="help-objective-${i}"></div>
-                <div>${this.objectivesManager.getTooltip(i)}</div>
+                <div id="help-mission-${i}"></div>
+                <div>${this.missionsManager.getTooltip(i)}</div>
             </div> `;
         }
         html += `</div>`;
@@ -520,7 +520,7 @@ class Humanity implements HumanityGame {
 
     private populateHelp() {
         for (let i = 1; i <=7; i++) {
-            this.objectivesManager.setForHelp(i, `help-objective-${i}`);
+            this.missionsManager.setForHelp(i, `help-mission-${i}`);
         }
     }
     
@@ -713,7 +713,7 @@ class Humanity implements HumanityGame {
             ['reactivateWorkers', ANIMATION_MS],
             ['upgradeWorker', 50],
             ['year', ANIMATION_MS],
-            ['gainObjective', undefined],
+            ['gainMission', undefined],
             ['moveWorker', ANIMATION_MS],
             ['confirmMoveWorkers', 1],
             ['restartTurn', 1],
@@ -858,12 +858,12 @@ class Humanity implements HumanityGame {
         this.yearCounter.toValue(+args.year);
     }
 
-    notif_gainObjective(args: NotifGainObjectiveArgs) {
-        const { playerId, objective, fromPlayerId } = args;
+    notif_gainMission(args: NotifGainMissionArgs) {
+        const { playerId, mission, fromPlayerId } = args;
         if (fromPlayerId === null) {
-            document.getElementById(`objective-science-token-${objective.id}`)?.remove();
+            document.getElementById(`mission-science-token-${mission.id}`)?.remove();
         }
-        return this.getPlayerTable(playerId).addObjective(objective);
+        return this.getPlayerTable(playerId).addMission(mission);
     }
     
 
@@ -872,9 +872,9 @@ class Humanity implements HumanityGame {
 
         this.tableCenter.resetModules(undo.tableModules);
         this.tableCenter.newExperiments(undo.tableExperiments);
-        this.researchBoard.resetObjectives(undo.allObjectives.filter(objective => objective.location == 'table'));
+        this.researchBoard.resetMissions(undo.allMissions.filter(mission => mission.location == 'table'));
 
-        this.playersTables.forEach(playerTable => playerTable.resetObjectives(undo.allObjectives.filter(objective => objective.location == 'player' && objective.locationArg == playerTable.playerId)));
+        this.playersTables.forEach(playerTable => playerTable.resetMissions(undo.allMissions.filter(mission => mission.location == 'player' && mission.locationArg == playerTable.playerId)));
 
         const table = this.getPlayerTable(playerId);
         table.resetModules(undo.modules);
@@ -968,12 +968,12 @@ class Humanity implements HumanityGame {
                     args.experiment_image = `<div class="log-image">${this.experimentsManager.getHtml(args.experiment)}</div>`;
                 }
 
-                if (args.objective_image === '' && args.objective) {
-                    args.objective_image = `<div class="log-image">${this.objectivesManager.getHtml(args.objective)}</div>`;
+                if (args.mission_image === '' && args.mission) {
+                    args.mission_image = `<div class="log-image">${this.missionsManager.getHtml(args.mission)}</div>`;
                 }
 
                 /* TODO DELETE ? for (const property in args) {
-                    if (['number', 'color', 'card_color', 'card_type', 'objective_name'].includes(property) && args[property][0] != '<') {
+                    if (['number', 'color', 'card_color', 'card_type', 'mission_name'].includes(property) && args[property][0] != '<') {
                         args[property] = `<strong>${_(args[property])}</strong>`;
                     }
                 }*/

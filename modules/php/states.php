@@ -21,7 +21,7 @@ trait StateTrait {
             $this->getPlayer($playerId),
             $this->getModulesByLocation('table'),
             $this->getExperimentsByLocation('table'),
-            $this->getObjectivesByLocation(),
+            $this->getMissionsByLocation(),
         ));
         
         $this->gamestate->nextState('next');
@@ -35,15 +35,15 @@ trait StateTrait {
         }
     }
 
-    function stCheckObjectives() {
+    function stCheckMissions() {
         $playerId = intval($this->getActivePlayerId());
 
-        $objectives = $this->getObjectivesByLocation();
+        $missions = $this->getMissionsByLocation();
 
-        foreach($objectives as $objective) {
-            if ($objective->location != 'player' || $objective->locationArg != $playerId) {
-                if ($this->fulfillObjective($playerId, $objective)) {
-                    $this->gainObjective($playerId, $objective);
+        foreach($missions as $mission) {
+            if ($mission->location != 'player' || $mission->locationArg != $playerId) {
+                if ($this->fulfillMission($playerId, $mission)) {
+                    $this->gainMission($playerId, $mission);
                 }
             }
         }

@@ -128,7 +128,7 @@ $playerActionsGameStates = [
         ],
         "transitions" => [
             "upgrade" => ST_PLAYER_UPGRADE_WORKER,
-            "endTurn" => ST_CHECK_OBJECTIVES,
+            "endTurn" => ST_CHECK_MISSIONS,
         ],
     ],
 
@@ -144,7 +144,7 @@ $playerActionsGameStates = [
         ],
         "transitions" => [
             "stay" => ST_PLAYER_UPGRADE_WORKER,
-            "endTurn" => ST_CHECK_OBJECTIVES,
+            "endTurn" => ST_CHECK_MISSIONS,
         ],
     ],
 
@@ -160,7 +160,7 @@ $playerActionsGameStates = [
         ],
         "transitions" => [
             "stay" => ST_PLAYER_ACTIVATE_TILE,
-            "endTurn" => ST_CHECK_OBJECTIVES,
+            "endTurn" => ST_CHECK_MISSIONS,
         ]
     ],
 
@@ -225,11 +225,11 @@ $gameGameStates = [
         ]
     ],
 
-    ST_CHECK_OBJECTIVES => [
-        "name" => "checkObjectives",
-        "description" => clienttranslate('Checking objectives...'),
+    ST_CHECK_MISSIONS => [
+        "name" => "checkMissions",
+        "description" => clienttranslate('Checking missions...'),
         "type" => "game",
-        "action" => "stCheckObjectives",
+        "action" => "stCheckMissions",
         "transitions" => [
             "next" => ST_PLAYER_CONFIRM_TURN,
         ]

@@ -7,7 +7,7 @@ $playerColors: 'f0db6c', '62bce6', '70c499', 'ddbdd7';
 @import 'workers';
 @import 'modules';
 @import 'experiments';
-@import 'objectives';
+@import 'missions';
 @import 'table-center';
 @import 'research-board';
 @import 'playerboards';
@@ -138,7 +138,7 @@ html, .mode_3d #game_play_area_background {
   background: url('img/first-player.png');
 }
 
-.objective-tooltip {
+.mission-tooltip {
   &>div {
     padding: 5px;
 

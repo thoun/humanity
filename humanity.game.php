@@ -22,7 +22,7 @@ require_once(APP_GAMEMODULE_PATH.'module/table/table.game.php');
 require_once('modules/php/objects/worker.php');
 require_once('modules/php/objects/module.php');
 require_once('modules/php/objects/experiment.php');
-require_once('modules/php/objects/objective.php');
+require_once('modules/php/objects/mission.php');
 require_once('modules/php/objects/player.php');
 require_once('modules/php/objects/current-action.php');
 require_once('modules/php/objects/undo.php');
@@ -30,7 +30,7 @@ require_once('modules/php/constants.inc.php');
 require_once('modules/php/utils.php');
 require_once('modules/php/workers.php');
 require_once('modules/php/modules.php');
-require_once('modules/php/objectives.php');
+require_once('modules/php/missions.php');
 require_once('modules/php/experiments.php');
 require_once('modules/php/actions.php');
 require_once('modules/php/states.php');
@@ -41,7 +41,7 @@ class Humanity extends Table {
     use UtilTrait;
     use WorkerTrait;
     use ModuleTrait;
-    use ObjectiveTrait;
+    use MissionTrait;
     use ExperimentTrait;
     use ActionTrait;
     use StateTrait;
@@ -65,8 +65,8 @@ class Humanity extends Table {
         $this->experiments = $this->getNew("module.common.deck");
         $this->experiments->init("experiment");   
 		
-        $this->objectives = $this->getNew("module.common.deck");
-        $this->objectives->init("objective");  
+        $this->missions = $this->getNew("module.common.deck");
+        $this->missions->init("mission");  
 	}
 	
     protected function getGameName() {
@@ -140,7 +140,7 @@ class Humanity extends Table {
         $this->setupWorkers(array_keys($players));
         $this->setupModules($players);
         $this->setupExperiments();
-        $this->setupObjectives();
+        $this->setupMissions();
 
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
@@ -183,7 +183,7 @@ class Humanity extends Table {
             $player['science'] = $isEndScore || $playerId == $currentPlayerId ? intval($player['science']) : null;
             $player['modules'] = $this->getModulesByLocation('player', $playerId);
             $player['experiments'] = $this->getExperimentsByLocation('player', $playerId);
-            $player['objectives'] = $this->getObjectivesByLocation('player', $playerId);
+            $player['missions'] = $this->getMissionsByLocation('player', $playerId);
             if ($isEndScore) {
                 $player['score'] = $player['vp'] + $player['science'];
             }
@@ -193,7 +193,7 @@ class Humanity extends Table {
 
         $result['tableModules'] = $this->getModulesByLocation('table');
         $result['tableExperiments'] = $this->getExperimentsByLocation('table');
-        $result['tableObjectives'] = $this->getObjectivesByLocation('table');      
+        $result['tableMissions'] = $this->getMissionsByLocation('table');      
 
         $result['arm'] = $this->getArm();
         $result['year'] = $this->getYear();

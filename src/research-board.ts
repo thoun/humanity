@@ -5,7 +5,7 @@ const RESEARCH_CASE_WIDTH = 40.71;
 const RESEARCH_CASE_HEIGHT = 33.5;
 
 class ResearchBoard {
-    private objectives: SlotStock<Objective>;
+    private missions: SlotStock<Mission>;
     private vp = new Map<number, number>();
     private sciencePoints = new Map<number, number>(); 
         
@@ -27,12 +27,12 @@ class ResearchBoard {
         this.moveVP();
         this.moveResearch();
         
-        this.objectives = new SlotStock<Objective>(this.game.objectivesManager, document.getElementById(`objectives`), {
+        this.missions = new SlotStock<Mission>(this.game.missionsManager, document.getElementById(`missions`), {
             slotsIds: [1, 2, 3],
             mapCardToSlot: card => card.locationArg,
         });
-        this.objectives.addCards(gamedatas.tableObjectives);
-        this.setObjectiveScienceTokens();
+        this.missions.addCards(gamedatas.tableMissions);
+        this.setMissionScienceTokens();
     }
 
     private getVPCoordinates(points: number) {
@@ -153,18 +153,18 @@ class ResearchBoard {
         return this.sciencePoints.get(playerId);
     }
     
-    public resetObjectives(objectives: Objective[]) {
-        this.objectives.removeAll();
-        this.objectives.addCards(objectives);
-        this.setObjectiveScienceTokens();
+    public resetMissions(missions: Mission[]) {
+        this.missions.removeAll();
+        this.missions.addCards(missions);
+        this.setMissionScienceTokens();
     }
 
-    public setObjectiveScienceTokens() {
-        this.objectives.getCards().forEach(objective => {
+    public setMissionScienceTokens() {
+        this.missions.getCards().forEach(mission => {
             const token = document.createElement('div');
-            token.id = `objective-science-token-${objective.id}`;
-            token.classList.add('science', 'icon', 'objective-science-token');
-            token.dataset.slotId = `${objective.locationArg}`;
+            token.id = `mission-science-token-${mission.id}`;
+            token.classList.add('science', 'icon', 'mission-science-token');
+            token.dataset.slotId = `${mission.locationArg}`;
             document.getElementById('research-board').appendChild(token);
         })
     }

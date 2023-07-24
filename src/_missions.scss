@@ -1,4 +1,4 @@
-.card.objective {
+.card.mission {
     display: inline-block;
     position: relative;
     width: 206px;
@@ -21,7 +21,7 @@
 
             &.front {
                 background-size: 300% auto;
-                background-image: url('img/objectives.png');
+                background-image: url('img/missions.png');
 
                 @for $number from 1 through 6 {
                     &[data-number="#{$number}"] {

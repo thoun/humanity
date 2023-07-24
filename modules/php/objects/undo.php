@@ -9,7 +9,7 @@ class Undo {
     public int $science;
     public array $tableModules;
     public array $tableExperiments;
-    public array $allObjectives;
+    public array $allMissions;
 
     public function __construct(
         array $modules,
@@ -18,7 +18,7 @@ class Undo {
         HumanityPlayer $player,
         array $tableModules,
         array $tableExperiments,
-        array $allObjectives
+        array $allMissions
     ) {
         $this->modules = $modules;
         $this->experiments = $experiments;
@@ -28,7 +28,7 @@ class Undo {
         $this->science = $player->science;
         $this->tableModules = $tableModules;
         $this->tableExperiments = $tableExperiments;
-        $this->allObjectives = $allObjectives;
+        $this->allMissions = $allMissions;
     }
 
 }
