@@ -2011,13 +2011,13 @@ var CardManager = /** @class */ (function () {
     };
     return CardManager;
 }());
-var TilesManager = /** @class */ (function (_super) {
-    __extends(TilesManager, _super);
-    function TilesManager(game) {
+var ModulesManager = /** @class */ (function (_super) {
+    __extends(ModulesManager, _super);
+    function ModulesManager(game) {
         var _this = _super.call(this, game, {
-            getId: function (card) { return "tile-".concat(card.id); },
+            getId: function (card) { return "module-".concat(card.id); },
             setupDiv: function (card, div) {
-                div.classList.add('tile');
+                div.classList.add('module');
                 div.dataset.type = '' + card.type;
                 div.dataset.r = '' + card.r;
             },
@@ -2029,33 +2029,33 @@ var TilesManager = /** @class */ (function (_super) {
         _this.game = game;
         return _this;
     }
-    TilesManager.prototype.setupFrontDiv = function (card, div, ignoreTooltip) {
+    ModulesManager.prototype.setupFrontDiv = function (card, div, ignoreTooltip) {
         if (ignoreTooltip === void 0) { ignoreTooltip = false; }
         div.dataset.number = '' + card.number;
         if (!ignoreTooltip) {
             this.game.setTooltip(div.id, this.getTooltip(card));
         }
     };
-    TilesManager.prototype.getTooltip = function (card) {
-        var message = "x ".concat(card.x, "<br>\n        y ").concat(card.y); /*
+    ModulesManager.prototype.getTooltip = function (card) {
+        var message = "TODO"; /*
         <strong>${_("Color:")}</strong> ${this.game.getTooltipColor(card.color)}
         <br>
         <strong>${_("Gain:")}</strong> <strong>1</strong> ${this.game.getTooltipGain(card.gain)}
         `;*/
         return message;
     };
-    TilesManager.prototype.setForHelp = function (tile, divId) {
+    ModulesManager.prototype.setForHelp = function (module, divId) {
         var div = document.getElementById(divId);
-        div.classList.add('card', 'tile');
+        div.classList.add('card', 'module');
         div.dataset.side = 'front';
         div.innerHTML = "\n        <div class=\"card-sides\">\n            <div class=\"card-side front\">\n            </div>\n            <div class=\"card-side back\">\n            </div>\n        </div>";
-        this.setupFrontDiv(tile, div.querySelector('.front'), true);
+        this.setupFrontDiv(module, div.querySelector('.front'), true);
     };
-    TilesManager.prototype.getHtml = function (tile) {
-        var html = "<div class=\"card tile\" data-side=\"front\" data-type=\"".concat(tile.type, "\" data-r=\"").concat(tile.r, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(tile.number, "\">\n                </div>\n                <div class=\"card-side back\">\n                </div>\n            </div>\n        </div>");
+    ModulesManager.prototype.getHtml = function (module) {
+        var html = "<div class=\"card module\" data-side=\"front\" data-type=\"".concat(module.type, "\" data-r=\"").concat(module.r, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(module.number, "\">\n                </div>\n                <div class=\"card-side back\">\n                </div>\n            </div>\n        </div>");
         return html;
     };
-    return TilesManager;
+    return ModulesManager;
 }(CardManager));
 var DestinationsManager = /** @class */ (function (_super) {
     __extends(DestinationsManager, _super);
@@ -2090,8 +2090,8 @@ var DestinationsManager = /** @class */ (function (_super) {
         `;*/
         return message;
     };
-    DestinationsManager.prototype.getHtml = function (tile) {
-        var html = "<div class=\"card research\" data-side=\"front\" data-year=\"".concat(tile.year, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(tile.number, "\">\n                </div>\n                <div class=\"card-side back\">\n                </div>\n            </div>\n        </div>");
+    DestinationsManager.prototype.getHtml = function (module) {
+        var html = "<div class=\"card research\" data-side=\"front\" data-year=\"".concat(module.year, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(module.number, "\">\n                </div>\n                <div class=\"card-side back\">\n                </div>\n            </div>\n        </div>");
         return html;
     };
     return DestinationsManager;
@@ -2116,7 +2116,7 @@ var ObjectivesManager = /** @class */ (function (_super) {
         return _this;
     }
     ObjectivesManager.prototype.getTooltip = function (objective) {
-        var message = '';
+        var message = 'TODO';
         switch (objective.number) {
             case 1:
                 message = _("(+2) if you have 1 or 3 orange cards.");
@@ -2163,8 +2163,8 @@ var ObjectivesManager = /** @class */ (function (_super) {
         }
         return message;
     };
-    ObjectivesManager.prototype.getHtml = function (tile) {
-        var html = "<div class=\"card objective\" data-side=\"front\" data-type=\"".concat(tile.type, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(tile.number, "\">\n                </div>\n                <div class=\"card-side back\">\n                </div>\n            </div>\n        </div>");
+    ObjectivesManager.prototype.getHtml = function (module) {
+        var html = "<div class=\"card objective\" data-side=\"front\" data-type=\"".concat(module.type, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(module.number, "\">\n                </div>\n                <div class=\"card-side back\">\n                </div>\n            </div>\n        </div>");
         return html;
     };
     return ObjectivesManager;
@@ -2186,13 +2186,13 @@ var TableCenter = /** @class */ (function () {
         });
         this.research.addCards(gamedatas.tableResearch);
         this.research.onCardClick = function (card) { return _this.game.onTableResearchClick(card); };
-        this.tiles = new SlotStock(game.tilesManager, document.getElementById("table-tiles"), {
+        this.modules = new SlotStock(game.modulesManager, document.getElementById("table-modules"), {
             slotsIds: [0, 1, 2, 3, 4, 5, 6, 7],
             mapCardToSlot: function (card) { return card.locationArg; },
             gap: '12px',
         });
-        this.tiles.onCardClick = function (card) { return _this.game.onTableTileClick(card); };
-        this.tiles.addCards(gamedatas.tableTiles);
+        this.modules.onCardClick = function (card) { return _this.game.onTableModuleClick(card); };
+        this.modules.addCards(gamedatas.tableModules);
         var tableWorkers = document.getElementById('table-workers');
         tableWorkers.insertAdjacentHTML('beforeend', [0, 1, 2, 3, 4, 5, 6, 7].map(function (spot) { return "<div></div><div class=\"slot\" data-slot-id=\"".concat(spot, "\"></div>"); }).join(''));
         Object.values(gamedatas.players).forEach(function (player) { return player.workers.filter(function (worker) { return worker.location == 'table'; }).forEach(function (worker) {
@@ -2206,14 +2206,14 @@ var TableCenter = /** @class */ (function () {
         var tableWorkers = document.getElementById('table-workers');
         tableWorkers.querySelector(".slot[data-slot-id=\"".concat(worker.spot, "\"]")).appendChild(workerDiv);
     };
-    TableCenter.prototype.removeTile = function (tile) {
-        this.tiles.removeCard(tile);
+    TableCenter.prototype.removeModule = function (module) {
+        this.modules.removeCard(module);
     };
-    TableCenter.prototype.shiftTile = function (tile) {
-        return this.tiles.addCard(tile);
+    TableCenter.prototype.shiftModule = function (module) {
+        return this.modules.addCard(module);
     };
-    TableCenter.prototype.newTile = function (tile) {
-        return this.tiles.addCard(tile);
+    TableCenter.prototype.newModule = function (module) {
+        return this.modules.addCard(module);
     };
     TableCenter.prototype.moveArm = function (arm) {
         document.getElementById('board-2').style.setProperty('--r', "".concat(arm));
@@ -2222,15 +2222,15 @@ var TableCenter = /** @class */ (function () {
         this.research.removeAll();
         this.research.addCards(tableResearch);
     };
-    TableCenter.prototype.setSelectableTiles = function (selectableTiles) {
-        this.tiles.setSelectionMode(selectableTiles ? 'single' : 'none', selectableTiles);
+    TableCenter.prototype.setSelectableModules = function (selectableModules) {
+        this.modules.setSelectionMode(selectableModules ? 'single' : 'none', selectableModules);
     };
     TableCenter.prototype.setSelectableResearch = function (selectableResearch) {
         this.research.setSelectionMode(selectableResearch ? 'single' : 'none', selectableResearch);
     };
-    TableCenter.prototype.resetTiles = function (tiles) {
-        this.tiles.removeAll();
-        this.tiles.addCards(tiles);
+    TableCenter.prototype.resetModules = function (modules) {
+        this.modules.removeAll();
+        this.modules.addCards(modules);
     };
     return TableCenter;
 }());
@@ -2400,23 +2400,23 @@ var ResearchBoard = /** @class */ (function () {
 var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 ;
 var log = isDebug ? console.log.bind(window.console) : function () { };
-var TileStock = /** @class */ (function (_super) {
-    __extends(TileStock, _super);
-    function TileStock(game, element, slotsIds) {
-        var _this = _super.call(this, game.tilesManager, element, {
+var ModuleStock = /** @class */ (function (_super) {
+    __extends(ModuleStock, _super);
+    function ModuleStock(game, element, slotsIds) {
+        var _this = _super.call(this, game.modulesManager, element, {
             slotsIds: slotsIds,
-            mapCardToSlot: function (tile) { return "".concat(tile.x, "_").concat(tile.y); },
+            mapCardToSlot: function (module) { return "".concat(module.x, "_").concat(module.y); },
         }) || this;
         _this.game = game;
         _this.element = element;
         return _this;
     }
-    TileStock.prototype.createSlot = function (slotId) {
+    ModuleStock.prototype.createSlot = function (slotId) {
         _super.prototype.createSlot.call(this, slotId);
         var coordinates = slotId.split('_').map(function (val) { return Number(val); });
         this.slots[slotId].style.setProperty('--area', "slot".concat(coordinates[0] * 1000 + coordinates[1]));
     };
-    return TileStock;
+    return ModuleStock;
 }(SlotStock));
 var PlayerTable = /** @class */ (function () {
     function PlayerTable(game, player) {
@@ -2425,75 +2425,75 @@ var PlayerTable = /** @class */ (function () {
         this.researchLines = [];
         this.playerId = Number(player.id);
         this.currentPlayer = this.playerId == this.game.getPlayerId();
-        var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.playerId, "-tiles\" class=\"tiles\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-research-lines\" class=\"research-lines\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-objective\" class=\"objective\"></div>\n        </div>\n        ");
+        var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.playerId, "-modules\" class=\"modules\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-research-lines\" class=\"research-lines\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-objective\" class=\"objective\"></div>\n        </div>\n        ");
         dojo.place(html, document.getElementById('tables'));
         var playerWorkers = player.workers.filter(function (worker) { return worker.location == 'player'; });
         var slotsIds = [];
-        var xs = __spreadArray(__spreadArray([], player.tiles.map(function (tile) { return tile.x; }), true), playerWorkers.map(function (worker) { return worker.x; }), true);
-        var ys = __spreadArray(__spreadArray([], player.tiles.map(function (tile) { return tile.y; }), true), playerWorkers.map(function (worker) { return worker.y; }), true);
-        this.tileMinX = Math.min.apply(Math, xs);
-        this.tileMaxX = Math.max.apply(Math, xs);
-        this.tileMinY = Math.min.apply(Math, ys);
-        this.tileMaxY = Math.max.apply(Math, ys);
-        for (var y = this.tileMinY; y <= this.tileMaxY; y++) {
-            for (var x = this.tileMinX; x <= this.tileMaxX; x++) {
+        var xs = __spreadArray(__spreadArray([], player.modules.map(function (module) { return module.x; }), true), playerWorkers.map(function (worker) { return worker.x; }), true);
+        var ys = __spreadArray(__spreadArray([], player.modules.map(function (module) { return module.y; }), true), playerWorkers.map(function (worker) { return worker.y; }), true);
+        this.moduleMinX = Math.min.apply(Math, xs);
+        this.moduleMaxX = Math.max.apply(Math, xs);
+        this.moduleMinY = Math.min.apply(Math, ys);
+        this.moduleMaxY = Math.max.apply(Math, ys);
+        for (var y = this.moduleMinY; y <= this.moduleMaxY; y++) {
+            for (var x = this.moduleMinX; x <= this.moduleMaxX; x++) {
                 slotsIds.push("".concat(x, "_").concat(y));
             }
         }
-        var tilesDiv = document.getElementById("player-table-".concat(this.playerId, "-tiles"));
-        tilesDiv.style.setProperty('--rows', "".concat(this.tileMaxX - this.tileMinX + 1));
-        tilesDiv.style.setProperty('--columns', "".concat(this.tileMaxY - this.tileMinY + 1));
-        this.tiles = new TileStock(this.game, tilesDiv, slotsIds);
+        var modulesDiv = document.getElementById("player-table-".concat(this.playerId, "-modules"));
+        modulesDiv.style.setProperty('--rows', "".concat(this.moduleMaxX - this.moduleMinX + 1));
+        modulesDiv.style.setProperty('--columns', "".concat(this.moduleMaxY - this.moduleMinY + 1));
+        this.modules = new ModuleStock(this.game, modulesDiv, slotsIds);
         this.updateGridTemplateAreas();
         slotsIds.forEach(function (slotId) {
-            var slotDiv = tilesDiv.querySelector("[data-slot-id=\"".concat(slotId, "\"]"));
+            var slotDiv = modulesDiv.querySelector("[data-slot-id=\"".concat(slotId, "\"]"));
             slotDiv.addEventListener('click', function () {
                 if (slotDiv.classList.contains('selectable')) {
                     var coordinates = slotId.split('_').map(function (val) { return Number(val); });
-                    _this.game.onPlayerTileSpotClick(coordinates[0], coordinates[1]);
+                    _this.game.onPlayerModuleSpotClick(coordinates[0], coordinates[1]);
                 }
             });
         });
-        this.tiles.onCardClick = function (card) { return _this.game.onPlayerTileClick(card); };
-        this.tiles.addCards(player.tiles);
-        player.tiles.filter(function (tile) { return tile.type == 9; }).forEach(function (tile) { return _this.game.tilesManager.getCardElement(tile).dataset.playerColor = player.color; });
-        this.voidStock = new VoidStock(this.game.tilesManager, document.getElementById("player-table-".concat(this.playerId, "-name")));
-        player.research.forEach(function (researchTile) { return _this.addResearch(researchTile); });
+        this.modules.onCardClick = function (card) { return _this.game.onPlayerModuleClick(card); };
+        this.modules.addCards(player.modules);
+        player.modules.filter(function (module) { return module.type == 9; }).forEach(function (module) { return _this.game.modulesManager.getCardElement(module).dataset.playerColor = player.color; });
+        this.voidStock = new VoidStock(this.game.modulesManager, document.getElementById("player-table-".concat(this.playerId, "-name")));
+        player.research.forEach(function (researchModule) { return _this.addResearch(researchModule); });
         var objectiveDiv = document.getElementById("player-table-".concat(this.playerId, "-objective"));
         this.objectives = new LineStock(this.game.objectivesManager, objectiveDiv);
         this.objectives.addCards(player.objectives);
         playerWorkers.forEach(function (worker) {
-            tilesDiv.querySelector("[data-slot-id=\"".concat(worker.x, "_").concat(worker.y, "\"]")).appendChild(_this.game.createWorker(worker));
+            modulesDiv.querySelector("[data-slot-id=\"".concat(worker.x, "_").concat(worker.y, "\"]")).appendChild(_this.game.createWorker(worker));
             if (!worker.remainingWorkforce) {
                 document.getElementById("worker-".concat(worker.id)).classList.add('disabled-worker');
             }
         });
     }
     PlayerTable.prototype.setSelectableWorkers = function (workers) {
-        document.getElementById("player-table-".concat(this.playerId, "-tiles")).querySelectorAll('.worker').forEach(function (worker) {
+        document.getElementById("player-table-".concat(this.playerId, "-modules")).querySelectorAll('.worker').forEach(function (worker) {
             return worker.classList.toggle('selectable', workers.some(function (w) { return w.id == Number(worker.dataset.id); }));
         });
     };
     PlayerTable.prototype.setSelectedWorker = function (selectedWorker) {
-        document.getElementById("player-table-".concat(this.playerId, "-tiles")).querySelectorAll('.worker').forEach(function (worker) {
+        document.getElementById("player-table-".concat(this.playerId, "-modules")).querySelectorAll('.worker').forEach(function (worker) {
             return worker.classList.toggle('selected', (selectedWorker === null || selectedWorker === void 0 ? void 0 : selectedWorker.id) == Number(worker.dataset.id));
         });
     };
-    PlayerTable.prototype.setSelectableTiles = function (selectableTiles) {
-        this.tiles.setSelectionMode(selectableTiles ? 'single' : 'none', selectableTiles);
+    PlayerTable.prototype.setSelectableModules = function (selectableModules) {
+        this.modules.setSelectionMode(selectableModules ? 'single' : 'none', selectableModules);
     };
-    PlayerTable.prototype.rotateTile = function (tile) {
-        var tileDiv = this.game.tilesManager.getCardElement(tile);
-        tileDiv.dataset.r = "".concat(tile.r);
+    PlayerTable.prototype.rotateModule = function (module) {
+        var moduleDiv = this.game.modulesManager.getCardElement(module);
+        moduleDiv.dataset.r = "".concat(module.r);
     };
-    PlayerTable.prototype.addTile = function (tile) {
-        this.makeSlotForCoordinates(tile.x, tile.y);
-        var promise = this.tiles.addCard(tile);
-        this.game.tilesManager.getCardElement(tile).dataset.r = "".concat(tile.r);
+    PlayerTable.prototype.addModule = function (module) {
+        this.makeSlotForCoordinates(module.x, module.y);
+        var promise = this.modules.addCard(module);
+        this.game.modulesManager.getCardElement(module).dataset.r = "".concat(module.r);
         return promise;
     };
-    PlayerTable.prototype.removeTile = function (tile) {
-        this.tiles.removeCard(tile);
+    PlayerTable.prototype.removeModule = function (module) {
+        this.modules.removeCard(module);
     };
     PlayerTable.prototype.createResearchLine = function (line) {
         var lineDiv = document.createElement('div');
@@ -2511,112 +2511,112 @@ var PlayerTable = /** @class */ (function () {
         return this.researchLines[research.line].addCard(research);
     };
     PlayerTable.prototype.reactivateWorkers = function () {
-        document.getElementById("player-table-".concat(this.playerId, "-tiles")).querySelectorAll('.worker').forEach(function (worker) {
+        document.getElementById("player-table-".concat(this.playerId, "-modules")).querySelectorAll('.worker').forEach(function (worker) {
             return worker.classList.remove('disabled-worker');
         });
     };
     PlayerTable.prototype.updateGridTemplateAreas = function () {
-        var tilesDiv = document.getElementById("player-table-".concat(this.playerId, "-tiles"));
+        var modulesDiv = document.getElementById("player-table-".concat(this.playerId, "-modules"));
         var linesAreas = [];
-        for (var y = this.tileMinY; y <= this.tileMaxY; y++) {
+        for (var y = this.moduleMinY; y <= this.moduleMaxY; y++) {
             var lineAreas = [];
-            for (var x = this.tileMinX; x <= this.tileMaxX; x++) {
+            for (var x = this.moduleMinX; x <= this.moduleMaxX; x++) {
                 lineAreas.push("slot".concat(x * 1000 + y));
             }
             linesAreas.push(lineAreas.join(' '));
         }
-        tilesDiv.style.gridTemplateAreas = linesAreas.map(function (line) { return "\"".concat(line, "\""); }).join(' ');
+        modulesDiv.style.gridTemplateAreas = linesAreas.map(function (line) { return "\"".concat(line, "\""); }).join(' ');
     };
     PlayerTable.prototype.addLeftCol = function () {
-        this.tileMinX = this.tileMinX - 1;
+        this.moduleMinX = this.moduleMinX - 1;
         var newSlotsIds = [];
-        for (var y = this.tileMinY; y <= this.tileMaxY; y++) {
-            newSlotsIds.push("".concat(this.tileMinX, "_").concat(y));
+        for (var y = this.moduleMinY; y <= this.moduleMaxY; y++) {
+            newSlotsIds.push("".concat(this.moduleMinX, "_").concat(y));
         }
         this.addNewSlotsIds(newSlotsIds, 'column');
     };
     PlayerTable.prototype.addRightCol = function () {
-        this.tileMaxX = this.tileMaxX + 1;
+        this.moduleMaxX = this.moduleMaxX + 1;
         var newSlotsIds = [];
-        for (var y = this.tileMinY; y <= this.tileMaxY; y++) {
-            newSlotsIds.push("".concat(this.tileMaxX, "_").concat(y));
+        for (var y = this.moduleMinY; y <= this.moduleMaxY; y++) {
+            newSlotsIds.push("".concat(this.moduleMaxX, "_").concat(y));
         }
         this.addNewSlotsIds(newSlotsIds, 'column');
     };
     PlayerTable.prototype.addTopRow = function () {
-        this.tileMinY = this.tileMinY - 1;
+        this.moduleMinY = this.moduleMinY - 1;
         var newSlotsIds = [];
-        for (var x = this.tileMinX; x <= this.tileMaxX; x++) {
-            newSlotsIds.push("".concat(x, "_").concat(this.tileMinY));
+        for (var x = this.moduleMinX; x <= this.moduleMaxX; x++) {
+            newSlotsIds.push("".concat(x, "_").concat(this.moduleMinY));
         }
         this.addNewSlotsIds(newSlotsIds, 'row');
     };
     PlayerTable.prototype.addBottomRow = function () {
-        this.tileMaxY = this.tileMaxY + 1;
+        this.moduleMaxY = this.moduleMaxY + 1;
         var newSlotsIds = [];
-        for (var x = this.tileMinX; x <= this.tileMaxX; x++) {
-            newSlotsIds.push("".concat(x, "_").concat(this.tileMaxY));
+        for (var x = this.moduleMinX; x <= this.moduleMaxX; x++) {
+            newSlotsIds.push("".concat(x, "_").concat(this.moduleMaxY));
         }
         this.addNewSlotsIds(newSlotsIds, 'row');
     };
     PlayerTable.prototype.addNewSlotsIds = function (newSlotsIds, type) {
         var _this = this;
-        var tilesDiv = document.getElementById("player-table-".concat(this.playerId, "-tiles"));
+        var modulesDiv = document.getElementById("player-table-".concat(this.playerId, "-modules"));
         if (type == 'row') {
-            tilesDiv.style.setProperty('--rows', "".concat(this.tileMaxX - this.tileMinX + 1));
+            modulesDiv.style.setProperty('--rows', "".concat(this.moduleMaxX - this.moduleMinX + 1));
         }
         else if (type == 'column') {
-            tilesDiv.style.setProperty('--columns', "".concat(this.tileMaxY - this.tileMinY + 1));
+            modulesDiv.style.setProperty('--columns', "".concat(this.moduleMaxY - this.moduleMinY + 1));
         }
         this.updateGridTemplateAreas();
-        this.tiles.addSlotsIds(newSlotsIds);
+        this.modules.addSlotsIds(newSlotsIds);
         newSlotsIds.forEach(function (slotId) {
-            var slotDiv = tilesDiv.querySelector("[data-slot-id=\"".concat(slotId, "\"]"));
+            var slotDiv = modulesDiv.querySelector("[data-slot-id=\"".concat(slotId, "\"]"));
             slotDiv.addEventListener('click', function () {
                 if (slotDiv.classList.contains('selectable')) {
                     var coordinates = slotId.split('_').map(function (val) { return Number(val); });
-                    _this.game.onPlayerTileSpotClick(coordinates[0], coordinates[1]);
+                    _this.game.onPlayerModuleSpotClick(coordinates[0], coordinates[1]);
                 }
             });
         });
     };
     PlayerTable.prototype.makeSlotForCoordinates = function (x, y) {
-        while (x < this.tileMinX) {
+        while (x < this.moduleMinX) {
             this.addLeftCol();
         }
-        while (x > this.tileMaxX) {
+        while (x > this.moduleMaxX) {
             this.addRightCol();
         }
-        while (y < this.tileMinY) {
+        while (y < this.moduleMinY) {
             this.addTopRow();
         }
-        while (y > this.tileMaxY) {
+        while (y > this.moduleMaxY) {
             this.addBottomRow();
         }
     };
-    PlayerTable.prototype.setSelectableTileSpots = function (possibleCoordinates) {
+    PlayerTable.prototype.setSelectableModuleSpots = function (possibleCoordinates) {
         var _this = this;
-        var tilesDiv = document.getElementById("player-table-".concat(this.playerId, "-tiles"));
+        var modulesDiv = document.getElementById("player-table-".concat(this.playerId, "-modules"));
         if (possibleCoordinates) {
             possibleCoordinates.forEach(function (coordinate) {
                 var _a;
                 _this.makeSlotForCoordinates(coordinate[0], coordinate[1]);
-                (_a = tilesDiv.querySelector("[data-slot-id=\"".concat(coordinate[0], "_").concat(coordinate[1], "\"]"))) === null || _a === void 0 ? void 0 : _a.classList.add('selectable');
+                (_a = modulesDiv.querySelector("[data-slot-id=\"".concat(coordinate[0], "_").concat(coordinate[1], "\"]"))) === null || _a === void 0 ? void 0 : _a.classList.add('selectable');
             });
         }
         else {
-            tilesDiv.querySelectorAll('.slot.selectable').forEach(function (elem) { return elem.classList.remove('selectable'); });
+            modulesDiv.querySelectorAll('.slot.selectable').forEach(function (elem) { return elem.classList.remove('selectable'); });
         }
     };
-    PlayerTable.prototype.resetTiles = function (tiles) {
-        this.tiles.removeAll(tiles);
-        this.tiles.addCards(tiles);
+    PlayerTable.prototype.resetModules = function (modules) {
+        this.modules.removeAll(modules);
+        this.modules.addCards(modules);
     };
     PlayerTable.prototype.resetResearch = function (research) {
         var _this = this;
         document.getElementById("player-table-".concat(this.playerId, "-research-lines")).innerHTML = "";
         this.researchLines = [];
-        research.forEach(function (researchTile) { return _this.addResearch(researchTile); });
+        research.forEach(function (researchModule) { return _this.addResearch(researchModule); });
     };
     PlayerTable.prototype.resetObjectives = function (objectives) {
         this.objectives.removeAll();
@@ -2661,7 +2661,7 @@ var Humanity = /** @class */ (function () {
         log("Starting game setup");
         this.gamedatas = gamedatas;
         log('gamedatas', gamedatas);
-        this.tilesManager = new TilesManager(this);
+        this.modulesManager = new ModulesManager(this);
         this.researchManager = new DestinationsManager(this);
         this.objectivesManager = new ObjectivesManager(this);
         this.animationManager = new AnimationManager(this);
@@ -2731,8 +2731,8 @@ var Humanity = /** @class */ (function () {
             case 'chooseAction':
                 this.onEnteringChooseAction(args.args);
                 break;
-            case 'activateTile':
-                this.onEnteringActivateTile(args.args);
+            case 'activateModule':
+                this.onEnteringActivateModule(args.args);
                 break;
             case 'chooseWorker':
                 this.onEnteringChooseWorker(args.args);
@@ -2749,15 +2749,15 @@ var Humanity = /** @class */ (function () {
         var _a;
         if (this.isCurrentPlayerActive()) {
             (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableWorkers(args.workers);
-            this.tableCenter.setSelectableTiles(args.selectableTiles);
+            this.tableCenter.setSelectableModules(args.selectableModules);
             this.tableCenter.setSelectableResearch(args.selectableResearch);
         }
     };
-    Humanity.prototype.onEnteringActivateTile = function (args) {
+    Humanity.prototype.onEnteringActivateModule = function (args) {
         if (this.isCurrentPlayerActive()) {
             var table = this.getCurrentPlayerTable();
             table.setSelectedWorker(args.worker);
-            table.setSelectableTiles(args.activatableTiles);
+            table.setSelectableModules(args.activatableModules);
         }
     };
     Humanity.prototype.onEnteringChooseWorker = function (args) {
@@ -2773,18 +2773,18 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.onEnteringMoveWorker = function (args) {
         var _a;
-        (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableTileSpots(args.possibleCoordinates);
+        (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableModuleSpots(args.possibleCoordinates);
     };
     Humanity.prototype.onLeavingState = function (stateName) {
         log('Leaving state: ' + stateName);
         switch (stateName) {
             case 'chooseAction':
                 this.onLeavingChooseWorker();
-                this.tableCenter.setSelectableTiles(null);
+                this.tableCenter.setSelectableModules(null);
                 this.tableCenter.setSelectableResearch(null);
                 break;
-            case 'activateTile':
-                this.onLeavingActivateTile();
+            case 'activateModule':
+                this.onLeavingActivateModule();
                 break;
             case 'chooseWorker':
                 this.onLeavingChooseWorker();
@@ -2797,11 +2797,11 @@ var Humanity = /** @class */ (function () {
                 break;
         }
     };
-    Humanity.prototype.onLeavingActivateTile = function () {
+    Humanity.prototype.onLeavingActivateModule = function () {
         if (this.isCurrentPlayerActive()) {
             var table = this.getCurrentPlayerTable();
             table.setSelectedWorker(null);
-            table.setSelectableTiles(null);
+            table.setSelectableModules(null);
         }
     };
     Humanity.prototype.onLeavingChooseWorker = function () {
@@ -2810,7 +2810,7 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.onLeavingMoveWorker = function () {
         var _a;
-        (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableTileSpots(null);
+        (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableModuleSpots(null);
     };
     Humanity.prototype.onLeavingUpgradeWorker = function () {
         document.querySelectorAll('.worker.selectable').forEach(function (worker) { return worker.classList.remove('selectable'); });
@@ -2822,7 +2822,7 @@ var Humanity = /** @class */ (function () {
         var _this = this;
         if (this.isCurrentPlayerActive()) {
             switch (stateName) {
-                case 'activateTile':
+                case 'activateModule':
                     this.addActionButton("endTurn_button", _("End turn"), function () { return _this.endTurn(); });
                     break;
                 case 'chooseRadarColor':
@@ -2840,7 +2840,7 @@ var Humanity = /** @class */ (function () {
                     this.addActionButton("restartMoveWorkers_button", _("Restart"), function () { return _this.restartMoveWorkers(); }, null, null, 'red');
                     break;
             }
-            if (['chooseRadarColor', 'pay', 'chooseWorker', 'upgradeWorker', 'activateTile', 'confirmTurn'].includes(stateName)) {
+            if (['chooseRadarColor', 'pay', 'chooseWorker', 'upgradeWorker', 'activateModule', 'confirmTurn'].includes(stateName)) {
                 this.addActionButton("restartTurn_button", _("Restart turn"), function () { return _this.restartTurn(); }, null, null, 'red');
             }
         }
@@ -3018,18 +3018,18 @@ var Humanity = /** @class */ (function () {
             this.chooseNewResearch(research.id);
         }
     };
-    Humanity.prototype.onPlayerTileClick = function (card) {
-        this.activateTile(card.id);
+    Humanity.prototype.onPlayerModuleClick = function (card) {
+        this.activateModule(card.id);
     };
-    Humanity.prototype.onPlayerTileSpotClick = function (x, y) {
+    Humanity.prototype.onPlayerModuleSpotClick = function (x, y) {
         var _a;
         if (((_a = this.gamedatas.gamestate.private_state) === null || _a === void 0 ? void 0 : _a.name) == 'moveWorker') {
             this.moveWorker(x, y);
         }
     };
-    Humanity.prototype.onTableTileClick = function (tile) {
+    Humanity.prototype.onTableModuleClick = function (module) {
         if (this.gamedatas.gamestate.name == 'chooseAction') {
-            this.chooseNewTile(tile.id);
+            this.chooseNewModule(module.id);
         }
     };
     Humanity.prototype.onWorkerClick = function (worker) {
@@ -3056,19 +3056,19 @@ var Humanity = /** @class */ (function () {
             id: id
         });
     };
-    Humanity.prototype.activateTile = function (id) {
-        if (!this.checkAction('activateTile')) {
+    Humanity.prototype.activateModule = function (id) {
+        if (!this.checkAction('activateModule')) {
             return;
         }
-        this.takeAction('activateTile', {
+        this.takeAction('activateModule', {
             id: id
         });
     };
-    Humanity.prototype.chooseNewTile = function (id) {
-        if (!this.checkAction('chooseNewTile')) {
+    Humanity.prototype.chooseNewModule = function (id) {
+        if (!this.checkAction('chooseNewModule')) {
             return;
         }
-        this.takeAction('chooseNewTile', {
+        this.takeAction('chooseNewModule', {
             id: id
         });
     };
@@ -3151,22 +3151,22 @@ var Humanity = /** @class */ (function () {
         var _this = this;
         var notifs = [
             ['firstPlayerToken', undefined],
-            ['activateTile', ANIMATION_MS],
+            ['activateModule', ANIMATION_MS],
             ['pay', 50],
-            ['removeTile', ANIMATION_MS],
+            ['removeModule', ANIMATION_MS],
             ['disableWorker', ANIMATION_MS],
             ['gainTimeUnit', ANIMATION_MS],
             ['moveWorkerToTable', ANIMATION_MS],
-            ['deployTile', undefined],
+            ['deployModule', undefined],
             ['deployResearch', undefined],
             ['score', 1],
             ['researchPoints', 1],
             ['vp', 1],
             ['science', 1],
             ['newFirstPlayer', ANIMATION_MS],
-            ['removeTableTile', ANIMATION_MS],
-            ['shiftTableTile', ANIMATION_MS],
-            ['newTableTile', ANIMATION_MS],
+            ['removeTableModule', ANIMATION_MS],
+            ['shiftTableModule', ANIMATION_MS],
+            ['newTableModule', ANIMATION_MS],
             ['moveArm', ANIMATION_MS],
             ['newTableResearch', ANIMATION_MS],
             ['reactivateWorkers', ANIMATION_MS],
@@ -3205,20 +3205,20 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_firstPlayerToken = function (notif) {
         return this.placeFirstPlayerToken(notif.args.playerId);
     };
-    Humanity.prototype.notif_activateTile = function (args) {
+    Humanity.prototype.notif_activateModule = function (args) {
         var playerId = args.playerId;
         var playerTable = this.getPlayerTable(playerId);
-        playerTable.rotateTile(args.tile);
+        playerTable.rotateModule(args.module);
     };
     Humanity.prototype.notif_pay = function (args) {
         var playerId = args.playerId;
         var playerTable = this.getPlayerTable(playerId);
-        playerTable.rotateTile(args.tile);
+        playerTable.rotateModule(args.module);
     };
-    Humanity.prototype.notif_removeTile = function (args) {
+    Humanity.prototype.notif_removeModule = function (args) {
         var playerId = args.playerId;
         var playerTable = this.getPlayerTable(playerId);
-        playerTable.removeTile(args.tile);
+        playerTable.removeModule(args.module);
     };
     Humanity.prototype.notif_disableWorker = function (args) {
         this.setWorkerDisabled(args.worker, true);
@@ -3233,9 +3233,9 @@ var Humanity = /** @class */ (function () {
         this.setWorkerDisabled(worker, false);
         this.tableCenter.moveWorker(worker);
     };
-    Humanity.prototype.notif_deployTile = function (args) {
-        var playerId = args.playerId, tile = args.tile;
-        return this.getPlayerTable(playerId).addTile(tile);
+    Humanity.prototype.notif_deployModule = function (args) {
+        var playerId = args.playerId, module = args.module;
+        return this.getPlayerTable(playerId).addModule(module);
     };
     Humanity.prototype.notif_deployResearch = function (args) {
         var playerId = args.playerId, research = args.research;
@@ -3258,14 +3258,14 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_newFirstPlayer = function (args) {
         this.placeFirstPlayerToken(args.playerId);
     };
-    Humanity.prototype.notif_removeTableTile = function (args) {
-        this.tableCenter.removeTile(args.tile);
+    Humanity.prototype.notif_removeTableModule = function (args) {
+        this.tableCenter.removeModule(args.module);
     };
-    Humanity.prototype.notif_shiftTableTile = function (args) {
-        this.tableCenter.shiftTile(args.tile);
+    Humanity.prototype.notif_shiftTableModule = function (args) {
+        this.tableCenter.shiftModule(args.module);
     };
-    Humanity.prototype.notif_newTableTile = function (args) {
-        this.tableCenter.newTile(args.tile);
+    Humanity.prototype.notif_newTableModule = function (args) {
+        this.tableCenter.newModule(args.module);
     };
     Humanity.prototype.notif_moveArm = function (args) {
         this.tableCenter.moveArm(args.arm);
@@ -3298,12 +3298,12 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_restartTurn = function (args) {
         var _this = this;
         var playerId = args.playerId, undo = args.undo;
-        this.tableCenter.resetTiles(undo.tableTiles);
+        this.tableCenter.resetModules(undo.tableModules);
         this.tableCenter.newResearch(undo.tableResearch);
         this.researchBoard.resetObjectives(undo.allObjectives.filter(function (objective) { return objective.location == 'table'; }));
         this.playersTables.forEach(function (playerTable) { return playerTable.resetObjectives(undo.allObjectives.filter(function (objective) { return objective.location == 'player' && objective.locationArg == playerTable.playerId; })); });
         var table = this.getPlayerTable(playerId);
-        table.resetTiles(undo.tiles);
+        table.resetModules(undo.modules);
         table.resetResearch(undo.research);
         undo.workers.forEach(function (worker) { return _this.resetWorker(playerId, worker); });
         this.setResearchPoints(playerId, undo.researchPoints);
@@ -3326,9 +3326,9 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.moveWorkerDiv = function (playerId, worker) {
         var workerDiv = document.getElementById("worker-".concat(worker.id));
         if (worker.location == 'player') {
-            var tilesDiv = document.getElementById("player-table-".concat(playerId, "-tiles"));
+            var modulesDiv = document.getElementById("player-table-".concat(playerId, "-modules"));
             this.getPlayerTable(playerId).makeSlotForCoordinates(worker.x, worker.y);
-            tilesDiv.querySelector("[data-slot-id=\"".concat(worker.x, "_").concat(worker.y, "\"]")).appendChild(workerDiv);
+            modulesDiv.querySelector("[data-slot-id=\"".concat(worker.x, "_").concat(worker.y, "\"]")).appendChild(workerDiv);
         }
         else if (worker.location == 'table') {
             var tableWorkers = document.getElementById('table-workers');
@@ -3376,8 +3376,8 @@ var Humanity = /** @class */ (function () {
                         args[argName] = getCostStr(args[argName]);
                     }
                 });
-                if (args.tile_image === '' && args.tile) {
-                    args.tile_image = "<div class=\"log-image\">".concat(this.tilesManager.getHtml(args.tile), "</div>");
+                if (args.module_image === '' && args.module) {
+                    args.module_image = "<div class=\"log-image\">".concat(this.modulesManager.getHtml(args.module), "</div>");
                 }
                 if (args.research_image === '' && args.research) {
                     args.research_image = "<div class=\"log-image\">".concat(this.researchManager.getHtml(args.research), "</div>");

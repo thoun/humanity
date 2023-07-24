@@ -20,7 +20,7 @@
 
 -- Example 1: create a standard "card" table to be used with the "Deck" tools (see example game "hearts"):
 
-CREATE TABLE IF NOT EXISTS `tile` (
+CREATE TABLE IF NOT EXISTS `module` (
    `card_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
    `card_type` tinyint(1) NOT NULL,
    `card_type_arg` tinyint(1) NOT NULL,

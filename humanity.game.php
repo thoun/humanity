@@ -28,7 +28,7 @@ require_once('modules/php/objects/undo.php');
 require_once('modules/php/constants.inc.php');
 require_once('modules/php/utils.php');
 require_once('modules/php/workers.php');
-require_once('modules/php/tiles.php');
+require_once('modules/php/modules.php');
 require_once('modules/php/objectives.php');
 require_once('modules/php/research.php');
 require_once('modules/php/actions.php');
@@ -39,7 +39,7 @@ require_once('modules/php/debug-util.php');
 class Humanity extends Table {
     use UtilTrait;
     use WorkerTrait;
-    use TileTrait;
+    use ModuleTrait;
     use ObjectiveTrait;
     use ResearchTrait;
     use ActionTrait;
@@ -58,8 +58,8 @@ class Humanity extends Table {
         
         self::initGameStateLabels([]);   
 		
-        $this->tiles = $this->getNew("module.common.deck");
-        $this->tiles->init("tile");
+        $this->modules = $this->getNew("module.common.deck");
+        $this->modules->init("module");
 		
         $this->research = $this->getNew("module.common.deck");
         $this->research->init("research");   
@@ -137,7 +137,7 @@ class Humanity extends Table {
 
         // setup the initial game situation here
         $this->setupWorkers(array_keys($players));
-        $this->setupTiles($players);
+        $this->setupModules($players);
         $this->setupResearches();
         $this->setupObjectives();
 
@@ -180,7 +180,7 @@ class Humanity extends Table {
             $player['researchPoints'] = intval($player['researchPoints']);
             $player['vp'] = intval($player['vp']);
             $player['science'] = $isEndScore || $playerId == $currentPlayerId ? intval($player['science']) : null;
-            $player['tiles'] = $this->getTilesByLocation('player', $playerId);
+            $player['modules'] = $this->getModulesByLocation('player', $playerId);
             $player['research'] = $this->getResearchsByLocation('player', $playerId);
             $player['objectives'] = $this->getObjectivesByLocation('player', $playerId);
             if ($isEndScore) {
@@ -190,7 +190,7 @@ class Humanity extends Table {
             $player['icons'] = $this->getPlayerIcons($playerId);
         }
 
-        $result['tableTiles'] = $this->getTilesByLocation('table');
+        $result['tableModules'] = $this->getModulesByLocation('table');
         $result['tableResearch'] = $this->getResearchsByLocation('table');
         $result['tableObjectives'] = $this->getObjectivesByLocation('table');      
 

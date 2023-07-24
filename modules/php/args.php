@@ -12,18 +12,18 @@ trait ArgsTrait {
         game state.
     */
 
-    function argActivateTile() {
+    function argActivateModule() {
         $playerId = intval($this->getActivePlayerId());
 
-        $playerTiles = $this->getTilesByLocation('player', $playerId);
+        $playerModules = $this->getModulesByLocation('player', $playerId);
 
         $worker = $this->getSelectedWorker();
-        $activatableTiles = array_values(array_filter($playerTiles, fn($tile) => $tile->workforce != null && $tile->r < 3 && $tile->workforce <= $worker->remainingWorkforce));
+        $activatableModules = array_values(array_filter($playerModules, fn($module) => $module->workforce != null && $module->r < 3 && $module->workforce <= $worker->remainingWorkforce));
 
         return [
             'worker' => $worker,
             'remaining' => $worker->remainingWorkforce, // for title
-            'activatableTiles' => $activatableTiles,
+            'activatableModules' => $activatableModules,
         ];
     }
    
@@ -31,14 +31,14 @@ trait ArgsTrait {
         $playerId = intval($this->getActivePlayerId());
         $playerIcons = $this->getPlayerIcons($playerId);
 
-        $tableTiles = $this->getTilesByLocation('table');
+        $tableModules = $this->getModulesByLocation('table');
         $tableResearch = $this->getResearchsByLocation('table');
 
-        $selectableTiles = array_values(array_filter($tableTiles, fn($tile) => $this->canPay($tile->cost, $playerIcons) != null));
-        $selectableResearch = array_values(array_filter($tableResearch, fn($tile) => $this->canPay($tile->cost, $playerIcons) != null));
+        $selectableModules = array_values(array_filter($tableModules, fn($module) => $this->canPay($module->cost, $playerIcons) != null));
+        $selectableResearch = array_values(array_filter($tableResearch, fn($module) => $this->canPay($module->cost, $playerIcons) != null));
 
         return [
-            'selectableTiles' => $selectableTiles,
+            'selectableModules' => $selectableModules,
             'selectableResearch' => $selectableResearch,
         ] + $this->argChooseWorker();
     }

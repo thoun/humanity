@@ -74,13 +74,13 @@ $playerActionsGameStates = [
 
     ST_PLAYER_CHOOSE_ACTION => [
         "name" => "chooseAction",
-        "description" => clienttranslate('${actplayer} must select a worker to activate tiles, or select a tile or research to deploy'),
-        "descriptionmyturn" => clienttranslate('${you} must select a worker to activate tiles, or select a tile or research to deploy'),
+        "description" => clienttranslate('${actplayer} must select a worker to activate modules, or select a module or research to deploy'),
+        "descriptionmyturn" => clienttranslate('${you} must select a worker to activate modules, or select a module or research to deploy'),
         "type" => "activeplayer",    
         "args" => "argChooseAction",
         "possibleactions" => [ 
             "chooseWorker",
-            "chooseNewTile",
+            "chooseNewModule",
             "chooseNewResearch",
         ],
         "transitions" => [
@@ -149,13 +149,13 @@ $playerActionsGameStates = [
     ],
 
     ST_PLAYER_ACTIVATE_TILE => [
-        "name" => "activateTile",
-        "description" => clienttranslate('${actplayer} can activate some tiles (${remaining} workforce remaining)'),
-        "descriptionmyturn" => clienttranslate('${you} can activate some tiles (${remaining} workforce remaining)'),
+        "name" => "activateModule",
+        "description" => clienttranslate('${actplayer} can activate some modules (${remaining} workforce remaining)'),
+        "descriptionmyturn" => clienttranslate('${you} can activate some modules (${remaining} workforce remaining)'),
         "type" => "activeplayer",
-        "args" => "argActivateTile",
+        "args" => "argActivateModule",
         "possibleactions" => [ 
-            "activateTile",
+            "activateModule",
             "endTurn",
         ],
         "transitions" => [
@@ -264,6 +264,7 @@ $gameGameStates = [
         "description" => clienttranslate('Reactivating workers...'),
         "type" => "game",
         "action" => "stAfterEndRound",
+        "updateGameProgression" => true,
         "transitions" => [
             "nextRound" => ST_START_TURN,
             "endYear" => ST_END_YEAR,
@@ -275,6 +276,7 @@ $gameGameStates = [
         "description" => clienttranslate('Scoring research points...'),
         "type" => "game",
         "action" => "stEndYear",
+        "updateGameProgression" => true,
         "transitions" => [
             "moveWorkers" => ST_MULTIPLAYER_MOVE_WORKERS,
             "afterEndRound" => ST_AFTER_END_ROUND,

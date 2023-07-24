@@ -2,7 +2,7 @@
 
 require_once(__DIR__.'/../constants.inc.php');
 
-class TileType {
+class ModuleType {
     public int $color;
     public array $cost;
     public ?int $workforce;
@@ -24,31 +24,31 @@ class TileType {
     } 
 }
 
-class BlueTileType extends TileType {
+class BlueModuleType extends ModuleType {
     public function __construct(array $cost, ?int $workforce = null, ?array $production = null, ?int $power = null, int $points = 0) {
         parent::__construct(BLUE, $cost, $workforce, $production, 0, 0, $power, $points);
     } 
 }
 
-class OrangeTileType extends TileType {
+class OrangeModuleType extends ModuleType {
     public function __construct(array $cost, ?int $workforce = null, ?array $production = null, ?int $power = null, int $points = 0) {
         parent::__construct(ORANGE, $cost, $workforce, $production, 0, 0, $power, $points);
     } 
 }
 
-class PurpleTileType extends TileType {
+class PurpleModuleType extends ModuleType {
     public function __construct(array $cost, ?int $adjacentResearchPoints = null, ?int $researchPoints = null, ?int $searchColor = null) {
         parent::__construct(PURPLE, $cost, null, null, $adjacentResearchPoints, $researchPoints, $searchColor);
     } 
 }
 
-class GreenTileType extends TileType {
+class GreenModuleType extends ModuleType {
     public function __construct(array $cost, ?int $shape = null, int $points = 0) {
         parent::__construct(GREEN, $cost, null, null, 0, 0, $shape, $points);
     } 
 }
 
-class Tile extends TileType {
+class Module extends ModuleType {
 
     public int $id;
     public string $location;
@@ -86,21 +86,21 @@ class Tile extends TileType {
         return $this->production[$this->r];
     }
 
-    public static function onlyId(?Tile $tile) {
-        if ($tile == null) {
+    public static function onlyId(?Module $module) {
+        if ($module == null) {
             return null;
         }
         
-        return new Tile([
-            'card_id' => $tile->id,
-            'card_location' => $tile->location,
-            'card_location_arg' => $tile->locationArg,
-            'card_type' => $tile->type,
+        return new Module([
+            'card_id' => $module->id,
+            'card_location' => $module->location,
+            'card_location_arg' => $module->locationArg,
+            'card_type' => $module->type,
         ], null);
     }
 
-    public static function onlyIds(array $tiles) {
-        return array_map(fn($tile) => self::onlyId($tile), $tiles);
+    public static function onlyIds(array $modules) {
+        return array_map(fn($module) => self::onlyId($module), $modules);
     }
 }
 

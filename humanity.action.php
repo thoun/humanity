@@ -57,20 +57,20 @@
         self::ajaxResponse();
     }
 
-    public function activateTile() {
+    public function activateModule() {
         self::setAjaxMode();     
 
         $id = self::getArg("id", AT_posint, true);
-        $this->game->activateTile($id);
+        $this->game->activateModule($id);
 
         self::ajaxResponse();
     }
 
-    public function chooseNewTile() {
+    public function chooseNewModule() {
         self::setAjaxMode();     
 
         $id = self::getArg("id", AT_posint, true);
-        $this->game->chooseNewTile($id);
+        $this->game->chooseNewModule($id);
 
         self::ajaxResponse();
     }

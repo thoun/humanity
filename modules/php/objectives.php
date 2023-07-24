@@ -36,13 +36,13 @@ trait ObjectiveTrait {
     }
 
     function setupObjectives() {
-        $tiles[] = ['A' => [], 'B' => [], 'C' => []];
+        $modules[] = ['A' => [], 'B' => [], 'C' => []];
         foreach (['A', 'B', 'C'] as $index => $letter) {
             foreach ($this->OBJECTIVES[$index + 1] as $number => $objectiveType) {
-                $tiles[$letter][] = [ 'type' => $index + 1, 'type_arg' => $number, 'nbr' => 1 ];
+                $modules[$letter][] = [ 'type' => $index + 1, 'type_arg' => $number, 'nbr' => 1 ];
             }
 
-            $this->objectives->createCards($tiles[$letter], 'deck'.$letter);
+            $this->objectives->createCards($modules[$letter], 'deck'.$letter);
             $this->objectives->shuffle('deck'.$letter);
         }
 
@@ -51,20 +51,20 @@ trait ObjectiveTrait {
         }
     }
 
-    function getAdjacentTilesCount(array $tiles, Tile $fromTile, bool $diagonal, array $alreadyCounted) {
+    function getAdjacentModulesCount(array $modules, Module $fromModule, bool $diagonal, array $alreadyCounted) {
         $maxFromHere = 0;
 
-        $adjacentTiles = $this->getAdjacentTiles($tiles, $fromTile, $diagonal);
-        foreach ($adjacentTiles as $adjacentTile) {
-            if (!$this->array_some($alreadyCounted, fn($countedTile) => $countedTile->id == $adjacentTile->id)) {
-                $fromAdjacentTile = $this->getAdjacentTilesCount(
-                    $tiles, 
-                    $adjacentTile, 
+        $adjacentModules = $this->getAdjacentModules($modules, $fromModule, $diagonal);
+        foreach ($adjacentModules as $adjacentModule) {
+            if (!$this->array_some($alreadyCounted, fn($countedModule) => $countedModule->id == $adjacentModule->id)) {
+                $fromAdjacentModule = $this->getAdjacentModulesCount(
+                    $modules, 
+                    $adjacentModule, 
                     $diagonal, 
-                    array_merge($alreadyCounted, [$adjacentTile]),
+                    array_merge($alreadyCounted, [$adjacentModule]),
                 );
-                if ($fromAdjacentTile > $maxFromHere) {
-                    $maxFromHere = $fromAdjacentTile;
+                if ($fromAdjacentModule > $maxFromHere) {
+                    $maxFromHere = $fromAdjacentModule;
                 }
             }
         }
@@ -72,25 +72,25 @@ trait ObjectiveTrait {
         return $maxFromHere + count($alreadyCounted);
     }
 
-    function countTilesOfColor(int $playerId, int $color, bool $adjacent, bool $diagonal) {
-        $tiles = $this->getTilesByLocation('player', $playerId);
-        $tilesOfColor = array_values(array_filter($tiles, fn($tile) => $tile->color == $color));
+    function countModulesOfColor(int $playerId, int $color, bool $adjacent, bool $diagonal) {
+        $modules = $this->getModulesByLocation('player', $playerId);
+        $modulesOfColor = array_values(array_filter($modules, fn($module) => $module->color == $color));
 
         if ($adjacent) {
-            return max(array_map(fn($fromTile) => $this->getAdjacentTilesCount($tilesOfColor, $fromTile, $diagonal, [$fromTile]), $tilesOfColor));
+            return max(array_map(fn($fromModule) => $this->getAdjacentModulesCount($modulesOfColor, $fromModule, $diagonal, [$fromModule]), $modulesOfColor));
         } else {
-            return count($tilesOfColor);
+            return count($modulesOfColor);
         }
     }
 
-    function getMaxTilesInDirectionFromTile(array $tiles, Tile $fromTile, int $x, int $y, bool $sameColor) {
+    function getMaxModulesInDirectionFromModule(array $modules, Module $fromModule, int $x, int $y, bool $sameColor) {
         $count = 1;
         do {
-            $nextTile = $this->array_find($tiles, fn($tile) => 
-                $tile->x == $fromTile->x + $x * $count && $tile->y == $fromTile->y + $y * $count
+            $nextModule = $this->array_find($modules, fn($module) => 
+                $module->x == $fromModule->x + $x * $count && $module->y == $fromModule->y + $y * $count
             );
 
-            if ($nextTile !== null && (!$sameColor || $nextTile->color == $fromTile->color)) {
+            if ($nextModule !== null && (!$sameColor || $nextModule->color == $fromModule->color)) {
                 $count++;
             } else {
                 return $count;
@@ -98,31 +98,31 @@ trait ObjectiveTrait {
         } while (true);
     }
 
-    function getMaxTilesInDirection(int $playerId, int $direction, bool $sameColor) {
-        $tiles = $this->getTilesByLocation('player', $playerId);
+    function getMaxModulesInDirection(int $playerId, int $direction, bool $sameColor) {
+        $modules = $this->getModulesByLocation('player', $playerId);
 
         if ($direction == HORIZONTAL) {
-            return max(array_map(fn($fromTile) => $this->getMaxTilesInDirectionFromTile($tiles, $fromTile, 1, 0, $sameColor), $tiles));
+            return max(array_map(fn($fromModule) => $this->getMaxModulesInDirectionFromModule($modules, $fromModule, 1, 0, $sameColor), $modules));
         } else if ($direction == VERTICAL) {
-            return max(array_map(fn($fromTile) => $this->getMaxTilesInDirectionFromTile($tiles, $fromTile, 0, 1, $sameColor), $tiles));
+            return max(array_map(fn($fromModule) => $this->getMaxModulesInDirectionFromModule($modules, $fromModule, 0, 1, $sameColor), $modules));
         } else if ($direction == DIAGONAL) {
             return max(
-                max(array_map(fn($fromTile) => $this->getMaxTilesInDirectionFromTile($tiles, $fromTile, 1, 1, $sameColor), $tiles)),
-                max(array_map(fn($fromTile) => $this->getMaxTilesInDirectionFromTile($tiles, $fromTile, -1, 1, $sameColor), $tiles)),
+                max(array_map(fn($fromModule) => $this->getMaxModulesInDirectionFromModule($modules, $fromModule, 1, 1, $sameColor), $modules)),
+                max(array_map(fn($fromModule) => $this->getMaxModulesInDirectionFromModule($modules, $fromModule, -1, 1, $sameColor), $modules)),
             );
         }
     }
 
     function getResearchTypeIcons(int $playerId, int $baseType) {
-        $researchTiles = $this->getResearchsByLocation('player', $playerId);
+        $researchModules = $this->getResearchsByLocation('player', $playerId);
         $count = 0;
 
-        foreach ($researchTiles as $researchTile) {
-            if (array_key_exists($baseType, $researchTile->cost)) {
-                $count += $researchTile->cost[$baseType];
+        foreach ($researchModules as $researchModule) {
+            if (array_key_exists($baseType, $researchModule->cost)) {
+                $count += $researchModule->cost[$baseType];
             }
-            if (array_key_exists($baseType + 10, $researchTile->cost)) {
-                $count += $researchTile->cost[$baseType + 10];
+            if (array_key_exists($baseType + 10, $researchModule->cost)) {
+                $count += $researchModule->cost[$baseType + 10];
             }
         }
 
@@ -130,15 +130,15 @@ trait ObjectiveTrait {
     }
 
     function getResearchExtremities(int $playerId, int $extremity) {
-        $researchTiles = $this->getResearchsByLocation('player', $playerId);
-        return count(array_filter($researchTiles, fn($researchTile) => $researchTile->extremity == $extremity));
+        $researchModules = $this->getResearchsByLocation('player', $playerId);
+        return count(array_filter($researchModules, fn($researchModule) => $researchModule->extremity == $extremity));
     }
     
     function fulfillObjective(int $playerId, Objective $objective) {
         if ($objective->color !== null) {
-            return $this->countTilesOfColor($playerId, $objective->color, $objective->adjacent, $objective->diagonal) >= $objective->minimum;
+            return $this->countModulesOfColor($playerId, $objective->color, $objective->adjacent, $objective->diagonal) >= $objective->minimum;
         } else if ($objective->direction !== null) {
-            return $this->getMaxTilesInDirection($playerId, $objective->direction, $objective->sameColor) >= $objective->minimum;
+            return $this->getMaxModulesInDirection($playerId, $objective->direction, $objective->sameColor) >= $objective->minimum;
         } else if ($objective->baseType !== null) {
             return $this->getResearchTypeIcons($playerId, $objective->baseType) >= $objective->minimum;
         } else if ($objective->extremity !== null) {

@@ -35,7 +35,7 @@ trait ActionTrait {
             $currentAction->selectedWorker = $id;
             $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
-            self::notifyAllPlayers('log', clienttranslate('${player_name} selects a worker of workforce ${workforce} to activate tiles'), [
+            self::notifyAllPlayers('log', clienttranslate('${player_name} selects a worker of workforce ${workforce} to activate modules'), [
                 'playerId' => $playerId,
                 'player_name' => $this->getPlayerName($playerId),
                 'workforce' => $worker->workforce,
@@ -49,8 +49,8 @@ trait ActionTrait {
             $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
             $upgrade = 0;
-            if ($currentAction->type == 'tile') {
-                $upgrade = $this->deployTile($playerId, $currentAction, $worker);
+            if ($currentAction->type == 'module') {
+                $upgrade = $this->deployModule($playerId, $currentAction, $worker);
             } else if ($currentAction->type == 'research') {
                 $this->deployResearch($playerId, $currentAction, $worker);
             }
@@ -64,8 +64,8 @@ trait ActionTrait {
         }
     }
 
-    public function activateTile(int $id) {
-        self::checkAction('activateTile');
+    public function activateModule(int $id) {
+        self::checkAction('activateModule');
 
         $worker = $this->getSelectedWorker();
         if ($worker == null) {
@@ -73,60 +73,60 @@ trait ActionTrait {
         }
 
         $playerId = intval($this->getActivePlayerId());
-        $argActivateTile = $this->argActivateTile($playerId);
+        $argActivateModule = $this->argActivateModule($playerId);
 
-        $tile = $this->array_find($argActivateTile['activatableTiles'], fn($t) => $t->id == $id);
-        if ($tile == null) {
-            throw new BgaUserException("You cannot activate this tile");
+        $module = $this->array_find($argActivateModule['activatableModules'], fn($t) => $t->id == $id);
+        if ($module == null) {
+            throw new BgaUserException("You cannot activate this module");
         }
 
-        if ($worker->remainingWorkforce < $tile->workforce) {
+        if ($worker->remainingWorkforce < $module->workforce) {
             throw new BgaUserException("Not enough remaining workforce");
         }
-        $worker->remainingWorkforce -= $tile->workforce;
+        $worker->remainingWorkforce -= $module->workforce;
         $this->DbQuery("UPDATE worker SET `remaining_workforce` = $worker->remainingWorkforce WHERE `id` = $worker->id");
 
         $message = null;
         $args = [];
-        if ($tile->matchType) {
-            if ($tile->matchType == RESEARCH_POWER_TIME) {
+        if ($module->matchType) {
+            if ($module->matchType == RESEARCH_POWER_TIME) {
                 $this->gainTimeUnit($playerId, 1);
             }
-            $message = clienttranslate('${player_name} activates a tile to trigger TODO POWER TIME effect ${tile_image}');
+            $message = clienttranslate('${player_name} activates a module to trigger TODO POWER TIME effect ${module_image}');
         } else {
-            if ($tile->r >= 3) {
-                throw new BgaUserException("You cannot activate this tile (already fully activated)");
+            if ($module->r >= 3) {
+                throw new BgaUserException("You cannot activate this module (already fully activated)");
             }
-            $tile->r += 1;
-            $this->DbQuery("UPDATE tile SET `r` = $tile->r WHERE `card_id` = $tile->id");
+            $module->r += 1;
+            $this->DbQuery("UPDATE module SET `r` = $module->r WHERE `card_id` = $module->id");
 
-            if ($tile->type == 9) {
-                $message = clienttranslate('${player_name} activates an obstacle to reduce resistance to ${resistance} ${tile_image}');
-                $args['resistance'] = 3 - $tile->r;
+            if ($module->type == 9) {
+                $message = clienttranslate('${player_name} activates an obstacle to reduce resistance to ${resistance} ${module_image}');
+                $args['resistance'] = 3 - $module->r;
             } else {                
-                $message = clienttranslate('${player_name} activates a tile to set its production to ${types} ${tile_image}');
-                $args['types'] = $tile->getProduction();
+                $message = clienttranslate('${player_name} activates a module to set its production to ${types} ${module_image}');
+                $args['types'] = $module->getProduction();
             }
         }
 
-        self::notifyAllPlayers('activateTile', $message, $args + [
+        self::notifyAllPlayers('activateModule', $message, $args + [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'tile' => $tile,
+            'module' => $module,
             'icons' => $this->getPlayerIcons($playerId),
-            'tile_image' => '',
-            'preserve' => ['tile'],
+            'module_image' => '',
+            'preserve' => ['module'],
         ]);
 
-        if ($tile->type == 9 && $tile->r == 3) {
-            $this->tiles->moveCard($tile->id, 'void');
+        if ($module->type == 9 && $module->r == 3) {
+            $this->modules->moveCard($module->id, 'void');
 
             $this->incPlayerResearchPoints($playerId, 3);
 
-            self::notifyAllPlayers('removeTile', clienttranslate('${player_name} removes an obstacle and gain 3 research points'), [
+            self::notifyAllPlayers('removeModule', clienttranslate('${player_name} removes an obstacle and gain 3 research points'), [
                 'playerId' => $playerId,
                 'player_name' => $this->getPlayerName($playerId),
-                'tile' => $tile,
+                'module' => $module,
             ]);
         }
 
@@ -137,28 +137,28 @@ trait ActionTrait {
         }
     }
 
-    public function chooseNewTile(int $id) {
-        self::checkAction('chooseNewTile');
+    public function chooseNewModule(int $id) {
+        self::checkAction('chooseNewModule');
 
         $playerId = intval($this->getActivePlayerId());
-        $tile = $this->getTileById($id);
+        $module = $this->getModuleById($id);
 
-        $currentAction = new CurrentAction('tile');
-        $currentAction->addTileId = $id;
-        $currentAction->removeTileId = $id;
-        $currentAction->remainingCost = $tile->cost;
-        $currentAction->workerSpot = $tile->locationArg;
+        $currentAction = new CurrentAction('module');
+        $currentAction->addModuleId = $id;
+        $currentAction->removeModuleId = $id;
+        $currentAction->remainingCost = $module->cost;
+        $currentAction->workerSpot = $module->locationArg;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
-        self::notifyAllPlayers('log', clienttranslate('${player_name} chooses a tile to deploy ${tile_image}'), [
+        self::notifyAllPlayers('log', clienttranslate('${player_name} chooses a module to deploy ${module_image}'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'tile' => $tile,
-            'tile_image' => '',
-            'preserve' => ['tile'],
+            'module' => $module,
+            'module_image' => '',
+            'preserve' => ['module'],
         ]);
 
-        $this->gamestate->nextState($tile->color == BLUE_OR_ORANGE ? 'chooseRadarColor' : 'pay');
+        $this->gamestate->nextState($module->color == BLUE_OR_ORANGE ? 'chooseRadarColor' : 'pay');
     }
 
     public function chooseRadarColor(int $color) {
@@ -171,20 +171,20 @@ trait ActionTrait {
         $playerId = intval($this->getActivePlayerId());
         $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
 
-        $radarTiles = $this->getTilesByLocation('radar');
-        $tile = $this->getTileById($currentAction->removeTileId);
-        $tile = $this->array_find($radarTiles, fn($t) => $t->color == $color && $t->researchPoints == $tile->researchPoints);
+        $radarModules = $this->getModulesByLocation('radar');
+        $module = $this->getModuleById($currentAction->removeModuleId);
+        $module = $this->array_find($radarModules, fn($t) => $t->color == $color && $t->researchPoints == $module->researchPoints);
 
-        $currentAction->addTileId = $tile->id;
+        $currentAction->addModuleId = $module->id;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
-        self::notifyAllPlayers('log', clienttranslate('${player_name} chooses a ${color} radar to replace the selected tile ${tile_image}'), [
+        self::notifyAllPlayers('log', clienttranslate('${player_name} chooses a ${color} radar to replace the selected module ${module_image}'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'tile' => $tile,
+            'module' => $module,
             'color' => $this->getColorName($color),
-            'tile_image' => '',
-            'preserve' => ['tile'],
+            'module_image' => '',
+            'preserve' => ['module'],
             'i18n' => ['color'],
         ]);
 
@@ -195,20 +195,20 @@ trait ActionTrait {
         self::checkAction('chooseNewResearch');
 
         $playerId = intval($this->getActivePlayerId());
-        $tile = $this->getResearchById($id);
+        $module = $this->getResearchById($id);
 
         $currentAction = new CurrentAction('research');
         $currentAction->research = $id;
-        $currentAction->remainingCost = $tile->cost;
-        $currentAction->workerSpot = ($tile->locationArg + $this->getArm()) % 8;
+        $currentAction->remainingCost = $module->cost;
+        $currentAction->workerSpot = ($module->locationArg + $this->getArm()) % 8;
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
-        self::notifyAllPlayers('log', clienttranslate('${player_name} chooses a research tile to deploy ${research_image}'), [
+        self::notifyAllPlayers('log', clienttranslate('${player_name} chooses a research module to deploy ${research_image}'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'research' => $tile,
+            'research' => $module,
             'research_image' => '',
-            'preserve' => ['tile'],
+            'preserve' => ['module'],
         ]);
 
         $this->gamestate->nextState('pay');
@@ -219,31 +219,31 @@ trait ActionTrait {
 
         $playerId = intval($this->getActivePlayerId());
         $playerIcons = $this->getPlayerIcons($playerId);
-        $playerTiles = $this->getTilesByLocation('player', $playerId);
-        $playerTiles = array_values(array_filter($playerTiles, fn($t) => $t->production !== null && $t->r > 0));
+        $playerModules = $this->getModulesByLocation('player', $playerId);
+        $playerModules = array_values(array_filter($playerModules, fn($t) => $t->production !== null && $t->r > 0));
 
         $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
         
         $pay = $this->canPay((array)$currentAction->remainingCost, $playerIcons);
         if ($pay == null) {
-            throw new BgaVisibleSystemException("You cannot afford this tile");
+            throw new BgaVisibleSystemException("You cannot afford this module");
         }
 
         foreach ($pay as $type => $amount) {
             $remainingAmount = $amount;
 
-            foreach ($playerTiles as $produceTile) {
-                $produce = $produceTile->getProduction();
+            foreach ($playerModules as $produceModule) {
+                $produce = $produceModule->getProduction();
                 if (array_key_exists($type, $produce)) {
                     $rotate = min($remainingAmount, $produce[$type]);
                     $remainingAmount -= $rotate;
                     $playerIcons[$type] -= $rotate;
-                    $produceTile->r -= $rotate;
+                    $produceModule->r -= $rotate;
 
                     self::notifyAllPlayers('pay', '', [
                         'playerId' => $playerId,
                         'player_name' => $this->getPlayerName($playerId),
-                        'tile' => $produceTile,
+                        'module' => $produceModule,
                         'icons' => $playerIcons,
                     ]);
 
@@ -254,7 +254,7 @@ trait ActionTrait {
             }
         }
 
-        self::notifyAllPlayers('log', clienttranslate('${player_name} pays ${cost} to deploy the tile'), [
+        self::notifyAllPlayers('log', clienttranslate('${player_name} pays ${cost} to deploy the module'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
             'cost' => $pay,
@@ -412,19 +412,19 @@ trait ActionTrait {
             $this->DbQuery("UPDATE `objective` SET `card_location` = '$objective->location', `card_location_arg` = $objective->locationArg WHERE `card_id` = $objective->id");
         }
 
-        foreach ($undo->tableTiles as $tile) {
-            $this->DbQuery("UPDATE `tile` SET `card_location` = '$tile->location', `card_location_arg` = $tile->locationArg, `x` = NULL, `y` = NULL, `r` = 0 WHERE `card_id` = $tile->id");
+        foreach ($undo->tableModules as $module) {
+            $this->DbQuery("UPDATE `module` SET `card_location` = '$module->location', `card_location_arg` = $module->locationArg, `x` = NULL, `y` = NULL, `r` = 0 WHERE `card_id` = $module->id");
         }
-        foreach ($undo->tableResearch as $tile) {
-            $this->DbQuery("UPDATE `research` SET `card_location` = '$tile->location', `card_location_arg` = $tile->locationArg, `line` = NULL WHERE `card_id` = $tile->id");
+        foreach ($undo->tableResearch as $module) {
+            $this->DbQuery("UPDATE `research` SET `card_location` = '$module->location', `card_location_arg` = $module->locationArg, `line` = NULL WHERE `card_id` = $module->id");
         }
        
-        $this->DbQuery("UPDATE `tile` SET `card_location` = 'radar' WHERE `card_type` = 8 && `card_location` = 'player' AND `card_location_arg` = $playerId");
-        foreach ($undo->tiles as $tile) {            
-            $this->DbQuery("UPDATE `tile` SET `card_location` = '$tile->location', `card_location_arg` = $tile->locationArg, `x` = $tile->x, `y` = $tile->y, `r` = $tile->r WHERE `card_id` = $tile->id");
+        $this->DbQuery("UPDATE `module` SET `card_location` = 'radar' WHERE `card_type` = 8 && `card_location` = 'player' AND `card_location_arg` = $playerId");
+        foreach ($undo->modules as $module) {            
+            $this->DbQuery("UPDATE `module` SET `card_location` = '$module->location', `card_location_arg` = $module->locationArg, `x` = $module->x, `y` = $module->y, `r` = $module->r WHERE `card_id` = $module->id");
         }
-        foreach ($undo->research as $tile) {
-            $this->DbQuery("UPDATE `research` SET `card_location` = '$tile->location', `card_location_arg` = $tile->locationArg, `line` = $tile->line WHERE `card_id` = $tile->id");
+        foreach ($undo->research as $module) {
+            $this->DbQuery("UPDATE `research` SET `card_location` = '$module->location', `card_location_arg` = $module->locationArg, `line` = $module->line WHERE `card_id` = $module->id");
         }
 
         foreach ($undo->workers as $worker) {

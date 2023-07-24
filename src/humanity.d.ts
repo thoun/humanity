@@ -2,7 +2,7 @@
  * Your game interfaces
  */
 
-interface Tile {
+interface Module {
     id: number;
     location: string;
     locationArg: number;
@@ -67,7 +67,7 @@ interface HumanityPlayer extends Player {
     playerNo: number;
     
     workers: Worker[];
-    tiles: Tile[];
+    modules: Module[];
     research: Research[];
     researchPoints: number;
     vp: number;
@@ -90,7 +90,7 @@ interface HumanityGamedatas {
     tablespeed: string;
 
     // Add here variables you set up in getAllDatas
-    tableTiles: Tile[];
+    tableModules: Module[];
     tableResearch: Research[];
     tableObjectives: Objective[];
     arm: number;
@@ -102,7 +102,7 @@ interface HumanityGamedatas {
 }
 
 interface HumanityGame extends Game {
-    tilesManager: TilesManager;
+    modulesManager: ModulesManager;
     researchManager: DestinationsManager;
     objectivesManager: ObjectivesManager;
 
@@ -115,9 +115,9 @@ interface HumanityGame extends Game {
 
     setTooltip(id: string, html: string): void;
     onTableResearchClick(research: Research): void;
-    onPlayerTileClick(card: Tile): void;
-    onPlayerTileSpotClick(x: number, y: number): void;
-    onTableTileClick(card: Tile): void;
+    onPlayerModuleClick(card: Module): void;
+    onPlayerModuleSpotClick(x: number, y: number): void;
+    onTableModuleClick(card: Module): void;
 }
 
 interface EnteringChooseWorkerArgs {
@@ -125,7 +125,7 @@ interface EnteringChooseWorkerArgs {
 }
 
 interface EnteringChooseActionArgs extends EnteringChooseWorkerArgs {
-    selectableTiles: Tile[];
+    selectableModules: Module[];
     selectableResearch: Research[];
 }
 
@@ -134,9 +134,9 @@ interface EnteringPayArgs {
     pay: Icons;
 }
 
-interface EnteringActivateTileArgs {
+interface EnteringActivateModuleArgs {
     worker: Worker;
-    activatableTiles: Tile[];
+    activatableModules: Module[];
 }
 
 interface EnteringMoveWorkerArgs {
@@ -148,16 +148,16 @@ interface NotifFirstPlayerTokenArgs {
     playerId: number;
 }
 
-// activateTile, pay
-interface NotifRotateTileArgs {
+// activateModule, pay
+interface NotifRotateModuleArgs {
     playerId: number;
-    tile: Tile;
+    module: Module;
 }
 
-// removeTile
-interface NotifRemoveTileArgs {
+// removeModule
+interface NotifRemoveModuleArgs {
     playerId: number;
-    tile: Tile;
+    module: Module;
 }
 
 // disableWorker, upgradeWorker
@@ -178,10 +178,10 @@ interface NotifMoveWorkerToTableArgs {
     worker: Worker;
 }
 
-// deployTile
-interface NotifDeployTileArgs {
+// deployModule
+interface NotifDeployModuleArgs {
     playerId: number;
-    tile: Tile;
+    module: Module;
 }
 
 // deployResearch
@@ -203,9 +203,9 @@ interface NotifNewFirstPlayerArgs {
     playerId: number;
 }  
 
-// removeTableTile, shiftTableTile, newTableTile
-interface NotifTableTileArgs {
-    tile: Tile;
+// removeTableModule, shiftTableModule, newTableModule
+interface NotifTableModuleArgs {
+    module: Module;
 }
 
 // moveArm
@@ -236,13 +236,13 @@ interface NotifGainObjectiveArgs {
 }
 
 interface Undo {
-    tiles: Tile[];
+    modules: Module[];
     research: Research[];
     workers: Worker[];
     vp: number;
     researchPoints: number;
     science: number;
-    tableTiles: Tile[];
+    tableModules: Module[];
     tableResearch: Research[];
     allObjectives: Objective[];
 }

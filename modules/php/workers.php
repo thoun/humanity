@@ -112,21 +112,21 @@ trait WorkerTrait {
 
     function getWorkerPossibleCoordinates(int $playerId, array $alreadyMovedWorkers) {
         $workers = $this->getPlayerWorkers($playerId);
-        $tilesAndObstacles = ($this->getTilesByLocation('player', $playerId));
-        $tiles = array_values(array_filter($tilesAndObstacles, fn($tile) => $tile->type !== 9));
+        $modulesAndObstacles = ($this->getModulesByLocation('player', $playerId));
+        $modules = array_values(array_filter($modulesAndObstacles, fn($module) => $module->type !== 9));
         $possibleCoordinates = [];
 
-        foreach ($tiles as $tile) {    
+        foreach ($modules as $module) {    
             for ($dx = -1; $dx <= 1; $dx++) {
                 for ($dy = -1; $dy <= 1; $dy++) {
                     if ($dx == 0 && $dy == 0) { continue; }
                     if ($dx != 0 && $dy != 0) { continue; }
 
-                    $x = $tile->x + $dx;
-                    $y = $tile->y + $dy;
+                    $x = $module->x + $dx;
+                    $y = $module->y + $dy;
 
                     if (
-                        !$this->array_some($tilesAndObstacles, fn($t) => $t->x == $x && $t->y == $y) // no tile or obstacle in this place
+                        !$this->array_some($modulesAndObstacles, fn($t) => $t->x == $x && $t->y == $y) // no module or obstacle in this place
                         && !$this->array_some($workers, fn($w) => $w->x == $x && $w->y == $y) // no worker in this place
                         && !$this->array_some($alreadyMovedWorkers, fn($w) => $w->x == $x && $w->y == $y) // not already moved worker in this place
                         && !$this->array_some($possibleCoordinates, fn($pc) => $pc[0] == $x && $pc[1] == $y) // not already in the array

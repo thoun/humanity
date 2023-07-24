@@ -1,4 +1,4 @@
-.tile {
+.module {
     display: inline-block;
     position: relative;
     width: 150px;
@@ -28,7 +28,7 @@
     }  
 
     &[data-type="0"] .front {
-        background-image: url('img/tiles-starting.png');
+        background-image: url('img/modules-starting.png');
 
         @for $number from 1 through 4 {
             &[data-number="#{$number}"] {
@@ -39,7 +39,7 @@
 
     @for $age from 1 through 3 {
         &[data-type="#{$age}"] .front {
-            background-image: url('img/tiles-ages.png');  
+            background-image: url('img/modules-ages.png');  
             background-size: auto 300%;
             background-position-y: #{($age - 1) * 100% / 2};
 
@@ -52,7 +52,7 @@
     }
 
     &[data-type="8"] .front {
-        background-image: url('img/tiles-radar.png');  
+        background-image: url('img/modules-radar.png');  
         background-size: auto 200%;
 
         @for $number from 1 through 3 {

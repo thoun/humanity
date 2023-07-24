@@ -16,8 +16,8 @@ trait ResearchTrait {
     function getResearchById(int $id) {
         $sql = "SELECT * FROM `research` WHERE `card_id` = $id";
         $dbResults = $this->getCollectionFromDb($sql);
-        $tiles = array_map(fn($dbCard) => $this->getResearchFromDb($dbCard), array_values($dbResults));
-        return count($tiles) > 0 ? $tiles[0] : null;
+        $modules = array_map(fn($dbCard) => $this->getResearchFromDb($dbCard), array_values($dbResults));
+        return count($modules) > 0 ? $modules[0] : null;
     }
 
     function getResearchsByLocation(string $location, /*int|null*/ $location_arg = null, /*int|null*/ $type = null, /*int|null*/ $number = null) {
@@ -37,13 +37,13 @@ trait ResearchTrait {
     }
 
     function setupResearches() {
-        $tiles[] = [1 => [], 2 => [], 3 => []];
+        $modules[] = [1 => [], 2 => [], 3 => []];
         foreach ([1, 2, 3] as $year) {
             foreach ($this->RESEARCH[$year] as $number => $researchType) {
-                $tiles[$year][] = [ 'type' => $year, 'type_arg' => $number, 'nbr' => 1 ];
+                $modules[$year][] = [ 'type' => $year, 'type_arg' => $number, 'nbr' => 1 ];
             }
 
-            $this->research->createCards($tiles[$year], 'deck'.$year);
+            $this->research->createCards($modules[$year], 'deck'.$year);
             $this->research->shuffle('deck'.$year);
         }
 
@@ -56,23 +56,23 @@ trait ResearchTrait {
         $this->moveWorkerToTable($playerId, $worker, $currentAction->workerSpot);
 
         $playerResearches = $this->getResearchsByLocation('player', $playerId);
-        $tile = $this->getResearchById($currentAction->research);
+        $module = $this->getResearchById($currentAction->research);
 
         $numberByExtremities = [LEFT => 0, CENTRAL => 0, RIGHT => 0];
         foreach ($playerResearches as $playerResearch) {
             $numberByExtremities[$playerResearch->extremity]++;
         }
-        $line = $numberByExtremities[$tile->extremity];
+        $line = $numberByExtremities[$module->extremity];
 
         $alreadyBuildForSameLine = 0;
         foreach (array_keys($numberByExtremities) as $extremity) {
-            if ($extremity != $tile->extremity && $numberByExtremities[$extremity] > $line) {
+            if ($extremity != $module->extremity && $numberByExtremities[$extremity] > $line) {
                 $alreadyBuildForSameLine++;
             }
         }
 
         if ($alreadyBuildForSameLine > 0) {
-            $message = clienttranslate('${player_name} gains ${inc} points for placing the ${rank} research tile of a line');
+            $message = clienttranslate('${player_name} gains ${inc} points for placing the ${rank} research module of a line');
             $args = ['i18n' => ['rank']];
             if ($alreadyBuildForSameLine == 1) {
                 $args['rank'] = clienttranslate('second');
@@ -83,28 +83,28 @@ trait ResearchTrait {
             }
         }
 
-        if ($tile->researchPoints > 0) {
-            $this->incPlayerResearchPoints($playerId, $tile->researchPoints, clienttranslate('${player_name} gains ${inc} research points from the played research'));
+        if ($module->researchPoints > 0) {
+            $this->incPlayerResearchPoints($playerId, $module->researchPoints, clienttranslate('${player_name} gains ${inc} research points from the played research'));
         }
 
-        if ($tile->points > 0) {
-            $this->incPlayerVP($playerId, $tile->points, clienttranslate('${player_name} gains ${inc} points from the played research'));
+        if ($module->points > 0) {
+            $this->incPlayerVP($playerId, $module->points, clienttranslate('${player_name} gains ${inc} points from the played research'));
         }
 
-        $this->DbQuery("UPDATE research SET `card_location` = 'player', `card_location_arg` = $playerId, `line` = $line WHERE `card_id` = $tile->id");
-        $tile->location = 'player';
-        $tile->locationArg = $playerId;
-        $tile->line = $line;
+        $this->DbQuery("UPDATE research SET `card_location` = 'player', `card_location_arg` = $playerId, `line` = $line WHERE `card_id` = $module->id");
+        $module->location = 'player';
+        $module->locationArg = $playerId;
+        $module->line = $line;
 
         self::notifyAllPlayers('deployResearch', '', [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
-            'research' => $tile,
+            'research' => $module,
         ]);
 
-        if ($tile->effect == RESEARCH_POWER_TIME) {
+        if ($module->effect == RESEARCH_POWER_TIME) {
             $this->gainTimeUnit($playerId, 2);
-        } else if ($tile->effect == RESEARCH_POWER_REACTIVATE) {
+        } else if ($module->effect == RESEARCH_POWER_REACTIVATE) {
             $this->reactivatePlayerWorkers($playerId);
         }
     }

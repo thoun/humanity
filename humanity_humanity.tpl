@@ -7,7 +7,7 @@
                 <div id="board-2">
                     <div id="table-research"></div>
                 </div>
-                <div id="table-tiles"></div>
+                <div id="table-modules"></div>
                 <div id="table-workers"></div>
             </div>
             <div id="research-board">

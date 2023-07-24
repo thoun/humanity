@@ -15,11 +15,11 @@ trait StateTrait {
         $playerId = intval($this->getActivePlayerId());
 
         $this->setGlobalVariable(UNDO, new Undo(
-            $this->getTilesByLocation('player', $playerId),
+            $this->getModulesByLocation('player', $playerId),
             $this->getResearchsByLocation('player', $playerId),
             $this->getPlayerWorkers($playerId),
             $this->getPlayer($playerId),
-            $this->getTilesByLocation('table'),
+            $this->getModulesByLocation('table'),
             $this->getResearchsByLocation('table'),
             $this->getObjectivesByLocation(),
         ));
@@ -86,55 +86,55 @@ trait StateTrait {
 
         // remove first 2 modules
         $armBefore = $this->getArm();
-        $tableTiles = $this->getTilesByLocation('table');
+        $tableModules = $this->getModulesByLocation('table');
         foreach ([1, 2] as $moduleIndex) {
             $spot = ($armBefore + $moduleIndex) % 8;
-            $spotTile = $this->array_find($tableTiles, fn($tableTile) => $tableTile->locationArg == $spot);
-            if ($spotTile) {
-                $this->tiles->moveCard($spotTile->id, 'void');
-                self::notifyAllPlayers('removeTableTile', clienttranslate('There is a tile remaining under a white cross, the tile is removed ${tile_image}'), [
-                    'tile' => $spotTile,
-                    'tile_image' => '',
-                    'preserve' => ['tile'],
+            $spotModule = $this->array_find($tableModules, fn($tableModule) => $tableModule->locationArg == $spot);
+            if ($spotModule) {
+                $this->modules->moveCard($spotModule->id, 'void');
+                self::notifyAllPlayers('removeTableModule', clienttranslate('There is a module remaining under a white cross, the module is removed ${module_image}'), [
+                    'module' => $spotModule,
+                    'module_image' => '',
+                    'preserve' => ['module'],
                 ]);
-                $tableTiles = array_values(array_filter($tableTiles, fn($tableTile) => $tableTile->id != $spotTile->id));
+                $tableModules = array_values(array_filter($tableModules, fn($tableModule) => $tableModule->id != $spotModule->id));
             }
         }
 
-        $orderedTilesDesc = []; // remaining tiles, from farest to closest from arm
+        $orderedModulesDesc = []; // remaining modules, from farest to closest from arm
         for ($i = 1; $i <= 7; $i++) {
             $spot = ($armBefore + $i) % 8;
-            $spotTile = $this->array_find($tableTiles, fn($tableTile) => $tableTile->locationArg == $spot);
-            if ($spotTile) {
-                array_unshift($orderedTilesDesc, $spotTile);
+            $spotModule = $this->array_find($tableModules, fn($tableModule) => $tableModule->locationArg == $spot);
+            if ($spotModule) {
+                array_unshift($orderedModulesDesc, $spotModule);
             }
         }
 
         $shifted = 0;
         // shift remaining modules
-        for ($i = 0; $i < count($orderedTilesDesc); $i++) {
+        for ($i = 0; $i < count($orderedModulesDesc); $i++) {
             $spot = ($armBefore + 7 - $i) % 8;
-            if ($orderedTilesDesc[$i]->locationArg != $spot) {
-                $orderedTilesDesc[$i]->locationArg = $spot;
-                $this->tiles->moveCard($orderedTilesDesc[$i]->id, 'table', $spot);
+            if ($orderedModulesDesc[$i]->locationArg != $spot) {
+                $orderedModulesDesc[$i]->locationArg = $spot;
+                $this->modules->moveCard($orderedModulesDesc[$i]->id, 'table', $spot);
                 $shifted++;
 
-                self::notifyAllPlayers('shiftTableTile', '', [
-                    'tile' => $orderedTilesDesc[$i],
+                self::notifyAllPlayers('shiftTableModule', '', [
+                    'module' => $orderedModulesDesc[$i],
                 ]);
             }
         }
 
         if ($shifted > 0) {
-            self::notifyAllPlayers('log', clienttranslate('${diff} tiles were shifted on the free spots before the arm'), [
+            self::notifyAllPlayers('log', clienttranslate('${diff} modules were shifted on the free spots before the arm'), [
                 'diff' => $shifted,
             ]);
         }
 
         // move arm
-        $tableTiles = $this->getTilesByLocation('table');
+        $tableModules = $this->getModulesByLocation('table');
         $armAfter = $armBefore;
-        while (!$this->array_some($tableTiles, fn($tableTile) => $tableTile->locationArg == (($armAfter + 1) % 8))) {
+        while (!$this->array_some($tableModules, fn($tableModule) => $tableModule->locationArg == (($armAfter + 1) % 8))) {
             $armAfter = ($armAfter + 1) % 8;
         }
         $this->setGlobalVariable(ARM, $armAfter);
@@ -157,24 +157,24 @@ trait StateTrait {
         }
         $this->setGlobalVariable(MOVED_WORKERS, $movedWorkers);
 
-        // place new tiles
+        // place new modules
         $age = $this->getYear();
-        $tableTiles = $this->getTilesByLocation('table');
+        $tableModules = $this->getModulesByLocation('table');
         for ($i = 1; $i < 8; $i++) {
             $spot = ($armAfter + $i) % 8;
-            $spotTile = $this->array_find($tableTiles, fn($tableTile) => $tableTile->locationArg == $spot);
-            if (!$spotTile) {
-                $newTile = $this->getTileFromDb($this->tiles->pickCardForLocation('deck'.$age, 'table', $spot));
-                if ($newTile == null) {
-                    self::notifyAllPlayers('log', clienttranslate('Impossible to refill the tiles, moving to next year'), []);
+            $spotModule = $this->array_find($tableModules, fn($tableModule) => $tableModule->locationArg == $spot);
+            if (!$spotModule) {
+                $newModule = $this->getModuleFromDb($this->modules->pickCardForLocation('deck'.$age, 'table', $spot));
+                if ($newModule == null) {
+                    self::notifyAllPlayers('log', clienttranslate('Impossible to refill the modules, moving to next year'), []);
                     
                     $this->gamestate->nextState('endYear');
                     return;
                 } else {
-                    self::notifyAllPlayers('newTableTile', clienttranslate('A new tile is added to the board to fill an empty hangar ${tile_image}'), [
-                        'tile' => $newTile,
-                        'tile_image' => '',
-                        'preserve' => ['tile'],
+                    self::notifyAllPlayers('newTableModule', clienttranslate('A new module is added to the board to fill an empty hangar ${module_image}'), [
+                        'module' => $newModule,
+                        'module_image' => '',
+                        'preserve' => ['module'],
                     ]);
                 }
             }
@@ -239,7 +239,7 @@ trait StateTrait {
             'year' => $year,
         ]);
 
-        // replace all research tiles
+        // replace all research modules
         $this->research->moveAllCardsInLocation('table', 'void');
         foreach ([1, 2, 3, 4, 5, 6, 7] as $spot) {
             $this->research->pickCardForLocation('deck'.$year, 'table', $spot);
@@ -248,16 +248,16 @@ trait StateTrait {
             'tableResearch' => $this->getResearchsByLocation('table'),
         ]);
 
-        // continue to fill tiles with new age tiles
+        // continue to fill modules with new age modules
         $arm = $this->getArm();
-        $tableTiles = $this->getTilesByLocation('table');
+        $tableModules = $this->getModulesByLocation('table');
         for ($i = 1; $i < 8; $i++) {
             $spot = ($arm + $i) % 8;
-            $spotTile = $this->array_find($tableTiles, fn($tableTile) => $tableTile->locationArg == $spot);
-            if (!$spotTile) {
-                $newTile = $this->getTileFromDb($this->tiles->pickCardForLocation('deck'.$year, 'table', $spot));
-                self::notifyAllPlayers('newTableTile', '', [
-                    'tile' => $newTile,
+            $spotModule = $this->array_find($tableModules, fn($tableModule) => $tableModule->locationArg == $spot);
+            if (!$spotModule) {
+                $newModule = $this->getModuleFromDb($this->modules->pickCardForLocation('deck'.$year, 'table', $spot));
+                self::notifyAllPlayers('newTableModule', '', [
+                    'module' => $newModule,
                 ]);
             }
         }

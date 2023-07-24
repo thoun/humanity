@@ -1,6 +1,6 @@
 class TableCenter {
     public research: SlotStock<Research>;
-    public tiles: SlotStock<Tile>;
+    public modules: SlotStock<Module>;
         
     constructor(private game: HumanityGame, gamedatas: HumanityGamedatas) {
         /*this.researchDecks = new Deck<Destination>(game.researchManager, document.getElementById(`table-research-${letter}-deck`), {
@@ -17,13 +17,13 @@ class TableCenter {
         this.research.addCards(gamedatas.tableResearch);
         this.research.onCardClick = (card: Research) => this.game.onTableResearchClick(card);
 
-        this.tiles = new SlotStock<Tile>(game.tilesManager, document.getElementById(`table-tiles`), {
+        this.modules = new SlotStock<Module>(game.modulesManager, document.getElementById(`table-modules`), {
             slotsIds: [0, 1, 2, 3, 4, 5, 6, 7],
             mapCardToSlot: card => card.locationArg,
             gap: '12px',
         });
-        this.tiles.onCardClick = card => this.game.onTableTileClick(card);
-        this.tiles.addCards(gamedatas.tableTiles);
+        this.modules.onCardClick = card => this.game.onTableModuleClick(card);
+        this.modules.addCards(gamedatas.tableModules);
 
         const tableWorkers = document.getElementById('table-workers');
         tableWorkers.insertAdjacentHTML('beforeend', 
@@ -45,16 +45,16 @@ class TableCenter {
         tableWorkers.querySelector(`.slot[data-slot-id="${worker.spot}"]`).appendChild(workerDiv);
     }
     
-    public removeTile(tile: Tile) {
-        this.tiles.removeCard(tile);
+    public removeModule(module: Module) {
+        this.modules.removeCard(module);
     }
     
-    public shiftTile(tile: Tile): Promise<any> {
-        return this.tiles.addCard(tile);
+    public shiftModule(module: Module): Promise<any> {
+        return this.modules.addCard(module);
     }
     
-    public newTile(tile: Tile): Promise<any> {
-        return this.tiles.addCard(tile);
+    public newModule(module: Module): Promise<any> {
+        return this.modules.addCard(module);
     }
     
     public moveArm(arm: number) {
@@ -66,16 +66,16 @@ class TableCenter {
         this.research.addCards(tableResearch);
     }
     
-    public setSelectableTiles(selectableTiles: Tile[] | null) {
-        this.tiles.setSelectionMode(selectableTiles ? 'single' : 'none', selectableTiles);
+    public setSelectableModules(selectableModules: Module[] | null) {
+        this.modules.setSelectionMode(selectableModules ? 'single' : 'none', selectableModules);
     }
     
     public setSelectableResearch(selectableResearch: Research[] | null) {
         this.research.setSelectionMode(selectableResearch ? 'single' : 'none', selectableResearch);
     }
     
-    public resetTiles(tiles: Tile[]) {
-        this.tiles.removeAll();
-        this.tiles.addCards(tiles);
+    public resetModules(modules: Module[]) {
+        this.modules.removeAll();
+        this.modules.addCards(modules);
     }
 }

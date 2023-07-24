@@ -19,7 +19,7 @@ function getCostStr(cost: Icons) {
 }
 
 class Humanity implements HumanityGame {
-    public tilesManager: TilesManager;
+    public modulesManager: ModulesManager;
     public researchManager: DestinationsManager;
     public objectivesManager: ObjectivesManager;
 
@@ -59,7 +59,7 @@ class Humanity implements HumanityGame {
 
         log('gamedatas', gamedatas);
 
-        this.tilesManager = new TilesManager(this);
+        this.modulesManager = new ModulesManager(this);
         this.researchManager = new DestinationsManager(this);        
         this.objectivesManager = new ObjectivesManager(this);
         this.animationManager = new AnimationManager(this);
@@ -139,8 +139,8 @@ class Humanity implements HumanityGame {
             case 'chooseAction':
                 this.onEnteringChooseAction(args.args);
                 break;
-            case 'activateTile':
-                this.onEnteringActivateTile(args.args);
+            case 'activateModule':
+                this.onEnteringActivateModule(args.args);
                 break;
             case 'chooseWorker':
                 this.onEnteringChooseWorker(args.args);
@@ -157,16 +157,16 @@ class Humanity implements HumanityGame {
     private onEnteringChooseAction(args: EnteringChooseActionArgs) {
         if ((this as any).isCurrentPlayerActive()) {
             this.getCurrentPlayerTable()?.setSelectableWorkers(args.workers);
-            this.tableCenter.setSelectableTiles(args.selectableTiles);
+            this.tableCenter.setSelectableModules(args.selectableModules);
             this.tableCenter.setSelectableResearch(args.selectableResearch);
         }
     }
     
-    public onEnteringActivateTile(args: EnteringActivateTileArgs) {
+    public onEnteringActivateModule(args: EnteringActivateModuleArgs) {
         if ((this as any).isCurrentPlayerActive()) {
             const table = this.getCurrentPlayerTable();
             table.setSelectedWorker(args.worker);
-            table.setSelectableTiles(args.activatableTiles);
+            table.setSelectableModules(args.activatableModules);
         }
     }
 
@@ -183,7 +183,7 @@ class Humanity implements HumanityGame {
     }
 
     private onEnteringMoveWorker(args: EnteringMoveWorkerArgs) {
-        this.getCurrentPlayerTable()?.setSelectableTileSpots(args.possibleCoordinates);
+        this.getCurrentPlayerTable()?.setSelectableModuleSpots(args.possibleCoordinates);
     }
 
     public onLeavingState(stateName: string) {
@@ -192,11 +192,11 @@ class Humanity implements HumanityGame {
         switch (stateName) {
             case 'chooseAction':
                 this.onLeavingChooseWorker();
-                this.tableCenter.setSelectableTiles(null);
+                this.tableCenter.setSelectableModules(null);
                 this.tableCenter.setSelectableResearch(null);
                 break;
-            case 'activateTile':
-                this.onLeavingActivateTile();
+            case 'activateModule':
+                this.onLeavingActivateModule();
                 break;
             case 'chooseWorker':
                 this.onLeavingChooseWorker();
@@ -210,11 +210,11 @@ class Humanity implements HumanityGame {
         }
     }
     
-    public onLeavingActivateTile() {
+    public onLeavingActivateModule() {
         if ((this as any).isCurrentPlayerActive()) {
             const table = this.getCurrentPlayerTable();
             table.setSelectedWorker(null);
-            table.setSelectableTiles(null);
+            table.setSelectableModules(null);
         }
     }
 
@@ -223,7 +223,7 @@ class Humanity implements HumanityGame {
     }
 
     private onLeavingMoveWorker() {
-        this.getCurrentPlayerTable()?.setSelectableTileSpots(null);
+        this.getCurrentPlayerTable()?.setSelectableModuleSpots(null);
     }
 
     private onLeavingUpgradeWorker() {
@@ -237,7 +237,7 @@ class Humanity implements HumanityGame {
         
         if ((this as any).isCurrentPlayerActive()) {
             switch (stateName) {
-                case 'activateTile':
+                case 'activateModule':
                     (this as any).addActionButton(`endTurn_button`, _("End turn"), () => this.endTurn());
                     break;
                 case 'chooseRadarColor':
@@ -257,7 +257,7 @@ class Humanity implements HumanityGame {
             }
 
             
-            if (['chooseRadarColor', 'pay', 'chooseWorker', 'upgradeWorker', 'activateTile', 'confirmTurn'].includes(stateName)) {
+            if (['chooseRadarColor', 'pay', 'chooseWorker', 'upgradeWorker', 'activateModule', 'confirmTurn'].includes(stateName)) {
                 (this as any).addActionButton(`restartTurn_button`, _("Restart turn"), () => this.restartTurn(), null, null, 'red');
             }
         }
@@ -478,7 +478,7 @@ class Humanity implements HumanityGame {
         this.researchBoard.setResearchPoints(playerId, count);
     }
 
-    private getHelpHtml() {
+    private getHelpHtml() { // TODO
         let html = `
         <div id="help-popin">
             <h1>${_("Assets")}</h2>
@@ -530,19 +530,19 @@ class Humanity implements HumanityGame {
         }
     }
 
-    public onPlayerTileClick(card: Tile): void {
-        this.activateTile(card.id);
+    public onPlayerModuleClick(card: Module): void {
+        this.activateModule(card.id);
     }
     
-    public onPlayerTileSpotClick(x: number, y: number): void {
+    public onPlayerModuleSpotClick(x: number, y: number): void {
         if (this.gamedatas.gamestate.private_state?.name == 'moveWorker') {
             this.moveWorker(x, y);
         }
     }
 
-    public onTableTileClick(tile: Tile): void {
+    public onTableModuleClick(module: Module): void {
         if (this.gamedatas.gamestate.name == 'chooseAction') {
-            this.chooseNewTile(tile.id);
+            this.chooseNewModule(module.id);
         }
     }
 
@@ -574,22 +574,22 @@ class Humanity implements HumanityGame {
         });
     }
   	
-    public activateTile(id: number) {
-        if(!(this as any).checkAction('activateTile')) {
+    public activateModule(id: number) {
+        if(!(this as any).checkAction('activateModule')) {
             return;
         }
 
-        this.takeAction('activateTile', {
+        this.takeAction('activateModule', {
             id
         });
     }
   	
-    public chooseNewTile(id: number) {
-        if(!(this as any).checkAction('chooseNewTile')) {
+    public chooseNewModule(id: number) {
+        if(!(this as any).checkAction('chooseNewModule')) {
             return;
         }
 
-        this.takeAction('chooseNewTile', {
+        this.takeAction('chooseNewModule', {
             id
         });
     }
@@ -692,22 +692,22 @@ class Humanity implements HumanityGame {
 
         const notifs = [
             ['firstPlayerToken', undefined],
-            ['activateTile', ANIMATION_MS],
+            ['activateModule', ANIMATION_MS],
             ['pay', 50],
-            ['removeTile', ANIMATION_MS],
+            ['removeModule', ANIMATION_MS],
             ['disableWorker', ANIMATION_MS],
             ['gainTimeUnit', ANIMATION_MS],
             ['moveWorkerToTable', ANIMATION_MS],
-            ['deployTile', undefined],
+            ['deployModule', undefined],
             ['deployResearch', undefined],
             ['score', 1],
             ['researchPoints', 1],
             ['vp', 1],
             ['science', 1],
             ['newFirstPlayer', ANIMATION_MS],
-            ['removeTableTile', ANIMATION_MS],
-            ['shiftTableTile', ANIMATION_MS],
-            ['newTableTile', ANIMATION_MS],
+            ['removeTableModule', ANIMATION_MS],
+            ['shiftTableModule', ANIMATION_MS],
+            ['newTableModule', ANIMATION_MS],
             ['moveArm', ANIMATION_MS],
             ['newTableResearch', ANIMATION_MS],
             ['reactivateWorkers', ANIMATION_MS],
@@ -754,25 +754,25 @@ class Humanity implements HumanityGame {
         return this.placeFirstPlayerToken(notif.args.playerId);
     }
 
-    notif_activateTile(args: NotifRotateTileArgs) {
+    notif_activateModule(args: NotifRotateModuleArgs) {
         const playerId = args.playerId;
         const playerTable = this.getPlayerTable(playerId);
 
-        playerTable.rotateTile(args.tile);
+        playerTable.rotateModule(args.module);
     }
 
-    notif_pay(args: NotifRotateTileArgs) {
+    notif_pay(args: NotifRotateModuleArgs) {
         const playerId = args.playerId;
         const playerTable = this.getPlayerTable(playerId);
 
-        playerTable.rotateTile(args.tile);
+        playerTable.rotateModule(args.module);
     }
 
-    notif_removeTile(args: NotifRemoveTileArgs) {
+    notif_removeModule(args: NotifRemoveModuleArgs) {
         const playerId = args.playerId;
         const playerTable = this.getPlayerTable(playerId);
 
-        playerTable.removeTile(args.tile);
+        playerTable.removeModule(args.module);
     }
 
     notif_disableWorker(args: NotifWorkerArgs) {
@@ -790,9 +790,9 @@ class Humanity implements HumanityGame {
         this.tableCenter.moveWorker(worker);
     }
 
-    notif_deployTile(args: NotifDeployTileArgs) {
-        const { playerId, tile } = args;
-        return this.getPlayerTable(playerId).addTile(tile);
+    notif_deployModule(args: NotifDeployModuleArgs) {
+        const { playerId, module } = args;
+        return this.getPlayerTable(playerId).addModule(module);
     }
 
     notif_deployResearch(args: NotifDeployResearchArgs) {
@@ -822,16 +822,16 @@ class Humanity implements HumanityGame {
         this.placeFirstPlayerToken(args.playerId);
     }
 
-    notif_removeTableTile(args: NotifTableTileArgs) {
-        this.tableCenter.removeTile(args.tile);
+    notif_removeTableModule(args: NotifTableModuleArgs) {
+        this.tableCenter.removeModule(args.module);
     }    
 
-    notif_shiftTableTile(args: NotifTableTileArgs) {
-        this.tableCenter.shiftTile(args.tile);
+    notif_shiftTableModule(args: NotifTableModuleArgs) {
+        this.tableCenter.shiftModule(args.module);
     }     
 
-    notif_newTableTile(args: NotifTableTileArgs) {
-        this.tableCenter.newTile(args.tile);
+    notif_newTableModule(args: NotifTableModuleArgs) {
+        this.tableCenter.newModule(args.module);
     }  
 
     notif_moveArm(args: NotifMoveArmArgs) {
@@ -870,14 +870,14 @@ class Humanity implements HumanityGame {
     notif_restartTurn(args: NotifRestartTurnArgs) {
         const { playerId, undo } = args;
 
-        this.tableCenter.resetTiles(undo.tableTiles);
+        this.tableCenter.resetModules(undo.tableModules);
         this.tableCenter.newResearch(undo.tableResearch);
         this.researchBoard.resetObjectives(undo.allObjectives.filter(objective => objective.location == 'table'));
 
         this.playersTables.forEach(playerTable => playerTable.resetObjectives(undo.allObjectives.filter(objective => objective.location == 'player' && objective.locationArg == playerTable.playerId)));
 
         const table = this.getPlayerTable(playerId);
-        table.resetTiles(undo.tiles);
+        table.resetModules(undo.modules);
         table.resetResearch(undo.research);
 
         undo.workers.forEach(worker => this.resetWorker(playerId, worker));
@@ -904,9 +904,9 @@ class Humanity implements HumanityGame {
     private moveWorkerDiv(playerId: number, worker: Worker) {
         const workerDiv = document.getElementById(`worker-${worker.id}`);
         if (worker.location == 'player') {
-            const tilesDiv = document.getElementById(`player-table-${playerId}-tiles`);
+            const modulesDiv = document.getElementById(`player-table-${playerId}-modules`);
             this.getPlayerTable(playerId).makeSlotForCoordinates(worker.x, worker.y);
-            tilesDiv.querySelector(`[data-slot-id="${worker.x}_${worker.y}"]`).appendChild(workerDiv);
+            modulesDiv.querySelector(`[data-slot-id="${worker.x}_${worker.y}"]`).appendChild(workerDiv);
         } else if (worker.location == 'table') {
             const tableWorkers = document.getElementById('table-workers');
             tableWorkers.querySelector(`.slot[data-slot-id="${worker.spot}"]`).appendChild(workerDiv);
@@ -960,8 +960,8 @@ class Humanity implements HumanityGame {
                     }
                 });
 
-                if (args.tile_image === '' && args.tile) {
-                    args.tile_image = `<div class="log-image">${this.tilesManager.getHtml(args.tile)}</div>`;
+                if (args.module_image === '' && args.module) {
+                    args.module_image = `<div class="log-image">${this.modulesManager.getHtml(args.module)}</div>`;
                 }
 
                 if (args.research_image === '' && args.research) {

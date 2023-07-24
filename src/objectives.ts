@@ -16,7 +16,7 @@ class ObjectivesManager extends CardManager<Objective> {
     }
 
     private getTooltip(objective: Objective): string {
-        let message = '';
+        let message = 'TODO';
         switch (objective.number) {
             case 1: message = _("(+2) if you have 1 or 3 orange cards."); break;
             case 2: message = _("(-2) if orange cards are in the scoring column with either value (1) or value (2)."); break;
@@ -38,10 +38,10 @@ class ObjectivesManager extends CardManager<Objective> {
         
     }
     
-    public getHtml(tile: Objective): string {
-        let html = `<div class="card objective" data-side="front" data-type="${tile.type}">
+    public getHtml(module: Objective): string {
+        let html = `<div class="card objective" data-side="front" data-type="${module.type}">
             <div class="card-sides">
-                <div class="card-side front" data-number="${tile.number}">
+                <div class="card-side front" data-number="${module.number}">
                 </div>
                 <div class="card-side back">
                 </div>

@@ -1,32 +1,32 @@
 <?php
 
 class Undo {
-    public array $tiles;
+    public array $modules;
     public array $research;
     public array $workers;
     public int $vp;
     public int $researchPoints;
     public int $science;
-    public array $tableTiles;
+    public array $tableModules;
     public array $tableResearch;
     public array $allObjectives;
 
     public function __construct(
-        array $tiles,
+        array $modules,
         array $research,
         array $workers,
         HumanityPlayer $player,
-        array $tableTiles,
+        array $tableModules,
         array $tableResearch,
         array $allObjectives
     ) {
-        $this->tiles = $tiles;
+        $this->modules = $modules;
         $this->research = $research;
         $this->workers = $workers;
         $this->vp = $player->vp;
         $this->researchPoints = $player->researchPoints;
         $this->science = $player->science;
-        $this->tableTiles = $tableTiles;
+        $this->tableModules = $tableModules;
         $this->tableResearch = $tableResearch;
         $this->allObjectives = $allObjectives;
     }
