@@ -10,6 +10,7 @@ const ACTION_TIMER_DURATION = 5;
 
 const LOCAL_STORAGE_ZOOM_KEY = 'Humanity-zoom';
 const LOCAL_STORAGE_JUMP_TO_FOLDED_KEY = 'Humanity-jump-to-folded';
+const LOCAL_STORAGE_HELP_FOLDED_KEY = 'Humanity-help-folded';
 
 const ICONS_COUNTERS_TYPES = [1, 2, 3, 0];
 
@@ -116,14 +117,28 @@ class Humanity implements HumanityGame {
             },
         });
 
+        const helpButtons: BgaHelpButton[] = [
+            new BgaHelpPopinButton({
+                title: _("Tile details").toUpperCase(),
+                html: this.getHelpHtml(),
+                buttonBackground: '#ba3c1e',
+            }),
+        ];
+        const currentPlayerColor = this.getPlayer(this.getPlayerId())?.color;
+        if (currentPlayerColor) {
+            helpButtons.push(
+                new BgaHelpExpandableButton({
+                    expandedWidth: '843px',
+                    expandedHeight: '370px',
+                    defaultFolded: true,
+                    localStorageFoldedKey: LOCAL_STORAGE_HELP_FOLDED_KEY,
+                    buttonExtraClasses: `player-color-${currentPlayerColor}`
+                })
+            );
+        }
+
         new HelpManager(this, { 
-            buttons: [
-                new BgaHelpPopinButton({
-                    title: _("Tile details").toUpperCase(),
-                    html: this.getHelpHtml(),
-                    buttonBackground: '#ba3c1e',
-                }),
-            ]
+            buttons: helpButtons
         });
         this.setupNotifications();
         this.setupPreferences();
@@ -529,15 +544,17 @@ class Humanity implements HumanityGame {
                 <div class="tiles">
                     <div class="legend-tile-wrapper">
                         ${this.modulesManager.getHtml({ type: 1, number: 8, r: 1 } as Module)}
-                        <div class="legend-number" style="left: 10px; top: 20px;">1</div>
-                        <div class="legend-number" style="left: 40px; top: 20px;">2</div>
-                        <div class="legend-number" style="left: 70px; top: 20px;">3</div>
+                        <div class="legend-number" style="left: 0; bottom: 0;">1</div>
+                        <div class="legend-number" style="left: 49px; bottom: -22px;">2</div>
+                        <div class="legend-number" style="left: 101px; bottom: 3px;">3</div>
                     </div>
                     <div class="legend-tile-wrapper">
                         ${this.modulesManager.getHtml({ type: 1, number: 11 } as Module)}
-                        <div class="legend-number" style="left: 10px; top: 20px;">1</div>
-                        <div class="legend-number" style="left: 100px; top: 20px;">4</div>
-                        <div class="legend-number" style="left: 130px; top: 20px;">5</div>
+                        <div class="legend-number" style="left: 0; bottom: 0;">1</div>
+                        <div class="legend-number" style="left: -14px; top: 64px;">4</div>
+                        <div class="legend-number" style="right: -14px; top: 64px;">4</div>
+                        <div class="legend-number" style="left: 64px; bottom: -14px;">4</div>
+                        <div class="legend-number" style="right: 2px; bottom: 2px;">5</div>
                     </div>
                 </div>
             </div>
@@ -557,10 +574,11 @@ class Humanity implements HumanityGame {
             <h1>${_("Mission Tiles")}</h1>
 
             <h2>${_("Missions ${letter}").replace('${letter}', 'A')}</h2>
+
             <div class="help-section">
-                <div>${this.missionsManager.getTooltip({ minimum: 4, color: ORANGE } as Mission)}</div>
-                <div>${this.missionsManager.getTooltip({ minimum: 3, color: BLUE } as Mission)}</div>
-                <div>${this.missionsManager.getTooltip({ minimum: 3, color: PURPLE, diagonal: true } as Mission)}</div>
+                <div>${this.missionsManager.getTooltip({ minimum: 4, adjacent: true, color: ORANGE } as Mission)}</div>
+                <div>${this.missionsManager.getTooltip({ minimum: 3, adjacent: true, color: BLUE } as Mission)}</div>
+                <div>${this.missionsManager.getTooltip({ minimum: 3, adjacent: true, color: PURPLE, diagonal: true } as Mission)}</div>
                 <div class="tiles">
                     ${this.missionsManager.getHtml({ type: 1, number: 1 } as Mission)}
                     ${this.missionsManager.getHtml({ type: 1, number: 2 } as Mission)}
@@ -572,11 +590,64 @@ class Humanity implements HumanityGame {
                 </div>
             </div>
 
+            <div class="help-section">
+                <div>${this.missionsManager.getTooltip({ minimum: 6, adjacent: false, color: ORANGE } as Mission)}</div>
+                <div>${this.missionsManager.getTooltip({ minimum: 4, adjacent: false, color: BLUE } as Mission)}</div>
+                <div>${this.missionsManager.getTooltip({ minimum: 3, adjacent: false, color: PURPLE } as Mission)}</div>
+                <div class="tiles">
+                    ${this.missionsManager.getHtml({ type: 1, number: 4 } as Mission)}
+                    ${this.missionsManager.getHtml({ type: 1, number: 5 } as Mission)}
+                    ${this.missionsManager.getHtml({ type: 1, number: 6 } as Mission)}
+                </div>
+            </div>
+
             <h2>${_("Missions ${letter}").replace('${letter}', 'B')}</h2>
-            TODO
+
+            <div class="help-section">
+                <div>${this.missionsManager.getTooltip({ minimum: 4, direction: 1, sameColor: false } as Mission)}</div>
+                <div>${this.missionsManager.getTooltip({ minimum: 5, direction: 2, sameColor: false } as Mission)}</div>
+                <div>${this.missionsManager.getTooltip({ minimum: 4, direction: 3, sameColor: false } as Mission)}</div>
+                <div class="tiles">
+                    ${this.missionsManager.getHtml({ type: 2, number: 1 } as Mission)}
+                    ${this.missionsManager.getHtml({ type: 2, number: 2 } as Mission)}
+                    ${this.missionsManager.getHtml({ type: 2, number: 3 } as Mission)}
+                </div>
+            </div>
+
+            <div class="help-section">
+                <div>${this.missionsManager.getTooltip({ minimum: 3, direction: 1, sameColor: true } as Mission)}</div>
+                <div>${this.missionsManager.getTooltip({ minimum: 3, direction: 2, sameColor: true } as Mission)}</div>
+                <div>${this.missionsManager.getTooltip({ minimum: 3, direction: 3, sameColor: true } as Mission)}</div>
+                <div class="tiles">
+                    ${this.missionsManager.getHtml({ type: 2, number: 4 } as Mission)}
+                    ${this.missionsManager.getHtml({ type: 2, number: 5 } as Mission)}
+                    ${this.missionsManager.getHtml({ type: 2, number: 6 } as Mission)}
+                </div>
+            </div>
 
             <h2>${_("Missions ${letter}").replace('${letter}', 'C')}</h2>
-            TODO
+
+            <div class="help-section">
+                <div>${this.missionsManager.getTooltip({ minimum: 4, baseType: 1 } as Mission)}</div>
+                <div>${this.missionsManager.getTooltip({ minimum: 4, baseType: 2 } as Mission)}</div>
+                <div>${this.missionsManager.getTooltip({ minimum: 4, baseType: 3 } as Mission)}</div>
+                <div class="tiles">
+                    ${this.missionsManager.getHtml({ type: 3, number: 1 } as Mission)}
+                    ${this.missionsManager.getHtml({ type: 3, number: 2 } as Mission)}
+                    ${this.missionsManager.getHtml({ type: 3, number: 3 } as Mission)}
+                </div>
+            </div>
+
+            <div class="help-section">
+                <div>${this.missionsManager.getTooltip({ minimum: 3, side: 1 } as Mission)}</div>
+                <div>${this.missionsManager.getTooltip({ minimum: 3, side: 2 } as Mission)}</div>
+                <div>${this.missionsManager.getTooltip({ minimum: 3, side: 3 } as Mission)}</div>
+                <div class="tiles">
+                    ${this.missionsManager.getHtml({ type: 3, number: 4 } as Mission)}
+                    ${this.missionsManager.getHtml({ type: 3, number: 5 } as Mission)}
+                    ${this.missionsManager.getHtml({ type: 3, number: 6 } as Mission)}
+                </div>
+            </div>
         `;
 
         return html;

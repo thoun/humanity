@@ -1,3 +1,20 @@
+.bga-help_expandable-button {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+
+    @each $playerColor in $playerColors {
+        &.player-color-#{$playerColor} { 
+            background-image: url('img/screens/screen-#{$playerColor}.png');
+        }
+    }
+
+    &[data-folded="false"] {
+        background-color: transparent;
+        box-shadow: none;
+    }
+}
+
 #popin_bgaHelpDialog {
     --background-color: #bae5f4;
 }
@@ -29,15 +46,19 @@
     }
 
     .help-section {  
-        background: #FFFFFF66;  
+        background: #FFFFFFBB;  
         padding: 5px;
-        margin: 3px 0;
+        margin: 8px 0;
 
         .tiles {
             display: flex;
             justify-content: space-evenly;
             gap: 8px;
         }
+    }
+
+    .legend-tile-wrapper {
+        margin: 16px;
     }
 
     span.legend-number {

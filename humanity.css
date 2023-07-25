@@ -1347,6 +1347,28 @@ body > .card {
   height: 100px;
 }
 
+.bga-help_expandable-button {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+.bga-help_expandable-button.player-color-f0db6c {
+  background-image: url("img/screens/screen-f0db6c.png");
+}
+.bga-help_expandable-button.player-color-62bce6 {
+  background-image: url("img/screens/screen-62bce6.png");
+}
+.bga-help_expandable-button.player-color-70c499 {
+  background-image: url("img/screens/screen-70c499.png");
+}
+.bga-help_expandable-button.player-color-ddbdd7 {
+  background-image: url("img/screens/screen-ddbdd7.png");
+}
+.bga-help_expandable-button[data-folded=false] {
+  background-color: transparent;
+  box-shadow: none;
+}
+
 #popin_bgaHelpDialog {
   --background-color: #bae5f4;
 }
@@ -1374,14 +1396,17 @@ body > .card {
   background: white;
 }
 #help-popin .help-section {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.7333333333);
   padding: 5px;
-  margin: 3px 0;
+  margin: 8px 0;
 }
 #help-popin .help-section .tiles {
   display: flex;
   justify-content: space-evenly;
   gap: 8px;
+}
+#help-popin .legend-tile-wrapper {
+  margin: 16px;
 }
 #help-popin span.legend-number {
   font-weight: bold;

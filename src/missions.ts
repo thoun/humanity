@@ -25,19 +25,19 @@ class MissionsManager extends CardManager<Mission> {
 
     public getTooltip(mission: Mission): string {
         let message = '';
-        if (mission.color !== null) {
+        if (mission.color) {
             message = mission.adjacent ? _("Have at least ${number} adjacent ${color} Modules.") : _("Have at least ${number} ${color} Modules in their base.");
             message = message.replace('${number}', ''+mission.minimum).replace('${color}', this.game.getColor(mission.color, false));
             if (mission.diagonal) {
                 message += `<br><br><span color="red">${_("Important: for this Mission only, diagonally adjacent Modules are also counted.")}</span>`;
             }
-        } else if (mission.direction !== null) {
+        } else if (mission.direction) {
             message = mission.sameColor ? _("Have a ${direction} line of at least ${number} adjacent Modules of the same color.") : _("Have a ${direction} line of at least ${number} adjacent Modules, whatever their color.");
             message = message.replace('${number}', ''+mission.minimum).replace('${direction}', this.getDirection(mission.direction));
-        } else if (mission.baseType !== null) {
+        } else if (mission.baseType) {
             message = _("Have at least ${number} ${base_icon} and/or ${advanced_icon} pictograms represented on the Experiments they have carried out.");
             message = message.replace('${number}', ''+mission.minimum).replace('${base_icon}', `<div class="resource-icon" data-type="${mission.baseType}"></div>`).replace('${advanced_icon}', `<div class="resource-icon" data-type="${mission.baseType + 10}"></div>`);
-        } else if (mission.side !== null) {
+        } else if (mission.side) {
             message = _("Have carried out at least ${number} Experiments from the ${side}");
             message = message.replace('${number}', ''+mission.minimum).replace('${side}', this.game.getSide(mission.side));
         }
