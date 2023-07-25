@@ -63,6 +63,13 @@ html, .mode_3d #game_play_area_background {
   &.science {
     background-position-x: #{1 * 100% / 1};
   } 
+
+  &.reactivate {
+    background-image: url('img/icon-reactivate.svg');
+  }
+  &.time-unit {
+    background-image: url('img/icon-time-unit.svg');
+  }
 }
 
 

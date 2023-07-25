@@ -11,6 +11,11 @@
       }
   }
 
+  &[data-year="3"] .front {
+    top: -14px;
+    right: -14px;
+  }
+
   .card-sides {
       .card-side {
         box-shadow: none;

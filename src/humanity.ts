@@ -520,16 +520,16 @@ class Humanity implements HumanityGame {
                 <div class="tiles">
                     <div class="legend-tile-wrapper">
                         ${this.experimentsManager.getHtml({ year: 3, number: 2 } as Experiment)}
-                        <div class="legend-number" style="left: 10px; top: 20px;">1</div>
-                        <div class="legend-number" style="left: 40px; top: 20px;">2</div>
-                        <div class="legend-number" style="left: 70px; top: 20px;">3</div>
-                        <div class="legend-number" style="left: 100px; top: 20px;">4</div>
+                        <div class="legend-number" style="left: 10px; bottom: 0px;">1</div>
+                        <div class="legend-number" style="left: 49px; top: 2px;">2</div>
+                        <div class="legend-number" style="left: 81px; top: 2px;">3</div>
+                        <div class="legend-number" style="right: -26px; top: -8px;">4</div>
                     </div>
                 </div>
 
-                <h2>[TODO Reactivate logo]</h2>
+                <h2><div class="reactivate icon"></div></h2>
                 <div>${this.getPower(1, 2)}</div>
-                <h2>[TODO Time unit logo]</h2>
+                <h2><div class="time-unit icon"></div></h2>
                 <div>${this.getPower(2, 2)}</div>
             </div>
 
@@ -560,16 +560,108 @@ class Humanity implements HumanityGame {
             </div>
 
             <h2>${_("Production modules")}</h2>
-            TODO
+
+            <div class="help-section">
+                <div>${_("This type of Module requires 1 Work point to activate and produces 1 basic resource that can be spent later.")}</div>
+                <div class="tiles">
+                    ${this.modulesManager.getHtml({ type: 0, number: 2, r: 1 } as Module)}
+                    ${this.modulesManager.getHtml({ type: 0, number: 1, r: 1 } as Module)}
+                    ${this.modulesManager.getHtml({ type: 0, number: 3, r: 1 } as Module)}
+                </div>
+            </div>
+
+            <div class="help-section">
+                <div>${_("This type of Module requires 1 Work point to activate and produces 1 variable basic resource. But, the player does not have to choose which resource type it is until they spend it later on. If they decide to spend several resources from this Module at once, they can choose different resources for each.")}</div>
+                <div class="tiles">
+                    ${this.modulesManager.getHtml({ type: 1, number: 4, r: 1 } as Module)}
+                    ${this.modulesManager.getHtml({ type: 1, number: 5, r: 1 } as Module)}
+                    ${this.modulesManager.getHtml({ type: 1, number: 6, r: 1 } as Module)}
+                </div>
+            </div>
+
+            <div class="help-section">
+                <div>${_("This type of Module requires 2 Work points to activate and produces 1 advanced resource, that can be spent later.")}</div>
+                <div class="tiles">
+                    ${this.modulesManager.getHtml({ type: 0, number: 4, r: 1 } as Module)}
+                    ${this.modulesManager.getHtml({ type: 1, number: 7, r: 1 } as Module)}
+                    ${this.modulesManager.getHtml({ type: 1, number: 8, r: 1 } as Module)}
+                    ${this.modulesManager.getHtml({ type: 1, number: 9, r: 1 } as Module)}
+                </div>
+            </div>
+
+            <div class="help-section">
+                <div>${_("This type of Module requires 2 Work point to activate and produces 1 variable advanced resource. But, the player does not have to choose which resource type it is until they spend it later on. If they decide to spend several resources from this Module at once, they can choose different resources for each.")}</div>
+                <div class="tiles">
+                    ${this.modulesManager.getHtml({ type: 2, number: 6, r: 1 } as Module)}
+                    ${this.modulesManager.getHtml({ type: 2, number: 7, r: 1 } as Module)}
+                    ${this.modulesManager.getHtml({ type: 2, number: 8, r: 1 } as Module)}
+                </div>
+            </div>
+
+            <div class="help-section">
+                <div>${_("This type of Module requires 1 Work point to activate and produces 1 electricity that can be spent later. Players can spend 1 electricity to replace 1 basic resource (methane, ice, or insect).")}</div>
+                <div class="tiles">
+                    ${this.modulesManager.getHtml({ type: 2, number: 4, r: 1 } as Module)}
+                </div>
+            </div>
+
+            <div class="help-section">
+                <div>${_("This type of Module requires 1 Work point to activate and produces 1 Time unit <strong>that must be spent immediately</strong>: <strong>All</strong> of that player’s Astronauts around the main board are moved 1 hangar counterclockwise. Astronauts cannot be moved beyond the articulated arm.")}</div>
+                <div class="tiles">
+                    ${this.modulesManager.getHtml({ type: 1, number: 3, r: 0 } as Module)}
+                </div>
+            </div>
 
             <h2>${_("Modules that Earn Research Points")}</h2>
-            TODO
+
+            <div class="help-section">
+                <div>${_("When a Communications Module is deployed, the player chooses whether it is blue or orange. This tile is then discarded and either a blue tile or an orange tile is taken from the additional Communications Modules for the current year, matching the player’s choice. It is placed in their Base following the usual rules.")}</div>
+                <div class="tiles">
+                    ${this.modulesManager.getHtml({ type: 1, number: 1 } as Module)}
+                    =&gt;
+                    ${this.modulesManager.getHtml({ type: 8, number: 1 } as Module)}
+                    /
+                    ${this.modulesManager.getHtml({ type: 8, number: 4 } as Module)}
+                </div>
+            </div>  
+
+            <div class="help-section">
+                <div>${_("When a player deploys this type of Module, they immediately earn the number of research points indicated at the bottom right. In addition, for each adjacent module of the indicated color (green, orange, purple, and/or blue), they immediately earn the number of research points shown (see the example on p. 10). If the player <strong>later</strong> deploys a Module of the indicated color adjacent to this one, they earn the number of research points shown.")}</div>
+                <div class="tiles">
+                    ${this.modulesManager.getHtml({ type: 2, number: 9 } as Module)}
+                    ${this.modulesManager.getHtml({ type: 2, number: 12 } as Module)}
+                    ${this.modulesManager.getHtml({ type: 2, number: 11 } as Module)}
+                    ${this.modulesManager.getHtml({ type: 2, number: 10 } as Module)}
+                </div>
+            </div>
 
             <h2>${_("Greenhouse Modules")}</h2>
-            TODO
+
+            <div class="help-section">
+                <div>${_("Greenhouses have special placement rules and allow the player to score points during the game (the size of the Greenhouse group after deploying the tile). There are 3 different types: round, rectangular, and octagonal.")}</div>
+                <div class="tiles">
+                    ${this.modulesManager.getHtml({ type: 3, number: 12 } as Module)}
+                    ${this.modulesManager.getHtml({ type: 3, number: 13 } as Module)}
+                    ${this.modulesManager.getHtml({ type: 3, number: 14 } as Module)}
+                </div>
+            </div>  
+
+            <div class="help-section">
+                <div>${_("This special Greenhouse Module is a “wild” whose type is chosen by the player (round, rectangular, or octagonal). This choice may change depending on the Greenhouses that are placed around it. It also earns the player 1 victory point when it is deployed.")}</div>
+                <div class="tiles">
+                    ${this.modulesManager.getHtml({ type: 3, number: 15 } as Module)}
+                </div>
+            </div>  
 
             <h2>${_("Drone Landing Strips")}</h2>
-            TODO
+
+            <div class="help-section">
+                <div>${_("These Modules earn the player 1 victory point when deployed. They count as a blue or orange Module, depending on their color, but cannot be activated.")}</div>
+                <div class="tiles">
+                    ${this.modulesManager.getHtml({ type: 3, number: 5 } as Module)}
+                    ${this.modulesManager.getHtml({ type: 3, number: 2 } as Module)}
+                </div>
+            </div>            
 
             <h1>${_("Mission Tiles")}</h1>
 

@@ -809,6 +809,10 @@ body > .card {
 .card.experiment[data-year="3"] .front {
   background-image: url("img/experiments-year3.png");
 }
+.card.experiment[data-year="3"] .front {
+  top: -14px;
+  right: -14px;
+}
 .card.experiment .card-sides .card-side {
   box-shadow: none;
   background-size: 1000% 100%;
@@ -1403,6 +1407,7 @@ body > .card {
 #help-popin .help-section .tiles {
   display: flex;
   justify-content: space-evenly;
+  align-items: center;
   gap: 8px;
 }
 #help-popin .legend-tile-wrapper {
@@ -1474,6 +1479,12 @@ html, .mode_3d #game_play_area_background {
 }
 .icon.science {
   background-position-x: 100%;
+}
+.icon.reactivate {
+  background-image: url("img/icon-reactivate.svg");
+}
+.icon.time-unit {
+  background-image: url("img/icon-time-unit.svg");
 }
 
 .resource-icon {
