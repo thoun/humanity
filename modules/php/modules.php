@@ -163,7 +163,7 @@ trait ModuleTrait {
             
         $this->incStat(1, 'deployedModules', $playerId);
         $this->incStat(1, 'deployedModules'.$module->color, $playerId);
-        $this->incStat(1, 'deployedModulesYear'.$module->type, $playerId);
+        $this->incStat(1, 'deployedModulesYear'.($module->type == 8 ? $module->researchPoints - 2 : $module->type), $playerId);
 
         return $squareResult['upgrade'];
     }
