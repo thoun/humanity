@@ -53,10 +53,9 @@ trait DebugUtilTrait {
 			// 'other' game specific tables. example:
 			// tables specific to your schema that use player_ids
 			$this->DbQuery("UPDATE module SET card_location_arg=$sid WHERE card_location_arg = $id" );
-			foreach ([1,2,3,4,5] as $i) { $this->DbQuery("UPDATE module SET card_location='played$sid-$i' WHERE card_location='played$id-$i'" ); }
-			$this->DbQuery("UPDATE experiment SET card_location='played$sid' WHERE card_location='played$id'" );
-			$this->DbQuery("UPDATE experiment SET card_location_arg=$sid WHERE card_location_arg = $id" );
-
+			$this->DbQuery("UPDATE experiment SET card_location_arg=$sid WHERE card_location_arg=$id" );
+			$this->DbQuery("UPDATE mission SET card_location_arg=$sid WHERE card_location_arg = $id" );
+			$this->DbQuery("UPDATE astronaut SET player_id=$sid WHERE player_id = $id" );
             
 			++$sid;
 		}

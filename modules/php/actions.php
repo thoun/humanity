@@ -432,7 +432,7 @@ trait ActionTrait {
             $this->DbQuery("UPDATE `module` SET `card_location` = '$module->location', `card_location_arg` = $module->locationArg, `x` = $module->x, `y` = $module->y, `r` = $module->r WHERE `card_id` = $module->id");
         }
         foreach ($undo->experiments as $experiment) {
-            $this->DbQuery("UPDATE `experiment` SET `card_location` = '$module->experiment', `card_location_arg` = $experiment->locationArg, `line` = $experiment->line WHERE `card_id` = $experiment->id");
+            $this->DbQuery("UPDATE `experiment` SET `card_location` = '$experiment->location', `card_location_arg` = $experiment->locationArg, `line` = $experiment->line WHERE `card_id` = $experiment->id");
         }
 
         foreach ($undo->astronauts as $astronaut) {

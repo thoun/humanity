@@ -68,8 +68,8 @@ trait MissionTrait {
                 }
             }
         }
-
-        return $maxFromHere + count($alreadyCounted);
+        
+        return 1 + $maxFromHere;
     }
 
     function countModulesOfColor(int $playerId, int $color, bool $adjacent, bool $diagonal) {
