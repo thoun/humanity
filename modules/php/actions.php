@@ -223,7 +223,6 @@ trait ActionTrait {
         self::checkAction('autoPay');
 
         $playerId = intval($this->getActivePlayerId());
-        $playerIcons = $this->getPlayerIcons($playerId);
         $playerModules = $this->getModulesByLocation('player', $playerId);
         $modules = array_values(array_filter($playerModules, fn($t) => $t->production !== null && $t->r > 0));
 
@@ -243,7 +242,7 @@ trait ActionTrait {
                 'playerId' => $playerId,
                 'player_name' => $this->getPlayerName($playerId),
                 'module' => $module,
-                'icons' => $playerIcons,
+                'icons' => $this->getPlayerIcons($playerId),
             ]);
 
             $this->incStat($rotate, 'spentModules', $playerId);
