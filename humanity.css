@@ -1347,46 +1347,62 @@ body > .card {
   height: 100px;
 }
 
-.color-help-folded-content {
-  background: url("img/logo-coloradd.svg") #dfe8e8 center no-repeat;
-  background-size: contain;
+#popin_bgaHelpDialog {
+  --background-color: #bae5f4;
 }
 
-.color-help-unfolded-content {
-  display: grid;
-  grid-template-columns: 40px 80px;
-  align-items: center;
-  justify-items: center;
-  background: #dfe8e8;
-}
-.color-help-unfolded-content .color {
-  width: 18px;
-  height: 18px;
-}
-.color-help-unfolded-content .label {
-  font-size: 10pt;
-  display: flex;
-  justify-content: start;
-  align-items: center;
-  width: 100%;
-  height: 42px;
-  word-break: break-word;
-  color: black;
+#help-dialog-content {
+  width: 675px;
+  max-width: 45rem;
 }
 
+#help-popin h1, #help-popin h2 {
+  text-align: center;
+  font-weight: normal;
+  font-family: "conthrax-sb";
+}
 #help-popin h1 {
-  color: #5890a9;
+  color: white;
   font-size: 18px;
-  margin: 8px 0;
+  margin: 16px 0;
+  background: #393b3d;
+}
+#help-popin h2 {
+  color: #ba3c1e;
+  font-size: 15px;
+  margin: 10px 0;
+  background: white;
 }
 #help-popin .help-section {
+  background: rgba(255, 255, 255, 0.4);
   padding: 5px;
   margin: 3px 0;
-  display: flex;
 }
-#help-popin .help-section > div:not(:first-child) {
-  margin-left: 5px;
-  flex: 1;
+#help-popin .help-section .tiles {
+  display: flex;
+  justify-content: space-evenly;
+  gap: 8px;
+}
+#help-popin span.legend-number {
+  font-weight: bold;
+  font-family: "conthrax-sb";
+  color: #ba3c1e;
+}
+#help-popin .legend-tile-wrapper {
+  position: relative;
+}
+#help-popin div.legend-number {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-family: "conthrax-sb";
+  background: #ba3c1e;
+  color: white;
 }
 
 /* make space between buttons on touch devices */

@@ -2065,7 +2065,7 @@ var ModulesManager = /** @class */ (function (_super) {
         if (module.points) {
             message += "<br>\n            <strong>".concat(_("Victory points:"), "</strong> ").concat(module.points);
         }
-        if (module.color == 4) { // greenhouse
+        if (module.color == GREEN) {
             message += "<br>\n            <strong>".concat(_("Greenhouse shape:"), "</strong> ").concat(this.getGreenhouseShape(module.matchType));
         }
         return message;
@@ -2078,7 +2078,7 @@ var ModulesManager = /** @class */ (function (_super) {
         this.setupFrontDiv(module, div.querySelector('.front'), true);
     };
     ModulesManager.prototype.getHtml = function (module) {
-        var html = "<div class=\"card module\" data-side=\"front\" data-type=\"".concat(module.type, "\" data-r=\"").concat(module.r, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(module.number, "\">\n                </div>\n                <div class=\"card-side back\">\n                </div>\n            </div>\n        </div>");
+        var html = "<div class=\"card module\" data-side=\"front\" data-type=\"".concat(module.type, "\" data-r=\"").concat(module.r, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(module.number, "\">\n                </div>\n            </div>\n        </div>");
         return html;
     };
     return ModulesManager;
@@ -2116,8 +2116,8 @@ var ExperimentsManager = /** @class */ (function (_super) {
         }
         return message;
     };
-    ExperimentsManager.prototype.getHtml = function (module) {
-        var html = "<div class=\"card experiment\" data-side=\"front\" data-year=\"".concat(module.year, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(module.number, "\">\n                </div>\n                <div class=\"card-side back\">\n                </div>\n            </div>\n        </div>");
+    ExperimentsManager.prototype.getHtml = function (experiment) {
+        var html = "<div class=\"card experiment\" data-side=\"front\" data-year=\"".concat(experiment.year, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(experiment.number, "\">\n                </div>\n            </div>\n        </div>");
         return html;
     };
     return ExperimentsManager;
@@ -2171,8 +2171,8 @@ var MissionsManager = /** @class */ (function (_super) {
         }
         return message;
     };
-    MissionsManager.prototype.getHtml = function (module) {
-        var html = "<div class=\"card mission\" data-side=\"front\" data-type=\"".concat(module.type, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(module.number, "\">\n                </div>\n                <div class=\"card-side back\">\n                </div>\n            </div>\n        </div>");
+    MissionsManager.prototype.getHtml = function (mission) {
+        var html = "<div class=\"card mission\" data-side=\"front\" data-type=\"".concat(mission.type, "\">\n            <div class=\"card-sides\">\n                <div class=\"card-side front\" data-number=\"").concat(mission.number, "\">\n                </div>\n            </div>\n        </div>");
         return html;
     };
     return MissionsManager;
@@ -2391,10 +2391,6 @@ var ResearchBoard = /** @class */ (function () {
             token.dataset.slotId = "".concat(mission.locationArg);
             document.getElementById('research-board').appendChild(token);
         });
-    };
-    // TODO keep?
-    ResearchBoard.prototype.highlightPlayerTokens = function (playerId) {
-        document.querySelectorAll('#research-board .marker').forEach(function (elem) { return elem.classList.toggle('highlight', Number(elem.dataset.playerId) === playerId); });
     };
     return ResearchBoard;
 }());
@@ -2633,6 +2629,12 @@ var ACTION_TIMER_DURATION = 5;
 var LOCAL_STORAGE_ZOOM_KEY = 'Humanity-zoom';
 var LOCAL_STORAGE_JUMP_TO_FOLDED_KEY = 'Humanity-jump-to-folded';
 var ICONS_COUNTERS_TYPES = [1, 2, 3, 0];
+var ANY_COLOR = 0;
+var BLUE_OR_ORANGE = 0;
+var ORANGE = 1;
+var BLUE = 2;
+var PURPLE = 3;
+var GREEN = 4;
 function getCostStr(cost) {
     return Object.entries(cost).filter(function (entry) { return entry[1] > 0; }).map(function (entry) { return "".concat(entry[1], " <div class=\"resource-icon\" data-type=\"").concat(entry[0], "\"></div>"); }).join(' ');
 }
@@ -2710,10 +2712,9 @@ var Humanity = /** @class */ (function () {
         new HelpManager(this, {
             buttons: [
                 new BgaHelpPopinButton({
-                    title: _("Card help").toUpperCase(),
+                    title: _("Tile details").toUpperCase(),
                     html: this.getHelpHtml(),
-                    onPopinCreated: function () { return _this.populateHelp(); },
-                    buttonBackground: '#653771',
+                    buttonBackground: '#ba3c1e',
                 }),
             ]
         });
@@ -2908,9 +2909,9 @@ var Humanity = /** @class */ (function () {
             _this.vpCounters[playerId] = new ebg.counter();
             _this.vpCounters[playerId].create("vp-counter-".concat(playerId));
             _this.vpCounters[playerId].setValue(player.vp);
-            _this.scienceCounters[playerId] = new ebg.counter();
-            _this.scienceCounters[playerId].create("science-counter-".concat(playerId));
             if (gamedatas.isEnd || playerId == _this.getPlayerId()) {
+                _this.scienceCounters[playerId] = new ebg.counter();
+                _this.scienceCounters[playerId].create("science-counter-".concat(playerId));
                 _this.scienceCounters[playerId].setValue(player.science);
             }
             _this.iconsCounters[playerId] = [];
@@ -2998,23 +2999,21 @@ var Humanity = /** @class */ (function () {
         this.vpCounters[playerId].toValue(count);
     };
     Humanity.prototype.setScience = function (playerId, count) {
-        this.scienceCounters[playerId].toValue(count);
+        if (this.scienceCounters[playerId]) {
+            this.scienceCounters[playerId].toValue(count);
+        }
+        else {
+            this.scienceCounters[playerId] = new ebg.counter();
+            this.scienceCounters[playerId].create("science-counter-".concat(playerId));
+            this.scienceCounters[playerId].setValue(count);
+        }
     };
     Humanity.prototype.setResearchPoints = function (playerId, count) {
         this.researchBoard.setResearchPoints(playerId, count);
     };
     Humanity.prototype.getHelpHtml = function () {
-        var html = "\n        <div id=\"help-popin\">\n            <h1>".concat(_("Assets"), "</h2>\n            <div class=\"help-section\">\n                <div class=\"icon vp\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Victory Point</strong>. The player moves their token forward 1 space on the Score Track."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon recruit\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Recruit</strong>: The player adds 1 Recruit token to their ship."), " ").concat(_("It is not possible to have more than 3."), " ").concat(_("A recruit allows a player to draw the Viking card of their choice when Recruiting or replaces a Viking card during Exploration."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon bracelet\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Silver Bracelet</strong>: The player adds 1 Silver Bracelet token to their ship."), " ").concat(_("It is not possible to have more than 3."), " ").concat(_("They are used for Trading."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon research\"></div>\n                <div class=\"help-label\">").concat(_("Gain 1 <strong>Research Point</strong>: The player moves their token forward 1 space on the Research Track."), "</div>\n            </div>\n            <div class=\"help-section\">\n                <div class=\"icon take-card\"></div>\n                <div class=\"help-label\">").concat(_("Draw <strong>the first Viking card</strong> from the deck: It is placed in the player’s Crew Zone (without taking any assets)."), "</div>\n            </div>\n\n            <h1>").concat(_("Powers of the missions (variant option)"), "</h1>\n        ");
-        for (var i = 1; i <= 7; i++) {
-            html += "\n            <div class=\"help-section\">\n                <div id=\"help-mission-".concat(i, "\"></div>\n                <div>").concat(this.missionsManager.getTooltip(i), "</div>\n            </div> ");
-        }
-        html += "</div>";
+        var html = "\n        <div id=\"help-popin\">\n            <h1>".concat(_("Experiment Tiles"), "</h1>\n\n            <div class=\"help-section\">\n                <div><span class=\"legend-number\">1</span> ").concat(_("Resources needed to carry it out"), "</div>\n                <div><span class=\"legend-number\">2</span> ").concat(_("Research points"), "</div>\n                <div><span class=\"legend-number\">3</span> ").concat(_("Effect"), "</div>\n                <div><span class=\"legend-number\">4</span> ").concat(_("Victory point (only for Year 3)"), "</div>\n                <div class=\"tiles\">\n                    <div class=\"legend-tile-wrapper\">\n                        ").concat(this.experimentsManager.getHtml({ year: 3, number: 2 }), "\n                        <div class=\"legend-number\" style=\"left: 10px; top: 20px;\">1</div>\n                        <div class=\"legend-number\" style=\"left: 40px; top: 20px;\">2</div>\n                        <div class=\"legend-number\" style=\"left: 70px; top: 20px;\">3</div>\n                        <div class=\"legend-number\" style=\"left: 100px; top: 20px;\">4</div>\n                    </div>\n                </div>\n\n                <h2>[TODO Reactivate logo]</h2>\n                <div>").concat(this.getPower(1, 2), "</div>\n                <h2>[TODO Time unit logo]</h2>\n                <div>").concat(this.getPower(2, 2), "</div>\n            </div>\n\n            <h1>").concat(_("Module Tiles"), "</h1>\n\n            <div class=\"help-section\">\n                <div><span class=\"legend-number\">1</span> ").concat(_("Resources necessary for deployment"), "</div>\n                <div><span class=\"legend-number\">2</span> ").concat(_("Number of Work points necessary to activate it"), "</div>\n                <div><span class=\"legend-number\">3</span> ").concat(_("Quantity and type of resources produced"), "</div>\n                <div><span class=\"legend-number\">4</span> ").concat(_("Research point gained for adjacent Modules"), "</div>\n                <div><span class=\"legend-number\">5</span> ").concat(_("Immediate research point gain"), "</div>\n                <div class=\"tiles\">\n                    <div class=\"legend-tile-wrapper\">\n                        ").concat(this.modulesManager.getHtml({ type: 1, number: 8, r: 1 }), "\n                        <div class=\"legend-number\" style=\"left: 10px; top: 20px;\">1</div>\n                        <div class=\"legend-number\" style=\"left: 40px; top: 20px;\">2</div>\n                        <div class=\"legend-number\" style=\"left: 70px; top: 20px;\">3</div>\n                    </div>\n                    <div class=\"legend-tile-wrapper\">\n                        ").concat(this.modulesManager.getHtml({ type: 1, number: 11 }), "\n                        <div class=\"legend-number\" style=\"left: 10px; top: 20px;\">1</div>\n                        <div class=\"legend-number\" style=\"left: 100px; top: 20px;\">4</div>\n                        <div class=\"legend-number\" style=\"left: 130px; top: 20px;\">5</div>\n                    </div>\n                </div>\n            </div>\n\n            <h2>").concat(_("Production modules"), "</h2>\n            TODO\n\n            <h2>").concat(_("Modules that Earn Research Points"), "</h2>\n            TODO\n\n            <h2>").concat(_("Greenhouse Modules"), "</h2>\n            TODO\n\n            <h2>").concat(_("Drone Landing Strips"), "</h2>\n            TODO\n\n            <h1>").concat(_("Mission Tiles"), "</h1>\n\n            <h2>").concat(_("Missions ${letter}").replace('${letter}', 'A'), "</h2>\n            <div class=\"help-section\">\n                <div>").concat(this.missionsManager.getTooltip({ minimum: 4, color: ORANGE }), "</div>\n                <div>").concat(this.missionsManager.getTooltip({ minimum: 3, color: BLUE }), "</div>\n                <div>").concat(this.missionsManager.getTooltip({ minimum: 3, color: PURPLE, diagonal: true }), "</div>\n                <div class=\"tiles\">\n                    ").concat(this.missionsManager.getHtml({ type: 1, number: 1 }), "\n                    ").concat(this.missionsManager.getHtml({ type: 1, number: 2 }), "\n                    ").concat(this.missionsManager.getHtml({ type: 1, number: 3 }), "\n                </div>\n\n                <div>\n                    ").concat(_("Note: For these Missions, the layout of the Modules presented on the tiles is for information only — the player does not have to reproduce it exactly to complete the Mission."), "\n                </div>\n            </div>\n\n            <h2>").concat(_("Missions ${letter}").replace('${letter}', 'B'), "</h2>\n            TODO\n\n            <h2>").concat(_("Missions ${letter}").replace('${letter}', 'C'), "</h2>\n            TODO\n        ");
         return html;
-    };
-    Humanity.prototype.populateHelp = function () {
-        for (var i = 1; i <= 7; i++) {
-            this.missionsManager.setForHelp(i, "help-mission-".concat(i));
-        }
     };
     Humanity.prototype.onTableExperimentClick = function (experiment) {
         if (this.gamedatas.gamestate.name == 'chooseAction') {
@@ -3352,10 +3351,10 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.getColor = function (color, blueOrOrange) {
         switch (color) {
             case 0: return blueOrOrange ? _("Blue or orange") : _("Any color");
-            case 1: return _("Orange");
-            case 2: return _("Blue");
-            case 3: return _("Purple");
-            case 4: return _("Green");
+            case ORANGE: return _("Orange");
+            case BLUE: return _("Blue");
+            case PURPLE: return _("Purple");
+            case GREEN: return _("Green");
         }
     };
     Humanity.prototype.getPower = function (power, timeUnits) {

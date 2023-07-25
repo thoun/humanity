@@ -13,6 +13,12 @@ const LOCAL_STORAGE_JUMP_TO_FOLDED_KEY = 'Humanity-jump-to-folded';
 
 const ICONS_COUNTERS_TYPES = [1, 2, 3, 0];
 
+const ANY_COLOR = 0;
+const BLUE_OR_ORANGE = 0;
+const ORANGE = 1;
+const BLUE = 2;
+const PURPLE = 3;
+const GREEN = 4;
 
 function getCostStr(cost: Icons) {
     return Object.entries(cost).filter(entry => entry[1] > 0).map(entry => `${entry[1]} <div class="resource-icon" data-type="${entry[0]}"></div>`).join(' ');
@@ -113,10 +119,9 @@ class Humanity implements HumanityGame {
         new HelpManager(this, { 
             buttons: [
                 new BgaHelpPopinButton({
-                    title: _("Card help").toUpperCase(),
+                    title: _("Tile details").toUpperCase(),
                     html: this.getHelpHtml(),
-                    onPopinCreated: () => this.populateHelp(),
-                    buttonBackground: '#653771',
+                    buttonBackground: '#ba3c1e',
                 }),
             ]
         });
@@ -365,9 +370,9 @@ class Humanity implements HumanityGame {
             this.vpCounters[playerId].create(`vp-counter-${playerId}`);
             this.vpCounters[playerId].setValue(player.vp);
 
-            this.scienceCounters[playerId] = new ebg.counter();
-            this.scienceCounters[playerId].create(`science-counter-${playerId}`);
             if (gamedatas.isEnd || playerId == this.getPlayerId()) {
+                this.scienceCounters[playerId] = new ebg.counter();
+                this.scienceCounters[playerId].create(`science-counter-${playerId}`);
                 this.scienceCounters[playerId].setValue(player.science);
             } 
 
@@ -474,57 +479,107 @@ class Humanity implements HumanityGame {
     }
 
     private setScience(playerId: number, count: number) {
-        this.scienceCounters[playerId].toValue(count);
+        if (this.scienceCounters[playerId]) {
+            this.scienceCounters[playerId].toValue(count);
+        } else {
+            this.scienceCounters[playerId] = new ebg.counter();
+            this.scienceCounters[playerId].create(`science-counter-${playerId}`);
+            this.scienceCounters[playerId].setValue(count);
+        }
     }
 
     private setResearchPoints(playerId: number, count: number) {
         this.researchBoard.setResearchPoints(playerId, count);
     }
 
-    private getHelpHtml() { // TODO
+    private getHelpHtml() {
         let html = `
         <div id="help-popin">
-            <h1>${_("Assets")}</h2>
+            <h1>${_("Experiment Tiles")}</h1>
+
             <div class="help-section">
-                <div class="icon vp"></div>
-                <div class="help-label">${_("Gain 1 <strong>Victory Point</strong>. The player moves their token forward 1 space on the Score Track.")}</div>
-            </div>
-            <div class="help-section">
-                <div class="icon recruit"></div>
-                <div class="help-label">${_("Gain 1 <strong>Recruit</strong>: The player adds 1 Recruit token to their ship.")} ${_("It is not possible to have more than 3.")} ${_("A recruit allows a player to draw the Viking card of their choice when Recruiting or replaces a Viking card during Exploration.")}</div>
-            </div>
-            <div class="help-section">
-                <div class="icon bracelet"></div>
-                <div class="help-label">${_("Gain 1 <strong>Silver Bracelet</strong>: The player adds 1 Silver Bracelet token to their ship.")} ${_("It is not possible to have more than 3.")} ${_("They are used for Trading.")}</div>
-            </div>
-            <div class="help-section">
-                <div class="icon research"></div>
-                <div class="help-label">${_("Gain 1 <strong>Research Point</strong>: The player moves their token forward 1 space on the Research Track.")}</div>
-            </div>
-            <div class="help-section">
-                <div class="icon take-card"></div>
-                <div class="help-label">${_("Draw <strong>the first Viking card</strong> from the deck: It is placed in the player’s Crew Zone (without taking any assets).")}</div>
+                <div><span class="legend-number">1</span> ${_("Resources needed to carry it out")}</div>
+                <div><span class="legend-number">2</span> ${_("Research points")}</div>
+                <div><span class="legend-number">3</span> ${_("Effect")}</div>
+                <div><span class="legend-number">4</span> ${_("Victory point (only for Year 3)")}</div>
+                <div class="tiles">
+                    <div class="legend-tile-wrapper">
+                        ${this.experimentsManager.getHtml({ year: 3, number: 2 } as Experiment)}
+                        <div class="legend-number" style="left: 10px; top: 20px;">1</div>
+                        <div class="legend-number" style="left: 40px; top: 20px;">2</div>
+                        <div class="legend-number" style="left: 70px; top: 20px;">3</div>
+                        <div class="legend-number" style="left: 100px; top: 20px;">4</div>
+                    </div>
+                </div>
+
+                <h2>[TODO Reactivate logo]</h2>
+                <div>${this.getPower(1, 2)}</div>
+                <h2>[TODO Time unit logo]</h2>
+                <div>${this.getPower(2, 2)}</div>
             </div>
 
-            <h1>${_("Powers of the missions (variant option)")}</h1>
+            <h1>${_("Module Tiles")}</h1>
+
+            <div class="help-section">
+                <div><span class="legend-number">1</span> ${_("Resources necessary for deployment")}</div>
+                <div><span class="legend-number">2</span> ${_("Number of Work points necessary to activate it")}</div>
+                <div><span class="legend-number">3</span> ${_("Quantity and type of resources produced")}</div>
+                <div><span class="legend-number">4</span> ${_("Research point gained for adjacent Modules")}</div>
+                <div><span class="legend-number">5</span> ${_("Immediate research point gain")}</div>
+                <div class="tiles">
+                    <div class="legend-tile-wrapper">
+                        ${this.modulesManager.getHtml({ type: 1, number: 8, r: 1 } as Module)}
+                        <div class="legend-number" style="left: 10px; top: 20px;">1</div>
+                        <div class="legend-number" style="left: 40px; top: 20px;">2</div>
+                        <div class="legend-number" style="left: 70px; top: 20px;">3</div>
+                    </div>
+                    <div class="legend-tile-wrapper">
+                        ${this.modulesManager.getHtml({ type: 1, number: 11 } as Module)}
+                        <div class="legend-number" style="left: 10px; top: 20px;">1</div>
+                        <div class="legend-number" style="left: 100px; top: 20px;">4</div>
+                        <div class="legend-number" style="left: 130px; top: 20px;">5</div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>${_("Production modules")}</h2>
+            TODO
+
+            <h2>${_("Modules that Earn Research Points")}</h2>
+            TODO
+
+            <h2>${_("Greenhouse Modules")}</h2>
+            TODO
+
+            <h2>${_("Drone Landing Strips")}</h2>
+            TODO
+
+            <h1>${_("Mission Tiles")}</h1>
+
+            <h2>${_("Missions ${letter}").replace('${letter}', 'A')}</h2>
+            <div class="help-section">
+                <div>${this.missionsManager.getTooltip({ minimum: 4, color: ORANGE } as Mission)}</div>
+                <div>${this.missionsManager.getTooltip({ minimum: 3, color: BLUE } as Mission)}</div>
+                <div>${this.missionsManager.getTooltip({ minimum: 3, color: PURPLE, diagonal: true } as Mission)}</div>
+                <div class="tiles">
+                    ${this.missionsManager.getHtml({ type: 1, number: 1 } as Mission)}
+                    ${this.missionsManager.getHtml({ type: 1, number: 2 } as Mission)}
+                    ${this.missionsManager.getHtml({ type: 1, number: 3 } as Mission)}
+                </div>
+
+                <div>
+                    ${_("Note: For these Missions, the layout of the Modules presented on the tiles is for information only — the player does not have to reproduce it exactly to complete the Mission.")}
+                </div>
+            </div>
+
+            <h2>${_("Missions ${letter}").replace('${letter}', 'B')}</h2>
+            TODO
+
+            <h2>${_("Missions ${letter}").replace('${letter}', 'C')}</h2>
+            TODO
         `;
 
-        for (let i = 1; i <=7; i++) {
-            html += `
-            <div class="help-section">
-                <div id="help-mission-${i}"></div>
-                <div>${this.missionsManager.getTooltip(i)}</div>
-            </div> `;
-        }
-        html += `</div>`;
-
         return html;
-    }
-
-    private populateHelp() {
-        for (let i = 1; i <=7; i++) {
-            this.missionsManager.setForHelp(i, `help-mission-${i}`);
-        }
     }
     
     public onTableExperimentClick(experiment: Experiment): void {
@@ -933,10 +988,10 @@ class Humanity implements HumanityGame {
     public getColor(color: number, blueOrOrange: boolean): string {
         switch (color) {
             case 0: return blueOrOrange ? _("Blue or orange") : _("Any color");
-            case 1: return _("Orange");
-            case 2: return _("Blue");
-            case 3: return _("Purple");
-            case 4: return _("Green");
+            case ORANGE: return _("Orange");
+            case BLUE: return _("Blue");
+            case PURPLE: return _("Purple");
+            case GREEN: return _("Green");
         }
     }
 

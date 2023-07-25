@@ -168,9 +168,4 @@ class ResearchBoard {
             document.getElementById('research-board').appendChild(token);
         })
     }
-
-    // TODO keep?
-    public highlightPlayerTokens(playerId: number | null) {
-        document.querySelectorAll('#research-board .marker').forEach((elem: HTMLElement) => elem.classList.toggle('highlight', Number(elem.dataset.playerId) === playerId));
-    }
 }

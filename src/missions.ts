@@ -23,7 +23,7 @@ class MissionsManager extends CardManager<Mission> {
         }
     }
 
-    private getTooltip(mission: Mission): string {
+    public getTooltip(mission: Mission): string {
         let message = '';
         if (mission.color !== null) {
             message = mission.adjacent ? _("Have at least ${number} adjacent ${color} Modules.") : _("Have at least ${number} ${color} Modules in their base.");
@@ -44,12 +44,10 @@ class MissionsManager extends CardManager<Mission> {
         return message;
     }
     
-    public getHtml(module: Mission): string {
-        let html = `<div class="card mission" data-side="front" data-type="${module.type}">
+    public getHtml(mission: Mission): string {
+        let html = `<div class="card mission" data-side="front" data-type="${mission.type}">
             <div class="card-sides">
-                <div class="card-side front" data-number="${module.number}">
-                </div>
-                <div class="card-side back">
+                <div class="card-side front" data-number="${mission.number}">
                 </div>
             </div>
         </div>`;

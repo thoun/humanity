@@ -61,7 +61,7 @@ class ModulesManager extends CardManager<Module> {
             message += `<br>
             <strong>${_("Victory points:")}</strong> ${module.points}`;
         }
-        if (module.color == 4) { // greenhouse
+        if (module.color == GREEN) {
             message += `<br>
             <strong>${_("Greenhouse shape:")}</strong> ${this.getGreenhouseShape(module.matchType)}`;
         }
@@ -87,8 +87,6 @@ class ModulesManager extends CardManager<Module> {
         let html = `<div class="card module" data-side="front" data-type="${module.type}" data-r="${module.r}">
             <div class="card-sides">
                 <div class="card-side front" data-number="${module.number}">
-                </div>
-                <div class="card-side back">
                 </div>
             </div>
         </div>`;

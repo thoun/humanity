@@ -38,12 +38,10 @@ class ExperimentsManager extends CardManager<Experiment> {
         return message;
     }
     
-    public getHtml(module: Experiment): string {
-        let html = `<div class="card experiment" data-side="front" data-year="${module.year}">
+    public getHtml(experiment: Experiment): string {
+        let html = `<div class="card experiment" data-side="front" data-year="${experiment.year}">
             <div class="card-sides">
-                <div class="card-side front" data-number="${module.number}">
-                </div>
-                <div class="card-side back">
+                <div class="card-side front" data-number="${experiment.number}">
                 </div>
             </div>
         </div>`;
