@@ -440,7 +440,7 @@ trait ActionTrait {
         }
 
         $this->DbQuery("UPDATE player SET `player_vp` = $undo->vp, `player_research_points` = $undo->researchPoints, `player_science` = $undo->science WHERE `player_id` = $playerId");
-        $this->restoreStats($playerId, $undo->stats);
+        $this->restoreStats($playerId, (array)$undo->stats);
 
         self::notifyAllPlayers('restartTurn', clienttranslate('${player_name} restarts its turn'), [
             'playerId' => $playerId,
