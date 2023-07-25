@@ -221,9 +221,14 @@ trait StateTrait {
                 }
             }
 
-            $this->incPlayerScience($playerId, $sciencePoints, '${player_name} gains ${inc} science points with year research');
+            $this->incPlayerScience($playerId, $sciencePoints, '${player_name} gains ${inc} science point(s) with year research');
 
-            $this->DbQuery("UPDATE player SET `player_research_points` = 0 WHERE player_id = $playerId");                
+            $playersBehind = intval($this->getUniqueValueFromDB("SELECT count(*) FROM player WHERE player_research_points < $playerResearchPoints"));
+            $this->incPlayerScience($playerId, $playersBehind, '${player_name} gains ${inc} science point(s) with ${inc} player(s) behind');
+        }
+
+        $this->DbQuery("UPDATE player SET `player_research_points` = 0");   
+        foreach($playersIds as $playerId) {             
             $this->notifyAllPlayers('researchPoints', '', [
                 'playerId' => $playerId,
                 'player_name' => $this->getPlayerName($playerId),
