@@ -134,7 +134,7 @@ class Humanity extends Table {
             "skippedAstronaut",    
             // 60+ points
             "sciencePoints", "researchPoints", "researchPointsByScience", 
-            "vpWithModules", "vpWithExperiments", "vpWithMissions", "vpWithRemainingResources",
+            "vpWithModules", "vpWithSquares", "vpWithExperiments", "vpWithMissions", "vpWithRemainingResources",
         ] as $name) {
             $this->initStat('player', $name, 0);
         }

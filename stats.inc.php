@@ -242,6 +242,11 @@ $stats_type = [
             "name" => totranslate("VP gained with modules"),
             "type" => "int"
         ],   
+        "vpWithSquares" => [
+            "id" => 67,
+            "name" => totranslate("VP gained with completed squares"),
+            "type" => "int"
+        ], 
         "vpWithExperiments" => [
             "id" => 64,
             "name" => totranslate("VP gained with experiments"),
@@ -256,6 +261,7 @@ $stats_type = [
             "id" => 66,
             "name" => totranslate("VP gained with remaining resources"),
             "type" => "int"
-        ], 
+        ],   
+        // 67 used
     ],
 ];

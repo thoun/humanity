@@ -129,7 +129,6 @@ trait ModuleTrait {
         $playerModules = array_values(array_filter($playerModulesAndObstacles, fn($t) => $t->type != 9));
         
         $squareResult = $this->checkNewModuleSquares($module, $playerModules);
-        $points += $squareResult['points'];
 
         if ($module->color == GREEN) {
             $modulesOfColor = array_values(array_filter($playerModules, fn($t) => $t->color == GREEN));
@@ -137,8 +136,16 @@ trait ModuleTrait {
             $greenhouseGroupSize = $this->getAdjacentModulesCount($modulesOfColor, $module, false, [$module]);
             $points += $greenhouseGroupSize;
         }
+        
+        if ($points > 0) {
+            $this->incPlayerVP($playerId, $points, clienttranslate('${player_name} gains ${inc} point(s) with placed module'));
+            $this->incStat($points, 'vpWithModules', $playerId);
+        }
 
         if (count($squareResult['squares']) > 0) {
+            $this->incPlayerVP($playerId, count($squareResult['squares']), clienttranslate('${player_name} gains ${inc} point(s) with completed square(s)'));
+            $this->incStat($points, 'vpWithSquares', $playerId);
+
             $sql = "INSERT INTO square (`player_id`, `x`, `y`) VALUES ";
             $values = [];
             foreach($squareResult['squares'] as $square) {
@@ -153,11 +160,7 @@ trait ModuleTrait {
                 'squares' => $squareResult['squares'],
             ]);
         }
-        
-        if ($points > 0) {
-            $this->incPlayerVP($playerId, $points, clienttranslate('${player_name} gains ${inc} points with placed module'));
-            $this->incStat($points, 'vpWithModules', $playerId);
-        }
+
         $researchPoints = $module->researchPoints;
 
         $adjacentModules = $this->getAdjacentModules($playerModules, $module);
