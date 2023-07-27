@@ -110,9 +110,10 @@ $playerActionsGameStates = [
         "type" => "activeplayer",    
         "args" => "argPay",
         "possibleactions" => [ 
-            "autoPay",
+            "pay", "autoPay",
         ],
         "transitions" => [
+            "stay" => ST_PLAYER_SPEND_RESOURCES,
             "next" => ST_PLAYER_CHOOSE_ASTRONAUT,
         ],
     ],

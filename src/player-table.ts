@@ -270,4 +270,24 @@ class PlayerTable {
     public addMission(mission: Mission): Promise<any> {
         return this.missions.addCard(mission);
     }
+    
+    public setPayButtons(payButtons: { [tileId: number]: number[]; }) {
+        Object.entries(payButtons).forEach(entry => {
+            const buttons = document.createElement('div');
+            buttons.classList.add('buttons');
+            document.getElementById(`module-${entry[0]}`).insertAdjacentElement('beforeend', buttons);
+
+            entry[1].forEach(resource => {
+                const button = document.createElement('button');
+                button.classList.add('bgabutton', 'bgabutton_blue');
+                button.innerHTML = `<div class="resource-icon" data-type="${resource}"></div>`;
+                button.addEventListener('click', () => this.game.pay(Number(entry[0]), resource));
+                buttons.insertAdjacentElement('beforeend', button);
+            });
+        });
+    }
+
+    public removePayButtons() {
+        Array.from(document.getElementById(`player-table-${this.playerId}-modules`).getElementsByClassName('buttons')).forEach(elem => elem.remove());
+    }
 }

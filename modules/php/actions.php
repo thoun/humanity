@@ -219,6 +219,59 @@ trait ActionTrait {
         $this->gamestate->nextState('pay');
     }
 
+    public function pay(int $id, int $resource) {
+        self::checkAction('pay');
+
+        $playerId = intval($this->getActivePlayerId());
+
+        $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
+
+        $payButtons = $this->argPay()['payButtons'];
+
+        if (!array_key_exists($id, $payButtons)) {
+            throw new BgaUserException("You cannot spend this module");
+        }
+        if (!in_array($resource, $payButtons[$id])) {
+            throw new BgaUserException("You cannot spend this resource");
+        }
+
+        $module = $this->getModuleById($id);
+
+        $module->r -= 1;
+        $this->DbQuery("UPDATE module SET `r` = $module->r WHERE `card_id` = $module->id");
+
+        self::notifyAllPlayers('pay', '', [
+            'playerId' => $playerId,
+            'player_name' => $this->getPlayerName($playerId),
+            'module' => $module,
+            'icons' => $this->getPlayerIcons($playerId),
+        ]);
+
+        $this->incStat(1, 'spentModules', $playerId);
+
+        self::notifyAllPlayers('log', clienttranslate('${player_name} pays ${cost} to deploy the module'), [
+            'playerId' => $playerId,
+            'player_name' => $this->getPlayerName($playerId),
+            'cost' => [$resource => 1],
+        ]);
+
+        $remainingCost = (array)$currentAction->remainingCost;
+        if ($remainingCost[$resource] == 1) {
+            unset($remainingCost[$resource]);
+        } else {
+            $remainingCost[$resource]--;
+        }
+
+        if (count($remainingCost) > 0) {
+            $currentAction->remainingCost = $remainingCost;
+            $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
+
+            $this->gamestate->nextState('stay');
+        } else {
+            $this->gamestate->nextState('next');
+        }
+    }
+
     public function autoPay() {
         self::checkAction('autoPay');
 

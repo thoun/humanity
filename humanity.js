@@ -2622,6 +2622,24 @@ var PlayerTable = /** @class */ (function () {
     PlayerTable.prototype.addMission = function (mission) {
         return this.missions.addCard(mission);
     };
+    PlayerTable.prototype.setPayButtons = function (payButtons) {
+        var _this = this;
+        Object.entries(payButtons).forEach(function (entry) {
+            var buttons = document.createElement('div');
+            buttons.classList.add('buttons');
+            document.getElementById("module-".concat(entry[0])).insertAdjacentElement('beforeend', buttons);
+            entry[1].forEach(function (resource) {
+                var button = document.createElement('button');
+                button.classList.add('bgabutton', 'bgabutton_blue');
+                button.innerHTML = "<div class=\"resource-icon\" data-type=\"".concat(resource, "\"></div>");
+                button.addEventListener('click', function () { return _this.game.pay(Number(entry[0]), resource); });
+                buttons.insertAdjacentElement('beforeend', button);
+            });
+        });
+    };
+    PlayerTable.prototype.removePayButtons = function () {
+        Array.from(document.getElementById("player-table-".concat(this.playerId, "-modules")).getElementsByClassName('buttons')).forEach(function (elem) { return elem.remove(); });
+    };
     return PlayerTable;
 }());
 var ANIMATION_MS = 500;
@@ -2748,6 +2766,9 @@ var Humanity = /** @class */ (function () {
             case 'activateModule':
                 this.onEnteringActivateModule(args.args);
                 break;
+            case 'pay':
+                this.onEnteringPay(args.args);
+                break;
             case 'chooseAstronaut':
                 this.onEnteringChooseAstronaut(args.args);
                 break;
@@ -2772,6 +2793,12 @@ var Humanity = /** @class */ (function () {
             var table = this.getCurrentPlayerTable();
             table.setSelectedAstronaut(args.astronaut);
             table.setSelectableModules(args.activatableModules);
+        }
+    };
+    Humanity.prototype.onEnteringPay = function (args) {
+        if (this.isCurrentPlayerActive()) {
+            var table = this.getCurrentPlayerTable();
+            table.setPayButtons(args.payButtons);
         }
     };
     Humanity.prototype.onEnteringChooseAstronaut = function (args) {
@@ -2800,6 +2827,9 @@ var Humanity = /** @class */ (function () {
             case 'activateModule':
                 this.onLeavingActivateModule();
                 break;
+            case 'pay':
+                this.onLeavingPay();
+                break;
             case 'chooseAstronaut':
                 this.onLeavingChooseAstronaut();
                 break;
@@ -2816,6 +2846,12 @@ var Humanity = /** @class */ (function () {
             var table = this.getCurrentPlayerTable();
             table.setSelectedAstronaut(null);
             table.setSelectableModules(null);
+        }
+    };
+    Humanity.prototype.onLeavingPay = function () {
+        if (this.isCurrentPlayerActive()) {
+            var table = this.getCurrentPlayerTable();
+            table.removePayButtons();
         }
     };
     Humanity.prototype.onLeavingChooseAstronaut = function () {
@@ -2844,7 +2880,7 @@ var Humanity = /** @class */ (function () {
                     this.addActionButton("orange_button", _("Orange"), function () { return _this.chooseCommunicationColor(1); });
                     break;
                 case 'pay':
-                    this.addActionButton("autoPay_button", _("Spend ${cost}").replace('${cost}', getCostStr(args.pay)), function () { return _this.autoPay(); });
+                    this.addActionButton("autoPay_button", _("Automatically spend ${cost}").replace('${cost}', getCostStr(args.autoPay)), function () { return _this.autoPay(); });
                     break;
                 case 'confirmTurn':
                     this.addActionButton("confirmTurn_button", _("Confirm turn"), function () { return _this.confirmTurn(); });
@@ -3033,7 +3069,9 @@ var Humanity = /** @class */ (function () {
         }
     };
     Humanity.prototype.onPlayerModuleClick = function (card) {
-        this.activateModule(card.id);
+        if (this.gamedatas.gamestate.name == 'activateModule') {
+            this.activateModule(card.id);
+        }
     };
     Humanity.prototype.onPlayerModuleSpotClick = function (x, y) {
         var _a;
@@ -3100,6 +3138,15 @@ var Humanity = /** @class */ (function () {
         }
         this.takeAction('chooseNewExperiment', {
             id: id
+        });
+    };
+    Humanity.prototype.pay = function (id, resource) {
+        if (!this.checkAction('pay')) {
+            return;
+        }
+        this.takeAction('pay', {
+            id: id,
+            resource: resource
         });
     };
     Humanity.prototype.autoPay = function () {

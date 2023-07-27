@@ -93,6 +93,16 @@
         self::ajaxResponse();
     }
 
+    public function pay() {
+        self::setAjaxMode();     
+
+        $id = self::getArg("id", AT_posint, true);
+        $resource = self::getArg("resource", AT_posint, true);
+        $this->game->pay($id, $resource);
+
+        self::ajaxResponse();
+    }
+
     public function autoPay() {
         self::setAjaxMode();     
 

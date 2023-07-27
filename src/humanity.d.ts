@@ -121,6 +121,7 @@ interface HumanityGame extends Game {
     onPlayerModuleClick(card: Module): void;
     onPlayerModuleSpotClick(x: number, y: number): void;
     onTableModuleClick(card: Module): void;
+    pay(id: number, resource: number): void;
 }
 
 interface EnteringChooseAstronautArgs {
@@ -134,7 +135,8 @@ interface EnteringChooseActionArgs extends EnteringChooseAstronautArgs {
 
 interface EnteringPayArgs {
     cost: Icons;
-    pay: Icons;
+    autoPay: Icons;
+    payButtons: { [tileId: number]: number[] };
 }
 
 interface EnteringActivateModuleArgs {

@@ -162,6 +162,9 @@ class Humanity implements HumanityGame {
             case 'activateModule':
                 this.onEnteringActivateModule(args.args);
                 break;
+            case 'pay':
+                this.onEnteringPay(args.args);
+                break;
             case 'chooseAstronaut':
                 this.onEnteringChooseAstronaut(args.args);
                 break;
@@ -187,6 +190,13 @@ class Humanity implements HumanityGame {
             const table = this.getCurrentPlayerTable();
             table.setSelectedAstronaut(args.astronaut);
             table.setSelectableModules(args.activatableModules);
+        }
+    }
+
+    private onEnteringPay(args: EnteringPayArgs) {
+        if ((this as any).isCurrentPlayerActive()) {
+            const table = this.getCurrentPlayerTable();
+            table.setPayButtons(args.payButtons);
         }
     }
 
@@ -218,6 +228,9 @@ class Humanity implements HumanityGame {
             case 'activateModule':
                 this.onLeavingActivateModule();
                 break;
+            case 'pay':
+                this.onLeavingPay();
+                break;
             case 'chooseAstronaut':
                 this.onLeavingChooseAstronaut();
                 break;
@@ -235,6 +248,13 @@ class Humanity implements HumanityGame {
             const table = this.getCurrentPlayerTable();
             table.setSelectedAstronaut(null);
             table.setSelectableModules(null);
+        }
+    }
+    
+    public onLeavingPay() {
+        if ((this as any).isCurrentPlayerActive()) {
+            const table = this.getCurrentPlayerTable();
+            table.removePayButtons();
         }
     }
 
@@ -265,7 +285,7 @@ class Humanity implements HumanityGame {
                     (this as any).addActionButton(`orange_button`, _("Orange"), () => this.chooseCommunicationColor(1));
                     break;
                 case 'pay':
-                    (this as any).addActionButton(`autoPay_button`, _("Spend ${cost}").replace('${cost}', getCostStr(args.pay)), () => this.autoPay());
+                    (this as any).addActionButton(`autoPay_button`, _("Automatically spend ${cost}").replace('${cost}', getCostStr(args.autoPay)), () => this.autoPay());
                     break;
                 case 'confirmTurn':
                     (this as any).addActionButton(`confirmTurn_button`, _("Confirm turn"), () => this.confirmTurn());
@@ -752,7 +772,9 @@ class Humanity implements HumanityGame {
     }
 
     public onPlayerModuleClick(card: Module): void {
-        this.activateModule(card.id);
+        if (this.gamedatas.gamestate.name == 'activateModule') {
+            this.activateModule(card.id);
+        }
     }
     
     public onPlayerModuleSpotClick(x: number, y: number): void {
@@ -832,6 +854,16 @@ class Humanity implements HumanityGame {
 
         this.takeAction('chooseNewExperiment', {
             id
+        });
+    }
+  	
+    public pay(id: number, resource: number) {
+        if(!(this as any).checkAction('pay')) {
+            return;
+        }
+
+        this.takeAction('pay', {
+            id, resource
         });
     }
   	

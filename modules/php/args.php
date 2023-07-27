@@ -55,10 +55,25 @@ trait ArgsTrait {
         $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
         
         $pay = $this->canPay((array)$currentAction->remainingCost, $playerId)['payWith'];
+        
+        $remainingNeededResourceTypes = array_keys((array)$currentAction->remainingCost);
+        $playerModules = $this->getModulesByLocation('player', $playerId);
+
+        $payButtons = [];
+        foreach ($playerModules as $module) {
+            if ($module->r > 0 && $module->production != null) {
+                foreach ($module->production as $produce) {
+                    if (in_array($produce, $remainingNeededResourceTypes)) {
+                        $payButtons[$module->id][] = $produce;
+                    }
+                }
+            }
+        };
 
         return [
             'cost' => $currentAction->remainingCost,
-            'pay' => $pay,
+            'autoPay' => $pay,
+            'payButtons' => $payButtons,
         ];
     }
 
