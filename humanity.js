@@ -2181,6 +2181,7 @@ var TableCenter = /** @class */ (function () {
     function TableCenter(game, gamedatas) {
         var _this = this;
         this.game = game;
+        this.arm = 0;
         this.experiments = new SlotStock(game.experimentsManager, document.getElementById("table-experiments"), {
             slotsIds: [0, 1, 2, 3, 4, 5, 6, 7],
             mapCardToSlot: function (card) { return card.locationArg; },
@@ -2217,7 +2218,12 @@ var TableCenter = /** @class */ (function () {
         return this.modules.addCard(module);
     };
     TableCenter.prototype.moveArm = function (arm) {
+        // to make sure arm always turn clockwise even with a %
+        while (arm < this.arm) {
+            arm += 8;
+        }
         document.getElementById('board-2').style.setProperty('--r', "".concat(arm));
+        this.arm = arm;
     };
     TableCenter.prototype.newExperiments = function (tableExperiments) {
         this.experiments.removeAll();

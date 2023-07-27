@@ -1,6 +1,8 @@
 class TableCenter {
     public experiments: SlotStock<Experiment>;
     public modules: SlotStock<Module>;
+
+    private arm: number = 0;
         
     constructor(private game: HumanityGame, gamedatas: HumanityGamedatas) {
         this.experiments = new SlotStock<Experiment>(game.experimentsManager, document.getElementById(`table-experiments`), {
@@ -51,7 +53,14 @@ class TableCenter {
     }
     
     public moveArm(arm: number) {
+        // to make sure arm always turn clockwise even with a %
+        while (arm < this.arm) {
+            arm += 8;
+        }
+
         document.getElementById('board-2').style.setProperty('--r', `${arm}`);
+
+        this.arm = arm;
     }
     
     public newExperiments(tableExperiments: Experiment[]) {
