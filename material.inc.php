@@ -75,7 +75,7 @@ $this->EXPERIMENT = [
     ],
 ];
 
-$this->TILES = [ //public int $type; // 0 start, 1..3 year, 8 communication, 9 obstacle
+$this->MODULES = [ //public int $type; // 0 start, 1..3 year, 8 communication, 9 obstacle
     0 => [ // start
         1 => new OrangeModuleType([], 1, [ICE]),
         2 => new OrangeModuleType([], 1, [INSECT]),

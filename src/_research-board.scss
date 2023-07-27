@@ -2,6 +2,7 @@
   position: relative;
   width: 682px;
   height: 512px;
+  margin-left: 170px;
   margin-right: 170px;
   background: url('img/research-board.png');
 
@@ -128,5 +129,32 @@
     &[data-slot-id="3"] {
       top: 433px;
     }
-}
+  }
+
+  #module-decks {
+    position: absolute;
+    left: -170px;
+    top: 0;
+    width: 150px;
+    height: 600px;
+
+    .module-deck {
+      position: absolute;
+      left: 0;
+
+      &[data-year="1"] {
+        top: 0px;
+      }
+      &[data-year="2"] {
+        top: 170px;
+      }
+      &[data-year="3"] {
+        top: 340px;
+      }
+
+      &.card-stock.deck > .card:first-child {
+        box-shadow: none;
+      }
+    }
+  }
 }

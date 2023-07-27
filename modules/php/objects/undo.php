@@ -11,6 +11,7 @@ class Undo {
     public array $tableExperiments;
     public array $allMissions;
     public array $stats;
+    public array $squares;
 
     public function __construct(
         array $modules,
@@ -20,7 +21,8 @@ class Undo {
         array $tableModules,
         array $tableExperiments,
         array $allMissions,
-        array $stats
+        array $stats,
+        array $squares
     ) {
         $this->modules = $modules;
         $this->experiments = $experiments;
@@ -32,6 +34,7 @@ class Undo {
         $this->tableExperiments = $tableExperiments;
         $this->allMissions = $allMissions;
         $this->stats = $stats;
+        $this->squares = $squares;
     }
 
 }

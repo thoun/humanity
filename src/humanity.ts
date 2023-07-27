@@ -155,6 +155,10 @@ class Humanity implements HumanityGame {
     public onEnteringState(stateName: string, args: any) {
         log('Entering state: ' + stateName, args.args);
 
+        if (args.args?.astronaut && (this as any).isCurrentPlayerActive()) {
+            this.setSelectedAstronaut(args.args.astronaut);
+        }
+
         switch (stateName) {
             case 'chooseAction':
                 this.onEnteringChooseAction(args.args);
@@ -180,7 +184,6 @@ class Humanity implements HumanityGame {
     private onEnteringChooseAction(args: EnteringChooseActionArgs) {
         if ((this as any).isCurrentPlayerActive()) {
             const table = this.getCurrentPlayerTable();
-            table.setSelectedAstronaut(args.astronaut);
             table.setSelectableModules(args.activatableModules);
             this.tableCenter.setSelectableModules(args.selectableModules);
             this.tableCenter.setSelectableExperiments(args.selectableExperiments);
@@ -190,7 +193,6 @@ class Humanity implements HumanityGame {
     public onEnteringActivateModule(args: EnteringActivateModuleArgs) {
         if ((this as any).isCurrentPlayerActive()) {
             const table = this.getCurrentPlayerTable();
-            table.setSelectedAstronaut(args.astronaut);
             table.setSelectableModules(args.activatableModules);
         }
     }
@@ -221,6 +223,8 @@ class Humanity implements HumanityGame {
     public onLeavingState(stateName: string) {
         log( 'Leaving state: '+stateName );
 
+        this.setSelectedAstronaut(null);
+
         switch (stateName) {
             case 'chooseAction':
                 this.onLeavingChooseAction();
@@ -229,6 +233,7 @@ class Humanity implements HumanityGame {
                 this.onLeavingActivateModule();
                 break;
             case 'pay':
+            case 'chooseCommunicationColor':
                 this.onLeavingPay();
                 break;
             case 'chooseAstronaut':
@@ -246,7 +251,6 @@ class Humanity implements HumanityGame {
     public onLeavingChooseAction() {
         if ((this as any).isCurrentPlayerActive()) {
             const table = this.getCurrentPlayerTable();
-            table.setSelectedAstronaut(null);
             table.setSelectableModules(null);
             this.tableCenter.setSelectableModules(null);
             this.tableCenter.setSelectableExperiments(null);
@@ -256,7 +260,6 @@ class Humanity implements HumanityGame {
     public onLeavingActivateModule() {
         if ((this as any).isCurrentPlayerActive()) {
             const table = this.getCurrentPlayerTable();
-            table.setSelectedAstronaut(null);
             table.setSelectableModules(null);
         }
     }
@@ -278,6 +281,12 @@ class Humanity implements HumanityGame {
 
     private onLeavingUpgradeAstronaut() {
         document.querySelectorAll('.astronaut.selectable').forEach(astronaut => astronaut.classList.remove('selectable'));
+    }
+    
+    private setSelectedAstronaut(selectedAstronaut: Astronaut) {
+        document.querySelectorAll('.astronaut').forEach((astronaut: HTMLDivElement) => 
+            astronaut.classList.toggle('selected', selectedAstronaut?.id == Number(astronaut.dataset.id))
+        );
     }
 
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
@@ -307,7 +316,7 @@ class Humanity implements HumanityGame {
             }
 
             
-            if (['chooseCommunicationColor', 'pay', 'chooseAstronaut', 'upgradeAstronaut', 'activateModule', 'confirmTurn'].includes(stateName)) {
+            if (['chooseCommunicationColor', 'pay', 'chooseAction', 'upgradeAstronaut', 'activateModule', 'confirmTurn'].includes(stateName)) {
                 (this as any).addActionButton(`restartTurn_button`, _("Restart turn"), () => this.restartTurn(), null, null, 'red');
             }
         }
@@ -975,6 +984,7 @@ class Humanity implements HumanityGame {
             ['newTableExperiments', ANIMATION_MS],
             ['reactivateAstronauts', ANIMATION_MS],
             ['upgradeAstronaut', 50],
+            ['addSquares', 1],
             ['year', ANIMATION_MS],
             ['gainMission', undefined],
             ['moveAstronaut', ANIMATION_MS],
@@ -1058,6 +1068,11 @@ class Humanity implements HumanityGame {
         return this.getPlayerTable(playerId).addModule(module);
     }
 
+    notif_addSquares(args: NotifAddSquaresArgs) {
+        const { playerId, squares } = args;
+        return this.getPlayerTable(playerId).addSquares(squares);
+    }
+
     notif_deployExperiment(args: NotifDeployExperimentArgs) {
         const { playerId, experiment } = args;
         return this.getPlayerTable(playerId).addExperiment(experiment);
@@ -1093,8 +1108,10 @@ class Humanity implements HumanityGame {
         this.tableCenter.shiftModule(args.module);
     }     
 
-    notif_newTableModule(args: NotifTableModuleArgs) {
-        this.tableCenter.newModule(args.module);
+    notif_newTableModule(args: NotifNewTableModuleArgs) {
+        const { module, year, moduleDeckCount, moduleDeckTopCard } = args;
+        this.tableCenter.newModule(module);
+        this.researchBoard.moduleDecks[year].setCardNumber(moduleDeckCount, moduleDeckTopCard);
     }  
 
     notif_moveArm(args: NotifMoveArmArgs) {
@@ -1142,6 +1159,7 @@ class Humanity implements HumanityGame {
         const table = this.getPlayerTable(playerId);
         table.resetModules(undo.modules);
         table.resetExperiments(undo.experiments);
+        table.resetSquares(undo.squares);
 
         undo.astronauts.forEach(astronaut => this.resetAstronaut(playerId, astronaut));
 

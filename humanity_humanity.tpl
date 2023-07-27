@@ -11,6 +11,7 @@
                 <div id="table-astronauts"></div>
             </div>
             <div id="research-board">
+                <div id="module-decks"></div>
                 <div id="missions"></div>
             </div>
         </div>

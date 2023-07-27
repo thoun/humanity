@@ -62,10 +62,19 @@ trait ArgsTrait {
         ];
     }
 
+    function argChooseCommunicationColor() {
+        $astronaut = $this->getSelectedAstronaut();
+
+        return [
+            'astronaut' => $astronaut,
+        ];
+    }
+
     function argPay() {
         $playerId = intval($this->getActivePlayerId());
         
         $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
+        $astronaut = $this->getAstronautById($currentAction->selectedAstronaut);
         
         $pay = $this->canPay((array)$currentAction->remainingCost, $playerId)['payWith'];
         
@@ -84,6 +93,7 @@ trait ArgsTrait {
         };
 
         return [
+            'astronaut' => $astronaut,
             'cost' => $currentAction->remainingCost,
             'autoPay' => $pay,
             'payButtons' => $payButtons,

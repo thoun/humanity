@@ -22,7 +22,8 @@ trait StateTrait {
             $this->getModulesByLocation('table'),
             $this->getExperimentsByLocation('table'),
             $this->getMissionsByLocation(),
-            $this->getCollectionFromDb("SELECT stats_id, stats_value FROM `stats` WHERE stats_player_id = $playerId", true)
+            $this->getCollectionFromDb("SELECT stats_id, stats_value FROM `stats` WHERE stats_player_id = $playerId", true),
+            $this->getPlayerSquares($playerId),
         ));
         
         $this->gamestate->nextState('next');
@@ -201,6 +202,10 @@ trait StateTrait {
                         'module' => $newModule,
                         'module_image' => '',
                         'preserve' => ['module'],
+                        
+                        'year' => $year,
+                        'moduleDeckCount' => intval($this->modules->countCardInLocation("deck$year")),
+                        'moduleDeckTopCard' => Module::onlyId($this->getModuleFromDb($this->modules->getCardOnTop("deck$year"))),
                     ]);
                 }
             }
@@ -287,8 +292,14 @@ trait StateTrait {
             $spotModule = $this->array_find($tableModules, fn($tableModule) => $tableModule->locationArg == $spot);
             if (!$spotModule) {
                 $newModule = $this->getModuleFromDb($this->modules->pickCardForLocation('deck'.$year, 'table', $spot));
-                self::notifyAllPlayers('newTableModule', '', [
+                self::notifyAllPlayers('newTableModule', clienttranslate('A new module is added to the board to fill an empty hangar ${module_image}'), [
                     'module' => $newModule,
+                    'module_image' => '',
+                    'preserve' => ['module'],
+                    
+                    'year' => $year,
+                    'moduleDeckCount' => intval($this->modules->countCardInLocation("deck$year")),
+                    'moduleDeckTopCard' => Module::onlyId($this->getModuleFromDb($this->modules->getCardOnTop("deck$year"))),
                 ]);
             }
         }

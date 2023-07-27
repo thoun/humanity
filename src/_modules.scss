@@ -38,11 +38,13 @@
     }
 
     @for $year from 1 through 3 {
-        &[data-type="#{$year}"] .front {
+        &[data-type="#{$year}"] .card-side {
             background-image: url('img/modules-years.png');  
             background-size: auto 300%;
             background-position-y: #{($year - 1) * 100% / 2};
+        }
 
+        &[data-type="#{$year}"] .front {
             @for $number from 1 through 15 {
                 &[data-number="#{$number}"] {
                     background-position-x: #{$number * 100% / 15};

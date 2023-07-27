@@ -109,7 +109,8 @@ $playerActionsGameStates = [
         "name" => "chooseCommunicationColor",
         "description" => clienttranslate('${actplayer} must choose the communication module color'),
         "descriptionmyturn" => clienttranslate('${you} must choose the communication module color'),
-        "type" => "activeplayer",    
+        "type" => "activeplayer",   
+        "args" => "argChooseCommunicationColor", 
         "possibleactions" => [ 
             "chooseCommunicationColor",
         ],

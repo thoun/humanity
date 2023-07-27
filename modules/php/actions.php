@@ -469,6 +469,13 @@ trait ActionTrait {
             $this->DbQuery("UPDATE astronaut SET `location` = '$astronaut->location', `workforce` = $astronaut->workforce, `remaining_workforce` = $astronaut->remainingWorkforce, `spot` = ".($astronaut->spot === null ? 'NULL' : $astronaut->spot).", `x` = ".($astronaut->x === null ? 'NULL' : $astronaut->x).", `y` = ".($astronaut->y === null ? 'NULL' : $astronaut->y)." WHERE `id` = $astronaut->id");
         }
 
+        $playerSquaresBeforeUndo = $this->getPlayerSquares($playerId);
+        foreach ($playerSquaresBeforeUndo as $square) {
+            if (!$this->array_some($undo->squares, fn($s) => $s->x == $square['x'] && $s->y == $square['y'])) {
+                $this->DbQuery("DELETE FROM square WHERE `player_id` = $playerId AND `x` = ".$square['x']." AND `y` = ".$square['y']);
+            }
+        }
+
         $this->DbQuery("UPDATE player SET `player_vp` = $undo->vp, `player_research_points` = $undo->researchPoints, `player_science` = $undo->science WHERE `player_id` = $playerId");
         $this->restoreStats($playerId, (array)$undo->stats);
 

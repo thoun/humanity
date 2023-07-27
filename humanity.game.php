@@ -187,6 +187,7 @@ class Humanity extends Table {
             $player['modules'] = $this->getModulesByLocation('player', $playerId);
             $player['experiments'] = $this->getExperimentsByLocation('player', $playerId);
             $player['missions'] = $this->getMissionsByLocation('player', $playerId);
+            $player['squares'] = $this->getPlayerSquares($playerId);
             if ($isEndScore) {
                 $player['score'] = $player['vp'] + $player['science'];
             }
@@ -202,6 +203,15 @@ class Humanity extends Table {
         $result['year'] = $this->getYear();
         $result['firstPlayerId'] = $this->getGlobalVariable(FIRST_PLAYER);
         $result['isEnd'] = $isEndScore;
+
+        $moduleDeckCounts = [];
+        $moduleDeckTopCard = [];
+        foreach ([1, 2, 3] as $year) {
+            $moduleDeckCounts[$year] = intval($this->modules->countCardInLocation("deck$year"));
+            $moduleDeckTopCard[$year] = Module::onlyId($this->getModuleFromDb($this->modules->getCardOnTop("deck$year")));
+        }
+        $result['moduleDeckCounts'] = $moduleDeckCounts;
+        $result['moduleDeckTopCard'] = $moduleDeckTopCard;
 
         $result['movedAstronauts'] = $this->getGlobalVariable(MOVED_ASTRONAUTS);
   

@@ -68,6 +68,14 @@ CREATE TABLE IF NOT EXISTS `astronaut` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS `square` (
+  `id` TINYINT unsigned NOT NULL AUTO_INCREMENT,
+  `player_id` int(11) NOT NULL,
+   `x` smallint(2) NULL,
+   `y` smallint(2) NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS `global_variables` (
   `name` varchar(50) NOT NULL,
   `value` json,

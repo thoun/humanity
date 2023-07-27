@@ -2032,7 +2032,7 @@ var ModulesManager = /** @class */ (function (_super) {
     ModulesManager.prototype.setupFrontDiv = function (card, div, ignoreTooltip) {
         if (ignoreTooltip === void 0) { ignoreTooltip = false; }
         div.dataset.number = '' + card.number;
-        if (!ignoreTooltip) {
+        if (card.number && !ignoreTooltip) {
             this.game.setTooltip(div.id, this.getTooltip(card));
         }
     };
@@ -2243,6 +2243,7 @@ var ResearchBoard = /** @class */ (function () {
     function ResearchBoard(game, gamedatas) {
         var _this = this;
         this.game = game;
+        this.moduleDecks = [];
         this.vp = new Map();
         this.sciencePoints = new Map();
         var players = Object.values(gamedatas.players);
@@ -2264,6 +2265,14 @@ var ResearchBoard = /** @class */ (function () {
         });
         this.missions.addCards(gamedatas.tableMissions);
         this.setMissionScienceTokens();
+        [1, 2, 3].forEach(function (year) {
+            document.getElementById('module-decks').insertAdjacentHTML('beforeend', "<div id=\"module-deck-".concat(year, "\" class=\"module-deck\" data-year=\"").concat(year, "\"></div>"));
+            _this.moduleDecks[year] = new Deck(_this.game.modulesManager, document.getElementById("module-deck-".concat(year)), {
+                cardNumber: gamedatas.moduleDeckCounts[year],
+                topCard: gamedatas.moduleDeckTopCard[year],
+                counter: {},
+            });
+        });
     }
     ResearchBoard.prototype.getVPCoordinates = function (points) {
         var cases = Math.min(points, 40);
@@ -2465,15 +2474,11 @@ var PlayerTable = /** @class */ (function () {
                 document.getElementById("astronaut-".concat(astronaut.id)).classList.add('disabled-astronaut');
             }
         });
+        this.addSquares(player.squares);
     }
     PlayerTable.prototype.setSelectableAstronauts = function (astronauts) {
         document.getElementById("player-table-".concat(this.playerId, "-modules")).querySelectorAll('.astronaut').forEach(function (astronaut) {
             return astronaut.classList.toggle('selectable', astronauts.some(function (w) { return w.id == Number(astronaut.dataset.id); }));
-        });
-    };
-    PlayerTable.prototype.setSelectedAstronaut = function (selectedAstronaut) {
-        document.getElementById("player-table-".concat(this.playerId, "-modules")).querySelectorAll('.astronaut').forEach(function (astronaut) {
-            return astronaut.classList.toggle('selected', (selectedAstronaut === null || selectedAstronaut === void 0 ? void 0 : selectedAstronaut.id) == Number(astronaut.dataset.id));
         });
     };
     PlayerTable.prototype.setSelectableModules = function (selectableModules) {
@@ -2640,6 +2645,19 @@ var PlayerTable = /** @class */ (function () {
     PlayerTable.prototype.removePayButtons = function () {
         Array.from(document.getElementById("player-table-".concat(this.playerId, "-modules")).getElementsByClassName('buttons')).forEach(function (elem) { return elem.remove(); });
     };
+    PlayerTable.prototype.addSquares = function (squares) {
+        var _this = this;
+        squares.forEach(function (square) {
+            var token = document.createElement('div');
+            token.classList.add('vp', 'icon', 'square-vp-token');
+            document.getElementById("player-table-".concat(_this.playerId, "-modules")).querySelector("[data-slot-id=\"".concat(square.x, "_").concat(square.y, "\"]")).appendChild(token);
+        });
+    };
+    PlayerTable.prototype.resetSquares = function (squares) {
+        Array.from(document.getElementById("player-table-".concat(this.playerId, "-modules")).getElementsByClassName('square-vp-token'))
+            .filter(function (elem) { return !squares.find(function (square) { return elem.parentElement.dataset.slotId == "".concat(square.x, "_").concat(square.y); }); })
+            .forEach(function (elem) { return elem.remove(); });
+    };
     return PlayerTable;
 }());
 var ANIMATION_MS = 500;
@@ -2758,7 +2776,11 @@ var Humanity = /** @class */ (function () {
     //                  You can use this method to perform some user interface changes at this moment.
     //
     Humanity.prototype.onEnteringState = function (stateName, args) {
+        var _a;
         log('Entering state: ' + stateName, args.args);
+        if (((_a = args.args) === null || _a === void 0 ? void 0 : _a.astronaut) && this.isCurrentPlayerActive()) {
+            this.setSelectedAstronaut(args.args.astronaut);
+        }
         switch (stateName) {
             case 'chooseAction':
                 this.onEnteringChooseAction(args.args);
@@ -2783,7 +2805,6 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.onEnteringChooseAction = function (args) {
         if (this.isCurrentPlayerActive()) {
             var table = this.getCurrentPlayerTable();
-            table.setSelectedAstronaut(args.astronaut);
             table.setSelectableModules(args.activatableModules);
             this.tableCenter.setSelectableModules(args.selectableModules);
             this.tableCenter.setSelectableExperiments(args.selectableExperiments);
@@ -2792,7 +2813,6 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.onEnteringActivateModule = function (args) {
         if (this.isCurrentPlayerActive()) {
             var table = this.getCurrentPlayerTable();
-            table.setSelectedAstronaut(args.astronaut);
             table.setSelectableModules(args.activatableModules);
         }
     };
@@ -2819,6 +2839,7 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.onLeavingState = function (stateName) {
         log('Leaving state: ' + stateName);
+        this.setSelectedAstronaut(null);
         switch (stateName) {
             case 'chooseAction':
                 this.onLeavingChooseAction();
@@ -2827,6 +2848,7 @@ var Humanity = /** @class */ (function () {
                 this.onLeavingActivateModule();
                 break;
             case 'pay':
+            case 'chooseCommunicationColor':
                 this.onLeavingPay();
                 break;
             case 'chooseAstronaut':
@@ -2843,7 +2865,6 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.onLeavingChooseAction = function () {
         if (this.isCurrentPlayerActive()) {
             var table = this.getCurrentPlayerTable();
-            table.setSelectedAstronaut(null);
             table.setSelectableModules(null);
             this.tableCenter.setSelectableModules(null);
             this.tableCenter.setSelectableExperiments(null);
@@ -2852,7 +2873,6 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.onLeavingActivateModule = function () {
         if (this.isCurrentPlayerActive()) {
             var table = this.getCurrentPlayerTable();
-            table.setSelectedAstronaut(null);
             table.setSelectableModules(null);
         }
     };
@@ -2872,6 +2892,11 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.onLeavingUpgradeAstronaut = function () {
         document.querySelectorAll('.astronaut.selectable').forEach(function (astronaut) { return astronaut.classList.remove('selectable'); });
+    };
+    Humanity.prototype.setSelectedAstronaut = function (selectedAstronaut) {
+        document.querySelectorAll('.astronaut').forEach(function (astronaut) {
+            return astronaut.classList.toggle('selected', (selectedAstronaut === null || selectedAstronaut === void 0 ? void 0 : selectedAstronaut.id) == Number(astronaut.dataset.id));
+        });
     };
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
     //                        action status bar (ie: the HTML links in the status bar).
@@ -2898,7 +2923,7 @@ var Humanity = /** @class */ (function () {
                     this.addActionButton("restartMoveAstronauts_button", _("Restart"), function () { return _this.restartMoveAstronauts(); }, null, null, 'red');
                     break;
             }
-            if (['chooseCommunicationColor', 'pay', 'chooseAstronaut', 'upgradeAstronaut', 'activateModule', 'confirmTurn'].includes(stateName)) {
+            if (['chooseCommunicationColor', 'pay', 'chooseAction', 'upgradeAstronaut', 'activateModule', 'confirmTurn'].includes(stateName)) {
                 this.addActionButton("restartTurn_button", _("Restart turn"), function () { return _this.restartTurn(); }, null, null, 'red');
             }
         }
@@ -3240,6 +3265,7 @@ var Humanity = /** @class */ (function () {
             ['newTableExperiments', ANIMATION_MS],
             ['reactivateAstronauts', ANIMATION_MS],
             ['upgradeAstronaut', 50],
+            ['addSquares', 1],
             ['year', ANIMATION_MS],
             ['gainMission', undefined],
             ['moveAstronaut', ANIMATION_MS],
@@ -3306,6 +3332,10 @@ var Humanity = /** @class */ (function () {
         var playerId = args.playerId, module = args.module;
         return this.getPlayerTable(playerId).addModule(module);
     };
+    Humanity.prototype.notif_addSquares = function (args) {
+        var playerId = args.playerId, squares = args.squares;
+        return this.getPlayerTable(playerId).addSquares(squares);
+    };
     Humanity.prototype.notif_deployExperiment = function (args) {
         var playerId = args.playerId, experiment = args.experiment;
         return this.getPlayerTable(playerId).addExperiment(experiment);
@@ -3334,7 +3364,9 @@ var Humanity = /** @class */ (function () {
         this.tableCenter.shiftModule(args.module);
     };
     Humanity.prototype.notif_newTableModule = function (args) {
-        this.tableCenter.newModule(args.module);
+        var module = args.module, year = args.year, moduleDeckCount = args.moduleDeckCount, moduleDeckTopCard = args.moduleDeckTopCard;
+        this.tableCenter.newModule(module);
+        this.researchBoard.moduleDecks[year].setCardNumber(moduleDeckCount, moduleDeckTopCard);
     };
     Humanity.prototype.notif_moveArm = function (args) {
         this.tableCenter.moveArm(args.arm);
@@ -3374,6 +3406,7 @@ var Humanity = /** @class */ (function () {
         var table = this.getPlayerTable(playerId);
         table.resetModules(undo.modules);
         table.resetExperiments(undo.experiments);
+        table.resetSquares(undo.squares);
         undo.astronauts.forEach(function (astronaut) { return _this.resetAstronaut(playerId, astronaut); });
         this.setResearchPoints(playerId, undo.researchPoints);
         this.setVP(playerId, undo.vp);

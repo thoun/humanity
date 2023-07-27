@@ -64,6 +64,11 @@ interface Astronaut {
 
 type Icons = { [type: number]: number };
 
+interface Square {
+    x: number; 
+    y: number;
+}
+
 interface HumanityPlayer extends Player {
     playerNo: number;
     
@@ -74,6 +79,7 @@ interface HumanityPlayer extends Player {
     vp: number;
     science?: number;
     missions: Mission[];
+    squares: Square[];
 
     icons: Icons;
 }
@@ -94,6 +100,8 @@ interface HumanityGamedatas {
     tableModules: Module[];
     tableExperiments: Experiment[];
     tableMissions: Mission[];
+    moduleDeckCounts: { [year: number]: number };
+    moduleDeckTopCard: { [year: number]: Module };
     arm: number;
     year: number;
     firstPlayerId: number;
@@ -128,23 +136,26 @@ interface EnteringChooseAstronautArgs {
     astronauts: Astronaut[];
 }
 
+interface EnteringAstronautArgs {
+    astronaut: Astronaut;
+}
+
 interface EnteringChooseActionArgs extends EnteringActivateModuleArgs {
     selectableModules: Module[];
     selectableExperiments: Experiment[];
 }
 
-interface EnteringPayArgs {
+interface EnteringPayArgs extends EnteringAstronautArgs {
     cost: Icons;
     autoPay: Icons;
     payButtons: { [tileId: number]: number[] };
 }
 
-interface EnteringActivateModuleArgs {
-    astronaut: Astronaut;
+interface EnteringActivateModuleArgs extends EnteringAstronautArgs {
     activatableModules: Module[];
 }
 
-interface EnteringMoveAstronautArgs {
+interface EnteringMoveAstronautArgs extends EnteringAstronautArgs {
     astronaut: Astronaut;
     possibleCoordinates: number[][];
 }
@@ -189,6 +200,12 @@ interface NotifDeployModuleArgs {
     module: Module;
 }
 
+// addSquares
+interface NotifAddSquaresArgs {
+    playerId: number;
+    squares: Square[];
+}
+
 // deployExperiment
 interface NotifDeployExperimentArgs {
     playerId: number;
@@ -208,9 +225,16 @@ interface NotifNewFirstPlayerArgs {
     playerId: number;
 }  
 
-// removeTableModule, shiftTableModule, newTableModule
+// removeTableModule, shiftTableModule
 interface NotifTableModuleArgs {
     module: Module;
+}
+
+//  newTableModule
+interface NotifNewTableModuleArgs extends NotifTableModuleArgs {
+    year: number;
+    moduleDeckCount: number;
+    moduleDeckTopCard: Module;
 }
 
 // moveArm
@@ -250,6 +274,7 @@ interface Undo {
     tableModules: Module[];
     tableExperiments: Experiment[];
     allMissions: Mission[];
+    squares: Square[];
 }
 
 // restartTurn

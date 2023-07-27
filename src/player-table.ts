@@ -91,17 +91,13 @@ class PlayerTable {
                 document.getElementById(`astronaut-${astronaut.id}`).classList.add('disabled-astronaut');
             }
         });
+
+        this.addSquares(player.squares);
     }
     
     public setSelectableAstronauts(astronauts: Astronaut[]) {
         document.getElementById(`player-table-${this.playerId}-modules`).querySelectorAll('.astronaut').forEach((astronaut: HTMLDivElement) => 
             astronaut.classList.toggle('selectable', astronauts.some(w => w.id == Number(astronaut.dataset.id)))
-        );
-    }
-    
-    public setSelectedAstronaut(selectedAstronaut: Astronaut) {
-        document.getElementById(`player-table-${this.playerId}-modules`).querySelectorAll('.astronaut').forEach((astronaut: HTMLDivElement) => 
-            astronaut.classList.toggle('selected', selectedAstronaut?.id == Number(astronaut.dataset.id))
         );
     }
     
@@ -289,5 +285,20 @@ class PlayerTable {
 
     public removePayButtons() {
         Array.from(document.getElementById(`player-table-${this.playerId}-modules`).getElementsByClassName('buttons')).forEach(elem => elem.remove());
+    }
+
+    public addSquares(squares: Square[]) {
+            squares.forEach(square => {
+            const token = document.createElement('div');
+            token.classList.add('vp', 'icon', 'square-vp-token');
+
+            document.getElementById(`player-table-${this.playerId}-modules`).querySelector(`[data-slot-id="${square.x}_${square.y}"]`).appendChild(token);
+        });
+    }
+    
+    public resetSquares(squares: Square[]) {
+        Array.from(document.getElementById(`player-table-${this.playerId}-modules`).getElementsByClassName('square-vp-token'))
+            .filter(elem => !squares.find(square => elem.parentElement.dataset.slotId == `${square.x}_${square.y}`))
+            .forEach(elem => elem.remove());
     }
 }

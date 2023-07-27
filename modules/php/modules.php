@@ -6,7 +6,7 @@ trait ModuleTrait {
         if ($dbCard == null) {
             return null;
         }
-        return new Module($dbCard, $this->TILES);
+        return new Module($dbCard, $this->MODULES);
     }
 
     function getModulesFromDb(array $dbCards) {
@@ -37,9 +37,9 @@ trait ModuleTrait {
     }
 
     function setupModules(array $players) {
-        foreach ([1, 2, 3] as $year => $modulesType) {
+        foreach ([1, 2, 3] as $year) {
             $modules = [];
-            foreach ($this->TILES[$year] as $subType => $moduleType) {
+            foreach ($this->MODULES[$year] as $subType => $moduleType) {
                 $modules[] = [ 'type' => $year, 'type_arg' => $subType, 'nbr' => 1 ];
             }
             $this->modules->createCards($modules, 'deck'.$year);
@@ -50,13 +50,13 @@ trait ModuleTrait {
             $this->modules->pickCardForLocation('deck1', 'table', $spot);
         }
 
-        foreach ($this->TILES[8] as $subType => $moduleType) {
+        foreach ($this->MODULES[8] as $subType => $moduleType) {
             $this->modules->createCards([[ 'type' => 8, 'type_arg' => $subType, 'nbr' => 2 ]], 'communication');
         }
 
         foreach ($players as $playerId => $player) {
             $modules = [];
-            foreach ($this->TILES[0] as $subType => $moduleType) {
+            foreach ($this->MODULES[0] as $subType => $moduleType) {
                 $this->modules->createCards([[ 'type' => 0, 'type_arg' => $subType, 'nbr' => 1 ]], 'temp');
                 $cardId = $this->getModulesByLocation('temp')[0]->id;
                 $position = $this->STARTING_TILE_POSITIONS[$subType];
@@ -137,6 +137,22 @@ trait ModuleTrait {
             $greenhouseGroupSize = $this->getAdjacentModulesCount($modulesOfColor, $module, false, [$module]);
             $points += $greenhouseGroupSize;
         }
+
+        if (count($squareResult['squares']) > 0) {
+            $sql = "INSERT INTO square (`player_id`, `x`, `y`) VALUES ";
+            $values = [];
+            foreach($squareResult['squares'] as $square) {
+                $values[] = "($playerId, ".$square['x'].", ".$square['y'].")";
+            }
+
+            $sql .= implode(',', $values);
+            $this->DbQuery($sql);
+
+            self::notifyAllPlayers('addSquares', '', [
+                'playerId' => $playerId,
+                'squares' => $squareResult['squares'],
+            ]);
+        }
         
         if ($points > 0) {
             $this->incPlayerVP($playerId, $points, clienttranslate('${player_name} gains ${inc} points with placed module'));
@@ -192,6 +208,7 @@ trait ModuleTrait {
     function checkNewModuleSquares(Module $module, array $playerModules) {
         $points = 0;
         $upgrade = 0;
+        $squares = [];
 
         for ($x = -1; $x <= 1; $x += 2) {
             for ($y = -1; $y <= 1; $y += 2) {
@@ -206,6 +223,10 @@ trait ModuleTrait {
                 $squareModules = array_values(array_filter($squareModules, fn($module) => $module != null));
                 if (count($squareModules) == 4) {
                     $points++;
+                    $squares[] = [
+                        'x' => min($module->x, $module->x + $x),
+                        'y' => min($module->y, $module->y + $y),
+                    ];
 
                     $colors = count(array_unique(array_map(fn($module) => $module->color, $squareModules)));
 
@@ -219,6 +240,7 @@ trait ModuleTrait {
         return [
             'points' => $points,
             'upgrade' => $upgrade,
+            'squares' => $squares,
         ];
     }
 
@@ -239,5 +261,11 @@ trait ModuleTrait {
         }
 
         return !in_array($module->matchType, $adjacentGreenhousesTypes) && count(array_unique($adjacentGreenhousesTypes)) <= 3;
+    }
+
+    function getPlayerSquares(int $playerId) {
+        $sql = "SELECT * FROM square WHERE `player_id` = $playerId";
+        $dbQuares = $this->getCollectionFromDB($sql);
+        return array_map(fn($dbQuare) => ['x' => intval($dbQuare['x']), 'y' => intval($dbQuare['y'])], array_values($dbQuares));
     }
 }

@@ -599,7 +599,7 @@ body > .card {
 .module[data-type="0"] .front[data-number="4"] {
   background-position-x: 100%;
 }
-.module[data-type="1"] .front {
+.module[data-type="1"] .card-side {
   background-image: url("img/modules-years.png");
   background-size: auto 300%;
   background-position-y: 0%;
@@ -649,7 +649,7 @@ body > .card {
 .module[data-type="1"] .front[data-number="15"] {
   background-position-x: 100%;
 }
-.module[data-type="2"] .front {
+.module[data-type="2"] .card-side {
   background-image: url("img/modules-years.png");
   background-size: auto 300%;
   background-position-y: 50%;
@@ -699,7 +699,7 @@ body > .card {
 .module[data-type="2"] .front[data-number="15"] {
   background-position-x: 100%;
 }
-.module[data-type="3"] .front {
+.module[data-type="3"] .card-side {
   background-image: url("img/modules-years.png");
   background-size: auto 300%;
   background-position-y: 100%;
@@ -1155,6 +1155,7 @@ body > .card {
   position: relative;
   width: 682px;
   height: 512px;
+  margin-left: 170px;
   margin-right: 170px;
   background: url("img/research-board.png");
 }
@@ -1267,6 +1268,29 @@ body > .card {
 #research-board .mission-science-token[data-slot-id="3"] {
   top: 433px;
 }
+#research-board #module-decks {
+  position: absolute;
+  left: -170px;
+  top: 0;
+  width: 150px;
+  height: 600px;
+}
+#research-board #module-decks .module-deck {
+  position: absolute;
+  left: 0;
+}
+#research-board #module-decks .module-deck[data-year="1"] {
+  top: 0px;
+}
+#research-board #module-decks .module-deck[data-year="2"] {
+  top: 170px;
+}
+#research-board #module-decks .module-deck[data-year="3"] {
+  top: 340px;
+}
+#research-board #module-decks .module-deck.card-stock.deck > .card:first-child {
+  box-shadow: none;
+}
 
 .player-board {
   background-color: white;
@@ -1335,6 +1359,7 @@ body > .card {
   display: grid;
 }
 .player-table .modules .slot {
+  position: relative;
   width: 150px;
   height: 150px;
   display: flex;
@@ -1345,6 +1370,13 @@ body > .card {
 .player-table .modules .slot.selectable {
   outline: 4px dashed red;
   cursor: pointer;
+}
+.player-table .modules .square-vp-token {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  bottom: -28px;
+  right: -28px;
 }
 .player-table .buttons {
   position: absolute;

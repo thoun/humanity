@@ -5,6 +5,7 @@ const RESEARCH_CASE_WIDTH = 40.71;
 const RESEARCH_CASE_HEIGHT = 33.5;
 
 class ResearchBoard {
+    public moduleDecks: Deck<Module>[] = [];
     private missions: SlotStock<Mission>;
     private vp = new Map<number, number>();
     private sciencePoints = new Map<number, number>(); 
@@ -33,6 +34,15 @@ class ResearchBoard {
         });
         this.missions.addCards(gamedatas.tableMissions);
         this.setMissionScienceTokens();
+
+        [1, 2, 3].forEach(year => {
+            document.getElementById('module-decks').insertAdjacentHTML('beforeend', `<div id="module-deck-${year}" class="module-deck" data-year="${year}"></div>`);
+            this.moduleDecks[year] = new Deck<Module>(this.game.modulesManager, document.getElementById(`module-deck-${year}`), {
+                cardNumber: gamedatas.moduleDeckCounts[year],
+                topCard: gamedatas.moduleDeckTopCard[year],
+                counter: {},
+            });
+        })
     }
 
     private getVPCoordinates(points: number) {

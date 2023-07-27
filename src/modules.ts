@@ -16,7 +16,7 @@ class ModulesManager extends CardManager<Module> {
     
     private setupFrontDiv(card: Module, div: HTMLElement, ignoreTooltip: boolean = false) { 
         div.dataset.number = ''+card.number;
-        if (!ignoreTooltip) {
+        if (card.number && !ignoreTooltip) {
             this.game.setTooltip(div.id, this.getTooltip(card));
         }
     }
