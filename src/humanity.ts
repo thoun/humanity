@@ -179,7 +179,9 @@ class Humanity implements HumanityGame {
 
     private onEnteringChooseAction(args: EnteringChooseActionArgs) {
         if ((this as any).isCurrentPlayerActive()) {
-            this.getCurrentPlayerTable()?.setSelectableAstronauts(args.astronauts);
+            const table = this.getCurrentPlayerTable();
+            table.setSelectedAstronaut(args.astronaut);
+            table.setSelectableModules(args.activatableModules);
             this.tableCenter.setSelectableModules(args.selectableModules);
             this.tableCenter.setSelectableExperiments(args.selectableExperiments);
         }
@@ -221,9 +223,7 @@ class Humanity implements HumanityGame {
 
         switch (stateName) {
             case 'chooseAction':
-                this.onLeavingChooseAstronaut();
-                this.tableCenter.setSelectableModules(null);
-                this.tableCenter.setSelectableExperiments(null);
+                this.onLeavingChooseAction();
                 break;
             case 'activateModule':
                 this.onLeavingActivateModule();
@@ -240,6 +240,16 @@ class Humanity implements HumanityGame {
             case 'upgradeAstronaut':
                 this.onLeavingUpgradeAstronaut();
                 break;
+        }
+    }
+    
+    public onLeavingChooseAction() {
+        if ((this as any).isCurrentPlayerActive()) {
+            const table = this.getCurrentPlayerTable();
+            table.setSelectedAstronaut(null);
+            table.setSelectableModules(null);
+            this.tableCenter.setSelectableModules(null);
+            this.tableCenter.setSelectableExperiments(null);
         }
     }
     
@@ -772,7 +782,7 @@ class Humanity implements HumanityGame {
     }
 
     public onPlayerModuleClick(card: Module): void {
-        if (this.gamedatas.gamestate.name == 'activateModule') {
+        if (['activateModule', 'chooseAction'].includes(this.gamedatas.gamestate.name)) {
             this.activateModule(card.id);
         }
     }

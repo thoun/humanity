@@ -72,19 +72,34 @@ $basicGameStates = [
 
 $playerActionsGameStates = [
 
+    ST_PLAYER_CHOOSE_ASTRONAUT => [
+        "name" => "chooseAstronaut",
+        "description" => clienttranslate('${actplayer} must choose a astronaut'),
+        "descriptionmyturn" => clienttranslate('${you} must choose a astronaut'),
+        "type" => "activeplayer",    
+        "args" => "argChooseAstronaut",
+        "possibleactions" => [ 
+            "chooseAstronaut",
+        ],
+        "transitions" => [
+            "next" => ST_PLAYER_CHOOSE_ACTION,
+        ],
+    ],
+
     ST_PLAYER_CHOOSE_ACTION => [
         "name" => "chooseAction",
-        "description" => clienttranslate('${actplayer} must select a astronaut to activate modules, a module to deploy or an experiment to carry out'),
-        "descriptionmyturn" => clienttranslate('${you} must select a astronaut to activate modules, a module to deploy or an experiment to carry out'),
+        "description" => clienttranslate('${actplayer} must select a module to activate, a module to deploy or an experiment to carry out'),
+        "descriptionmyturn" => clienttranslate('${you} must select a module to activate, a module to deploy or an experiment to carry out'),
         "type" => "activeplayer",    
         "args" => "argChooseAction",
         "possibleactions" => [ 
-            "chooseAstronaut",
+            "activateModule",
             "chooseNewModule",
             "chooseNewExperiment",
         ],
         "transitions" => [
-            "activate" => ST_PLAYER_ACTIVATE_TILE,
+            "stay" => ST_PLAYER_ACTIVATE_TILE,
+            "endTurn" => ST_CHECK_MISSIONS,
             "chooseCommunicationColor" => ST_PLAYER_CHOOSE_COMMUNICATION_COLOR,
             "pay" => ST_PLAYER_SPEND_RESOURCES,
         ],
@@ -114,22 +129,7 @@ $playerActionsGameStates = [
         ],
         "transitions" => [
             "stay" => ST_PLAYER_SPEND_RESOURCES,
-            "next" => ST_PLAYER_CHOOSE_ASTRONAUT,
-        ],
-    ],
-
-    ST_PLAYER_CHOOSE_ASTRONAUT => [
-        "name" => "chooseAstronaut",
-        "description" => clienttranslate('${actplayer} must choose a astronaut'),
-        "descriptionmyturn" => clienttranslate('${you} must choose a astronaut'),
-        "type" => "activeplayer",    
-        "args" => "argChooseAstronaut",
-        "possibleactions" => [ 
-            "chooseAstronaut",
-        ],
-        "transitions" => [
-            "upgrade" => ST_PLAYER_UPGRADE_ASTRONAUT,
-            "endTurn" => ST_CHECK_MISSIONS,
+            "next" => ST_DEPLOY,
         ],
     ],
 
@@ -218,11 +218,22 @@ $gameGameStates = [
 
     ST_START_TURN => [
         "name" => "startTurn",
-        "description" => clienttranslate('Scoring research points...'),
+        "description" => '',
         "type" => "game",
         "action" => "stStartTurn",
         "transitions" => [
-            "next" => ST_PLAYER_CHOOSE_ACTION,
+            "next" => ST_PLAYER_CHOOSE_ASTRONAUT,
+        ]
+    ],
+
+    ST_DEPLOY => [
+        "name" => "deploy",
+        "description" => '',
+        "type" => "game",
+        "action" => "stDeploy",
+        "transitions" => [
+            "upgrade" => ST_PLAYER_UPGRADE_ASTRONAUT,
+            "endTurn" => ST_CHECK_MISSIONS,
         ]
     ],
 

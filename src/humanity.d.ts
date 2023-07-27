@@ -128,7 +128,7 @@ interface EnteringChooseAstronautArgs {
     astronauts: Astronaut[];
 }
 
-interface EnteringChooseActionArgs extends EnteringChooseAstronautArgs {
+interface EnteringChooseActionArgs extends EnteringActivateModuleArgs {
     selectableModules: Module[];
     selectableExperiments: Experiment[];
 }

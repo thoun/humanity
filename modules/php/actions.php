@@ -21,49 +21,24 @@ trait ActionTrait {
         self::checkAction('chooseAstronaut');
 
         $playerId = intval($this->getActivePlayerId());
-        $stateId = intval($this->gamestate->state_id());
-        $fromChooseAction = $stateId == ST_PLAYER_CHOOSE_ACTION;
 
-        $astronauts = $fromChooseAction ? $this->getPlayerAstronauts($playerId, 'player', true) : $this->argChooseAstronaut()['astronauts'];
+        $astronauts = $this->getPlayerAstronauts($playerId, 'player', true);
         $astronaut = $this->array_find($astronauts, fn($astronaut) => $astronaut->id == $id);
 
         if ($astronaut == null) {
             throw new BgaUserException("Invalid astronaut");
         }
         
-        
-        if ($fromChooseAction) {
-            $currentAction = new CurrentAction('activate');
-            $currentAction->selectedAstronaut = $id;
-            $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
+        $currentAction = new CurrentAction($id);
+        $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
-            self::notifyAllPlayers('log', clienttranslate('${player_name} selects a astronaut of work value ${work_value} to activate modules'), [
-                'playerId' => $playerId,
-                'player_name' => $this->getPlayerName($playerId),
-                'work_value' => $astronaut->workforce,
-            ]);
+        self::notifyAllPlayers('log', clienttranslate('${player_name} selects a astronaut of work value ${work_value}'), [
+            'playerId' => $playerId,
+            'player_name' => $this->getPlayerName($playerId),
+            'work_value' => $astronaut->workforce,
+        ]);
 
-            $this->gamestate->nextState('activate');
-        } else {
-
-            $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
-            $currentAction->selectedAstronaut = $id;
-            $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
-
-            $upgrade = 0;
-            if ($currentAction->type == 'module') {
-                $upgrade = $this->deployModule($playerId, $currentAction, $astronaut);
-            } else if ($currentAction->type == 'experiment') {
-                $this->deployExperiment($playerId, $currentAction, $astronaut);
-            }
-
-            if ($upgrade > 0) {
-                $currentAction->upgrade = $upgrade;
-                $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
-            }
-
-            $this->gamestate->nextState($upgrade > 0 ? 'upgrade' : 'endTurn');
-        }
+        $this->gamestate->nextState('next');
     }
 
     public function activateModule(int $id) {
@@ -148,7 +123,8 @@ trait ActionTrait {
         $playerId = intval($this->getActivePlayerId());
         $module = $this->getModuleById($id);
 
-        $currentAction = new CurrentAction('module');
+        $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
+        $currentAction->type = 'module';
         $currentAction->addModuleId = $id;
         $currentAction->removeModuleId = $id;
         $currentAction->remainingCost = $module->cost;
@@ -202,7 +178,8 @@ trait ActionTrait {
         $playerId = intval($this->getActivePlayerId());
         $module = $this->getExperimentById($id);
 
-        $currentAction = new CurrentAction('experiment');
+        $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
+        $currentAction->type = 'experiment';
         $currentAction->experiment = $id;
         $currentAction->remainingCost = $module->cost;
         $currentAction->astronautSpot = ($module->locationArg + $this->getArm()) % 8;
@@ -502,6 +479,6 @@ trait ActionTrait {
             'icons' => $this->getPlayerIcons($playerId),
         ]);
 
-        $this->gamestate->jumpToState(ST_PLAYER_CHOOSE_ACTION);
+        $this->gamestate->jumpToState(ST_PLAYER_CHOOSE_ASTRONAUT);
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
 class CurrentAction {
-    public string $type; // 'module', 'experiment', 'activate'
-    public ?int $selectedAstronaut;
+    public ?string $type; // 'module', 'experiment', 'activate'
+    public int $selectedAstronaut;
     public ?int $astronautSpot;
     public ?int $addModuleId;
     public ?int $removeModuleId;
@@ -10,8 +10,8 @@ class CurrentAction {
     public ?array $remainingCost;
     public ?int $upgrade;
 
-    public function __construct(string $type) {
-        $this->type = $type;
+    public function __construct(int $selectedAstronaut) {
+        $this->selectedAstronaut = $selectedAstronaut;
     } 
 }
 

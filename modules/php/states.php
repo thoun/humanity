@@ -28,6 +28,27 @@ trait StateTrait {
         $this->gamestate->nextState('next');
     }
 
+    function stDeploy() {
+        $playerId = intval($this->getActivePlayerId());
+
+        $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
+        $astronaut = $this->getAstronautById($currentAction->selectedAstronaut);
+
+        $upgrade = 0;
+        if ($currentAction->type == 'module') {
+            $upgrade = $this->deployModule($playerId, $currentAction, $astronaut);
+        } else if ($currentAction->type == 'experiment') {
+            $this->deployExperiment($playerId, $currentAction, $astronaut);
+        }
+
+        if ($upgrade > 0) {
+            $currentAction->upgrade = $upgrade;
+            $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
+        }
+
+        $this->gamestate->nextState($upgrade > 0 ? 'upgrade' : 'endTurn');
+    }
+
     function stUpgradeAstronauts() {
         $args = $this->argUpgradeAstronaut();
 

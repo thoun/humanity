@@ -2781,9 +2781,10 @@ var Humanity = /** @class */ (function () {
         }
     };
     Humanity.prototype.onEnteringChooseAction = function (args) {
-        var _a;
         if (this.isCurrentPlayerActive()) {
-            (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableAstronauts(args.astronauts);
+            var table = this.getCurrentPlayerTable();
+            table.setSelectedAstronaut(args.astronaut);
+            table.setSelectableModules(args.activatableModules);
             this.tableCenter.setSelectableModules(args.selectableModules);
             this.tableCenter.setSelectableExperiments(args.selectableExperiments);
         }
@@ -2820,9 +2821,7 @@ var Humanity = /** @class */ (function () {
         log('Leaving state: ' + stateName);
         switch (stateName) {
             case 'chooseAction':
-                this.onLeavingChooseAstronaut();
-                this.tableCenter.setSelectableModules(null);
-                this.tableCenter.setSelectableExperiments(null);
+                this.onLeavingChooseAction();
                 break;
             case 'activateModule':
                 this.onLeavingActivateModule();
@@ -2839,6 +2838,15 @@ var Humanity = /** @class */ (function () {
             case 'upgradeAstronaut':
                 this.onLeavingUpgradeAstronaut();
                 break;
+        }
+    };
+    Humanity.prototype.onLeavingChooseAction = function () {
+        if (this.isCurrentPlayerActive()) {
+            var table = this.getCurrentPlayerTable();
+            table.setSelectedAstronaut(null);
+            table.setSelectableModules(null);
+            this.tableCenter.setSelectableModules(null);
+            this.tableCenter.setSelectableExperiments(null);
         }
     };
     Humanity.prototype.onLeavingActivateModule = function () {
@@ -3069,7 +3077,7 @@ var Humanity = /** @class */ (function () {
         }
     };
     Humanity.prototype.onPlayerModuleClick = function (card) {
-        if (this.gamedatas.gamestate.name == 'activateModule') {
+        if (['activateModule', 'chooseAction'].includes(this.gamedatas.gamestate.name)) {
             this.activateModule(card.id);
         }
     };

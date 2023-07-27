@@ -11,24 +11,37 @@ trait ArgsTrait {
         These methods function is to return some additional information that is specific to the current
         game state.
     */
-   
-    function argChooseAction() {
+
+    function argChooseAstronaut() {
         $playerId = intval($this->getActivePlayerId());
 
         $astronauts = $this->getPlayerAstronauts($playerId, 'player', true);
 
+        return [
+            'astronauts' => $astronauts,
+        ];
+    }
+   
+    function argChooseAction() {
+        $playerId = intval($this->getActivePlayerId());
+
+        $astronaut = $this->getSelectedAstronaut();
         $tableModules = $this->getModulesByLocation('table');
         $tableExperiments = $this->getExperimentsByLocation('table');
 
         $selectableModules = array_values(array_filter($tableModules, fn($module) => 
             $this->canPay($module->cost, $playerId) != null && 
-            ($module->color != GREEN || $this->array_some($astronauts, fn($astronaut) => $this->canPlaceGreenhouse($playerId, $module, $astronaut))))
+            ($module->color != GREEN || $this->canPlaceGreenhouse($playerId, $module, $astronaut)))
         );
         $selectableExperiments = array_values(array_filter($tableExperiments, fn($module) => $this->canPay($module->cost, $playerId) != null));
         
 
+        $playerModules = $this->getModulesByLocation('player', $playerId);
+        $activatableModules = array_values(array_filter($playerModules, fn($module) => $module->workforce != null && $module->r < 3 && $module->workforce <= $astronaut->remainingWorkforce));
+
         return [
-            'astronauts' => $astronauts,
+            'astronaut' => $astronaut,
+            'activatableModules' => $activatableModules,
             'selectableModules' => $selectableModules,
             'selectableExperiments' => $selectableExperiments,
         ];
@@ -74,25 +87,6 @@ trait ArgsTrait {
             'cost' => $currentAction->remainingCost,
             'autoPay' => $pay,
             'payButtons' => $payButtons,
-        ];
-    }
-
-    function argChooseAstronaut() {
-        $playerId = intval($this->getActivePlayerId());
-
-        $astronauts = $this->getPlayerAstronauts($playerId, 'player', true);
-        
-        $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
-        if ($currentAction->type == 'module') {
-            $module = $this->getModuleById($currentAction->addModuleId);
-
-            if ($module->color == GREEN) {
-                $astronauts = array_values(array_filter($astronauts, fn($astronaut) => $this->canPlaceGreenhouse($playerId, $module, $astronaut)));
-            }
-        }
-
-        return [
-            'astronauts' => $astronauts,
         ];
     }
 
