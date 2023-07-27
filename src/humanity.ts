@@ -665,7 +665,7 @@ class Humanity implements HumanityGame {
             </div>  
 
             <div class="help-section">
-                <div>${_("When a player deploys this type of Module, they immediately earn the number of research points indicated at the bottom right. In addition, for each adjacent module of the indicated color (green, orange, purple, and/or blue), they immediately earn the number of research points shown (see the example on p. 10). If the player <strong>later</strong> deploys a Module of the indicated color adjacent to this one, they earn the number of research points shown.")}</div>
+                <div>${_("When a player deploys this type of Module, they immediately earn the number of research points indicated at the bottom right. In addition, for each adjacent module of the indicated color (green, orange, purple, and/or blue), they immediately earn the number of research points shown. If the player <strong>later</strong> deploys a Module of the indicated color adjacent to this one, they earn the number of research points shown.")}</div>
                 <div class="tiles">
                     ${this.modulesManager.getHtml({ type: 2, number: 9 } as Module)}
                     ${this.modulesManager.getHtml({ type: 2, number: 12 } as Module)}
@@ -1221,7 +1221,7 @@ class Humanity implements HumanityGame {
     public getPower(power: number, timeUnits: number): string {
         switch (power) {
             case 1: return _("All Astronauts in the player’s Base are immediately reactivated: They are turned around to face the player and can be used again to perform an action starting <strong>from their next turn</strong>. If the player has no Astronauts to reactivate, the effect is lost.");
-            case 2: return _("The player <strong>immediately</strong> gains ${number} Time units: <strong>All their Astronauts</strong> around the main board are moved 2 hangars counterclockwise (including the one who just carried out this Experiment). Astronauts cannot be moved beyond the articulated arm.").replace('${number}', timeUnits);
+            case 2: return _("The player <strong>immediately</strong> gains ${number} Time unit(s): <strong>All their Astronauts</strong> around the main board are moved ${number} hangar(s) counterclockwise (including the one who just carried out this Experiment). Astronauts cannot be moved beyond the articulated arm.").replace('${number}', timeUnits);
         }
     }
 

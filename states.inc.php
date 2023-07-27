@@ -194,7 +194,7 @@ $playerActionsGameStates = [
 
     ST_PRIVATE_MOVE_ASTRONAUT => [
         "name" => "moveAstronaut",
-        "descriptionmyturn" => clienttranslate('Phase 2 : ${you} must choose a place for moved astronaut'),
+        "descriptionmyturn" => clienttranslate('${you} must choose a place for moved astronaut'),
         "type" => "private",
         "args" => "argMoveAstronaut",
         "possibleactions" => [ "moveAstronaut" ],
