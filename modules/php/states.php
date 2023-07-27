@@ -178,7 +178,7 @@ trait StateTrait {
         $tableAstronauts = $this->getTableAstronauts();
         $movedAstronauts = [];
         foreach ($tableAstronauts as $astronaut) {
-            if ($astronaut->spot >= $armBefore && $astronaut->spot <= $armAfter) {
+            if ($astronaut->spot >= $armBefore && $astronaut->spot < $armAfter) {
                 $movedAstronauts[] = $astronaut;
             }
         }
@@ -220,10 +220,19 @@ trait StateTrait {
     }
 
     function stMoveAstronauts() {
+        $playersIds = $this->getPlayersIds();
         $movedAstronauts = $this->getGlobalVariable(MOVED_ASTRONAUTS);
-        $playersIds = array_values(array_unique(array_map(fn($astronaut) =>$astronaut->playerId, $movedAstronauts)));
+        $activePlayersIds = array_values(array_unique(array_map(fn($astronaut) => $astronaut->playerId, $movedAstronauts)));
 
-        $this->gamestate->setPlayersMultiactive($playersIds, 'next');
+        foreach($playersIds as $playerId) {
+            $this->notifyAllPlayers('log', clienttranslate('${player_name} has ${number} astronaut(s) to place back on its area'), [
+                'playerId' => $playerId,
+                'player_name' => $this->getPlayerName($playerId),
+                'number' => count(array_filter($movedAstronauts, fn($astronaut) => $astronaut->playerId == $playerId)),
+            ]);
+        }
+
+        $this->gamestate->setPlayersMultiactive($activePlayersIds, 'next');
         $this->gamestate->initializePrivateStateForAllActivePlayers(); 
     }
 
@@ -254,7 +263,7 @@ trait StateTrait {
         }
 
         $this->DbQuery("UPDATE player SET `player_research_points` = 0");   
-        foreach($playersIds as $playerId) {             
+        foreach($playersIds as $playerId) {
             $this->notifyAllPlayers('researchPoints', '', [
                 'playerId' => $playerId,
                 'player_name' => $this->getPlayerName($playerId),
