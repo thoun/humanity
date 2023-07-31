@@ -2011,6 +2011,63 @@ var CardManager = /** @class */ (function () {
     };
     return CardManager;
 }());
+var AstronautsManager = /** @class */ (function () {
+    function AstronautsManager(game) {
+        this.game = game;
+    }
+    AstronautsManager.prototype.createAstronaut = function (astronaut) {
+        var _this = this;
+        var astronautDiv = document.createElement('div');
+        astronautDiv.id = "astronaut-".concat(astronaut.id);
+        astronautDiv.classList.add('astronaut');
+        astronautDiv.dataset.id = "".concat(astronaut.id);
+        astronautDiv.dataset.playerColor = this.game.getPlayer(astronaut.playerId).color;
+        astronautDiv.dataset.workforce = "".concat(astronaut.workforce);
+        astronautDiv.dataset.remainingWorkforce = "".concat(astronaut.remainingWorkforce);
+        astronautDiv.addEventListener('click', function () {
+            if (astronautDiv.classList.contains('selectable')) {
+                _this.game.onAstronautClick(astronaut);
+            }
+        });
+        var workforceDiv = document.createElement('div');
+        workforceDiv.id = "".concat(astronautDiv.id, "-force");
+        workforceDiv.classList.add('workforce');
+        astronautDiv.appendChild(workforceDiv);
+        return astronautDiv;
+    };
+    AstronautsManager.prototype.getAstronautDiv = function (astronaut) {
+        return document.getElementById("astronaut-".concat(astronaut.id));
+    };
+    AstronautsManager.prototype.setSelectedAstronaut = function (selectedAstronaut) {
+        document.querySelectorAll('.astronaut').forEach(function (astronaut) {
+            return astronaut.classList.toggle('selected', (selectedAstronaut === null || selectedAstronaut === void 0 ? void 0 : selectedAstronaut.id) == Number(astronaut.dataset.id));
+        });
+    };
+    AstronautsManager.prototype.moveAstronautDiv = function (astronaut) {
+        var astronautDiv = this.getAstronautDiv(astronaut);
+        if (astronaut.location == 'player') {
+            var modulesDiv = document.getElementById("player-table-".concat(astronaut.playerId, "-modules"));
+            modulesDiv.querySelector("[data-slot-id=\"".concat(astronaut.x, "_").concat(astronaut.y, "\"]")).appendChild(astronautDiv);
+        }
+        else if (astronaut.location == 'table') {
+            var tableAstronauts = document.getElementById('table-astronauts');
+            tableAstronauts.querySelector(".slot[data-slot-id=\"".concat(astronaut.spot, "\"]")).appendChild(astronautDiv);
+        }
+    };
+    AstronautsManager.prototype.resetAstronaut = function (astronaut) {
+        this.moveAstronautDiv(astronaut);
+        this.updateAstronaut(astronaut);
+    };
+    AstronautsManager.prototype.updateAstronaut = function (astronaut) {
+        var div = this.getAstronautDiv(astronaut);
+        div.dataset.remainingWorkforce = "".concat(astronaut.remainingWorkforce);
+        div.dataset.workforce = "".concat(astronaut.workforce);
+    };
+    AstronautsManager.prototype.setAstronautToConfirm = function (astronaut, toConfirm) {
+        this.getAstronautDiv(astronaut).classList.toggle('to-confirm', toConfirm);
+    };
+    return AstronautsManager;
+}());
 var ModulesManager = /** @class */ (function (_super) {
     __extends(ModulesManager, _super);
     function ModulesManager(game) {
@@ -2198,7 +2255,7 @@ var TableCenter = /** @class */ (function () {
         var tableAstronauts = document.getElementById('table-astronauts');
         tableAstronauts.insertAdjacentHTML('beforeend', [0, 1, 2, 3, 4, 5, 6, 7].map(function (spot) { return "<div></div><div class=\"slot\" data-slot-id=\"".concat(spot, "\"></div>"); }).join(''));
         Object.values(gamedatas.players).forEach(function (player) { return player.astronauts.filter(function (astronaut) { return astronaut.location == 'table'; }).forEach(function (astronaut) {
-            return tableAstronauts.querySelector(".slot[data-slot-id=\"".concat(astronaut.spot, "\"]")).appendChild(_this.game.createAstronaut(astronaut));
+            return tableAstronauts.querySelector(".slot[data-slot-id=\"".concat(astronaut.spot, "\"]")).appendChild(_this.game.astronautsManager.createAstronaut(astronaut));
         }); });
         this.moveArm(gamedatas.arm);
     }
@@ -2475,9 +2532,9 @@ var PlayerTable = /** @class */ (function () {
         this.missions = new LineStock(this.game.missionsManager, missionDiv);
         this.missions.addCards(player.missions);
         playerAstronauts.forEach(function (astronaut) {
-            modulesDiv.querySelector("[data-slot-id=\"".concat(astronaut.x, "_").concat(astronaut.y, "\"]")).appendChild(_this.game.createAstronaut(astronaut));
+            modulesDiv.querySelector("[data-slot-id=\"".concat(astronaut.x, "_").concat(astronaut.y, "\"]")).appendChild(_this.game.astronautsManager.createAstronaut(astronaut));
             if (!astronaut.remainingWorkforce) {
-                document.getElementById("astronaut-".concat(astronaut.id)).classList.add('disabled-astronaut');
+                document.getElementById("astronaut-".concat(astronaut.id)).dataset.remainingWorkforce = "".concat(astronaut.remainingWorkforce);
             }
         });
         this.addSquares(player.squares);
@@ -2520,7 +2577,7 @@ var PlayerTable = /** @class */ (function () {
     };
     PlayerTable.prototype.reactivateAstronauts = function () {
         document.getElementById("player-table-".concat(this.playerId, "-modules")).querySelectorAll('.astronaut').forEach(function (astronaut) {
-            return astronaut.classList.remove('disabled-astronaut');
+            return astronaut.dataset.remainingWorkforce = astronaut.dataset.workforce;
         });
     };
     PlayerTable.prototype.updateGridTemplateAreas = function () {
@@ -2707,6 +2764,7 @@ var Humanity = /** @class */ (function () {
         log("Starting game setup");
         this.gamedatas = gamedatas;
         log('gamedatas', gamedatas);
+        this.astronautsManager = new AstronautsManager(this);
         this.modulesManager = new ModulesManager(this);
         this.experimentsManager = new ExperimentsManager(this);
         this.missionsManager = new MissionsManager(this);
@@ -2714,7 +2772,7 @@ var Humanity = /** @class */ (function () {
         new JumpToManager(this, {
             localStorageFoldedKey: LOCAL_STORAGE_JUMP_TO_FOLDED_KEY,
             topEntries: [
-                new JumpToEntry(_('AMBS'), 'board-1', { 'color': '#224757' }),
+                new JumpToEntry('AMBS', 'board-1', { 'color': '#224757' }),
                 new JumpToEntry(_('Research track'), 'research-board', { 'color': '#224757' }),
             ],
             entryClasses: 'hexa-point',
@@ -2731,8 +2789,8 @@ var Humanity = /** @class */ (function () {
         (_a = gamedatas.movedAstronauts) === null || _a === void 0 ? void 0 : _a.forEach(function (astronaut) {
             if (astronaut.location == 'table' && astronaut.x !== null) {
                 astronaut.location = 'player';
-                _this.moveAstronautDiv(astronaut.playerId, astronaut);
-                _this.setAstronautToConfirm(astronaut, true);
+                _this.astronautsManager.moveAstronautDiv(astronaut);
+                _this.astronautsManager.setAstronautToConfirm(astronaut, true);
             }
         });
         this.zoomManager = new ZoomManager({
@@ -2785,7 +2843,7 @@ var Humanity = /** @class */ (function () {
         var _a;
         log('Entering state: ' + stateName, args.args);
         if (((_a = args.args) === null || _a === void 0 ? void 0 : _a.astronaut) && this.isCurrentPlayerActive()) {
-            this.setSelectedAstronaut(args.args.astronaut);
+            this.astronautsManager.setSelectedAstronaut(args.args.astronaut);
         }
         switch (stateName) {
             case 'chooseAction':
@@ -2845,7 +2903,7 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.onLeavingState = function (stateName) {
         log('Leaving state: ' + stateName);
-        this.setSelectedAstronaut(null);
+        this.astronautsManager.setSelectedAstronaut(null);
         switch (stateName) {
             case 'chooseAction':
                 this.onLeavingChooseAction();
@@ -2898,11 +2956,6 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.onLeavingUpgradeAstronaut = function () {
         document.querySelectorAll('.astronaut.selectable').forEach(function (astronaut) { return astronaut.classList.remove('selectable'); });
-    };
-    Humanity.prototype.setSelectedAstronaut = function (selectedAstronaut) {
-        document.querySelectorAll('.astronaut').forEach(function (astronaut) {
-            return astronaut.classList.toggle('selected', (selectedAstronaut === null || selectedAstronaut === void 0 ? void 0 : selectedAstronaut.id) == Number(astronaut.dataset.id));
-        });
     };
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
     //                        action status bar (ie: the HTML links in the status bar).
@@ -3044,25 +3097,6 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.createPlayerTable = function (gamedatas, playerId) {
         var table = new PlayerTable(this, gamedatas.players[playerId]);
         this.playersTables.push(table);
-    };
-    Humanity.prototype.createAstronaut = function (astronaut) {
-        var _this = this;
-        var astronautDiv = document.createElement('div');
-        astronautDiv.id = "astronaut-".concat(astronaut.id);
-        astronautDiv.classList.add('astronaut');
-        astronautDiv.dataset.id = "".concat(astronaut.id);
-        astronautDiv.dataset.playerColor = this.getPlayer(astronaut.playerId).color;
-        astronautDiv.addEventListener('click', function () {
-            if (astronautDiv.classList.contains('selectable')) {
-                _this.onAstronautClick(astronaut);
-            }
-        });
-        var workforceDiv = document.createElement('div');
-        workforceDiv.id = "".concat(astronautDiv.id, "-force");
-        workforceDiv.classList.add('workforce');
-        workforceDiv.dataset.workforce = "".concat(astronaut.workforce);
-        astronautDiv.appendChild(workforceDiv);
-        return astronautDiv;
     };
     Humanity.prototype.placeFirstPlayerToken = function (playerId) {
         var firstPlayerToken = document.getElementById('firstPlayerToken');
@@ -3322,7 +3356,7 @@ var Humanity = /** @class */ (function () {
         playerTable.removeModule(args.module);
     };
     Humanity.prototype.notif_disableAstronaut = function (args) {
-        this.setAstronautDisabled(args.astronaut, true);
+        this.astronautsManager.updateAstronaut(args.astronaut);
     };
     Humanity.prototype.notif_gainTimeUnit = function (args) {
         var _this = this;
@@ -3331,7 +3365,7 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.notif_moveAstronautToTable = function (args) {
         var astronaut = args.astronaut;
-        this.setAstronautDisabled(astronaut, false);
+        this.astronautsManager.updateAstronaut(astronaut);
         this.tableCenter.moveAstronaut(astronaut);
     };
     Humanity.prototype.notif_deployModule = function (args) {
@@ -3389,7 +3423,7 @@ var Humanity = /** @class */ (function () {
         }
     };
     Humanity.prototype.notif_upgradeAstronaut = function (args) {
-        document.getElementById("astronaut-".concat(args.astronaut.id, "-force")).dataset.workforce = "".concat(args.astronaut.workforce);
+        this.astronautsManager.updateAstronaut(args.astronaut);
     };
     Humanity.prototype.notif_year = function (args) {
         this.yearCounter.toValue(+args.year);
@@ -3413,7 +3447,7 @@ var Humanity = /** @class */ (function () {
         table.resetModules(undo.modules);
         table.resetExperiments(undo.experiments);
         table.resetSquares(undo.squares);
-        undo.astronauts.forEach(function (astronaut) { return _this.resetAstronaut(playerId, astronaut); });
+        undo.astronauts.forEach(function (astronaut) { return _this.astronautsManager.resetAstronaut(astronaut); });
         this.setResearchPoints(playerId, undo.researchPoints);
         this.setVP(playerId, undo.vp);
         if (args.playerId == this.getPlayerId()) {
@@ -3423,36 +3457,16 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_moveAstronaut = function (args) {
         var playerId = args.playerId, astronaut = args.astronaut, toConfirm = args.toConfirm;
         astronaut.location = astronaut.x !== null ? 'player' : 'table';
-        this.moveAstronautDiv(playerId, astronaut);
-        this.setAstronautToConfirm(astronaut, toConfirm);
+        if (astronaut.location == 'player') {
+            this.getPlayerTable(playerId).makeSlotForCoordinates(astronaut.x, astronaut.y);
+        }
+        this.astronautsManager.moveAstronautDiv(astronaut);
+        this.astronautsManager.setAstronautToConfirm(astronaut, toConfirm);
     };
     Humanity.prototype.notif_confirmMoveAstronauts = function (args) {
         var _this = this;
         var astronauts = args.astronauts;
-        astronauts.forEach(function (astronaut) { return _this.setAstronautToConfirm(astronaut, false); });
-    };
-    Humanity.prototype.moveAstronautDiv = function (playerId, astronaut) {
-        var astronautDiv = document.getElementById("astronaut-".concat(astronaut.id));
-        if (astronaut.location == 'player') {
-            var modulesDiv = document.getElementById("player-table-".concat(playerId, "-modules"));
-            this.getPlayerTable(playerId).makeSlotForCoordinates(astronaut.x, astronaut.y);
-            modulesDiv.querySelector("[data-slot-id=\"".concat(astronaut.x, "_").concat(astronaut.y, "\"]")).appendChild(astronautDiv);
-        }
-        else if (astronaut.location == 'table') {
-            var tableAstronauts = document.getElementById('table-astronauts');
-            tableAstronauts.querySelector(".slot[data-slot-id=\"".concat(astronaut.spot, "\"]")).appendChild(astronautDiv);
-        }
-    };
-    Humanity.prototype.resetAstronaut = function (playerId, astronaut) {
-        this.moveAstronautDiv(playerId, astronaut);
-        document.getElementById("astronaut-".concat(astronaut.id)).classList.toggle('disabled-astronaut', !astronaut.remainingWorkforce);
-        document.getElementById("astronaut-".concat(astronaut.id, "-force")).dataset.workforce = "".concat(astronaut.workforce);
-    };
-    Humanity.prototype.setAstronautDisabled = function (astronaut, disabled) {
-        document.getElementById("astronaut-".concat(astronaut.id)).classList.toggle('disabled-astronaut', disabled);
-    };
-    Humanity.prototype.setAstronautToConfirm = function (astronaut, toConfirm) {
-        document.getElementById("astronaut-".concat(astronaut.id)).classList.toggle('to-confirm', toConfirm);
+        astronauts.forEach(function (astronaut) { return _this.astronautsManager.setAstronautToConfirm(astronaut, false); });
     };
     Humanity.prototype.getColor = function (color, blueOrOrange) {
         switch (color) {

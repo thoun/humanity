@@ -86,9 +86,9 @@ class PlayerTable {
         this.missions.addCards(player.missions);
 
         playerAstronauts.forEach(astronaut => {
-            modulesDiv.querySelector(`[data-slot-id="${astronaut.x}_${astronaut.y}"]`).appendChild(this.game.createAstronaut(astronaut));
+            modulesDiv.querySelector(`[data-slot-id="${astronaut.x}_${astronaut.y}"]`).appendChild(this.game.astronautsManager.createAstronaut(astronaut));
             if (!astronaut.remainingWorkforce) {
-                document.getElementById(`astronaut-${astronaut.id}`).classList.add('disabled-astronaut');
+                document.getElementById(`astronaut-${astronaut.id}`).dataset.remainingWorkforce = `${astronaut.remainingWorkforce}`;
             }
         });
 
@@ -141,7 +141,7 @@ class PlayerTable {
     
     public reactivateAstronauts(): void {
         document.getElementById(`player-table-${this.playerId}-modules`).querySelectorAll('.astronaut').forEach((astronaut: HTMLDivElement) => 
-            astronaut.classList.remove('disabled-astronaut')
+            astronaut.dataset.remainingWorkforce = astronaut.dataset.workforce
         );
     }
 

@@ -105,6 +105,7 @@ trait AstronautTrait {
         $this->DbQuery("UPDATE astronaut SET `location` = 'table', `x` = null, `y` = null, `spot` = $spot WHERE `id` = $astronaut->id");
         $astronaut->location = 'table';
         $astronaut->spot = $spot;
+        $astronaut->remainingWorkforce = $astronaut->workforce;
 
         self::notifyAllPlayers('moveAstronautToTable', '', [
             'playerId' => $playerId,

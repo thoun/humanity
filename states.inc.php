@@ -74,8 +74,8 @@ $playerActionsGameStates = [
 
     ST_PLAYER_CHOOSE_ASTRONAUT => [
         "name" => "chooseAstronaut",
-        "description" => clienttranslate('${actplayer} must choose a astronaut'),
-        "descriptionmyturn" => clienttranslate('${you} must choose a astronaut'),
+        "description" => clienttranslate('${actplayer} must choose an astronaut'),
+        "descriptionmyturn" => clienttranslate('${you} must choose an astronaut'),
         "type" => "activeplayer",    
         "args" => "argChooseAstronaut",
         "possibleactions" => [ 
@@ -136,8 +136,8 @@ $playerActionsGameStates = [
 
     ST_PLAYER_UPGRADE_ASTRONAUT => [
         "name" => "upgradeAstronaut",
-        "description" => clienttranslate('${actplayer} must choose a astronaut to upgrade (${remaining} upgrade(s) remaining)'),
-        "descriptionmyturn" => clienttranslate('${you} must choose a astronaut to upgrade (${remaining} upgrade(s) remaining)'),
+        "description" => clienttranslate('${actplayer} must choose an astronaut to upgrade (${remaining} upgrade(s) remaining)'),
+        "descriptionmyturn" => clienttranslate('${you} must choose an astronaut to upgrade (${remaining} upgrade(s) remaining)'),
         "type" => "activeplayer",    
         "args" => "argUpgradeAstronaut",
         "action" => "stUpgradeAstronauts",

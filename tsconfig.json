@@ -30,6 +30,7 @@
         "node_modules/bga-cards/src/stocks/void-stock.ts",
         "node_modules/bga-cards/src/sort.ts",
         "node_modules/bga-cards/src/card-manager.ts",
+        "src/astronauts.ts",
         "src/modules.ts",
         "src/experiments.ts",
         "src/missions.ts",

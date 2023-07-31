@@ -26,7 +26,7 @@
         border-radius: 15px;
     }
 
-    &.disabled-astronaut {
+    &[data-remaining-workforce="0"] {
         transform: rotate(180deg);
     }
 
@@ -44,11 +44,11 @@
 
         background-image: url('img/workforces.png');
         background-size: auto 300%;
+    }
 
-        @for $workforce from 2 through 4 {
-            &[data-workforce="#{$workforce}"] {
-                background-position-y: #{($workforce - 2) * 100% / 2};
-            }
+    @for $workforce from 2 through 4 {
+        .workforce[data-workforce="#{$workforce}"] {
+            background-position-y: #{($workforce - 2) * 100% / 2};
         }
     }
 }

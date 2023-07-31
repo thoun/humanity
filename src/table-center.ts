@@ -26,7 +26,7 @@ class TableCenter {
         );
 
         Object.values(gamedatas.players).forEach(player => player.astronauts.filter(astronaut => astronaut.location == 'table').forEach(astronaut => 
-            tableAstronauts.querySelector(`.slot[data-slot-id="${astronaut.spot}"]`).appendChild(this.game.createAstronaut(astronaut))
+            tableAstronauts.querySelector(`.slot[data-slot-id="${astronaut.spot}"]`).appendChild(this.game.astronautsManager.createAstronaut(astronaut))
         ));
 
         this.moveArm(gamedatas.arm);

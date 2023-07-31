@@ -26,6 +26,7 @@ function getCostStr(cost: Icons) {
 }
 
 class Humanity implements HumanityGame {
+    public astronautsManager: AstronautsManager;
     public modulesManager: ModulesManager;
     public experimentsManager: ExperimentsManager;
     public missionsManager: MissionsManager;
@@ -66,6 +67,7 @@ class Humanity implements HumanityGame {
 
         log('gamedatas', gamedatas);
 
+        this.astronautsManager = new AstronautsManager(this);
         this.modulesManager = new ModulesManager(this);
         this.experimentsManager = new ExperimentsManager(this);        
         this.missionsManager = new MissionsManager(this);
@@ -73,7 +75,7 @@ class Humanity implements HumanityGame {
         new JumpToManager(this, {
             localStorageFoldedKey: LOCAL_STORAGE_JUMP_TO_FOLDED_KEY,
             topEntries: [
-                new JumpToEntry(_('AMBS'), 'board-1', { 'color': '#224757' }),
+                new JumpToEntry('AMBS', 'board-1', { 'color': '#224757' }),
                 new JumpToEntry(_('Research track'), 'research-board', { 'color': '#224757' }),
             ],
             entryClasses: 'hexa-point',
@@ -93,8 +95,8 @@ class Humanity implements HumanityGame {
         gamedatas.movedAstronauts?.forEach(astronaut => {
             if (astronaut.location == 'table' && astronaut.x !== null) {
                 astronaut.location = 'player';
-                this.moveAstronautDiv(astronaut.playerId, astronaut);
-                this.setAstronautToConfirm(astronaut, true);
+                this.astronautsManager.moveAstronautDiv(astronaut);
+                this.astronautsManager.setAstronautToConfirm(astronaut, true);
             }
         })
         
@@ -156,7 +158,7 @@ class Humanity implements HumanityGame {
         log('Entering state: ' + stateName, args.args);
 
         if (args.args?.astronaut && (this as any).isCurrentPlayerActive()) {
-            this.setSelectedAstronaut(args.args.astronaut);
+            this.astronautsManager.setSelectedAstronaut(args.args.astronaut);
         }
 
         switch (stateName) {
@@ -223,7 +225,7 @@ class Humanity implements HumanityGame {
     public onLeavingState(stateName: string) {
         log( 'Leaving state: '+stateName );
 
-        this.setSelectedAstronaut(null);
+        this.astronautsManager.setSelectedAstronaut(null);
 
         switch (stateName) {
             case 'chooseAction':
@@ -281,12 +283,6 @@ class Humanity implements HumanityGame {
 
     private onLeavingUpgradeAstronaut() {
         document.querySelectorAll('.astronaut.selectable').forEach(astronaut => astronaut.classList.remove('selectable'));
-    }
-    
-    private setSelectedAstronaut(selectedAstronaut: Astronaut) {
-        document.querySelectorAll('.astronaut').forEach((astronaut: HTMLDivElement) => 
-            astronaut.classList.toggle('selected', selectedAstronaut?.id == Number(astronaut.dataset.id))
-        );
     }
 
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
@@ -481,28 +477,6 @@ class Humanity implements HumanityGame {
     private createPlayerTable(gamedatas: HumanityGamedatas, playerId: number) {
         const table = new PlayerTable(this, gamedatas.players[playerId]);
         this.playersTables.push(table);
-    }
-
-    public createAstronaut(astronaut: Astronaut): HTMLDivElement {
-        const astronautDiv = document.createElement('div');
-        astronautDiv.id = `astronaut-${astronaut.id}`;
-        astronautDiv.classList.add('astronaut');
-        astronautDiv.dataset.id = `${astronaut.id}`;
-        astronautDiv.dataset.playerColor = this.getPlayer(astronaut.playerId).color;
-
-        astronautDiv.addEventListener('click', () => {
-            if (astronautDiv.classList.contains('selectable')) {
-                this.onAstronautClick(astronaut);
-            }
-        });
-        
-        const workforceDiv = document.createElement('div');
-        workforceDiv.id = `${astronautDiv.id}-force`;
-        workforceDiv.classList.add('workforce');
-        workforceDiv.dataset.workforce = `${astronaut.workforce}`;
-        astronautDiv.appendChild(workforceDiv);
-
-        return astronautDiv;
     }
 
     placeFirstPlayerToken(playerId: number): Promise<any> {
@@ -1049,7 +1023,7 @@ class Humanity implements HumanityGame {
     }
 
     notif_disableAstronaut(args: NotifAstronautArgs) {
-        this.setAstronautDisabled(args.astronaut, true);
+        this.astronautsManager.updateAstronaut(args.astronaut);
     }
 
     notif_gainTimeUnit(args: NotifGainTimeUnitArgs) {
@@ -1059,7 +1033,7 @@ class Humanity implements HumanityGame {
 
     notif_moveAstronautToTable(args: NotifMoveAstronautToTableArgs) {
         const { astronaut } = args;
-        this.setAstronautDisabled(astronaut, false);
+        this.astronautsManager.updateAstronaut(astronaut);
         this.tableCenter.moveAstronaut(astronaut);
     }
 
@@ -1131,7 +1105,7 @@ class Humanity implements HumanityGame {
     }
 
     notif_upgradeAstronaut(args: NotifAstronautArgs) {
-        document.getElementById(`astronaut-${args.astronaut.id}-force`).dataset.workforce = `${args.astronaut.workforce}`;
+        this.astronautsManager.updateAstronaut(args.astronaut);
     }
 
     notif_year(args: NotifYearArgs) {
@@ -1161,7 +1135,7 @@ class Humanity implements HumanityGame {
         table.resetExperiments(undo.experiments);
         table.resetSquares(undo.squares);
 
-        undo.astronauts.forEach(astronaut => this.resetAstronaut(playerId, astronaut));
+        undo.astronauts.forEach(astronaut => this.astronautsManager.resetAstronaut(astronaut));
 
         this.setResearchPoints(playerId, undo.researchPoints);
         this.setVP(playerId, undo.vp);
@@ -1173,39 +1147,18 @@ class Humanity implements HumanityGame {
     notif_moveAstronaut(args: NotifMoveAstronautArgs) {
         const { playerId, astronaut, toConfirm } = args;
         astronaut.location = astronaut.x !== null ? 'player' : 'table';
-        this.moveAstronautDiv(playerId, astronaut);
-        this.setAstronautToConfirm(astronaut, toConfirm);
+
+        if (astronaut.location == 'player') {
+            this.getPlayerTable(playerId).makeSlotForCoordinates(astronaut.x, astronaut.y);
+        }
+
+        this.astronautsManager.moveAstronautDiv(astronaut);
+        this.astronautsManager.setAstronautToConfirm(astronaut, toConfirm);
     }
 
     notif_confirmMoveAstronauts(args: NotifConfirmMoveAstronautsArgs) {
         const { astronauts } = args;
-        astronauts.forEach(astronaut => this.setAstronautToConfirm(astronaut, false));
-    }
-
-    private moveAstronautDiv(playerId: number, astronaut: Astronaut) {
-        const astronautDiv = document.getElementById(`astronaut-${astronaut.id}`);
-        if (astronaut.location == 'player') {
-            const modulesDiv = document.getElementById(`player-table-${playerId}-modules`);
-            this.getPlayerTable(playerId).makeSlotForCoordinates(astronaut.x, astronaut.y);
-            modulesDiv.querySelector(`[data-slot-id="${astronaut.x}_${astronaut.y}"]`).appendChild(astronautDiv);
-        } else if (astronaut.location == 'table') {
-            const tableAstronauts = document.getElementById('table-astronauts');
-            tableAstronauts.querySelector(`.slot[data-slot-id="${astronaut.spot}"]`).appendChild(astronautDiv);
-        }
-    }
-
-    private resetAstronaut(playerId: number, astronaut: Astronaut) {
-        this.moveAstronautDiv(playerId, astronaut);
-        document.getElementById(`astronaut-${astronaut.id}`).classList.toggle('disabled-astronaut', !astronaut.remainingWorkforce);
-        document.getElementById(`astronaut-${astronaut.id}-force`).dataset.workforce = `${astronaut.workforce}`;
-    }
-
-    private setAstronautDisabled(astronaut: Astronaut, disabled: boolean) {
-        document.getElementById(`astronaut-${astronaut.id}`).classList.toggle('disabled-astronaut', disabled);
-    }
-
-    private setAstronautToConfirm(astronaut: Astronaut, toConfirm: boolean) {
-        document.getElementById(`astronaut-${astronaut.id}`).classList.toggle('to-confirm', toConfirm);
+        astronauts.forEach(astronaut => this.astronautsManager.setAstronautToConfirm(astronaut, false));
     }
 
     public getColor(color: number, blueOrOrange: boolean): string {

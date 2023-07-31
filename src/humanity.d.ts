@@ -111,6 +111,7 @@ interface HumanityGamedatas {
 }
 
 interface HumanityGame extends Game {
+    astronautsManager: AstronautsManager;
     modulesManager: ModulesManager;
     experimentsManager: ExperimentsManager;
     missionsManager: MissionsManager;
@@ -122,13 +123,13 @@ interface HumanityGame extends Game {
     getSide(side: number): string;
     getGameStateName(): string;
     getCurrentPlayerTable(): PlayerTable | null;
-    createAstronaut(astronaut: Astronaut): HTMLDivElement;
 
     setTooltip(id: string, html: string): void;
     onTableExperimentClick(experiment: Experiment): void;
     onPlayerModuleClick(card: Module): void;
     onPlayerModuleSpotClick(x: number, y: number): void;
     onTableModuleClick(card: Module): void;
+    onAstronautClick(astronaut: Astronaut): void;
     pay(id: number, resource: number): void;
 }
 

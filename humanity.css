@@ -528,7 +528,7 @@ body > .card {
   outline: 5px solid red;
   border-radius: 15px;
 }
-.astronaut.disabled-astronaut {
+.astronaut[data-remaining-workforce="0"] {
   transform: rotate(180deg);
 }
 .astronaut.to-confirm {

@@ -32,7 +32,7 @@ trait ActionTrait {
         $currentAction = new CurrentAction($id);
         $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
 
-        self::notifyAllPlayers('log', clienttranslate('${player_name} selects a astronaut of work value ${work_value}'), [
+        self::notifyAllPlayers('log', clienttranslate('${player_name} selects an astronaut of work value ${work_value}'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
             'work_value' => $astronaut->workforce,
@@ -315,6 +315,7 @@ trait ActionTrait {
         if ($astronaut->remainingWorkforce > 0) {
             $this->DbQuery("UPDATE astronaut SET `remaining_workforce` = 0 WHERE `id` = $astronaut->id");
         }
+        $astronaut->remainingWorkforce = 0;
 
         self::notifyAllPlayers('disableAstronaut', '', [
             'playerId' => $playerId,
@@ -347,7 +348,7 @@ trait ActionTrait {
         }
         $astronaut->workforce++;
 
-        self::notifyAllPlayers('upgradeAstronaut', clienttranslate('${player_name} upgrades a astronaut work value from ${from} to ${to}'), [
+        self::notifyAllPlayers('upgradeAstronaut', clienttranslate('${player_name} upgrades an astronaut work value from ${from} to ${to}'), [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
             'astronaut' => $astronaut,
