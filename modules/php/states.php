@@ -176,10 +176,13 @@ trait StateTrait {
 
         // reset astronauts in arm range
         $tableAstronauts = $this->getTableAstronauts();
-        $movedAstronauts = [];
-        foreach ($tableAstronauts as $astronaut) {
-            if ($astronaut->spot >= $armBefore && $astronaut->spot < $armAfter) {
-                $movedAstronauts[] = $astronaut;
+        $movedAstronauts = [];        
+        for ($i = $armBefore; $i < $armBefore + $diff; $i++) {
+            $spot = $i % 8;
+            foreach ($tableAstronauts as $astronaut) {
+                if ($astronaut->spot == $spot) {
+                    $movedAstronauts[] = $astronaut;
+                }
             }
         }
         $this->setGlobalVariable(MOVED_ASTRONAUTS, $movedAstronauts);
