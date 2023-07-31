@@ -224,6 +224,8 @@ $gameGameStates = [
         "action" => "stStartTurn",
         "transitions" => [
             "next" => ST_PLAYER_CHOOSE_ASTRONAUT,
+            "nextPlayer" => ST_START_TURN,
+            "endRound" => ST_END_ROUND,
         ]
     ],
 

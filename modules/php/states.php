@@ -14,6 +14,28 @@ trait StateTrait {
     function stStartTurn() {
         $playerId = intval($this->getActivePlayerId());
 
+        // in case a player start the round with no active astronaut
+        if ($this->countRemainingAstronauts($playerId) == 0) {
+            if ($this->countRemainingAstronauts() > 0) {
+
+                $this->activeNextPlayer();
+                $playerId = $this->getActivePlayerId();
+                while ($this->countRemainingAstronauts($playerId) == 0) {
+                    $this->activeNextPlayer();
+                    $playerId = $this->getActivePlayerId();
+                }
+                
+                $this->gamestate->nextState('nextPlayer');
+                return;
+            } else {
+                self::notifyAllPlayers('log', clienttranslate('All astronauts are exhausted or around the AMBS'), []);
+
+                $this->gamestate->nextState('endRound');
+                return;
+            }
+        }
+
+
         $this->setGlobalVariable(UNDO, new Undo(
             $this->getModulesByLocation('player', $playerId),
             $this->getExperimentsByLocation('player', $playerId),
