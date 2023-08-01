@@ -98,7 +98,7 @@ class Humanity implements HumanityGame {
                 this.astronautsManager.moveAstronautDiv(astronaut);
                 this.astronautsManager.setAstronautToConfirm(astronaut, true);
             }
-        })
+        });
         
         this.zoomManager = new ZoomManager({
             element: document.getElementById('table'),
@@ -339,7 +339,7 @@ class Humanity implements HumanityGame {
         return Object.values(this.gamedatas.players).find(player => Number(player.id) == playerId);
     }
 
-    private getPlayerTable(playerId: number): PlayerTable {
+    public getPlayerTable(playerId: number): PlayerTable {
         return this.playersTables.find(playerTable => playerTable.playerId === playerId);
     }
 
@@ -1124,16 +1124,19 @@ class Humanity implements HumanityGame {
     notif_restartTurn(args: NotifRestartTurnArgs) {
         const { playerId, undo } = args;
 
+        const originalInstantaneousMode = (this as any).instantaneousMode;
+        (this as any).instantaneousMode = true;
+
         this.tableCenter.resetModules(undo.tableModules);
         this.tableCenter.newExperiments(undo.tableExperiments);
         this.researchBoard.resetMissions(undo.allMissions.filter(mission => mission.location == 'table'));
 
         this.playersTables.forEach(playerTable => playerTable.resetMissions(undo.allMissions.filter(mission => mission.location == 'player' && mission.locationArg == playerTable.playerId)));
 
-        const table = this.getPlayerTable(playerId);
-        table.resetModules(undo.modules);
-        table.resetExperiments(undo.experiments);
-        table.resetSquares(undo.squares);
+        const playerTable = this.getPlayerTable(playerId);
+        playerTable.resetModules(undo.modules);
+        //playerTable.resetExperiments(undo.experiments); // useless as table reset will remove
+        playerTable.resetSquares(undo.squares);
 
         undo.astronauts.forEach(astronaut => this.astronautsManager.resetAstronaut(astronaut));
 
@@ -1142,15 +1145,13 @@ class Humanity implements HumanityGame {
         if (args.playerId == this.getPlayerId()) {
             this.setScience(playerId, undo.science);
         }
+
+        (this as any).instantaneousMode = originalInstantaneousMode;
     }
 
     notif_moveAstronaut(args: NotifMoveAstronautArgs) {
-        const { playerId, astronaut, toConfirm } = args;
+        const { astronaut, toConfirm } = args;
         astronaut.location = astronaut.x !== null ? 'player' : 'table';
-
-        if (astronaut.location == 'player') {
-            this.getPlayerTable(playerId).makeSlotForCoordinates(astronaut.x, astronaut.y);
-        }
 
         this.astronautsManager.moveAstronautDiv(astronaut);
         this.astronautsManager.setAstronautToConfirm(astronaut, toConfirm);

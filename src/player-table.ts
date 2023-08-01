@@ -253,7 +253,11 @@ class PlayerTable {
     }
 
     public resetExperiments(experiments: Experiment[]) {
-        document.getElementById(`player-table-${this.playerId}-experiments-lines`).innerHTML = ``;
+        const experimentLinesDiv = document.getElementById(`player-table-${this.playerId}-experiments-lines`);
+        Array.from(experimentLinesDiv.children).forEach(child => {
+            child.id = `deleted-${child.id}`;
+            experimentLinesDiv.removeChild(child);
+        });
         this.experimentsLines = [];
         experiments.forEach(experiment => this.addExperiment(experiment));
     }

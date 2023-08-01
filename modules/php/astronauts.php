@@ -66,6 +66,9 @@ trait AstronautTrait {
             if ($distanceWithArm != 0) {
                 $moved = min($amount, $distanceWithArm - 1);
                 $astronaut->spot -= $moved;
+                while ($astronaut->spot < 0) {
+                    $astronaut->spot += 8;
+                }
                 $this->DbQuery("UPDATE astronaut SET `spot` = $astronaut->spot WHERE `id` = $astronaut->id");
 
                 $movedAstronauts[] = $astronaut;

@@ -2047,6 +2047,7 @@ var AstronautsManager = /** @class */ (function () {
         var astronautDiv = this.getAstronautDiv(astronaut);
         if (astronaut.location == 'player') {
             var modulesDiv = document.getElementById("player-table-".concat(astronaut.playerId, "-modules"));
+            this.game.getPlayerTable(astronaut.playerId).makeSlotForCoordinates(astronaut.x, astronaut.y);
             modulesDiv.querySelector("[data-slot-id=\"".concat(astronaut.x, "_").concat(astronaut.y, "\"]")).appendChild(astronautDiv);
         }
         else if (astronaut.location == 'table') {
@@ -2679,7 +2680,11 @@ var PlayerTable = /** @class */ (function () {
     };
     PlayerTable.prototype.resetExperiments = function (experiments) {
         var _this = this;
-        document.getElementById("player-table-".concat(this.playerId, "-experiments-lines")).innerHTML = "";
+        var experimentLinesDiv = document.getElementById("player-table-".concat(this.playerId, "-experiments-lines"));
+        Array.from(experimentLinesDiv.children).forEach(function (child) {
+            child.id = "deleted-".concat(child.id);
+            experimentLinesDiv.removeChild(child);
+        });
         this.experimentsLines = [];
         experiments.forEach(function (experiment) { return _this.addExperiment(experiment); });
     };
@@ -3439,27 +3444,27 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_restartTurn = function (args) {
         var _this = this;
         var playerId = args.playerId, undo = args.undo;
+        var originalInstantaneousMode = this.instantaneousMode;
+        this.instantaneousMode = true;
         this.tableCenter.resetModules(undo.tableModules);
         this.tableCenter.newExperiments(undo.tableExperiments);
         this.researchBoard.resetMissions(undo.allMissions.filter(function (mission) { return mission.location == 'table'; }));
         this.playersTables.forEach(function (playerTable) { return playerTable.resetMissions(undo.allMissions.filter(function (mission) { return mission.location == 'player' && mission.locationArg == playerTable.playerId; })); });
-        var table = this.getPlayerTable(playerId);
-        table.resetModules(undo.modules);
-        table.resetExperiments(undo.experiments);
-        table.resetSquares(undo.squares);
+        var playerTable = this.getPlayerTable(playerId);
+        playerTable.resetModules(undo.modules);
+        //playerTable.resetExperiments(undo.experiments); // useless as table reset will remove
+        playerTable.resetSquares(undo.squares);
         undo.astronauts.forEach(function (astronaut) { return _this.astronautsManager.resetAstronaut(astronaut); });
         this.setResearchPoints(playerId, undo.researchPoints);
         this.setVP(playerId, undo.vp);
         if (args.playerId == this.getPlayerId()) {
             this.setScience(playerId, undo.science);
         }
+        this.instantaneousMode = originalInstantaneousMode;
     };
     Humanity.prototype.notif_moveAstronaut = function (args) {
-        var playerId = args.playerId, astronaut = args.astronaut, toConfirm = args.toConfirm;
+        var astronaut = args.astronaut, toConfirm = args.toConfirm;
         astronaut.location = astronaut.x !== null ? 'player' : 'table';
-        if (astronaut.location == 'player') {
-            this.getPlayerTable(playerId).makeSlotForCoordinates(astronaut.x, astronaut.y);
-        }
         this.astronautsManager.moveAstronautDiv(astronaut);
         this.astronautsManager.setAstronautToConfirm(astronaut, toConfirm);
     };

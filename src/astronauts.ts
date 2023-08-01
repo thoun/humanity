@@ -38,6 +38,7 @@ class AstronautsManager {
         const astronautDiv = this.getAstronautDiv(astronaut);
         if (astronaut.location == 'player') {
             const modulesDiv = document.getElementById(`player-table-${astronaut.playerId}-modules`);
+            this.game.getPlayerTable(astronaut.playerId).makeSlotForCoordinates(astronaut.x, astronaut.y);
             modulesDiv.querySelector(`[data-slot-id="${astronaut.x}_${astronaut.y}"]`).appendChild(astronautDiv);
         } else if (astronaut.location == 'table') {
             const tableAstronauts = document.getElementById('table-astronauts');

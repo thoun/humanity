@@ -123,6 +123,7 @@ interface HumanityGame extends Game {
     getSide(side: number): string;
     getGameStateName(): string;
     getCurrentPlayerTable(): PlayerTable | null;
+    getPlayerTable(playerId: number): PlayerTable;
 
     setTooltip(id: string, html: string): void;
     onTableExperimentClick(experiment: Experiment): void;
