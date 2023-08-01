@@ -544,13 +544,13 @@ body > .card {
   background-image: url("img/workforces.png");
   background-size: auto 300%;
 }
-.astronaut .workforce[data-workforce="2"] {
+.astronaut[data-workforce="2"] .workforce {
   background-position-y: 0%;
 }
-.astronaut .workforce[data-workforce="3"] {
+.astronaut[data-workforce="3"] .workforce {
   background-position-y: 50%;
 }
-.astronaut .workforce[data-workforce="4"] {
+.astronaut[data-workforce="4"] .workforce {
   background-position-y: 100%;
 }
 

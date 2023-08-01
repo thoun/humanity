@@ -1084,10 +1084,15 @@ var CardStock = /** @class */ (function () {
      * @param settings a `RemoveCardSettings` object
      */
     CardStock.prototype.removeCard = function (card, settings) {
+        var promise;
         if (this.contains(card) && this.element.contains(this.getCardElement(card))) {
-            this.manager.removeCard(card, settings);
+            promise = this.manager.removeCard(card, settings);
+        }
+        else {
+            promise = Promise.resolve(false);
         }
         this.cardRemoved(card, settings);
+        return promise;
     };
     /**
      * Notify the stock that a card is removed.
@@ -1112,8 +1117,20 @@ var CardStock = /** @class */ (function () {
      * @param settings a `RemoveCardSettings` object
      */
     CardStock.prototype.removeCards = function (cards, settings) {
-        var _this = this;
-        cards.forEach(function (card) { return _this.removeCard(card, settings); });
+        return __awaiter(this, void 0, void 0, function () {
+            var promises, results;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        promises = cards.map(function (card) { return _this.removeCard(card, settings); });
+                        return [4 /*yield*/, Promise.all(promises)];
+                    case 1:
+                        results = _a.sent();
+                        return [2 /*return*/, results.some(function (result) { return result; })];
+                }
+            });
+        });
     };
     /**
      * Remove all cards from the stock.
@@ -1460,9 +1477,7 @@ var Deck = /** @class */ (function (_super) {
     Deck.prototype.setCardNumber = function (cardNumber, topCard) {
         var _this = this;
         if (topCard === void 0) { topCard = null; }
-        if (topCard) {
-            this.addCard(topCard);
-        }
+        var promise = topCard ? this.addCard(topCard) : Promise.resolve(true);
         this.cardNumber = cardNumber;
         this.element.dataset.empty = (this.cardNumber == 0).toString();
         var thickness = 0;
@@ -1476,6 +1491,7 @@ var Deck = /** @class */ (function (_super) {
         if (counterDiv) {
             counterDiv.innerHTML = "".concat(cardNumber);
         }
+        return promise;
     };
     Deck.prototype.addCard = function (card, animation, settings) {
         var _this = this;
@@ -1756,9 +1772,8 @@ var VoidStock = /** @class */ (function (_super) {
             promise = Promise.resolve(false);
         }
         if ((_a = settings === null || settings === void 0 ? void 0 : settings.remove) !== null && _a !== void 0 ? _a : true) {
-            return promise.then(function (result) {
-                _this.removeCard(card);
-                return result;
+            return promise.then(function () {
+                return _this.removeCard(card);
             });
         }
         else {
@@ -1812,6 +1827,7 @@ var CardManager = /** @class */ (function () {
         this.game = game;
         this.settings = settings;
         this.stocks = [];
+        this.updateMainTimeoutId = [];
         this.updateFrontTimeoutId = [];
         this.updateBackTimeoutId = [];
         this.animationManager = (_a = settings.animationManager) !== null && _a !== void 0 ? _a : new AnimationManager(game);
@@ -1873,13 +1889,13 @@ var CardManager = /** @class */ (function () {
         var id = this.getId(card);
         var div = document.getElementById(id);
         if (!div) {
-            return false;
+            return Promise.resolve(false);
         }
         div.id = "deleted".concat(id);
         div.remove();
         // if the card is in a stock, notify the stock about removal
         (_a = this.getCardStock(card)) === null || _a === void 0 ? void 0 : _a.cardRemoved(card, settings);
-        return true;
+        return Promise.resolve(true);
     };
     /**
      * Returns the stock containing the card.
@@ -1910,7 +1926,7 @@ var CardManager = /** @class */ (function () {
      */
     CardManager.prototype.setCardVisible = function (card, visible, settings) {
         var _this = this;
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
         var element = this.getCardElement(card);
         if (!element) {
             return;
@@ -1918,33 +1934,46 @@ var CardManager = /** @class */ (function () {
         var isVisible = visible !== null && visible !== void 0 ? visible : this.isCardVisible(card);
         element.dataset.side = isVisible ? 'front' : 'back';
         var stringId = JSON.stringify(this.getId(card));
-        if ((_a = settings === null || settings === void 0 ? void 0 : settings.updateFront) !== null && _a !== void 0 ? _a : true) {
+        if ((_a = settings === null || settings === void 0 ? void 0 : settings.updateMain) !== null && _a !== void 0 ? _a : false) {
+            if (this.updateMainTimeoutId[stringId]) { // make sure there is not a delayed animation that will overwrite the last flip request
+                clearTimeout(this.updateMainTimeoutId[stringId]);
+                delete this.updateMainTimeoutId[stringId];
+            }
+            var updateMainDelay = (_b = settings === null || settings === void 0 ? void 0 : settings.updateMainDelay) !== null && _b !== void 0 ? _b : 0;
+            if (isVisible && updateMainDelay > 0 && this.animationsActive()) {
+                this.updateMainTimeoutId[stringId] = setTimeout(function () { var _a, _b; return (_b = (_a = _this.settings).setupDiv) === null || _b === void 0 ? void 0 : _b.call(_a, card, element); }, updateMainDelay);
+            }
+            else {
+                (_d = (_c = this.settings).setupDiv) === null || _d === void 0 ? void 0 : _d.call(_c, card, element);
+            }
+        }
+        if ((_e = settings === null || settings === void 0 ? void 0 : settings.updateFront) !== null && _e !== void 0 ? _e : true) {
             if (this.updateFrontTimeoutId[stringId]) { // make sure there is not a delayed animation that will overwrite the last flip request
                 clearTimeout(this.updateFrontTimeoutId[stringId]);
                 delete this.updateFrontTimeoutId[stringId];
             }
-            var updateFrontDelay = (_b = settings === null || settings === void 0 ? void 0 : settings.updateFrontDelay) !== null && _b !== void 0 ? _b : 500;
+            var updateFrontDelay = (_f = settings === null || settings === void 0 ? void 0 : settings.updateFrontDelay) !== null && _f !== void 0 ? _f : 500;
             if (!isVisible && updateFrontDelay > 0 && this.animationsActive()) {
                 this.updateFrontTimeoutId[stringId] = setTimeout(function () { var _a, _b; return (_b = (_a = _this.settings).setupFrontDiv) === null || _b === void 0 ? void 0 : _b.call(_a, card, element.getElementsByClassName('front')[0]); }, updateFrontDelay);
             }
             else {
-                (_d = (_c = this.settings).setupFrontDiv) === null || _d === void 0 ? void 0 : _d.call(_c, card, element.getElementsByClassName('front')[0]);
+                (_h = (_g = this.settings).setupFrontDiv) === null || _h === void 0 ? void 0 : _h.call(_g, card, element.getElementsByClassName('front')[0]);
             }
         }
-        if ((_e = settings === null || settings === void 0 ? void 0 : settings.updateBack) !== null && _e !== void 0 ? _e : false) {
+        if ((_j = settings === null || settings === void 0 ? void 0 : settings.updateBack) !== null && _j !== void 0 ? _j : false) {
             if (this.updateBackTimeoutId[stringId]) { // make sure there is not a delayed animation that will overwrite the last flip request
                 clearTimeout(this.updateBackTimeoutId[stringId]);
                 delete this.updateBackTimeoutId[stringId];
             }
-            var updateBackDelay = (_f = settings === null || settings === void 0 ? void 0 : settings.updateBackDelay) !== null && _f !== void 0 ? _f : 0;
+            var updateBackDelay = (_k = settings === null || settings === void 0 ? void 0 : settings.updateBackDelay) !== null && _k !== void 0 ? _k : 0;
             if (isVisible && updateBackDelay > 0 && this.animationsActive()) {
                 this.updateBackTimeoutId[stringId] = setTimeout(function () { var _a, _b; return (_b = (_a = _this.settings).setupBackDiv) === null || _b === void 0 ? void 0 : _b.call(_a, card, element.getElementsByClassName('back')[0]); }, updateBackDelay);
             }
             else {
-                (_h = (_g = this.settings).setupBackDiv) === null || _h === void 0 ? void 0 : _h.call(_g, card, element.getElementsByClassName('back')[0]);
+                (_m = (_l = this.settings).setupBackDiv) === null || _m === void 0 ? void 0 : _m.call(_l, card, element.getElementsByClassName('back')[0]);
             }
         }
-        if ((_j = settings === null || settings === void 0 ? void 0 : settings.updateData) !== null && _j !== void 0 ? _j : true) {
+        if ((_o = settings === null || settings === void 0 ? void 0 : settings.updateData) !== null && _o !== void 0 ? _o : true) {
             // card data has changed
             var stock = this.getCardStock(card);
             var cards = stock.getCards();
@@ -2235,6 +2264,9 @@ var MissionsManager = /** @class */ (function (_super) {
     };
     return MissionsManager;
 }(CardManager));
+function sleep(ms) {
+    return new Promise(function (r) { return setTimeout(r, ms); });
+}
 var TableCenter = /** @class */ (function () {
     function TableCenter(game, gamedatas) {
         var _this = this;
@@ -2284,8 +2316,18 @@ var TableCenter = /** @class */ (function () {
         this.arm = arm;
     };
     TableCenter.prototype.newExperiments = function (tableExperiments) {
-        this.experiments.removeAll();
-        this.experiments.addCards(tableExperiments);
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.experiments.removeAll();
+                        return [4 /*yield*/, sleep(500)];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/, this.experiments.addCards(tableExperiments, undefined, undefined, 250)];
+                }
+            });
+        });
     };
     TableCenter.prototype.setSelectableModules = function (selectableModules) {
         this.modules.setSelectionMode(selectableModules ? 'single' : 'none', selectableModules);

@@ -47,7 +47,7 @@
     }
 
     @for $workforce from 2 through 4 {
-        .workforce[data-workforce="#{$workforce}"] {
+        &[data-workforce="#{$workforce}"] .workforce {
             background-position-y: #{($workforce - 2) * 100% / 2};
         }
     }

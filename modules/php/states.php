@@ -316,7 +316,7 @@ trait StateTrait {
             $this->experiments->pickCardForLocation('deck'.$year, 'table', $spot);
         }
         self::notifyAllPlayers('newTableExperiments', '', [
-            'tableExperiment' => $this->getExperimentsByLocation('table'),
+            'tableExperiments' => $this->getExperimentsByLocation('table'),
         ]);
 
         // continue to fill modules with new year modules
@@ -373,7 +373,7 @@ trait StateTrait {
             $scoreAux2 = $icons[11] + $icons[12] + $icons[13];
             $scoreAux3 = $icons[1] + $icons[2] + $icons[3];
             $scoreAux = 10000 * $scoreAux1 + 100 * $scoreAux2 + $scoreAux3;
-            $this->DbQuery("UPDATE player SET player_score = player_vp + player_science, player_score_aux = $scoreAux WHERE player_id = $playerId");
+            $this->DbQuery("UPDATE player SET player_score = player_vp, player_score_aux = $scoreAux WHERE player_id = $playerId");
 
             self::notifyAllPlayers('score', '', [
                 'playerId' => $playerId,

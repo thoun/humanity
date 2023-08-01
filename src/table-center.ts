@@ -1,3 +1,7 @@
+function sleep(ms: number){
+    return new Promise((r) => setTimeout(r, ms));
+}
+
 class TableCenter {
     public experiments: SlotStock<Experiment>;
     public modules: SlotStock<Module>;
@@ -63,9 +67,10 @@ class TableCenter {
         this.arm = arm;
     }
     
-    public newExperiments(tableExperiments: Experiment[]) {
+    public async newExperiments(tableExperiments: Experiment[]): Promise<any> {
         this.experiments.removeAll();
-        this.experiments.addCards(tableExperiments);
+        await sleep(500);
+        return this.experiments.addCards(tableExperiments, undefined, undefined, 250);
     }
     
     public setSelectableModules(selectableModules: Module[] | null) {
