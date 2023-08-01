@@ -284,7 +284,8 @@ trait StateTrait {
             $this->incPlayerScience($playerId, $sciencePoints, '${player_name} gains ${inc} science point(s) with year research');
 
             $playersBehind = intval($this->getUniqueValueFromDB("SELECT count(*) FROM player WHERE player_research_points < $playerResearchPoints"));
-            $this->incPlayerScience($playerId, $playersBehind, '${player_name} gains ${inc} science point(s) with ${inc} player(s) behind');
+            $bonus = count($playersIds) == 2 ? 2 : 1;
+            $this->incPlayerScience($playerId, $bonus * $playersBehind, '${player_name} gains ${inc} science point(s) with ${number} player(s) behind', ['number' => $playersBehind]);
         }
 
         $this->DbQuery("UPDATE player SET `player_research_points` = 0");   
