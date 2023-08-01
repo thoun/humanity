@@ -160,24 +160,28 @@ trait ModuleTrait {
                 'squares' => $squareResult['squares'],
             ]);
         }
-
-        $researchPoints = $module->researchPoints;
+        if ($module->researchPoints > 0) {
+            $this->incPlayerResearchPoints($playerId, $module->researchPoints, clienttranslate('${player_name} gains ${inc} research points with placed module'));
+        }
 
         $adjacentModules = $this->getAdjacentModules($playerModules, $module);
-        if ($module->adjacentResearchPoints !== null) {
+        if ($module->adjacentResearchPoints > 0) {
             $validAdjacentModules = $module->matchType == ANY_COLOR ? $adjacentModules : array_values(array_filter($adjacentModules, fn($t) => $t->color == $module->matchType));
-            $researchPoints += $module->adjacentResearchPoints * count($validAdjacentModules);
+            
+            $researchPoints = $module->adjacentResearchPoints * count($validAdjacentModules);
+            if ($researchPoints > 0) {
+                $this->incPlayerResearchPoints($playerId, $researchPoints, clienttranslate('${player_name} gains ${inc} research points with placed module (${number} neighbor module(s) matching)'), ['number' => count($validAdjacentModules)]);
+            }
         }
 
         // if new module match adjacent already placed purple module
         foreach ($adjacentModules as $adjacentModule) {
-            if ($adjacentModule->adjacentResearchPoints !== null && ($adjacentModule->matchType == ANY_COLOR || $adjacentModule->matchType == $module->color)) {
-                $researchPoints += $module->adjacentResearchPoints;
+            if ($adjacentModule->adjacentResearchPoints > 0 && ($adjacentModule->matchType == ANY_COLOR || $adjacentModule->matchType == $module->color)) {
+                $researchPoints = $module->adjacentResearchPoints;
+                if ($researchPoints > 0) {
+                    $this->incPlayerResearchPoints($playerId, $researchPoints, clienttranslate('${player_name} gains ${inc} research points with placed module (for matching an already placed purple module)'));
+                }
             }
-        }
-
-        if ($researchPoints > 0) {
-            $this->incPlayerResearchPoints($playerId, $researchPoints, clienttranslate('${player_name} gains ${inc} research points with placed module'));
         }
             
         $this->incStat(1, 'deployedModules', $playerId);
