@@ -158,7 +158,7 @@ $stats_type = [
         ],
         "uncompleteExperimentLines1" => [
             "id" => 36,
-            "name" => totranslate("Unomplete experiment lines (1 tile)"),
+            "name" => totranslate("Uncomplete experiment lines (1 tile)"),
             "type" => "int"
         ],
         

@@ -2318,8 +2318,8 @@ var ResearchBoard = /** @class */ (function () {
         });
         dojo.place(html, 'research-board');
         players.forEach(function (player) {
-            _this.vp.set(Number(player.id), Number(player.score));
-            _this.sciencePoints.set(Number(player.id), Math.min(14, Number(player.researchPoints)));
+            _this.vp.set(Number(player.id), player.vp);
+            _this.sciencePoints.set(Number(player.id), player.researchPoints);
         });
         this.moveVP();
         this.moveResearch();
