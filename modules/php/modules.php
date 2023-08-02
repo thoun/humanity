@@ -251,23 +251,32 @@ trait ModuleTrait {
         ];
     }
 
+    function getRecursiveAdjacentGreenhouses(array $modules, /*Module|Astronaut*/ $from, array $alreadyCounted) {
+        $adjacentModules = $this->getAdjacentModules($modules, $from, false);
+        $adjacentsToCall = [];
+        foreach ($adjacentModules as $adjacentModule) {
+            if (!$this->array_some($alreadyCounted, fn($countedModule) => $countedModule->id == $adjacentModule->id)) {
+                $adjacentsToCall[] = $adjacentModule;
+            }
+        }
+        
+        if (count($adjacentsToCall) == 0) {
+            return $alreadyCounted;
+        } else {
+            $adjacentsResults = array_map(fn($adjacentToCall) => $this->getRecursiveAdjacentGreenhouses($modules, $adjacentToCall, array_merge([$adjacentToCall], $alreadyCounted)), $adjacentsToCall);
+            return array_merge($alreadyCounted, ...$adjacentsResults);
+        }
+    }
+
     function canPlaceGreenhouse(int $playerId, Module $module, Astronaut $astronaut) {
         $playerModulesAndObstacles = $this->getModulesByLocation('player', $playerId);
         $playerModules = array_values(array_filter($playerModulesAndObstacles, fn($t) => $t->type != 9));
         $greenModules = array_values(array_filter($playerModules, fn($t) => $t->color == GREEN));
 
-        $adjacentGreenhousesTypes = [];
-        $adjacentModules = $this->getAdjacentModules($greenModules, $astronaut, false);
-        foreach ($adjacentModules as $adjacentModule) {
-            $adjacentGreenhousesTypes[] = $adjacentModule->matchType;
-            
-            $adjacentModulesLevel2 = $this->getAdjacentModules($greenModules, $adjacentModule, false);
-            foreach ($adjacentModulesLevel2 as $adjacentModuleLevel2) {
-                $adjacentGreenhousesTypes[] = $adjacentModuleLevel2->matchType;
-            }
-        }
-
-        return !in_array($module->matchType, $adjacentGreenhousesTypes) && count(array_unique($adjacentGreenhousesTypes)) <= 3;
+        $newGreenhousesSet = $this->getRecursiveAdjacentGreenhouses($greenModules, $astronaut, [$module]);
+        $newGreenhousesSet = array_intersect_key($newGreenhousesSet, array_unique(array_column($newGreenhousesSet, 'id')));
+        $newGreenhousesSetTypes = array_map(fn($m) => $m->matchType, $newGreenhousesSet);
+        return count(array_unique($newGreenhousesSetTypes)) == count($newGreenhousesSetTypes) && count($newGreenhousesSetTypes) <= 3;
     }
 
     function getPlayerSquares(int $playerId) {
