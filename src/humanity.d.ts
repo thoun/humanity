@@ -149,7 +149,7 @@ interface EnteringChooseActionArgs extends EnteringActivateModuleArgs {
 
 interface EnteringPayArgs extends EnteringAstronautArgs {
     cost: Icons;
-    autoPay: Icons;
+    autoPay: Icons | null;
     payButtons: { [tileId: number]: number[] };
 }
 

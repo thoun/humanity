@@ -76,7 +76,8 @@ trait ArgsTrait {
         $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
         $astronaut = $this->getAstronautById($currentAction->selectedAstronaut);
         
-        $pay = $this->canPay((array)$currentAction->remainingCost, $playerId)['payWith'];
+
+        $pay = $this->canPay((array)$currentAction->remainingCost, $playerId);
         
         $remainingNeededResourceTypes = array_keys((array)$currentAction->remainingCost);
         $playerModules = $this->getModulesByLocation('player', $playerId);
@@ -95,7 +96,7 @@ trait ArgsTrait {
         return [
             'astronaut' => $astronaut,
             'cost' => $currentAction->remainingCost,
-            'autoPay' => $pay,
+            'autoPay' => $pay ? $pay['payWith'] : null,
             'payButtons' => $payButtons,
         ];
     }

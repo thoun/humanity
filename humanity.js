@@ -2075,6 +2075,7 @@ var AstronautsManager = /** @class */ (function () {
     AstronautsManager.prototype.moveAstronautDiv = function (astronaut) {
         var astronautDiv = this.getAstronautDiv(astronaut);
         if (astronaut.location == 'player') {
+            console.log(astronaut.playerId);
             var modulesDiv = document.getElementById("player-table-".concat(astronaut.playerId, "-modules"));
             this.game.getPlayerTable(astronaut.playerId).makeSlotForCoordinates(astronaut.x, astronaut.y);
             modulesDiv.querySelector("[data-slot-id=\"".concat(astronaut.x, "_").concat(astronaut.y, "\"]")).appendChild(astronautDiv);
@@ -3019,7 +3020,9 @@ var Humanity = /** @class */ (function () {
                     this.addActionButton("orange_button", _("Orange"), function () { return _this.chooseCommunicationColor(1); });
                     break;
                 case 'pay':
-                    this.addActionButton("autoPay_button", _("Automatically spend ${cost}").replace('${cost}', getCostStr(args.autoPay)), function () { return _this.autoPay(); });
+                    if (args.autoPay) {
+                        this.addActionButton("autoPay_button", _("Automatically spend ${cost}").replace('${cost}', getCostStr(args.autoPay)), function () { return _this.autoPay(); });
+                    }
                     break;
                 case 'confirmTurn':
                     this.addActionButton("confirmTurn_button", _("Confirm turn"), function () { return _this.confirmTurn(); });

@@ -300,7 +300,9 @@ class Humanity implements HumanityGame {
                     (this as any).addActionButton(`orange_button`, _("Orange"), () => this.chooseCommunicationColor(1));
                     break;
                 case 'pay':
-                    (this as any).addActionButton(`autoPay_button`, _("Automatically spend ${cost}").replace('${cost}', getCostStr(args.autoPay)), () => this.autoPay());
+                    if (args.autoPay) {
+                        (this as any).addActionButton(`autoPay_button`, _("Automatically spend ${cost}").replace('${cost}', getCostStr(args.autoPay)), () => this.autoPay());
+                    }
                     break;
                 case 'confirmTurn':
                     (this as any).addActionButton(`confirmTurn_button`, _("Confirm turn"), () => this.confirmTurn());
