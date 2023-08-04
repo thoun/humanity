@@ -121,7 +121,13 @@ trait ActionTrait {
         self::checkAction('chooseNewModule');
 
         $playerId = intval($this->getActivePlayerId());
-        $module = $this->getModuleById($id);
+
+        $selectableModules = $this->argChooseAction()['selectableModules'];
+
+        $module = $this->array_find($selectableModules, fn($t) => $t->id == $id);
+        if ($module == null) {
+            throw new BgaUserException("You cannot choose this module");
+        }
 
         $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
         $currentAction->type = 'module';

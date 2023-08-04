@@ -11,15 +11,15 @@ trait DebugUtilTrait {
             return;
         } 
 
-		/*$this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 13 WHERE x = 0 AND y = 0");
+	    $this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 13 WHERE x = 0 AND y = 0");
 		$this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 15 WHERE x = -1 AND y = 0");
 		$this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 14 WHERE x = -1 AND y = 1");
 		$this->DbQuery("UPDATE astronaut SET `x` = -2, `y` = 1");
 
 		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 14 WHERE card_location ='table' AND card_location_arg = 7");
 		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 13 WHERE card_location ='table' AND card_location_arg = 1");
-		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 15 WHERE card_location ='table' AND card_location_arg = 2");*/
-        //$this->debugR(3);
+		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 15 WHERE card_location ='table' AND card_location_arg = 2");
+        $this->debugR(3);
         //$this->debugWorkforce();
     }
 
