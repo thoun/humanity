@@ -109,13 +109,21 @@ trait ModuleTrait {
             ]);
         }
 
-        $r = $module->production != null ? 1 : 0;
-        $this->DbQuery("UPDATE module SET card_location = 'player', card_location_arg = $playerId, `x` = $astronaut->x, `y` = $astronaut->y, `r` = $r WHERE `card_id` = $module->id");
+        $r = $module->production != null ? 1 : 0;        
         $module->location = 'player';
         $module->locationArg = $playerId;
         $module->x = $astronaut->x;
         $module->y = $astronaut->y;
         $module->r = $r;
+
+        $moduleVp = 0;
+        if ($module->color == GREEN) {
+            $set = $this->getGreenhouseSet($playerId, $module, $module);
+            $moduleVp = count($set);
+        }
+        $module->vp = $moduleVp;
+
+        $this->DbQuery("UPDATE module SET card_location = 'player', card_location_arg = $playerId, `x` = $astronaut->x, `y` = $astronaut->y, `r` = $r, `vp` = $moduleVp WHERE `card_id` = $module->id");
 
         self::notifyAllPlayers('deployModule', '', [
             'playerId' => $playerId,
@@ -123,17 +131,12 @@ trait ModuleTrait {
             'module' => $module,
         ]);
 
-        $points = $module->points;
+        $points = $module->points + $moduleVp;
 
         $playerModulesAndObstacles = $this->getModulesByLocation('player', $playerId);
         $playerModules = array_values(array_filter($playerModulesAndObstacles, fn($t) => $t->type != 9));
         
         $squareResult = $this->checkNewModuleSquares($module, $playerModules);
-
-        if ($module->color == GREEN) {
-            $set = $this->getGreenhouseSet($playerId, $module, $module);
-            $points += count($set);
-        }
         
         if ($points > 0) {
             $this->incPlayerVP($playerId, $points, clienttranslate('${player_name} gains ${inc} point(s) with placed module'));

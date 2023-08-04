@@ -58,6 +58,7 @@ class Module extends ModuleType {
     public ?int $x;
     public ?int $y;
     public ?int $r;
+    public ?int $vp;
 
     public function __construct($dbCard, $TILES) {
         $this->id = intval($dbCard['card_id'] ?? $dbCard['id']);
@@ -68,6 +69,7 @@ class Module extends ModuleType {
         $this->x = array_key_exists('x', $dbCard) ? intval($dbCard['x']) : null;
         $this->y = array_key_exists('y', $dbCard) ? intval($dbCard['y']) : null;
         $this->r = array_key_exists('r', $dbCard) ? intval($dbCard['r']) : null;
+        $this->vp = array_key_exists('vp', $dbCard) ? intval($dbCard['vp']) : null;
 
         if ($this->number !== null) {
             $moduleType = $TILES[$this->type][$this->number];

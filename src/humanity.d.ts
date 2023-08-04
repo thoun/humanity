@@ -11,6 +11,7 @@ interface Module {
     x: number;
     y: number;
     r: number;
+    vp?: number;
     color: number;
     cost: { [type: number]:number };
     workforce?: number;

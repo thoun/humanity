@@ -53,14 +53,20 @@ html, .mode_3d #game_play_area_background {
   background-image: url('img/icons.png');
   background-size: auto 100%;
   background-repeat: no-repeat;
-  background-position: center;
+  background-position: top center;
   vertical-align: middle;
   
   &.vp {
-    background-position-x: #{0 * 100% / 1};
+    background-position-x: #{0 * 100% / 3};
+
+    @for $vp from 1 through 3 {
+      &[data-vp="#{$vp}"] {
+        background-position-x: #{($vp - 1) * 100% / 3};
+      }
+    }
   }  
   &.science {
-    background-position-x: #{1 * 100% / 1};
+    background-position-x: #{1 * 100% / 3};
   } 
 
   &.reactivate {

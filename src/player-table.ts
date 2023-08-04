@@ -23,7 +23,6 @@ class PlayerTable {
     public experimentsLines: SlotStock<Experiment>[] = [];
     public missions: LineStock<Mission>;
 
-    private currentPlayer: boolean;
     private moduleMinX: number;
     private moduleMaxX: number;
     private moduleMinY: number;
@@ -31,7 +30,6 @@ class PlayerTable {
 
     constructor(private game: HumanityGame, player: HumanityPlayer) {
         this.playerId = Number(player.id);
-        this.currentPlayer = this.playerId == this.game.getPlayerId();
 
         let html = `
         <div id="player-table-${this.playerId}" class="player-table" style="--player-color: #${player.color};">
@@ -74,7 +72,7 @@ class PlayerTable {
         });
         this.modules.onCardClick = (card: Module) => this.game.onPlayerModuleClick(card);
         
-        this.modules.addCards(player.modules);
+        player.modules.forEach(module => this.addModule(module));
         player.modules.filter(module => module.type == 9).forEach(module => this.game.modulesManager.getCardElement(module).dataset.playerColor = player.color);
 
         this.voidStock = new VoidStock<Module>(this.game.modulesManager, document.getElementById(`player-table-${this.playerId}-name`));
@@ -113,7 +111,11 @@ class PlayerTable {
     public addModule(module: Module): Promise<any> {
         this.makeSlotForCoordinates(module.x, module.y);
         const promise = this.modules.addCard(module);
-        this.game.modulesManager.getCardElement(module).dataset.r = `${module.r}`;
+        const element = this.game.modulesManager.getCardElement(module);
+        element.dataset.r = `${module.r}`;
+        if (module.vp) {
+            element.querySelector('.front').insertAdjacentHTML('beforeend', `<div class="vp icon" data-vp="${module.vp}"></div>`);
+        }
 
         return promise;
     }

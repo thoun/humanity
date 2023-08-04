@@ -1400,6 +1400,13 @@ body > .card {
   bottom: -28px;
   right: -28px;
 }
+.player-table .modules .module .front .vp.icon {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  top: 8px;
+  left: 8px;
+}
 .player-table .buttons {
   position: absolute;
   top: 0;
@@ -1540,14 +1547,23 @@ html, .mode_3d #game_play_area_background {
   background-image: url("img/icons.png");
   background-size: auto 100%;
   background-repeat: no-repeat;
-  background-position: center;
+  background-position: top center;
   vertical-align: middle;
 }
 .icon.vp {
   background-position-x: 0%;
 }
+.icon.vp[data-vp="1"] {
+  background-position-x: 0%;
+}
+.icon.vp[data-vp="2"] {
+  background-position-x: 33.3333333333%;
+}
+.icon.vp[data-vp="3"] {
+  background-position-x: 66.6666666667%;
+}
 .icon.science {
-  background-position-x: 100%;
+  background-position-x: 33.3333333333%;
 }
 .icon.reactivate {
   background-image: url("img/icon-reactivate.svg");

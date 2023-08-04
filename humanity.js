@@ -2382,7 +2382,7 @@ var ResearchBoard = /** @class */ (function () {
         });
     }
     ResearchBoard.prototype.getVPCoordinates = function (points) {
-        var cases = Math.min(points, 40);
+        var cases = points > 40 ? points % 40 : points;
         var top = 0;
         var left = 0;
         if (cases > 0 && cases < 12) {
@@ -2537,7 +2537,6 @@ var PlayerTable = /** @class */ (function () {
         this.game = game;
         this.experimentsLines = [];
         this.playerId = Number(player.id);
-        this.currentPlayer = this.playerId == this.game.getPlayerId();
         var html = "\n        <div id=\"player-table-".concat(this.playerId, "\" class=\"player-table\" style=\"--player-color: #").concat(player.color, ";\">\n            <div id=\"player-table-").concat(this.playerId, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.playerId, "-modules\" class=\"modules\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-experiments-lines\" class=\"experiments-lines\"></div>\n            <div id=\"player-table-").concat(this.playerId, "-mission\" class=\"mission\"></div>\n        </div>\n        ");
         dojo.place(html, document.getElementById('tables'));
         var playerAstronauts = player.astronauts.filter(function (astronaut) { return astronaut.location == 'player'; });
@@ -2568,7 +2567,7 @@ var PlayerTable = /** @class */ (function () {
             });
         });
         this.modules.onCardClick = function (card) { return _this.game.onPlayerModuleClick(card); };
-        this.modules.addCards(player.modules);
+        player.modules.forEach(function (module) { return _this.addModule(module); });
         player.modules.filter(function (module) { return module.type == 9; }).forEach(function (module) { return _this.game.modulesManager.getCardElement(module).dataset.playerColor = player.color; });
         this.voidStock = new VoidStock(this.game.modulesManager, document.getElementById("player-table-".concat(this.playerId, "-name")));
         player.experiments.forEach(function (experiment) { return _this.addExperiment(experiment); });
@@ -2598,7 +2597,11 @@ var PlayerTable = /** @class */ (function () {
     PlayerTable.prototype.addModule = function (module) {
         this.makeSlotForCoordinates(module.x, module.y);
         var promise = this.modules.addCard(module);
-        this.game.modulesManager.getCardElement(module).dataset.r = "".concat(module.r);
+        var element = this.game.modulesManager.getCardElement(module);
+        element.dataset.r = "".concat(module.r);
+        if (module.vp) {
+            element.querySelector('.front').insertAdjacentHTML('beforeend', "<div class=\"vp icon\" data-vp=\"".concat(module.vp, "\"></div>"));
+        }
         return promise;
     };
     PlayerTable.prototype.removeModule = function (module) {

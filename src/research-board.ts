@@ -46,7 +46,7 @@ class ResearchBoard {
     }
 
     private getVPCoordinates(points: number) {
-        const cases = Math.min(points, 40);
+        const cases = points > 40 ? points % 40 : points;
 
         let top = 0;
         let left = 0;

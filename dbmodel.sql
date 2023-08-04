@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS `module` (
    `x` smallint(2) NULL,
    `y` smallint(2) NULL,
    `r` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+   `vp` smallint(2) NULL,
    PRIMARY KEY (`card_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
