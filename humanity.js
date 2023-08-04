@@ -2575,6 +2575,8 @@ var PlayerTable = /** @class */ (function () {
         this.missions = new LineStock(this.game.missionsManager, missionDiv);
         this.missions.addCards(player.missions);
         playerAstronauts.forEach(function (astronaut) {
+            console.log(astronaut.x, astronaut.y, modulesDiv.querySelector("[data-slot-id=\"".concat(astronaut.x, "_").concat(astronaut.y, "\"]")));
+            _this.makeSlotForCoordinates(astronaut.x, astronaut.y);
             modulesDiv.querySelector("[data-slot-id=\"".concat(astronaut.x, "_").concat(astronaut.y, "\"]")).appendChild(_this.game.astronautsManager.createAstronaut(astronaut));
             if (!astronaut.remainingWorkforce) {
                 document.getElementById("astronaut-".concat(astronaut.id)).dataset.remainingWorkforce = "".concat(astronaut.remainingWorkforce);

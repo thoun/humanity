@@ -66,7 +66,7 @@ html, .mode_3d #game_play_area_background {
     }
   }  
   &.science {
-    background-position-x: #{1 * 100% / 3};
+    background-position-x: #{3 * 100% / 3};
   } 
 
   &.reactivate {

@@ -11,16 +11,17 @@ trait DebugUtilTrait {
             return;
         } 
 
-	    $this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 13 WHERE x = 0 AND y = 0");
+	    /*$this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 13 WHERE x = 0 AND y = 0");
 		$this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 15 WHERE x = -1 AND y = 0");
 		$this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 14 WHERE x = -1 AND y = 1");
 		$this->DbQuery("UPDATE astronaut SET `x` = -2, `y` = 1");
 
 		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 14 WHERE card_location ='table' AND card_location_arg = 7");
 		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 13 WHERE card_location ='table' AND card_location_arg = 1");
-		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 15 WHERE card_location ='table' AND card_location_arg = 2");
+		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 15 WHERE card_location ='table' AND card_location_arg = 2");*/
         $this->debugR(3);
         //$this->debugWorkforce();
+        $this->debugNewAstronauts();
     }
 
     function debugR($r) {
@@ -36,6 +37,35 @@ trait DebugUtilTrait {
     // debugEndYear(3)
     function debugEndYear($year) {
 		$this->DbQuery("UPDATE module SET `card_location` = 'void' WHERE `card_location` = 'deck$year'");
+    }
+
+    function debugNewAstronauts() {
+        $playerId = 2343492;
+
+        $modules = $this->getModulesByLocation('player', $playerId);
+        $diagonal = true;
+
+        
+        $values = [];
+
+        foreach($modules as $module) {
+            for ($x = -1; $x <= 1; $x++) {
+                for ($y = -1; $y <= 1; $y++) {
+                    if ($x === 0 && $y === 0) { continue; }
+                    if (!$diagonal && $x !== 0 && $y !== 0) { continue; }
+
+                    $adjacentModule = $this->array_find($modules, fn($m) => 
+                        $m->x === $module->x + $x && $m->y === $module->y + $y
+                    );
+
+                    $ax = $module->x + $x;
+                    $ay = $module->y + $y;
+                    if ($adjacentModule == null && intval($this->getUniqueValueFromDB("SELECT count(*) FROM astronaut WHERE x = $ax AND y = $ay")) == 0) {
+                        $this->DbQuery("INSERT INTO astronaut (`player_id`, `location`, `x`, `y`) VALUES ($playerId, 'player', $ax, $ay)");
+                    }
+                }
+            }
+        }
     }
 
     public function debugReplacePlayersIds() {

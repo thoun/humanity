@@ -77,7 +77,7 @@ trait ModuleTrait {
         }
     }
 
-    function getAdjacentModules(array $modules, /*Module | Astronau*/ $fromModuleOrAstronaut, bool $diagonal = false) {
+    function getAdjacentModules(array $modules, /*Module | Astronaut*/ $fromModuleOrAstronaut, bool $diagonal = false) {
         $adjacentModules = [];
         for ($x = -1; $x <= 1; $x++) {
             for ($y = -1; $y <= 1; $y++) {
@@ -177,8 +177,9 @@ trait ModuleTrait {
 
         // if new module match adjacent already placed purple module
         foreach ($adjacentModules as $adjacentModule) {
+            
             if ($adjacentModule->adjacentResearchPoints > 0 && ($adjacentModule->matchType == ANY_COLOR || $adjacentModule->matchType == $module->color)) {
-                $researchPoints = $module->adjacentResearchPoints;
+                $researchPoints = $adjacentModule->adjacentResearchPoints;
                 if ($researchPoints > 0) {
                     $this->incPlayerResearchPoints($playerId, $researchPoints, clienttranslate('${player_name} gains ${inc} research points with placed module (for matching an already placed purple module)'));
                 }

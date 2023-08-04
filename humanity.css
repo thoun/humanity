@@ -1563,7 +1563,7 @@ html, .mode_3d #game_play_area_background {
   background-position-x: 66.6666666667%;
 }
 .icon.science {
-  background-position-x: 33.3333333333%;
+  background-position-x: 100%;
 }
 .icon.reactivate {
   background-image: url("img/icon-reactivate.svg");
