@@ -317,6 +317,10 @@ class Humanity implements HumanityGame {
             if (['chooseCommunicationColor', 'pay', 'chooseAction', 'upgradeAstronaut', 'activateModule', 'confirmTurn'].includes(stateName)) {
                 (this as any).addActionButton(`restartTurn_button`, _("Restart turn"), () => this.restartTurn(), null, null, 'red');
             }
+        } else {
+            if (stateName == 'moveAstronauts' && Object.keys(this.gamedatas.players).includes(''+this.getPlayerId())) { // ignore spectators
+                (this as any).addActionButton(`cancelConfirmAstronaut-button`, _("I changed my mind"), () => this.cancelConfirmAstronaut(), null, null, 'gray');
+            }
         }
     }
 
@@ -909,6 +913,10 @@ class Humanity implements HumanityGame {
         this.takeAction('confirmMoveAstronauts');
     }
   	
+    public cancelConfirmAstronaut() {
+        this.takeAction('cancelConfirmAstronaut');
+    }
+  	
     public restartMoveAstronauts() {
         if(!(this as any).checkAction('restartMoveAstronauts')) {
             return;
@@ -1161,7 +1169,10 @@ class Humanity implements HumanityGame {
 
     notif_confirmMoveAstronauts(args: NotifConfirmMoveAstronautsArgs) {
         const { astronauts } = args;
-        astronauts.forEach(astronaut => this.astronautsManager.setAstronautToConfirm(astronaut, false));
+        astronauts.forEach(astronaut => {
+            this.astronautsManager.moveAstronautDiv(astronaut);
+            this.astronautsManager.setAstronautToConfirm(astronaut, false)
+        });
     }
 
     public getColor(color: number, blueOrOrange: boolean): string {

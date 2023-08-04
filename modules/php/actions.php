@@ -383,7 +383,7 @@ trait ActionTrait {
         $movedAstronaut->y = $y;
         $this->setGlobalVariable(MOVED_ASTRONAUTS, $movedAstronauts);
 
-        self::notifyAllPlayers('moveAstronaut', '', [
+        self::notifyPlayer($playerId, 'moveAstronaut', '', [
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
             'astronaut' => $movedAstronaut,
@@ -400,20 +400,14 @@ trait ActionTrait {
 
         $playerId = intval($this->getCurrentPlayerId());
 
-        $movedAstronauts = $this->getGlobalVariable(MOVED_ASTRONAUTS);
-        $playerMovedAstronauts = array_values(array_filter($movedAstronauts, fn($astronaut) => $astronaut->playerId == $playerId));
-
-        foreach ($playerMovedAstronauts as $astronaut) {
-            $this->DbQuery("UPDATE astronaut SET `location` = 'player', `spot` = null, `x` = $astronaut->x, `y` = $astronaut->y WHERE `id` = $astronaut->id");
-        }
-
-        self::notifyAllPlayers('confirmMoveAstronauts', '', [
-            'playerId' => $playerId,
-            'player_name' => $this->getPlayerName($playerId),
-            'astronauts' => $playerMovedAstronauts,
-        ]);
-
         $this->gamestate->setPlayerNonMultiactive($playerId, 'next');
+    }
+
+    public function cancelConfirmAstronaut() {
+        $playerId = intval($this->getCurrentPlayerId());
+
+        $this->gamestate->setPlayersMultiactive([$playerId], 'next', false);
+        $this->gamestate->setPrivateState($playerId, ST_PRIVATE_CONFIRM_MOVE_ASTRONAUTS);
     }
 
     public function restartMoveAstronauts() {
@@ -430,7 +424,7 @@ trait ActionTrait {
                 $movedAstronaut->x = null;
                 $movedAstronaut->y = null;
 
-                self::notifyAllPlayers('moveAstronaut', '', [
+                self::notifyPlayer($playerId, 'moveAstronaut', '', [
                     'playerId' => $playerId,
                     'player_name' => $this->getPlayerName($playerId),
                     'astronaut' => $movedAstronaut,

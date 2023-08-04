@@ -262,6 +262,17 @@ trait StateTrait {
     }
 
     function stAfterEndRound() {
+        $movedAstronauts = $this->getGlobalVariable(MOVED_ASTRONAUTS);
+
+        foreach ($movedAstronauts as &$astronaut) {
+            $astronaut->location = 'player';
+            $this->DbQuery("UPDATE astronaut SET `location` = 'player', `spot` = null, `x` = $astronaut->x, `y` = $astronaut->y WHERE `id` = $astronaut->id");
+        }
+
+        self::notifyAllPlayers('confirmMoveAstronauts', '', [
+            'astronauts' => $movedAstronauts,
+        ]);
+
         $this->deleteGlobalVariable(MOVED_ASTRONAUTS);
         $this->reactivatePlayerAstronauts(null);
 

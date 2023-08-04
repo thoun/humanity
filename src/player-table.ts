@@ -84,7 +84,6 @@ class PlayerTable {
         this.missions.addCards(player.missions);
 
         playerAstronauts.forEach(astronaut => {
-            console.log(astronaut.x, astronaut.y, modulesDiv.querySelector(`[data-slot-id="${astronaut.x}_${astronaut.y}"]`));
             this.makeSlotForCoordinates(astronaut.x, astronaut.y);
             modulesDiv.querySelector(`[data-slot-id="${astronaut.x}_${astronaut.y}"]`).appendChild(this.game.astronautsManager.createAstronaut(astronaut));
             if (!astronaut.remainingWorkforce) {

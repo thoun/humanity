@@ -19,9 +19,9 @@ trait DebugUtilTrait {
 		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 14 WHERE card_location ='table' AND card_location_arg = 7");
 		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 13 WHERE card_location ='table' AND card_location_arg = 1");
 		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 15 WHERE card_location ='table' AND card_location_arg = 2");*/
-        $this->debugR(3);
+        //$this->debugR(3);
         //$this->debugWorkforce();
-        $this->debugNewAstronauts();
+        //$this->debugNewAstronauts();
     }
 
     function debugR($r) {
@@ -44,9 +44,6 @@ trait DebugUtilTrait {
 
         $modules = $this->getModulesByLocation('player', $playerId);
         $diagonal = true;
-
-        
-        $values = [];
 
         foreach($modules as $module) {
             for ($x = -1; $x <= 1; $x++) {

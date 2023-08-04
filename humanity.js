@@ -2075,7 +2075,6 @@ var AstronautsManager = /** @class */ (function () {
     AstronautsManager.prototype.moveAstronautDiv = function (astronaut) {
         var astronautDiv = this.getAstronautDiv(astronaut);
         if (astronaut.location == 'player') {
-            console.log(astronaut.playerId);
             var modulesDiv = document.getElementById("player-table-".concat(astronaut.playerId, "-modules"));
             this.game.getPlayerTable(astronaut.playerId).makeSlotForCoordinates(astronaut.x, astronaut.y);
             modulesDiv.querySelector("[data-slot-id=\"".concat(astronaut.x, "_").concat(astronaut.y, "\"]")).appendChild(astronautDiv);
@@ -2575,7 +2574,6 @@ var PlayerTable = /** @class */ (function () {
         this.missions = new LineStock(this.game.missionsManager, missionDiv);
         this.missions.addCards(player.missions);
         playerAstronauts.forEach(function (astronaut) {
-            console.log(astronaut.x, astronaut.y, modulesDiv.querySelector("[data-slot-id=\"".concat(astronaut.x, "_").concat(astronaut.y, "\"]")));
             _this.makeSlotForCoordinates(astronaut.x, astronaut.y);
             modulesDiv.querySelector("[data-slot-id=\"".concat(astronaut.x, "_").concat(astronaut.y, "\"]")).appendChild(_this.game.astronautsManager.createAstronaut(astronaut));
             if (!astronaut.remainingWorkforce) {
@@ -3041,6 +3039,11 @@ var Humanity = /** @class */ (function () {
                 this.addActionButton("restartTurn_button", _("Restart turn"), function () { return _this.restartTurn(); }, null, null, 'red');
             }
         }
+        else {
+            if (stateName == 'moveAstronauts' && Object.keys(this.gamedatas.players).includes('' + this.getPlayerId())) { // ignore spectators
+                this.addActionButton("cancelConfirmAstronaut-button", _("I changed my mind"), function () { return _this.cancelConfirmAstronaut(); }, null, null, 'gray');
+            }
+        }
     };
     ///////////////////////////////////////////////////
     //// Utility methods
@@ -3313,6 +3316,9 @@ var Humanity = /** @class */ (function () {
         }
         this.takeAction('confirmMoveAstronauts');
     };
+    Humanity.prototype.cancelConfirmAstronaut = function () {
+        this.takeAction('cancelConfirmAstronaut');
+    };
     Humanity.prototype.restartMoveAstronauts = function () {
         if (!this.checkAction('restartMoveAstronauts')) {
             return;
@@ -3521,7 +3527,10 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_confirmMoveAstronauts = function (args) {
         var _this = this;
         var astronauts = args.astronauts;
-        astronauts.forEach(function (astronaut) { return _this.astronautsManager.setAstronautToConfirm(astronaut, false); });
+        astronauts.forEach(function (astronaut) {
+            _this.astronautsManager.moveAstronautDiv(astronaut);
+            _this.astronautsManager.setAstronautToConfirm(astronaut, false);
+        });
     };
     Humanity.prototype.getColor = function (color, blueOrOrange) {
         switch (color) {

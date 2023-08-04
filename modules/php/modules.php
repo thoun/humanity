@@ -177,7 +177,6 @@ trait ModuleTrait {
 
         // if new module match adjacent already placed purple module
         foreach ($adjacentModules as $adjacentModule) {
-            
             if ($adjacentModule->adjacentResearchPoints > 0 && ($adjacentModule->matchType == ANY_COLOR || $adjacentModule->matchType == $module->color)) {
                 $researchPoints = $adjacentModule->adjacentResearchPoints;
                 if ($researchPoints > 0) {

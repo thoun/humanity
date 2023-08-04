@@ -160,6 +160,14 @@
 
         self::ajaxResponse();
     }
+
+    public function cancelConfirmAstronaut() {
+        self::setAjaxMode();     
+
+        $this->game->cancelConfirmAstronaut();
+
+        self::ajaxResponse();
+    }
   }
   
 

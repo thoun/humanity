@@ -295,7 +295,6 @@ interface NotifMoveAstronautArgs {
 
 // confirmMoveAstronauts
 interface NotifConfirmMoveAstronautsArgs {
-    playerId: number;
     astronauts: Astronaut[];
 }
 
