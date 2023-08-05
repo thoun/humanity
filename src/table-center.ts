@@ -67,10 +67,12 @@ class TableCenter {
         this.arm = arm;
     }
     
-    public async newExperiments(tableExperiments: Experiment[]): Promise<any> {
+    public async newExperiments(tableExperiments: Experiment[], instant: boolean): Promise<any> {
         this.experiments.removeAll();
-        await sleep(500);
-        return this.experiments.addCards(tableExperiments, undefined, undefined, 250);
+        if (!instant) {
+            await sleep(500);
+        }
+        return this.experiments.addCards(tableExperiments, undefined, undefined, instant ? false : 250);
     }
     
     public setSelectableModules(selectableModules: Module[] | null) {

@@ -4,6 +4,22 @@ const POINT_CASE_TWO_THIRD_HEIGHT = 36.25;
 const RESEARCH_CASE_WIDTH = 40.71;
 const RESEARCH_CASE_HEIGHT = 33.5;
 
+
+
+const SCIENCE_BY_EXPERIMENT_SPOT = {
+    0: 0,
+    1: 8,
+    2: 15,
+    3: 21,
+    4: 26,
+    5: 30,
+    6: 34,
+    7: 38,
+    8: 42,
+    9: 46,
+    10: 50,
+};
+
 class ResearchBoard {
     public moduleDecks: Deck<Module>[] = [];
     private missions: SlotStock<Mission>;
@@ -133,6 +149,16 @@ class ResearchBoard {
         return [-10 + left, 253 + top];
     }
 
+    private getScienceByResearchPoints(points: number) {        
+        let sciencePoints = 0;
+        Object.entries(SCIENCE_BY_EXPERIMENT_SPOT).forEach(([inc, minSpot]) => {
+            if (points >= minSpot) {
+                sciencePoints = Number(inc);
+            }
+        });
+        return sciencePoints;
+    }
+
     private moveResearch() {
         this.sciencePoints.forEach((points, playerId) => {
             const markerDiv = document.getElementById(`player-${playerId}-research-marker`);
@@ -152,6 +178,28 @@ class ResearchBoard {
     
             markerDiv.style.transform = `translateX(${left + leftShift}px) translateY(${top + topShift}px)`;
         });
+
+        const sortedPoints = Array.from(this.sciencePoints.entries()).sort((a, b) => a[1] - b[1]);
+        const uniquePoints = Array.from(new Set(sortedPoints.map(a => a[1])));
+        const number = uniquePoints.length;
+
+        let html = ``;
+        for (let i = 0; i < number; i++) {
+            html += `<div>${this.getScienceByResearchPoints(uniquePoints[i])}</div>`;
+        }
+        for (let i = 0; i < number; i++) {
+            html += `<div>`;
+            const players = sortedPoints.filter(entry => entry[1] == uniquePoints[i]);
+            players.forEach(([playerId, points]) => {
+                html += `<div class="marker" style="--color: #${this.game.getPlayer(playerId).color};"></div>`;
+            });
+            
+            html += `</div>`;
+        }
+
+        const elem = document.getElementById(`research-positions`);
+        elem.style.setProperty('--column-number', `${number}`);
+        elem.innerHTML = html;
     }
     
     public setResearchPoints(playerId: number, researchPoints: number) {

@@ -11,20 +11,25 @@ trait DebugUtilTrait {
             return;
         } 
 
-	    $this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 13 WHERE x = 0 AND y = 0");
+	    /*$this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 13 WHERE x = 0 AND y = 0");
 		$this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 15 WHERE x = -1 AND y = 0");
 		$this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 14 WHERE x = -1 AND y = 1");
 		$this->DbQuery("UPDATE astronaut SET `x` = -2, `y` = 1");
 
 		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 14 WHERE card_location ='table' AND card_location_arg = 7");
 		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 13 WHERE card_location ='table' AND card_location_arg = 1");
-		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 15 WHERE card_location ='table' AND card_location_arg = 2");
-        //$this->debugR(3);
+		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 15 WHERE card_location ='table' AND card_location_arg = 2");*/
+        $this->debugR(3);
         //$this->debugWorkforce();
 
-        //$this->debugNRemoveObstacles();
-       // $this->debugNewAstronauts(2343492);
-        //$this->debugNewAstronauts(2343493);
+        /*$this->debugRemoveObstacles();
+        $this->debugNewAstronauts(2343492);
+        $this->debugNewAstronauts(2343493);*/
+	    $this->DbQuery("UPDATE player SET `player_research_points` = 6 WHERE player_id = 2343492");
+	    $this->DbQuery("UPDATE player SET `player_research_points` = 9 WHERE player_id = 2343493");
+	    $this->DbQuery("UPDATE player SET `player_research_points` = 9 WHERE player_id = 2343494");
+	    $this->DbQuery("UPDATE player SET `player_research_points` = 30 WHERE player_id = 2343495");
+
     }
 
     function debugR($r) {
@@ -42,7 +47,7 @@ trait DebugUtilTrait {
 		$this->DbQuery("UPDATE module SET `card_location` = 'void' WHERE `card_location` = 'deck$year'");
     }
 
-    function debugNRemoveObstacles() {
+    function debugRemoveObstacles() {
         $this->DbQuery("DELETE FROM module WHERE `card_type` = 9");
     }
 

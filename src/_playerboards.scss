@@ -46,3 +46,28 @@
   }
 
 }
+
+#player_board_inner_research-positions {
+  display: flex;
+  justify-content: center;
+}
+
+#research-positions {
+  display: grid;
+  grid-template-columns: repeat(var(--column-number), 1fr);
+  align-items: center;
+  justify-items: center;
+  font-size: 16pt;
+  font-family: "conthrax-sb";
+  color: #653771;
+
+  .marker {
+    background-color: var(--color);
+    background-image: url('img/research.svg');
+    width: 35px;
+    height: 28px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: auto 65%;
+  }
+}

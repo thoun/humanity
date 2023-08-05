@@ -83,9 +83,9 @@ class Humanity implements HumanityGame {
         });
 
         this.tableCenter = new TableCenter(this, gamedatas);
-        this.researchBoard = new ResearchBoard(this, gamedatas);
         this.createPlayerPanels(gamedatas);
-        this.createPlayerTables(gamedatas);      
+        this.createPlayerTables(gamedatas);   
+        this.researchBoard = new ResearchBoard(this, gamedatas);   
 
         document.getElementById(`year`).insertAdjacentText('beforebegin', _('Year') + ' ');
         this.yearCounter = new ebg.counter();
@@ -458,6 +458,14 @@ class Humanity implements HumanityGame {
         this.setTooltipToClass('vp-counter', _('Victory points'));
         this.setTooltipToClass('science-counter', _('Science points'));
         this.setTooltipToClass('counter-warning', `${_('The counters display all possible resources.')}<br>${_('Some of your modules allow to choose between two types of resources, so when you will activate them, <strong>it will lower the counter for both resources</strong>!')}`);
+
+        document.getElementById(`player_boards`).insertAdjacentHTML('beforeend', `
+        <div id="overall_player_board_0" class="player-board current-player-board">					
+            <div class="player_board_inner" id="player_board_inner_research-positions">
+                <div id="research-positions"></div>
+            </div>
+        </div>`);
+        this.setTooltip('player_board_inner_research-positions', _('Player order in research track, and associated Science points'));
     }
 
     private updateIcons(playerId: number, icons: Icons) {
@@ -1103,7 +1111,7 @@ class Humanity implements HumanityGame {
     }   
 
     notif_newTableExperiments(args: NotifNewTableExperimentArgs) {
-        this.tableCenter.newExperiments(args.tableExperiments);
+        this.tableCenter.newExperiments(args.tableExperiments, false);
     }   
 
     notif_reactivateAstronauts(args: NotifReactivateAstronautsArgs) {
@@ -1138,7 +1146,7 @@ class Humanity implements HumanityGame {
         (this as any).instantaneousMode = true;
 
         this.tableCenter.resetModules(undo.tableModules);
-        this.tableCenter.newExperiments(undo.tableExperiments);
+        this.tableCenter.newExperiments(undo.tableExperiments, true);
         this.researchBoard.resetMissions(undo.allMissions.filter(mission => mission.location == 'table'));
 
         this.playersTables.forEach(playerTable => playerTable.resetMissions(undo.allMissions.filter(mission => mission.location == 'player' && mission.locationArg == playerTable.playerId)));

@@ -2315,16 +2315,18 @@ var TableCenter = /** @class */ (function () {
         document.getElementById('board-2').style.setProperty('--r', "".concat(arm));
         this.arm = arm;
     };
-    TableCenter.prototype.newExperiments = function (tableExperiments) {
+    TableCenter.prototype.newExperiments = function (tableExperiments, instant) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         this.experiments.removeAll();
+                        if (!!instant) return [3 /*break*/, 2];
                         return [4 /*yield*/, sleep(500)];
                     case 1:
                         _a.sent();
-                        return [2 /*return*/, this.experiments.addCards(tableExperiments, undefined, undefined, 250)];
+                        _a.label = 2;
+                    case 2: return [2 /*return*/, this.experiments.addCards(tableExperiments, undefined, undefined, instant ? false : 250)];
                 }
             });
         });
@@ -2345,6 +2347,19 @@ var POINT_CASE_HALF_WIDTH = 20.82;
 var POINT_CASE_TWO_THIRD_HEIGHT = 36.25;
 var RESEARCH_CASE_WIDTH = 40.71;
 var RESEARCH_CASE_HEIGHT = 33.5;
+var SCIENCE_BY_EXPERIMENT_SPOT = {
+    0: 0,
+    1: 8,
+    2: 15,
+    3: 21,
+    4: 26,
+    5: 30,
+    6: 34,
+    7: 38,
+    8: 42,
+    9: 46,
+    10: 50,
+};
 var ResearchBoard = /** @class */ (function () {
     function ResearchBoard(game, gamedatas) {
         var _this = this;
@@ -2468,6 +2483,16 @@ var ResearchBoard = /** @class */ (function () {
         }
         return [-10 + left, 253 + top];
     };
+    ResearchBoard.prototype.getScienceByResearchPoints = function (points) {
+        var sciencePoints = 0;
+        Object.entries(SCIENCE_BY_EXPERIMENT_SPOT).forEach(function (_a) {
+            var inc = _a[0], minSpot = _a[1];
+            if (points >= minSpot) {
+                sciencePoints = Number(inc);
+            }
+        });
+        return sciencePoints;
+    };
     ResearchBoard.prototype.moveResearch = function () {
         var _this = this;
         this.sciencePoints.forEach(function (points, playerId) {
@@ -2485,6 +2510,28 @@ var ResearchBoard = /** @class */ (function () {
             });
             markerDiv.style.transform = "translateX(".concat(left + leftShift, "px) translateY(").concat(top + topShift, "px)");
         });
+        var sortedPoints = Array.from(this.sciencePoints.entries()).sort(function (a, b) { return a[1] - b[1]; });
+        var uniquePoints = Array.from(new Set(sortedPoints.map(function (a) { return a[1]; })));
+        var number = uniquePoints.length;
+        var html = "";
+        for (var i = 0; i < number; i++) {
+            html += "<div>".concat(this.getScienceByResearchPoints(uniquePoints[i]), "</div>");
+        }
+        var _loop_3 = function (i) {
+            html += "<div>";
+            var players = sortedPoints.filter(function (entry) { return entry[1] == uniquePoints[i]; });
+            players.forEach(function (_a) {
+                var playerId = _a[0], points = _a[1];
+                html += "<div class=\"marker\" style=\"--color: #".concat(_this.game.getPlayer(playerId).color, ";\"></div>");
+            });
+            html += "</div>";
+        };
+        for (var i = 0; i < number; i++) {
+            _loop_3(i);
+        }
+        var elem = document.getElementById("research-positions");
+        elem.style.setProperty('--column-number', "".concat(number));
+        elem.innerHTML = html;
     };
     ResearchBoard.prototype.setResearchPoints = function (playerId, researchPoints) {
         this.sciencePoints.set(playerId, researchPoints);
@@ -2830,9 +2877,9 @@ var Humanity = /** @class */ (function () {
             defaultFolded: false,
         });
         this.tableCenter = new TableCenter(this, gamedatas);
-        this.researchBoard = new ResearchBoard(this, gamedatas);
         this.createPlayerPanels(gamedatas);
         this.createPlayerTables(gamedatas);
+        this.researchBoard = new ResearchBoard(this, gamedatas);
         document.getElementById("year").insertAdjacentText('beforebegin', _('Year') + ' ');
         this.yearCounter = new ebg.counter();
         this.yearCounter.create("year");
@@ -3134,6 +3181,8 @@ var Humanity = /** @class */ (function () {
         this.setTooltipToClass('vp-counter', _('Victory points'));
         this.setTooltipToClass('science-counter', _('Science points'));
         this.setTooltipToClass('counter-warning', "".concat(_('The counters display all possible resources.'), "<br>").concat(_('Some of your modules allow to choose between two types of resources, so when you will activate them, <strong>it will lower the counter for both resources</strong>!')));
+        document.getElementById("player_boards").insertAdjacentHTML('beforeend', "\n        <div id=\"overall_player_board_0\" class=\"player-board current-player-board\">\t\t\t\t\t\n            <div class=\"player_board_inner\" id=\"player_board_inner_research-positions\">\n                <div id=\"research-positions\"></div>\n            </div>\n        </div>");
+        this.setTooltip('player_board_inner_research-positions', _('Player order in research track, and associated Science points'));
     };
     Humanity.prototype.updateIcons = function (playerId, icons) {
         var _this = this;
@@ -3473,7 +3522,7 @@ var Humanity = /** @class */ (function () {
         this.tableCenter.moveArm(args.arm);
     };
     Humanity.prototype.notif_newTableExperiments = function (args) {
-        this.tableCenter.newExperiments(args.tableExperiments);
+        this.tableCenter.newExperiments(args.tableExperiments, false);
     };
     Humanity.prototype.notif_reactivateAstronauts = function (args) {
         if (args.playerId) {
@@ -3503,7 +3552,7 @@ var Humanity = /** @class */ (function () {
         var originalInstantaneousMode = this.instantaneousMode;
         this.instantaneousMode = true;
         this.tableCenter.resetModules(undo.tableModules);
-        this.tableCenter.newExperiments(undo.tableExperiments);
+        this.tableCenter.newExperiments(undo.tableExperiments, true);
         this.researchBoard.resetMissions(undo.allMissions.filter(function (mission) { return mission.location == 'table'; }));
         this.playersTables.forEach(function (playerTable) { return playerTable.resetMissions(undo.allMissions.filter(function (mission) { return mission.location == 'player' && mission.locationArg == playerTable.playerId; })); });
         var playerTable = this.getPlayerTable(playerId);
