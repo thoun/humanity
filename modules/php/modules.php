@@ -252,8 +252,8 @@ trait ModuleTrait {
         ];
     }
 
-    function getRecursiveAdjacentGreenhouses(array $modules, /*Module|Astronaut*/ $from, array $alreadyCounted) {
-        $adjacentModules = $this->getAdjacentModules($modules, $from, false);
+    function getRecursiveAdjacentModules(array $modules, /*Module|Astronaut*/ $from, array $alreadyCounted, $diagonal) {
+        $adjacentModules = $this->getAdjacentModules($modules, $from, $diagonal);
         $adjacentsToCall = [];
         foreach ($adjacentModules as $adjacentModule) {
             if (!$this->array_some($alreadyCounted, fn($countedModule) => $countedModule->id == $adjacentModule->id)) {
@@ -264,8 +264,10 @@ trait ModuleTrait {
         if (count($adjacentsToCall) == 0) {
             return $alreadyCounted;
         } else {
-            $adjacentsResults = array_map(fn($adjacentToCall) => $this->getRecursiveAdjacentGreenhouses($modules, $adjacentToCall, array_merge([$adjacentToCall], $alreadyCounted)), $adjacentsToCall);
-            return array_merge($alreadyCounted, ...$adjacentsResults);
+            $adjacentsResults = array_map(fn($adjacentToCall) => $this->getRecursiveAdjacentModules($modules, $adjacentToCall, array_merge([$adjacentToCall], $alreadyCounted), $diagonal), $adjacentsToCall);
+            $result = array_merge($alreadyCounted, ...$adjacentsResults);
+            $result = array_intersect_key($result, array_unique(array_column($result, 'id')));
+            return $result;
         }
     }
 
@@ -274,8 +276,7 @@ trait ModuleTrait {
         $playerModules = array_values(array_filter($playerModulesAndObstacles, fn($t) => $t->type != 9));
         $greenModules = array_values(array_filter($playerModules, fn($t) => $t->color == GREEN));
 
-        $greenhousesSet = $this->getRecursiveAdjacentGreenhouses($greenModules, $from, [$module]);
-        $greenhousesSet = array_intersect_key($greenhousesSet, array_unique(array_column($greenhousesSet, 'id')));
+        $greenhousesSet = $this->getRecursiveAdjacentModules($greenModules, $from, [$module], false);
         return $greenhousesSet;
     }
 

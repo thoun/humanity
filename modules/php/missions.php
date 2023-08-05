@@ -77,8 +77,14 @@ trait MissionTrait {
         $modulesOfColor = array_values(array_filter($modules, fn($module) => $module->color == $color));
 
         if ($adjacent) {
-            $maxes = array_map(fn($fromModule) => $this->getAdjacentModulesCount($modulesOfColor, $fromModule, $diagonal, [$fromModule]), $modulesOfColor);
-            return count($maxes) > 0 ? max($maxes) : 0;
+            $max = 0;
+            foreach ($modulesOfColor as $fromModule) {
+                $count = count($this->getRecursiveAdjacentModules($modulesOfColor, $fromModule, [$fromModule], $diagonal));
+                if ($count > $max) {
+                    $max = $count;
+                }
+            }
+            return $max;
         } else {
             return count($modulesOfColor);
         }
@@ -178,8 +184,8 @@ trait MissionTrait {
         $this->incStat(3, 'vpWithMissions', $playerId);
 
         $message = $fromPlayerId === null ?
-            clienttranslate('${player_name} gains an mission card and 1 science point ${mission_image}') :
-            clienttranslate('${player_name} gains an mission card previously owned by ${player_name2} ${mission_image}');
+            clienttranslate('${player_name} gains a mission card and 1 science point ${mission_image}') :
+            clienttranslate('${player_name} gains a mission card previously owned by ${player_name2} ${mission_image}');
 
         self::notifyAllPlayers('gainMission', $message, [
             'playerId' => $playerId,
