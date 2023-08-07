@@ -598,6 +598,7 @@ body > .card {
 .module .card-sides .card-side {
   background-size: auto 100%;
   box-shadow: none;
+  overflow: unset;
 }
 .module .card-sides .card-side > * {
   pointer-events: none;
@@ -838,6 +839,7 @@ body > .card {
 .card.experiment .card-sides .card-side {
   box-shadow: none;
   background-size: 1000% 100%;
+  overflow: unset;
 }
 .card.experiment .card-sides .card-side[data-number="1"] {
   background-position-x: 11.1111111111%;
@@ -1005,6 +1007,7 @@ body > .card {
 }
 .card.mission .card-sides .card-side {
   box-shadow: none;
+  overflow: unset;
 }
 .card.mission .card-sides .card-side > * {
   pointer-events: none;

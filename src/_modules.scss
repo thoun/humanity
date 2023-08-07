@@ -15,6 +15,7 @@
         .card-side {
             background-size: auto 100%;
             box-shadow: none;
+            overflow: unset;
 
             &>* {
                 pointer-events: none;

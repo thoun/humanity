@@ -13,6 +13,7 @@
     .card-sides {
         .card-side {
             box-shadow: none;
+            overflow: unset;
 
             &>* {
                 pointer-events: none;
