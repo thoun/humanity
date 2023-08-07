@@ -3060,6 +3060,7 @@ var Humanity = /** @class */ (function () {
     //
     Humanity.prototype.onUpdateActionButtons = function (stateName, args) {
         var _this = this;
+        var _a;
         if (this.isCurrentPlayerActive()) {
             switch (stateName) {
                 case 'activateModule':
@@ -3077,6 +3078,11 @@ var Humanity = /** @class */ (function () {
                 case 'confirmTurn':
                     this.addActionButton("confirmTurn_button", _("Confirm turn"), function () { return _this.confirmTurn(); });
                     break;
+                case 'moveAstronaut':
+                    if (args.canRestart) {
+                        this.addActionButton("restartMoveAstronauts_button", _("Restart"), function () { return _this.restartMoveAstronauts(); }, null, null, 'red');
+                    }
+                    break;
                 case 'confirmMoveAstronauts':
                     this.addActionButton("confirmMoveAstronauts_button", _("Confirm"), function () { return _this.confirmMoveAstronauts(); });
                     this.addActionButton("restartMoveAstronauts_button", _("Restart"), function () { return _this.restartMoveAstronauts(); }, null, null, 'red');
@@ -3087,7 +3093,7 @@ var Humanity = /** @class */ (function () {
             }
         }
         else {
-            if (stateName == 'moveAstronauts' && args.activePlayersIds.includes(this.getPlayerId())) { // only players that were active
+            if (stateName == 'moveAstronauts' && ((_a = args.activePlayersIds) === null || _a === void 0 ? void 0 : _a.includes(this.getPlayerId()))) { // only players that were active
                 this.addActionButton("cancelConfirmAstronaut-button", _("I changed my mind"), function () { return _this.cancelConfirmAstronaut(); }, null, null, 'gray');
             }
         }

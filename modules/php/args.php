@@ -127,6 +127,7 @@ trait ArgsTrait {
             'playerMovedAstronauts' => $playerMovedAstronauts,
             'astronaut' => $astronaut,
             'possibleCoordinates' => $possibleCoordinates,
+            'canRestart' => count($alreadyMovedAstronauts) > 0,
         ];
     }
 

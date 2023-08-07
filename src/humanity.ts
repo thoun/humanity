@@ -307,6 +307,11 @@ class Humanity implements HumanityGame {
                 case 'confirmTurn':
                     (this as any).addActionButton(`confirmTurn_button`, _("Confirm turn"), () => this.confirmTurn());
                     break;
+                case 'moveAstronaut':
+                    if (args.canRestart) {
+                        (this as any).addActionButton(`restartMoveAstronauts_button`, _("Restart"), () => this.restartMoveAstronauts(), null, null, 'red');
+                    }
+                    break;
                 case 'confirmMoveAstronauts':
                     (this as any).addActionButton(`confirmMoveAstronauts_button`, _("Confirm"), () => this.confirmMoveAstronauts());
                     (this as any).addActionButton(`restartMoveAstronauts_button`, _("Restart"), () => this.restartMoveAstronauts(), null, null, 'red');
@@ -318,7 +323,7 @@ class Humanity implements HumanityGame {
                 (this as any).addActionButton(`restartTurn_button`, _("Restart turn"), () => this.restartTurn(), null, null, 'red');
             }
         } else {
-            if (stateName == 'moveAstronauts' && args.activePlayersIds.includes(this.getPlayerId())) { // only players that were active
+            if (stateName == 'moveAstronauts' && args.activePlayersIds?.includes(this.getPlayerId())) { // only players that were active
                 (this as any).addActionButton(`cancelConfirmAstronaut-button`, _("I changed my mind"), () => this.cancelConfirmAstronaut(), null, null, 'gray');
             }
         }
