@@ -3087,7 +3087,7 @@ var Humanity = /** @class */ (function () {
             }
         }
         else {
-            if (stateName == 'moveAstronauts' && Object.keys(this.gamedatas.players).includes('' + this.getPlayerId())) { // ignore spectators
+            if (stateName == 'moveAstronauts' && args.activePlayersIds.includes(this.getPlayerId())) { // only players that were active
                 this.addActionButton("cancelConfirmAstronaut-button", _("I changed my mind"), function () { return _this.cancelConfirmAstronaut(); }, null, null, 'gray');
             }
         }

@@ -129,4 +129,13 @@ trait ArgsTrait {
             'possibleCoordinates' => $possibleCoordinates,
         ];
     }
+
+    function argMoveAstronauts() {
+        $movedAstronauts = $this->getGlobalVariable(MOVED_ASTRONAUTS);
+        $activePlayersIds = array_values(array_unique(array_map(fn($astronaut) => $astronaut->playerId, $movedAstronauts)));
+
+        return [
+            'activePlayersIds' => $activePlayersIds,
+        ];
+    }
 } 

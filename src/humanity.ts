@@ -318,7 +318,7 @@ class Humanity implements HumanityGame {
                 (this as any).addActionButton(`restartTurn_button`, _("Restart turn"), () => this.restartTurn(), null, null, 'red');
             }
         } else {
-            if (stateName == 'moveAstronauts' && Object.keys(this.gamedatas.players).includes(''+this.getPlayerId())) { // ignore spectators
+            if (stateName == 'moveAstronauts' && args.activePlayersIds.includes(this.getPlayerId())) { // only players that were active
                 (this as any).addActionButton(`cancelConfirmAstronaut-button`, _("I changed my mind"), () => this.cancelConfirmAstronaut(), null, null, 'gray');
             }
         }

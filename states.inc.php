@@ -185,6 +185,7 @@ $playerActionsGameStates = [
         "descriptionmyturn" => '',
         "type" => "multipleactiveplayer",
         "action" => "stMoveAstronauts",
+        "args" => "argMoveAstronauts",
         "initialprivate" => ST_PRIVATE_MOVE_ASTRONAUT,
         "possibleactions" => [ ],
         "transitions" => [
