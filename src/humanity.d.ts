@@ -161,7 +161,7 @@ interface EnteringActivateModuleArgs extends EnteringAstronautArgs {
 interface EnteringMoveAstronautArgs extends EnteringAstronautArgs {
     astronaut: Astronaut;
     possibleCoordinates: number[][];
-    canRestart: boolean;
+    canUndo: boolean;
 }
 
 interface NotifFirstPlayerTokenArgs {

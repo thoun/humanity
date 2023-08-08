@@ -408,33 +408,33 @@ trait ActionTrait {
 
         $this->gamestate->setPlayersMultiactive([$playerId], 'next', false);
         $this->gamestate->setPrivateState($playerId, ST_PRIVATE_CONFIRM_MOVE_ASTRONAUTS);
+
+        $this->undoMoveAstronaut();
     }
 
-    public function restartMoveAstronauts() {
-        self::checkAction('restartMoveAstronauts');
+    public function undoMoveAstronaut() {
+        self::checkAction('undoMoveAstronaut');
 
         $playerId = intval($this->getCurrentPlayerId());
 
         $movedAstronauts = $this->getGlobalVariable(MOVED_ASTRONAUTS);
         $playerMovedAstronauts = array_values(array_filter($movedAstronauts, fn($astronaut) => $astronaut->playerId == $playerId));
+        $lastMovedAstronaut = $this->array_find_last($playerMovedAstronauts, fn($astronaut) => $astronaut->x !== null);
 
-        foreach ($playerMovedAstronauts as $astronaut) {
-            if ($astronaut->x !== null) {
-                $movedAstronaut = $this->array_find($movedAstronauts, fn($w) => ((object)$w)->id == ((object)$astronaut)->id);
-                $movedAstronaut->x = null;
-                $movedAstronaut->y = null;
+        if ($lastMovedAstronaut !== null) {
+            $lastMovedAstronaut->x = null;
+            $lastMovedAstronaut->y = null;
 
-                self::notifyPlayer($playerId, 'moveAstronaut', '', [
-                    'playerId' => $playerId,
-                    'player_name' => $this->getPlayerName($playerId),
-                    'astronaut' => $movedAstronaut,
-                    'toConfirm' => false,
-                ]);
-            }
+            self::notifyPlayer($playerId, 'moveAstronaut', '', [
+                'playerId' => $playerId,
+                'player_name' => $this->getPlayerName($playerId),
+                'astronaut' => $lastMovedAstronaut,
+                'toConfirm' => false,
+            ]);
         }
         $this->setGlobalVariable(MOVED_ASTRONAUTS, $movedAstronauts);
 
-        $this->gamestate->nextPrivateState($playerId, 'restart');
+        $this->gamestate->nextPrivateState($playerId, 'undo');
     }
 
     private function restoreStats(int $playerId, array $stats) {

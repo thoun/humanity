@@ -308,13 +308,13 @@ class Humanity implements HumanityGame {
                     (this as any).addActionButton(`confirmTurn_button`, _("Confirm turn"), () => this.confirmTurn());
                     break;
                 case 'moveAstronaut':
-                    if (args.canRestart) {
-                        (this as any).addActionButton(`restartMoveAstronauts_button`, _("Restart"), () => this.restartMoveAstronauts(), null, null, 'red');
+                    if (args.canUndo) {
+                        (this as any).addActionButton(`undoMoveAstronaut_button`, _("Undo last move"), () => this.undoMoveAstronaut(), null, null, 'red');
                     }
                     break;
                 case 'confirmMoveAstronauts':
                     (this as any).addActionButton(`confirmMoveAstronauts_button`, _("Confirm"), () => this.confirmMoveAstronauts());
-                    (this as any).addActionButton(`restartMoveAstronauts_button`, _("Restart"), () => this.restartMoveAstronauts(), null, null, 'red');
+                    (this as any).addActionButton(`undoMoveAstronaut_button`, _("Undo last move"), () => this.undoMoveAstronaut(), null, null, 'red');
                     break;
             }
 
@@ -324,7 +324,7 @@ class Humanity implements HumanityGame {
             }
         } else {
             if (stateName == 'moveAstronauts' && args.activePlayersIds?.includes(this.getPlayerId())) { // only players that were active
-                (this as any).addActionButton(`cancelConfirmAstronaut-button`, _("I changed my mind"), () => this.cancelConfirmAstronaut(), null, null, 'gray');
+                (this as any).addActionButton(`cancelConfirmAstronaut-button`, _("Undo last move"), () => this.cancelConfirmAstronaut(), null, null, 'gray');
             }
         }
     }
@@ -930,12 +930,12 @@ class Humanity implements HumanityGame {
         this.takeAction('cancelConfirmAstronaut');
     }
   	
-    public restartMoveAstronauts() {
-        if(!(this as any).checkAction('restartMoveAstronauts')) {
+    public undoMoveAstronaut() {
+        if(!(this as any).checkAction('undoMoveAstronaut')) {
             return;
         }
 
-        this.takeAction('restartMoveAstronauts');
+        this.takeAction('undoMoveAstronaut');
     }
 
     public takeAction(action: string, data?: any) {

@@ -153,10 +153,10 @@
         self::ajaxResponse();
     }
 
-    public function restartMoveAstronauts() {
+    public function undoMoveAstronaut() {
         self::setAjaxMode();     
 
-        $this->game->restartMoveAstronauts();
+        $this->game->undoMoveAstronaut();
 
         self::ajaxResponse();
     }

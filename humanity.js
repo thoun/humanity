@@ -3079,13 +3079,13 @@ var Humanity = /** @class */ (function () {
                     this.addActionButton("confirmTurn_button", _("Confirm turn"), function () { return _this.confirmTurn(); });
                     break;
                 case 'moveAstronaut':
-                    if (args.canRestart) {
-                        this.addActionButton("restartMoveAstronauts_button", _("Restart"), function () { return _this.restartMoveAstronauts(); }, null, null, 'red');
+                    if (args.canUndo) {
+                        this.addActionButton("undoMoveAstronaut_button", _("Undo last move"), function () { return _this.undoMoveAstronaut(); }, null, null, 'red');
                     }
                     break;
                 case 'confirmMoveAstronauts':
                     this.addActionButton("confirmMoveAstronauts_button", _("Confirm"), function () { return _this.confirmMoveAstronauts(); });
-                    this.addActionButton("restartMoveAstronauts_button", _("Restart"), function () { return _this.restartMoveAstronauts(); }, null, null, 'red');
+                    this.addActionButton("undoMoveAstronaut_button", _("Undo last move"), function () { return _this.undoMoveAstronaut(); }, null, null, 'red');
                     break;
             }
             if (['chooseCommunicationColor', 'pay', 'chooseAction', 'upgradeAstronaut', 'activateModule', 'confirmTurn'].includes(stateName)) {
@@ -3094,7 +3094,7 @@ var Humanity = /** @class */ (function () {
         }
         else {
             if (stateName == 'moveAstronauts' && ((_a = args.activePlayersIds) === null || _a === void 0 ? void 0 : _a.includes(this.getPlayerId()))) { // only players that were active
-                this.addActionButton("cancelConfirmAstronaut-button", _("I changed my mind"), function () { return _this.cancelConfirmAstronaut(); }, null, null, 'gray');
+                this.addActionButton("cancelConfirmAstronaut-button", _("Undo last move"), function () { return _this.cancelConfirmAstronaut(); }, null, null, 'gray');
             }
         }
     };
@@ -3374,11 +3374,11 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.cancelConfirmAstronaut = function () {
         this.takeAction('cancelConfirmAstronaut');
     };
-    Humanity.prototype.restartMoveAstronauts = function () {
-        if (!this.checkAction('restartMoveAstronauts')) {
+    Humanity.prototype.undoMoveAstronaut = function () {
+        if (!this.checkAction('undoMoveAstronaut')) {
             return;
         }
-        this.takeAction('restartMoveAstronauts');
+        this.takeAction('undoMoveAstronaut');
     };
     Humanity.prototype.takeAction = function (action, data) {
         data = data || {};

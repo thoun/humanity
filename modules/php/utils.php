@@ -15,6 +15,16 @@ trait UtilTrait {
         return null;
     }
 
+    function array_find_last(array $array, callable $fn) {
+        $result = null;
+        foreach ($array as $value) {
+            if($fn($value)) {
+                $result = $value;
+            }
+        }
+        return $result;
+    }
+
     function array_findIndex(array $array, callable $fn) {
         $index = 0;
         foreach ($array as $value) {

@@ -198,11 +198,11 @@ $playerActionsGameStates = [
         "descriptionmyturn" => clienttranslate('${you} must choose a place for moved astronaut'),
         "type" => "private",
         "args" => "argMoveAstronaut",
-        "possibleactions" => [ "moveAstronaut", "restartMoveAstronauts" ],
+        "possibleactions" => [ "moveAstronaut", "undoMoveAstronaut" ],
         "transitions" => [
             'stay' => ST_PRIVATE_MOVE_ASTRONAUT,
             'next' => ST_PRIVATE_CONFIRM_MOVE_ASTRONAUTS,
-            'restart' => ST_PRIVATE_MOVE_ASTRONAUT,
+            'undo' => ST_PRIVATE_MOVE_ASTRONAUT,
         ],
     ],
 
@@ -210,9 +210,9 @@ $playerActionsGameStates = [
         "name" => "confirmMoveAstronauts",
         "descriptionmyturn" => clienttranslate('${you} must confirm moved astronauts'),
         "type" => "private",
-        "possibleactions" => [ "confirmMoveAstronauts", "restartMoveAstronauts" ],
+        "possibleactions" => [ "confirmMoveAstronauts", "undoMoveAstronaut" ],
         "transitions" => [
-            'restart' => ST_PRIVATE_MOVE_ASTRONAUT,
+            'undo' => ST_PRIVATE_MOVE_ASTRONAUT,
         ],
     ],
 ];
