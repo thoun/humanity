@@ -3599,7 +3599,7 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.getPower = function (power, timeUnits) {
         switch (power) {
             case 1: return _("All Astronauts in the player’s Base are immediately reactivated: They are turned around to face the player and can be used again to perform an action starting <strong>from their next turn</strong>. If the player has no Astronauts to reactivate, the effect is lost.");
-            case 2: return _("The player <strong>immediately</strong> gains ${number} Time unit(s): <strong>All their Astronauts</strong> around the main board are moved ${number} hangar(s) counterclockwise (including the one who just carried out this Experiment). Astronauts cannot be moved beyond the articulated arm.").replace('${number}', timeUnits);
+            case 2: return _("The player <strong>immediately</strong> gains ${number} Time unit(s): <strong>All their Astronauts</strong> around the main board are moved ${number} hangar(s) counterclockwise (including the one who just carried out this Experiment). Astronauts cannot be moved beyond the articulated arm.").replace(/\$\{number\}/g, timeUnits);
         }
     };
     Humanity.prototype.getSide = function (side) {

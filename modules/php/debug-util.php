@@ -19,16 +19,17 @@ trait DebugUtilTrait {
 		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 14 WHERE card_location ='table' AND card_location_arg = 7");
 		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 13 WHERE card_location ='table' AND card_location_arg = 1");
 		$this->DbQuery("UPDATE module SET `card_type` = 2, `card_type_arg` = 15 WHERE card_location ='table' AND card_location_arg = 2");*/
-        $this->debugR(3);
+        //$this->debugR(3);
         //$this->debugWorkforce();
 
         /*$this->debugRemoveObstacles();
         $this->debugNewAstronauts(2343492);
         $this->debugNewAstronauts(2343493);*/
-	    $this->DbQuery("UPDATE player SET `player_research_points` = 6 WHERE player_id = 2343492");
+		//$this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 3 WHERE x = -1 AND y = 1");
+	    /*$this->DbQuery("UPDATE player SET `player_research_points` = 6 WHERE player_id = 2343492");
 	    $this->DbQuery("UPDATE player SET `player_research_points` = 9 WHERE player_id = 2343493");
 	    $this->DbQuery("UPDATE player SET `player_research_points` = 9 WHERE player_id = 2343494");
-	    $this->DbQuery("UPDATE player SET `player_research_points` = 30 WHERE player_id = 2343495");
+	    $this->DbQuery("UPDATE player SET `player_research_points` = 30 WHERE player_id = 2343495");*/
 
     }
 

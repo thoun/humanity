@@ -64,7 +64,7 @@ trait AstronautTrait {
                 $distanceWithArm += 8;
             }
             if ($distanceWithArm != 0) {
-                $moved = min($amount, $distanceWithArm - 1);
+                $moved = min($amount, $distanceWithArm);
                 $astronaut->spot -= $moved;
                 while ($astronaut->spot < 0) {
                     $astronaut->spot += 8;
