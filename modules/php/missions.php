@@ -73,7 +73,8 @@ trait MissionTrait {
     }
 
     function countModulesOfColor(int $playerId, int $color, bool $adjacent, bool $diagonal) {
-        $modules = $this->getModulesByLocation('player', $playerId);
+        $modulesAndObstacles = $this->getModulesByLocation('player', $playerId);
+        $modules = array_values(array_filter($modulesAndObstacles, fn($t) => $t->type != 9));
         $modulesOfColor = array_values(array_filter($modules, fn($module) => $module->color == $color));
 
         if ($adjacent) {
@@ -106,7 +107,8 @@ trait MissionTrait {
     }
 
     function getMaxModulesInDirection(int $playerId, int $direction, bool $sameColor) {
-        $modules = $this->getModulesByLocation('player', $playerId);
+        $modulesAndObstacles = $this->getModulesByLocation('player', $playerId);
+        $modules = array_values(array_filter($modulesAndObstacles, fn($t) => $t->type != 9));
 
         if ($direction == HORIZONTAL) {
             return max(array_map(fn($fromModule) => $this->getMaxModulesInDirectionFromModule($modules, $fromModule, 1, 0, $sameColor), $modules));
