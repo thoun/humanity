@@ -413,17 +413,24 @@ class Humanity implements HumanityGame {
                 <div id="type-${type}-counter-wrapper-${player.id}">
                     <div class="resource-icon" data-type="${type}"></div>
                     <span id="type-${type}-counter-${player.id}"></span>
+                    <i id="counter-warning-${player.id}-${type}" data-warning="false" class="counter-warning-type counter-warning-tooltip fa fa-exclamation-triangle" aria-hidden="true"></i>
                 </div>
             `).join('');
             html += `</div>
             <div class="icons counters">`;            
             html += ICONS_COUNTERS_TYPES.map(type => `
                 <div id="type-${type + 10}-counter-wrapper-${player.id}">
-                ${type == 0 ? `<i id="counter-warning-${player.id}" class="counter-warning fa fa-exclamation-triangle" aria-hidden="true" data-warning="${player.icons[-1]}"></i>` : `<div class="resource-icon" data-type="${type + 10}"></div>
-                    <span id="type-${type + 10}-counter-${player.id}"></span>`}
+                    ${type == 0 ? '' : `
+                    <div class="resource-icon" data-type="${type + 10}"></div>
+                    <span id="type-${type + 10}-counter-${player.id}"></span>
+                    <i id="counter-warning-${player.id}-${type + 10}" data-warning="false" class="counter-warning-type counter-warning-tooltip fa fa-exclamation-triangle" aria-hidden="true"></i>`}
                 </div>
             `).join('');
-            html += `</div>`;
+            html += `</div>
+            <div id="counter-warning-${player.id}" class="counter-warning counter-warning-tooltip" data-warning="false">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                ${_('The counters display all possible resources.')} ${_('Some of your modules allow to choose between two types of resources, so when you will activate them, <strong>it will lower the counter for both resources</strong>!')}
+            </div>`;
 
             dojo.place(html, `player_board_${player.id}`);
 
@@ -451,6 +458,7 @@ class Humanity implements HumanityGame {
                     this.setTooltip(`type-${type + 10}-counter-wrapper-${player.id}`, this.getResourceTooltip(type + 10));
                 }
             });
+            this.updateIcons(playerId, player.icons); // to update warning icons
 
             // first player token
             dojo.place(`<div id="player_board_${player.id}_firstPlayerWrapper" class="firstPlayerWrapper"></div>`, `player_board_${player.id}`);
@@ -462,7 +470,6 @@ class Humanity implements HumanityGame {
 
         this.setTooltipToClass('vp-counter', _('Victory points'));
         this.setTooltipToClass('science-counter', _('Science points'));
-        this.setTooltipToClass('counter-warning', `${_('The counters display all possible resources.')}<br>${_('Some of your modules allow to choose between two types of resources, so when you will activate them, <strong>it will lower the counter for both resources</strong>!')}`);
 
         document.getElementById(`player_boards`).insertAdjacentHTML('beforeend', `
         <div id="overall_player_board_0" class="player-board current-player-board">					
@@ -482,7 +489,9 @@ class Humanity implements HumanityGame {
             }
         });
 
-        document.getElementById(`counter-warning-${playerId}`).dataset.warning = `${icons[-1]}`;
+        const warnings = icons[-1] as any as number[];
+        document.getElementById(`counter-warning-${playerId}`).dataset.warning = String(warnings.length > 0);
+        [1, 2, 3, 11, 12, 13].forEach(type => document.getElementById(`counter-warning-${playerId}-${type}`).dataset.warning = String(warnings.includes(type)));
     }
 
     private createPlayerTables(gamedatas: HumanityGamedatas) {

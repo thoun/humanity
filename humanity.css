@@ -1348,11 +1348,24 @@ body > .card {
 .player-board .counters.with-tokens .science-counter {
   color: #653771;
 }
-.player-board .counter-warning {
+.player-board .counter-warning-type {
   color: orange;
-  font-size: 150%;
+  font-size: 100%;
+  margin-left: -3px;
 }
-.player-board .counter-warning[data-warning="0"] {
+.player-board .counter-warning-type[data-warning=false] {
+  display: none;
+}
+.player-board .counter-warning {
+  font-size: 75%;
+}
+.player-board .counter-warning i {
+  color: orange;
+  font-size: 175%;
+  float: left;
+  margin: 3px;
+}
+.player-board .counter-warning[data-warning=false] {
   display: none;
 }
 

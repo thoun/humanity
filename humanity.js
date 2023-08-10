@@ -3152,10 +3152,10 @@ var Humanity = /** @class */ (function () {
         Object.values(gamedatas.players).forEach(function (player) {
             var playerId = Number(player.id);
             var html = "<div class=\"counters with-tokens\">            \n                <div id=\"vp-counter-wrapper-".concat(player.id, "\" class=\"vp-counter\">\n                    <div class=\"vp icon\"></div>\n                    <span id=\"vp-counter-").concat(player.id, "\"></span>\n                </div>\n                <div id=\"science-counter-wrapper-").concat(player.id, "\" class=\"science-counter\">\n                    <div class=\"science icon\"></div>\n                    <span id=\"science-counter-").concat(player.id, "\">?</span>\n                </div>\n            </div>\n            \n            <div class=\"icons counters\">");
-            html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type, "-counter-wrapper-").concat(player.id, "\">\n                    <div class=\"resource-icon\" data-type=\"").concat(type, "\"></div>\n                    <span id=\"type-").concat(type, "-counter-").concat(player.id, "\"></span>\n                </div>\n            "); }).join('');
+            html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type, "-counter-wrapper-").concat(player.id, "\">\n                    <div class=\"resource-icon\" data-type=\"").concat(type, "\"></div>\n                    <span id=\"type-").concat(type, "-counter-").concat(player.id, "\"></span>\n                    <i id=\"counter-warning-").concat(player.id, "-").concat(type, "\" data-warning=\"false\" class=\"counter-warning-type counter-warning-tooltip fa fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n                </div>\n            "); }).join('');
             html += "</div>\n            <div class=\"icons counters\">";
-            html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type + 10, "-counter-wrapper-").concat(player.id, "\">\n                ").concat(type == 0 ? "<i id=\"counter-warning-".concat(player.id, "\" class=\"counter-warning fa fa-exclamation-triangle\" aria-hidden=\"true\" data-warning=\"").concat(player.icons[-1], "\"></i>") : "<div class=\"resource-icon\" data-type=\"".concat(type + 10, "\"></div>\n                    <span id=\"type-").concat(type + 10, "-counter-").concat(player.id, "\"></span>"), "\n                </div>\n            "); }).join('');
-            html += "</div>";
+            html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type + 10, "-counter-wrapper-").concat(player.id, "\">\n                    ").concat(type == 0 ? '' : "\n                    <div class=\"resource-icon\" data-type=\"".concat(type + 10, "\"></div>\n                    <span id=\"type-").concat(type + 10, "-counter-").concat(player.id, "\"></span>\n                    <i id=\"counter-warning-").concat(player.id, "-").concat(type + 10, "\" data-warning=\"false\" class=\"counter-warning-type counter-warning-tooltip fa fa-exclamation-triangle\" aria-hidden=\"true\"></i>"), "\n                </div>\n            "); }).join('');
+            html += "</div>\n            <div id=\"counter-warning-".concat(player.id, "\" class=\"counter-warning counter-warning-tooltip\" data-warning=\"false\">\n                <i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n                ").concat(_('The counters display all possible resources.'), " ").concat(_('Some of your modules allow to choose between two types of resources, so when you will activate them, <strong>it will lower the counter for both resources</strong>!'), "\n            </div>");
             dojo.place(html, "player_board_".concat(player.id));
             _this.vpCounters[playerId] = new ebg.counter();
             _this.vpCounters[playerId].create("vp-counter-".concat(playerId));
@@ -3178,6 +3178,7 @@ var Humanity = /** @class */ (function () {
                     _this.setTooltip("type-".concat(type + 10, "-counter-wrapper-").concat(player.id), _this.getResourceTooltip(type + 10));
                 }
             });
+            _this.updateIcons(playerId, player.icons); // to update warning icons
             // first player token
             dojo.place("<div id=\"player_board_".concat(player.id, "_firstPlayerWrapper\" class=\"firstPlayerWrapper\"></div>"), "player_board_".concat(player.id));
             if (gamedatas.firstPlayerId === playerId) {
@@ -3186,7 +3187,6 @@ var Humanity = /** @class */ (function () {
         });
         this.setTooltipToClass('vp-counter', _('Victory points'));
         this.setTooltipToClass('science-counter', _('Science points'));
-        this.setTooltipToClass('counter-warning', "".concat(_('The counters display all possible resources.'), "<br>").concat(_('Some of your modules allow to choose between two types of resources, so when you will activate them, <strong>it will lower the counter for both resources</strong>!')));
         document.getElementById("player_boards").insertAdjacentHTML('beforeend', "\n        <div id=\"overall_player_board_0\" class=\"player-board current-player-board\">\t\t\t\t\t\n            <div class=\"player_board_inner\" id=\"player_board_inner_research-positions\">\n                <div id=\"research-positions\"></div>\n            </div>\n        </div>");
         this.setTooltip('player_board_inner_research-positions', _('Player order in research track, and associated Science points'));
     };
@@ -3198,7 +3198,9 @@ var Humanity = /** @class */ (function () {
                 _this.iconsCounters[playerId][type + 10].toValue(icons[type + 10]);
             }
         });
-        document.getElementById("counter-warning-".concat(playerId)).dataset.warning = "".concat(icons[-1]);
+        var warnings = icons[-1];
+        document.getElementById("counter-warning-".concat(playerId)).dataset.warning = String(warnings.length > 0);
+        [1, 2, 3, 11, 12, 13].forEach(function (type) { return document.getElementById("counter-warning-".concat(playerId, "-").concat(type)).dataset.warning = String(warnings.includes(type)); });
     };
     Humanity.prototype.createPlayerTables = function (gamedatas) {
         var _this = this;

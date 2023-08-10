@@ -196,7 +196,7 @@ trait ModuleTrait {
         $allModules = $this->getModulesByLocation('player', $playerId);
         $modules = array_values(array_filter($allModules, fn($module) => $module->production != null));
 
-        $icons = [-1 => 0, ELECTRICITY => 0, 1 => 0, 2 => 0, 3 => 0, 11 => 0, 12 => 0, 13 => 0];
+        $icons = [-1 => [], ELECTRICITY => 0, 1 => 0, 2 => 0, 3 => 0, 11 => 0, 12 => 0, 13 => 0];
 
         foreach ($modules as $module) {
             $production = $module->production;
@@ -206,7 +206,9 @@ trait ModuleTrait {
             }
 
             if (count($production) > 1 && $module->r > 0) {
-                $icons[-1]++;
+                foreach ($production as $type) {
+                    $icons[-1][] = $type;
+                }
             }
         }
 

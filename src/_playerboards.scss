@@ -36,11 +36,27 @@
     }
   }
 
-  .counter-warning {
+  .counter-warning-type {
     color: orange;
-    font-size: 150%;
+    font-size: 100%;
+    margin-left: -3px;
 
-    &[data-warning="0"] {
+    &[data-warning="false"] {
+      display: none;
+    }
+  }
+
+  .counter-warning {
+    font-size: 75%;
+
+    i {
+      color: orange;
+      font-size: 175%;
+      float: left;
+      margin: 3px;
+    }
+
+    &[data-warning="false"] {
       display: none;
     }
   }
