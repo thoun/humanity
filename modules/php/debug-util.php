@@ -102,6 +102,7 @@ trait DebugUtilTrait {
 			$this->DbQuery("UPDATE experiment SET card_location_arg=$sid WHERE card_location_arg=$id" );
 			$this->DbQuery("UPDATE mission SET card_location_arg=$sid WHERE card_location_arg = $id" );
 			$this->DbQuery("UPDATE astronaut SET player_id=$sid WHERE player_id = $id" );
+			$this->DbQuery("UPDATE global_variables SET `value`=$sid WHERE `value` = $id" );
             
 			++$sid;
 		}

@@ -372,7 +372,8 @@ trait StateTrait {
             
             // score remaining sets of 5 resources
             $icons = $this->getPlayerIcons($playerId);
-            $iconsSum = array_reduce($icons, fn($a, $b) => $a + $b);
+            unset($icons[-1]);
+            $iconsSum = array_reduce($icons, fn($a, $b) => $a + $b, 0);
             $iconPoints = floor($iconsSum / 5);
             $this->incPlayerVP($playerId, $iconPoints, clienttranslate('${player_name} gains ${inc} points from with ${resources} remaining resources'), [
                 'resources' => $iconsSum,
