@@ -1350,7 +1350,7 @@ body > .card {
 }
 .player-board .counter-warning-type {
   color: orange;
-  font-size: 100%;
+  font-size: 85%;
   margin-left: -3px;
 }
 .player-board .counter-warning-type[data-warning=false] {

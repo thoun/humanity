@@ -103,7 +103,7 @@ $this->MODULES = [ //public int $type; // 0 start, 1..3 year, 8 communication, 9
 
     2 => [
         1 => new ModuleType(BLUE_OR_ORANGE, [OXYGEN => 1, ICE => 1, METHANE => 1], null, null, 0, 4),
-        2 => new ModuleType(BLUE_OR_ORANGE, [PROTEIN => 1, INSECT => 1, METHANE => 1], null, null, 0, 4),
+        2 => new ModuleType(BLUE_OR_ORANGE, [PROTEIN => 1, INSECT => 1, ICE => 1], null, null, 0, 4),
         3 => new OrangeModuleType([PROTEIN => 1, ICE => 1, METHANE => 1], 1, null, EXPERIMENT_POWER_TIME),
         4 => new OrangeModuleType([INSECT => 1, OXYGEN => 1], 1, [ELECTRICITY]),
         5 => new OrangeModuleType([INSECT => 1, AIRCARBON => 1], 1, [ELECTRICITY]),
