@@ -3151,11 +3151,7 @@ var Humanity = /** @class */ (function () {
         var _this = this;
         Object.values(gamedatas.players).forEach(function (player) {
             var playerId = Number(player.id);
-            var html = "<div class=\"counters with-tokens\">            \n                <div id=\"vp-counter-wrapper-".concat(player.id, "\" class=\"vp-counter\">\n                    <div class=\"vp icon\"></div>\n                    <span id=\"vp-counter-").concat(player.id, "\"></span>\n                </div>\n                <div id=\"science-counter-wrapper-").concat(player.id, "\" class=\"science-counter\">\n                    <div class=\"science icon\"></div>\n                    <span id=\"science-counter-").concat(player.id, "\">?</span>\n                </div>\n            </div>\n            \n            <div class=\"icons counters\">");
-            html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type, "-counter-wrapper-").concat(player.id, "\">\n                    <div class=\"resource-icon\" data-type=\"").concat(type, "\"></div>\n                    <span id=\"type-").concat(type, "-counter-").concat(player.id, "\"></span>\n                    <i id=\"counter-warning-").concat(player.id, "-").concat(type, "\" data-warning=\"false\" class=\"counter-warning-type counter-warning-tooltip fa fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n                </div>\n            "); }).join('');
-            html += "</div>\n            <div class=\"icons counters\">";
-            html += ICONS_COUNTERS_TYPES.map(function (type) { return "\n                <div id=\"type-".concat(type + 10, "-counter-wrapper-").concat(player.id, "\">\n                    ").concat(type == 0 ? '' : "\n                    <div class=\"resource-icon\" data-type=\"".concat(type + 10, "\"></div>\n                    <span id=\"type-").concat(type + 10, "-counter-").concat(player.id, "\"></span>\n                    <i id=\"counter-warning-").concat(player.id, "-").concat(type + 10, "\" data-warning=\"false\" class=\"counter-warning-type counter-warning-tooltip fa fa-exclamation-triangle\" aria-hidden=\"true\"></i>"), "\n                </div>\n            "); }).join('');
-            html += "</div>\n            <div id=\"counter-warning-".concat(player.id, "\" class=\"counter-warning counter-warning-tooltip\" data-warning=\"false\">\n                <i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n                ").concat(_('The counters display all possible resources.'), " ").concat(_('Some of your modules allow to choose between two types of resources, so when you will activate them, <strong>it will lower the counter for both resources</strong>!'), "\n            </div>");
+            var html = "<div class=\"counters with-tokens\">            \n                <div id=\"vp-counter-wrapper-".concat(player.id, "\" class=\"vp-counter\">\n                    <div class=\"vp icon\"></div>\n                    <span id=\"vp-counter-").concat(player.id, "\"></span>\n                </div>\n                <div id=\"science-counter-wrapper-").concat(player.id, "\" class=\"science-counter\">\n                    <div class=\"science icon\"></div>\n                    <span id=\"science-counter-").concat(player.id, "\">?</span>\n                </div>\n            </div>\n\n            <div id=\"player-").concat(player.id, "-icons\" class=\"icons counters\"></div>");
             dojo.place(html, "player_board_".concat(player.id));
             _this.vpCounters[playerId] = new ebg.counter();
             _this.vpCounters[playerId].create("vp-counter-".concat(playerId));
@@ -3166,19 +3162,7 @@ var Humanity = /** @class */ (function () {
                 _this.scienceCounters[playerId].setValue(player.science);
             }
             _this.iconsCounters[playerId] = [];
-            ICONS_COUNTERS_TYPES.forEach(function (type) {
-                _this.iconsCounters[playerId][type] = new ebg.counter();
-                _this.iconsCounters[playerId][type].create("type-".concat(type, "-counter-").concat(playerId));
-                _this.iconsCounters[playerId][type].setValue(player.icons[type]);
-                _this.setTooltip("type-".concat(type, "-counter-wrapper-").concat(player.id), _this.getResourceTooltip(type));
-                if (type != 0) {
-                    _this.iconsCounters[playerId][type + 10] = new ebg.counter();
-                    _this.iconsCounters[playerId][type + 10].create("type-".concat(type + 10, "-counter-").concat(playerId));
-                    _this.iconsCounters[playerId][type + 10].setValue(player.icons[type + 10]);
-                    _this.setTooltip("type-".concat(type + 10, "-counter-wrapper-").concat(player.id), _this.getResourceTooltip(type + 10));
-                }
-            });
-            _this.updateIcons(playerId, player.icons); // to update warning icons
+            _this.updateIcons(playerId, player.icons);
             // first player token
             dojo.place("<div id=\"player_board_".concat(player.id, "_firstPlayerWrapper\" class=\"firstPlayerWrapper\"></div>"), "player_board_".concat(player.id));
             if (gamedatas.firstPlayerId === playerId) {
@@ -3192,15 +3176,29 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.updateIcons = function (playerId, icons) {
         var _this = this;
-        ICONS_COUNTERS_TYPES.forEach(function (type) {
-            _this.iconsCounters[playerId][type].toValue(icons[type]);
-            if (type != 0) {
-                _this.iconsCounters[playerId][type + 10].toValue(icons[type + 10]);
+        var keys = Object.keys(icons);
+        keys.forEach(function (key) {
+            var quantity = icons[key];
+            if (!_this.iconsCounters[playerId][key]) {
+                var icons_1 = JSON.parse(key);
+                var iconsHtml = icons_1.map(function (type) { return "<div class=\"resource-icon\" data-type=\"".concat(type, "\"></div>"); }).join('');
+                var order = icons_1.length > 1 ? 100 * icons_1[0] + icons_1[1] : icons_1[0];
+                var tooltip = icons_1.length > 1 ? _('${a} or ${b}').replace('${a}', _this.getResourceTooltip(icons_1[0])).replace('${b}', _this.getResourceTooltip(icons_1[1])) : _this.getResourceTooltip(icons_1[0]);
+                document.getElementById("player-".concat(playerId, "-icons")).insertAdjacentHTML('beforeend', "<div id=\"type-".concat(key, "-counter-wrapper-").concat(playerId, "\" style=\"order: ").concat(order, ";\">\n                    <span class=\"").concat(icons_1.length > 1 ? 'double-icons' : '', "\">").concat(iconsHtml, "</span> <span id=\"type-").concat(key, "-counter-").concat(playerId, "\"></span>\n                </div>"));
+                _this.iconsCounters[playerId][key] = new ebg.counter();
+                _this.iconsCounters[playerId][key].create("type-".concat(key, "-counter-").concat(playerId));
+                _this.iconsCounters[playerId][key].setValue(quantity);
+                _this.setTooltip("type-".concat(key, "-counter-wrapper-").concat(playerId), tooltip);
+            }
+            else {
+                _this.iconsCounters[playerId][key].toValue(quantity);
             }
         });
-        var warnings = icons[-1];
-        document.getElementById("counter-warning-".concat(playerId)).dataset.warning = String(warnings.length > 0);
-        [1, 2, 3, 11, 12, 13].forEach(function (type) { return document.getElementById("counter-warning-".concat(playerId, "-").concat(type)).dataset.warning = String(warnings.includes(type)); });
+        Object.keys(this.iconsCounters[playerId]).filter(function (key) { return !keys.includes(key); }).forEach(function (key) {
+            var _a;
+            (_a = document.getElementById("type-".concat(key, "-counter-wrapper-").concat(playerId))) === null || _a === void 0 ? void 0 : _a.remove();
+            _this.iconsCounters[playerId][key] = null;
+        });
     };
     Humanity.prototype.createPlayerTables = function (gamedatas) {
         var _this = this;

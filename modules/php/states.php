@@ -372,7 +372,6 @@ trait StateTrait {
             
             // score remaining sets of 5 resources
             $icons = $this->getPlayerIcons($playerId);
-            unset($icons[-1]);
             $iconsSum = array_reduce($icons, fn($a, $b) => $a + $b, 0);
             $iconPoints = floor($iconsSum / 5);
             $this->incPlayerVP($playerId, $iconPoints, clienttranslate('${player_name} gains ${inc} points from with ${resources} remaining resources'), [
@@ -381,9 +380,19 @@ trait StateTrait {
             $this->setStat($iconPoints, 'vpWithRemainingResources', $playerId);
 
             // final score & tiebreak
-            $scoreAux1 = $icons[ELECTRICITY];
-            $scoreAux2 = $icons[11] + $icons[12] + $icons[13];
-            $scoreAux3 = $icons[1] + $icons[2] + $icons[3];
+            $scoreAux1 = 0;
+            $scoreAux2 = 0;
+            $scoreAux3 = 0;
+            foreach ($icons as $key => $quantity) {
+                $type = json_decode($key)[0];
+                if ($type > 10) {
+                    $scoreAux2 += $quantity;
+                } else if ($type > 0) {
+                    $scoreAux3 += $quantity;
+                } else if ($type == 0) {
+                    $scoreAux1 += $quantity;
+                }
+            }
             $scoreAux = 10000 * $scoreAux1 + 100 * $scoreAux2 + $scoreAux3;
             $this->DbQuery("UPDATE player SET player_score = player_vp, player_score_aux = $scoreAux WHERE player_id = $playerId");
 

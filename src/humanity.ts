@@ -406,31 +406,8 @@ class Humanity implements HumanityGame {
                     <span id="science-counter-${player.id}">?</span>
                 </div>
             </div>
-            
-            <div class="icons counters">`;
-            
-            html += ICONS_COUNTERS_TYPES.map(type => `
-                <div id="type-${type}-counter-wrapper-${player.id}">
-                    <div class="resource-icon" data-type="${type}"></div>
-                    <span id="type-${type}-counter-${player.id}"></span>
-                    <i id="counter-warning-${player.id}-${type}" data-warning="false" class="counter-warning-type counter-warning-tooltip fa fa-exclamation-triangle" aria-hidden="true"></i>
-                </div>
-            `).join('');
-            html += `</div>
-            <div class="icons counters">`;            
-            html += ICONS_COUNTERS_TYPES.map(type => `
-                <div id="type-${type + 10}-counter-wrapper-${player.id}">
-                    ${type == 0 ? '' : `
-                    <div class="resource-icon" data-type="${type + 10}"></div>
-                    <span id="type-${type + 10}-counter-${player.id}"></span>
-                    <i id="counter-warning-${player.id}-${type + 10}" data-warning="false" class="counter-warning-type counter-warning-tooltip fa fa-exclamation-triangle" aria-hidden="true"></i>`}
-                </div>
-            `).join('');
-            html += `</div>
-            <div id="counter-warning-${player.id}" class="counter-warning counter-warning-tooltip" data-warning="false">
-                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                ${_('The counters display all possible resources.')} ${_('Some of your modules allow to choose between two types of resources, so when you will activate them, <strong>it will lower the counter for both resources</strong>!')}
-            </div>`;
+
+            <div id="player-${player.id}-icons" class="icons counters"></div>`;
 
             dojo.place(html, `player_board_${player.id}`);
 
@@ -445,20 +422,7 @@ class Humanity implements HumanityGame {
             } 
 
             this.iconsCounters[playerId] = [];
-            ICONS_COUNTERS_TYPES.forEach(type => {
-                this.iconsCounters[playerId][type] = new ebg.counter();
-                this.iconsCounters[playerId][type].create(`type-${type}-counter-${playerId}`);
-                this.iconsCounters[playerId][type].setValue(player.icons[type]);
-                this.setTooltip(`type-${type}-counter-wrapper-${player.id}`, this.getResourceTooltip(type));
-
-                if (type != 0) {
-                    this.iconsCounters[playerId][type + 10] = new ebg.counter();
-                    this.iconsCounters[playerId][type + 10].create(`type-${type + 10}-counter-${playerId}`);
-                    this.iconsCounters[playerId][type + 10].setValue(player.icons[type + 10]);
-                    this.setTooltip(`type-${type + 10}-counter-wrapper-${player.id}`, this.getResourceTooltip(type + 10));
-                }
-            });
-            this.updateIcons(playerId, player.icons); // to update warning icons
+            this.updateIcons(playerId, player.icons);
 
             // first player token
             dojo.place(`<div id="player_board_${player.id}_firstPlayerWrapper" class="firstPlayerWrapper"></div>`, `player_board_${player.id}`);
@@ -481,17 +445,34 @@ class Humanity implements HumanityGame {
     }
 
     private updateIcons(playerId: number, icons: Icons) {
-        ICONS_COUNTERS_TYPES.forEach(type => { 
-            this.iconsCounters[playerId][type].toValue(icons[type]);
-    
-            if (type != 0) {
-                this.iconsCounters[playerId][type + 10].toValue(icons[type + 10]);
+        const keys = Object.keys(icons);
+        keys.forEach(key => {
+            const quantity = icons[key];
+            if (!this.iconsCounters[playerId][key]) {
+                const icons = JSON.parse(key) as number[];
+                const iconsHtml = icons.map(type => `<div class="resource-icon" data-type="${type}"></div>`).join('');
+                const order = icons.length > 1 ? 100 * icons[0] + icons[1] : icons[0];
+                const tooltip = icons.length > 1 ? _('${a} or ${b}').replace('${a}', this.getResourceTooltip(icons[0])).replace('${b}', this.getResourceTooltip(icons[1])) : this.getResourceTooltip(icons[0]);
+
+                document.getElementById(`player-${playerId}-icons`).insertAdjacentHTML('beforeend',
+                `<div id="type-${key}-counter-wrapper-${playerId}" style="order: ${order};">
+                    <span class="${icons.length > 1 ? 'double-icons' : ''}">${iconsHtml}</span> <span id="type-${key}-counter-${playerId}"></span>
+                </div>`
+                );
+
+                this.iconsCounters[playerId][key] = new ebg.counter();
+                this.iconsCounters[playerId][key].create(`type-${key}-counter-${playerId}`);
+                this.iconsCounters[playerId][key].setValue(quantity);
+                this.setTooltip(`type-${key}-counter-wrapper-${playerId}`, tooltip);
+            } else {
+                this.iconsCounters[playerId][key].toValue(quantity);
             }
         });
 
-        const warnings = icons[-1] as any as number[];
-        document.getElementById(`counter-warning-${playerId}`).dataset.warning = String(warnings.length > 0);
-        [1, 2, 3, 11, 12, 13].forEach(type => document.getElementById(`counter-warning-${playerId}-${type}`).dataset.warning = String(warnings.includes(type)));
+        Object.keys(this.iconsCounters[playerId]).filter(key => !keys.includes(key)).forEach(key => {
+            document.getElementById(`type-${key}-counter-wrapper-${playerId}`)?.remove();
+            this.iconsCounters[playerId][key] = null;
+        });
     }
 
     private createPlayerTables(gamedatas: HumanityGamedatas) {

@@ -34,33 +34,30 @@
         color: #653771;
       }
     }
-  }
 
-  .counter-warning-type {
-    color: orange;
-    font-size: 85%;
-    margin-left: -3px;
+    &.icons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
 
-    &[data-warning="false"] {
-      display: none;
+      &>div {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .resource-icon:not(:first-child) {
+        position: relative;
+        left: -12px;
+        top: 12px;
+        margin-right: -12px;
+      }
+
+      .double-icons {
+        margin-bottom: 12px;
+      }
     }
   }
-
-  .counter-warning {
-    font-size: 75%;
-
-    i {
-      color: orange;
-      font-size: 175%;
-      float: left;
-      margin: 3px;
-    }
-
-    &[data-warning="false"] {
-      display: none;
-    }
-  }
-
 }
 
 #player_board_inner_research-positions {

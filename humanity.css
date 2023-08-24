@@ -1348,25 +1348,24 @@ body > .card {
 .player-board .counters.with-tokens .science-counter {
   color: #653771;
 }
-.player-board .counter-warning-type {
-  color: orange;
-  font-size: 85%;
-  margin-left: -3px;
+.player-board .counters.icons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
 }
-.player-board .counter-warning-type[data-warning=false] {
-  display: none;
+.player-board .counters.icons > div {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
-.player-board .counter-warning {
-  font-size: 75%;
+.player-board .counters.icons .resource-icon:not(:first-child) {
+  position: relative;
+  left: -12px;
+  top: 12px;
+  margin-right: -12px;
 }
-.player-board .counter-warning i {
-  color: orange;
-  font-size: 175%;
-  float: left;
-  margin: 3px;
-}
-.player-board .counter-warning[data-warning=false] {
-  display: none;
+.player-board .counters.icons .double-icons {
+  margin-bottom: 12px;
 }
 
 #player_board_inner_research-positions {

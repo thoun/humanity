@@ -63,7 +63,7 @@ interface Astronaut {
     spot: number; // table spot
 }
 
-type Icons = { [type: number]: number };
+type Icons = { [type: string]: number };
 
 interface Square {
     x: number; 

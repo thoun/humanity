@@ -129,6 +129,7 @@ trait ModuleTrait {
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
             'module' => $module,
+            'icons' => $this->getPlayerIcons($playerId),
         ]);
 
         $points = $module->points + $moduleVp;
@@ -196,20 +197,16 @@ trait ModuleTrait {
         $allModules = $this->getModulesByLocation('player', $playerId);
         $modules = array_values(array_filter($allModules, fn($module) => $module->production != null));
 
-        $icons = [-1 => [], ELECTRICITY => 0, 1 => 0, 2 => 0, 3 => 0, 11 => 0, 12 => 0, 13 => 0];
+        $icons = [];
 
         foreach ($modules as $module) {
-            $production = $module->production;
+            $key = json_encode($module->production);
 
-            foreach ($production as $type) {
-                $icons[$type] += $module->r;
+            if (!array_key_exists($key, $icons)) {
+                $icons[$key] = 0;
             }
 
-            if (count($production) > 1 && $module->r > 0) {
-                foreach ($production as $type) {
-                    $icons[-1][] = $type;
-                }
-            }
+            $icons[$key] += $module->r;
         }
 
         return $icons;
