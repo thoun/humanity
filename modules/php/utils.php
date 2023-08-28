@@ -119,7 +119,9 @@ trait UtilTrait {
 
     function incPlayerResearchPoints(int $playerId, int $amount, $message = '', $args = []) {
         if ($amount != 0) {
-            $this->DbQuery("UPDATE player SET `player_research_points` = `player_research_points` + $amount WHERE player_id = $playerId");
+            $current = $this->getPlayer($playerId)->researchPoints;
+            $new = min(50, $current + $amount);
+            $this->DbQuery("UPDATE player SET `player_research_points` = $new WHERE player_id = $playerId");
         }
             
         $this->notifyAllPlayers('researchPoints', $message, [

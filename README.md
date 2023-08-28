@@ -39,7 +39,7 @@ You can mix electricity with a base resource when you want to use 3 base resourc
 
 You take a communication of the same research point value, no matter the current year
 
-TODO : si tous les modules sont enlevés : La règle que j'applique : ça ne m'ai arrivé qu'une fois : Le bras fait un tour complet et donc seul l'astronaute de la dernière case n'est pas repris. 
+If all modules are taken, the arm makes a full turn to send back all astronauts.
 
-Pour la recherche c'est surtout qu'on est sensé franchir 1 Point tous les 4 cases. Franchement cela ne va arriver qu'une partie sur 500 et seulement à deux joueurs.       16:51
-Mais bon faut le prévoir.
+# TODO
+Summary points at the end

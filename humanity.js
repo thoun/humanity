@@ -2290,7 +2290,7 @@ var TableCenter = /** @class */ (function () {
         Object.values(gamedatas.players).forEach(function (player) { return player.astronauts.filter(function (astronaut) { return astronaut.location == 'table'; }).forEach(function (astronaut) {
             return tableAstronauts.querySelector(".slot[data-slot-id=\"".concat(astronaut.spot, "\"]")).appendChild(_this.game.astronautsManager.createAstronaut(astronaut));
         }); });
-        this.moveArm(gamedatas.arm);
+        this.setArm(gamedatas.arm);
     }
     TableCenter.prototype.moveAstronaut = function (astronaut) {
         var astronautDiv = document.getElementById("astronaut-".concat(astronaut.id));
@@ -2307,13 +2307,17 @@ var TableCenter = /** @class */ (function () {
     TableCenter.prototype.newModule = function (module) {
         return this.modules.addCard(module);
     };
-    TableCenter.prototype.moveArm = function (arm) {
+    TableCenter.prototype.setArm = function (arm) {
         // to make sure arm always turn clockwise even with a %
         while (arm < this.arm) {
             arm += 8;
         }
-        document.getElementById('board-2').style.setProperty('--r', "".concat(arm));
         this.arm = arm;
+        document.getElementById('board-2').style.setProperty('--r', "".concat(this.arm));
+    };
+    TableCenter.prototype.moveArm = function (diff) {
+        this.arm += diff;
+        document.getElementById('board-2').style.setProperty('--r', "".concat(this.arm));
     };
     TableCenter.prototype.newExperiments = function (tableExperiments, instant) {
         return __awaiter(this, void 0, void 0, function () {
@@ -3526,7 +3530,7 @@ var Humanity = /** @class */ (function () {
         this.researchBoard.moduleDecks[year].setCardNumber(moduleDeckCount, moduleDeckTopCard);
     };
     Humanity.prototype.notif_moveArm = function (args) {
-        this.tableCenter.moveArm(args.arm);
+        this.tableCenter.moveArm(Number(args.diff));
     };
     Humanity.prototype.notif_newTableExperiments = function (args) {
         this.tableCenter.newExperiments(args.tableExperiments, false);

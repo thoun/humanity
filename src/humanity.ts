@@ -1103,7 +1103,7 @@ class Humanity implements HumanityGame {
     }  
 
     notif_moveArm(args: NotifMoveArmArgs) {
-        this.tableCenter.moveArm(args.arm);
+        this.tableCenter.moveArm(Number(args.diff));
     }   
 
     notif_newTableExperiments(args: NotifNewTableExperimentArgs) {

@@ -244,6 +244,7 @@ interface NotifNewTableModuleArgs extends NotifTableModuleArgs {
 // moveArm
 interface NotifMoveArmArgs {
     arm: number;
+    diff: number | string;
 }
 
 // newTableExperiments

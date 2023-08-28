@@ -183,14 +183,12 @@ trait StateTrait {
         // move arm
         $tableModules = $this->getModulesByLocation('table');
         $armAfter = $armBefore;
-        while (!$this->array_some($tableModules, fn($tableModule) => $tableModule->locationArg == (($armAfter + 1) % 8))) {
+        $diff = 0;
+        while (!$this->array_some($tableModules, fn($tableModule) => $tableModule->locationArg == (($armAfter + 1) % 8)) && $diff < 8) {
             $armAfter = ($armAfter + 1) % 8;
+            $diff++;
         }
         $this->setGlobalVariable(ARM, $armAfter);
-        $diff = $armAfter - $armBefore;
-        if ($diff < 0) {
-            $diff += 8;
-        }
         self::notifyAllPlayers('moveArm', clienttranslate('Arm moves ${diff} hangars'), [
             'arm' => $armAfter,
             'diff' => $diff

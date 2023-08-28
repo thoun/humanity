@@ -33,7 +33,7 @@ class TableCenter {
             tableAstronauts.querySelector(`.slot[data-slot-id="${astronaut.spot}"]`).appendChild(this.game.astronautsManager.createAstronaut(astronaut))
         ));
 
-        this.moveArm(gamedatas.arm);
+        this.setArm(gamedatas.arm);
     }
     
     public moveAstronaut(astronaut: Astronaut): void {
@@ -56,15 +56,20 @@ class TableCenter {
         return this.modules.addCard(module);
     }
     
-    public moveArm(arm: number) {
+    public setArm(arm: number) {
         // to make sure arm always turn clockwise even with a %
         while (arm < this.arm) {
             arm += 8;
         }
 
-        document.getElementById('board-2').style.setProperty('--r', `${arm}`);
-
         this.arm = arm;
+        document.getElementById('board-2').style.setProperty('--r', `${this.arm}`);
+    }
+    
+    public moveArm(diff: number) {
+        this.arm += diff;
+
+        document.getElementById('board-2').style.setProperty('--r', `${this.arm}`);
     }
     
     public async newExperiments(tableExperiments: Experiment[], instant: boolean): Promise<any> {
