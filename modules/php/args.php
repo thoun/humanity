@@ -86,7 +86,13 @@ trait ArgsTrait {
         foreach ($playerModules as $module) {
             if ($module->r > 0 && $module->production != null) {
                 foreach ($module->production as $produce) {
-                    if (in_array($produce, $remainingNeededResourceTypes)) {
+                    if ($produce == ELECTRICITY) {
+                        foreach ($remainingNeededResourceTypes as $type) {
+                            if ($type < 10) {
+                                $payButtons[$module->id][] = $type;
+                            }
+                        }
+                    } else if (in_array($produce, $remainingNeededResourceTypes)) {
                         $payButtons[$module->id][] = $produce;
                     }
                 }

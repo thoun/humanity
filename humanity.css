@@ -1453,6 +1453,7 @@ body > .card {
   left: 0;
   right: 0;
   display: flex;
+  flex-wrap: wrap;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -1461,6 +1462,7 @@ body > .card {
   width: auto;
   box-shadow: 0 0 5px 5px white;
   outline: 4px dashed red;
+  padding: 8px;
 }
 .player-table .experiments-lines .slot {
   width: 150px;
