@@ -10,6 +10,8 @@ trait DebugUtilTrait {
         if ($this->getBgaEnvironment() != 'studio') { 
             return;
         } 
+        
+	    $this->DbQuery("UPDATE player SET `player_vp` = 36, `player_science` = 10");
 
 	    /*$this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 13 WHERE x = 0 AND y = 0");
 		$this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 15 WHERE x = -1 AND y = 0");
@@ -46,6 +48,10 @@ trait DebugUtilTrait {
     // debugEndYear(3)
     function debugEndYear($year) {
 		$this->DbQuery("UPDATE module SET `card_location` = 'void' WHERE `card_location` = 'deck$year'");
+    }
+
+    function debugEnd() {
+		$this->gamestate->jumpToState(ST_END_SCORE);
     }
 
     function debugRemoveObstacles() {

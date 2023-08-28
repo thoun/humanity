@@ -3498,6 +3498,7 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.notif_score = function (args) {
         this.setScore(args.playerId, args.new);
+        this.setScience(args.playerId, Number(args.inc));
     };
     Humanity.prototype.notif_researchPoints = function (args) {
         this.setResearchPoints(args.playerId, args.new);

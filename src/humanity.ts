@@ -1067,6 +1067,7 @@ class Humanity implements HumanityGame {
 
     notif_score(args: NotifScoreArgs) {
         this.setScore(args.playerId, args.new);
+        this.setScience(args.playerId, Number(args.inc));
     }
 
     notif_researchPoints(args: NotifScoreArgs) {

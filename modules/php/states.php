@@ -366,7 +366,6 @@ trait StateTrait {
             $player = $this->getPlayer($playerId);
 
             // score science points
-            $this->incPlayerVP($playerId, $player->science, clienttranslate('${player_name} gains ${inc} points from with ${inc} science points'));
             $this->setStat($player->science, 'sciencePoints', $playerId);
             $this->setStat($player->science == 0 ? 0 : $this->getStat('researchPoints', $playerId) / $player->science, 'researchPointsByScience', $playerId);
             
@@ -394,11 +393,14 @@ trait StateTrait {
                 }
             }
             $scoreAux = 10000 * $scoreAux1 + 100 * $scoreAux2 + $scoreAux3;
-            $this->DbQuery("UPDATE player SET player_score = player_vp, player_score_aux = $scoreAux WHERE player_id = $playerId");
+            $this->DbQuery("UPDATE player SET player_score = player_vp + player_science, player_score_aux = $scoreAux WHERE player_id = $playerId");
 
-            self::notifyAllPlayers('score', '', [
+            $player = $this->getPlayer($playerId);
+            self::notifyAllPlayers('score', clienttranslate('${player_name} gains ${inc} points from with ${inc} science points'), [
                 'playerId' => $playerId,
-                'new' => $this->getPlayer($playerId)->score,
+                'player_name' => $this->getPlayerName($playerId),
+                'new' => $player->score,
+                'inc' => $player->science,
             ]);
 
             $playerExperiments = $this->getExperimentsByLocation('player', $playerId);
