@@ -298,8 +298,8 @@ class Humanity extends Table {
             $sql = "ALTER TABLE `DBPREFIX_module` ADD `vp` smallint(2) NULL";
             self::applyDbUpgradeToAllDB($sql);
         }
-        if ($from_version <= 2308281725) {
-            $sql = "ALTER TABLE `DBPREFIXplayer` ADD `player_science_by_year` varchar(20) NOT NULL DEFAULT '[0,0,0]'";
+        if ($from_version <= 2308281854) {
+            $sql = "ALTER TABLE `DBPREFIX_player` ADD `player_science_by_year` varchar(20) NOT NULL DEFAULT '[0,0,0]'";
             self::applyDbUpgradeToAllDB($sql);
         }
     }    
