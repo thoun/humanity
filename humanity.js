@@ -2546,7 +2546,7 @@ var ResearchBoard = /** @class */ (function () {
         this.setMissionScienceTokens();
     };
     ResearchBoard.prototype.setMissionScienceTokens = function () {
-        this.missions.getCards().forEach(function (mission) {
+        this.missions.getCards().filter(function (mission) { return !document.getElementById("mission-science-token-".concat(mission.id)); }).forEach(function (mission) {
             var token = document.createElement('div');
             token.id = "mission-science-token-".concat(mission.id);
             token.classList.add('science', 'icon', 'mission-science-token');

@@ -218,7 +218,7 @@ class ResearchBoard {
     }
 
     public setMissionScienceTokens() {
-        this.missions.getCards().forEach(mission => {
+        this.missions.getCards().filter(mission => !document.getElementById(`mission-science-token-${mission.id}`)).forEach(mission => {
             const token = document.createElement('div');
             token.id = `mission-science-token-${mission.id}`;
             token.classList.add('science', 'icon', 'mission-science-token');
