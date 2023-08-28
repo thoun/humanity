@@ -134,7 +134,7 @@ class Humanity extends Table {
             "skippedAstronaut",    
             // 60+ points
             "sciencePoints", "researchPoints", "researchPointsByScience", 
-            "vpWithModules", "vpWithSquares", "vpWithExperiments", "vpWithMissions", "vpWithRemainingResources",
+            "vpWithModules", "vpWithSquares", "vpWithExperiments", "vpWithMissions", "vpWithRemainingResources", "vpWithGreenhouses",
         ] as $name) {
             $this->initStat('player', $name, 0);
         }
@@ -190,6 +190,7 @@ class Humanity extends Table {
             $player['squares'] = $this->getPlayerSquares($playerId);
             if ($isEndScore) {
                 $player['score'] = $player['vp'] + $player['science'];
+                $player['endScoreSummary'] = $this->getPlayerEndScoreSummary($playerId);
             }
 
             $player['icons'] = $this->getPlayerIcons($playerId);
@@ -295,6 +296,10 @@ class Humanity extends Table {
 
         if ($from_version <= 2308042354) {
             $sql = "ALTER TABLE `DBPREFIX_module` ADD `vp` smallint(2) NULL";
+            self::applyDbUpgradeToAllDB($sql);
+        }
+        if ($from_version <= 2308281725) {
+            $sql = "ALTER TABLE `DBPREFIXplayer` ADD `player_science_by_year` varchar(20) NOT NULL DEFAULT '[0,0,0]'";
             self::applyDbUpgradeToAllDB($sql);
         }
     }    

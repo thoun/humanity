@@ -145,6 +145,10 @@ class Humanity implements HumanityGame {
         this.setupNotifications();
         this.setupPreferences();
 
+        if (gamedatas.isEnd) { // score or end
+            this.onEnteringShowScore(true);
+        }
+
         log( "Ending game setup" );
     }
 
@@ -179,6 +183,9 @@ class Humanity implements HumanityGame {
                 break;
             case 'moveAstronaut':
                 this.onEnteringMoveAstronaut(args.args);
+                break;
+            case 'endScore':
+                this.onEnteringShowScore();
                 break;
         }
     }
@@ -220,6 +227,39 @@ class Humanity implements HumanityGame {
 
     private onEnteringMoveAstronaut(args: EnteringMoveAstronautArgs) {
         this.getCurrentPlayerTable()?.setSelectableModuleSpots(args.possibleCoordinates);
+    }
+
+    private onEnteringShowScore(fromReload: boolean = false) {
+        document.getElementById('score').style.display = 'flex';
+
+        document.getElementById('score-table-body').innerHTML = [
+            _("Remaining resources points"),
+            _("Squares points"),
+            _("Greenhouses points"),
+            _("Experiments points"),
+            _("Missions points"),
+            _("Science points"),
+            _("Total"),
+        ].map(label => `<tr><th>${label}</th></tr>`).join('');
+
+        if (fromReload) {
+            const players = Object.values(this.gamedatas.players);
+            players.forEach(player => this.addPlayerSummaryColumn(Number(player.id), player.endScoreSummary));            
+        }
+    }
+    
+    private addPlayerSummaryColumn(playerId: number, endScoreSummary: PlayerEndScoreSummary): void {
+        const player = this.getPlayer(playerId);
+        document.getElementById('scoretr').insertAdjacentHTML('beforeend', `<th class="player_name" style="color: #${player.color}">${player.name}</th>`);
+
+        const lines = Array.from(document.getElementById('score-table-body').getElementsByTagName('tr'));
+        lines[0].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.remainingResources}</td>`);
+        lines[1].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.squares}</td>`);
+        lines[2].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.greenhouses}</td>`);
+        lines[3].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.experiments}</td>`);
+        lines[4].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.missions}</td>`);
+        lines[5].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.scienceByYear.map((points, index) => `<div>${points} <span class="score-year">(${_('Year')} ${index + 1})</span></div>`).join('')}</td>`);
+        lines[6].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.total}</td>`);
     }
 
     public onLeavingState(stateName: string) {
@@ -1068,6 +1108,7 @@ class Humanity implements HumanityGame {
     notif_score(args: NotifScoreArgs) {
         this.setScore(args.playerId, args.new);
         this.setScience(args.playerId, Number(args.inc));
+        this.addPlayerSummaryColumn(args.playerId, (args as any).endScoreSummary);
     }
 
     notif_researchPoints(args: NotifScoreArgs) {

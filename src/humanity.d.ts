@@ -70,6 +70,16 @@ interface Square {
     y: number;
 }
 
+interface PlayerEndScoreSummary {
+    remainingResources: number;
+    squares: number;
+    greenhouses: number;
+    experiments: number;
+    missions: number;
+    scienceByYear: number[];
+    total: number;
+}
+
 interface HumanityPlayer extends Player {
     playerNo: number;
     
@@ -83,6 +93,8 @@ interface HumanityPlayer extends Player {
     squares: Square[];
 
     icons: Icons;
+
+    endScoreSummary?: PlayerEndScoreSummary;
 }
 
 interface HumanityGamedatas {

@@ -12,7 +12,7 @@ trait DebugUtilTrait {
         } 
         
 	    //$this->DbQuery("UPDATE player SET `player_vp` = 36, `player_science` = 10");
-        $this->DbQuery("UPDATE player SET player_research_points = 49");
+        //$this->DbQuery("UPDATE player SET player_research_points = 49");
 
 	    /*$this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 13 WHERE x = 0 AND y = 0");
 		$this->DbQuery("UPDATE module SET `card_type` = 1, `card_type_arg` = 15 WHERE x = -1 AND y = 0");

@@ -261,7 +261,11 @@ $stats_type = [
             "id" => 66,
             "name" => totranslate("VP gained with remaining resources"),
             "type" => "int"
-        ],   
-        // 67 used
+        ],    
+        "vpWithGreenhouses" => [
+            "id" => 68,
+            "name" => totranslate("VP gained with greenhouses"),
+            "type" => "int"
+        ], 
     ],
 ];

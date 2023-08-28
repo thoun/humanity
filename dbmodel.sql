@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS `mission` (
 ALTER TABLE `player` ADD `player_research_points` smallint UNSIGNED NOT NULL DEFAULT 0;
 ALTER TABLE `player` ADD `player_vp` smallint UNSIGNED NOT NULL DEFAULT 0;
 ALTER TABLE `player` ADD `player_science` smallint UNSIGNED NOT NULL DEFAULT 0;
+ALTER TABLE `player` ADD `player_science_by_year` varchar(20) NOT NULL DEFAULT '[0,0,0]';
 
 CREATE TABLE IF NOT EXISTS `astronaut` (
   `id` TINYINT unsigned NOT NULL AUTO_INCREMENT,

@@ -1,4 +1,19 @@
 {OVERALL_GAME_HEADER}
+
+<div id="score">
+    <div id="table-wrapper">
+        <table>
+            <thead>
+                <tr id="scoretr">
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="score-table-body">
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <div id="table">
     <div class="year"><span id="year"></span> / 3</div>
     <div id="tables-and-center">

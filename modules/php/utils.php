@@ -138,6 +138,12 @@ trait UtilTrait {
     function incPlayerScience(int $playerId, int $amount, $message = '', $args = []) {
         if ($amount != 0) {
             $this->DbQuery("UPDATE player SET `player_science` = `player_science` + $amount WHERE player_id = $playerId");
+            
+            $year = $this->getYear();
+            $scienceByYear = $this->getPlayer($playerId)->scienceByYear;
+            $scienceByYear[$year - 1] += $amount;
+            $scienceByYearJson = json_encode($scienceByYear);
+            $this->DbQuery("UPDATE player SET `player_science_by_year` = '$scienceByYearJson' WHERE `player_id` = $playerId"); 
         }
             
         $this->notifyAllPlayers('science', $message, [
@@ -295,5 +301,23 @@ trait UtilTrait {
             case 12: return clienttranslate("Aircarbon");
             case 13: return clienttranslate("Protein");
         }
+    }
+
+    function getPlayerEndScoreSummary(int $playerId) {
+        $player = $this->getPlayer($playerId);
+        $experiments = $this->getExperimentsByLocation('player', $playerId);
+        $experimentsPoints = array_reduce(array_map(fn($experiment) => $experiment->points, $experiments), fn($a, $b) => $a + $b, 0);
+        $missionsPoints = $this->getStat('endMissions', $playerId) * 3;
+
+        return [
+            'remainingResources' => $this->getStat('vpWithRemainingResources', $playerId),
+            'squares' => $this->getStat('vpWithSquares', $playerId), 
+            'greenhouses' => $this->getStat('vpWithGreenhouses', $playerId), 
+            'experiments' => $experimentsPoints,
+            'missions' => $missionsPoints,
+            'scienceByYear' => $player->scienceByYear,
+            'total' => $player->score,
+
+        ];
     }
 }

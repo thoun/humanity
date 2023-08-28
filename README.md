@@ -40,6 +40,3 @@ You can mix electricity with a base resource when you want to use 3 base resourc
 You take a communication of the same research point value, no matter the current year
 
 If all modules are taken, the arm makes a full turn to send back all astronauts.
-
-# TODO
-Summary points at the end

@@ -9,6 +9,7 @@ class HumanityPlayer {
     public int $researchPoints;
     public int $vp;
     public int $science;
+    public array $scienceByYear;
 
     public function __construct($dbPlayer) {
         $this->id = intval($dbPlayer['player_id']);
@@ -19,6 +20,7 @@ class HumanityPlayer {
         $this->vp = intval($dbPlayer['player_vp']);
         $this->researchPoints = intval($dbPlayer['player_research_points']);
         $this->science = intval($dbPlayer['player_science']);
+        $this->scienceByYear = json_decode($dbPlayer['player_science_by_year']);
     }
 }
 ?>

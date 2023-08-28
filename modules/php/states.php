@@ -279,6 +279,7 @@ trait StateTrait {
 
     function stEndYear() {
         $playersIds = $this->getPlayersIds();
+        $year = $this->getYear();
 
         // gain science points based on year research
         foreach($playersIds as $playerId) {
@@ -294,7 +295,8 @@ trait StateTrait {
 
             $playersBehind = intval($this->getUniqueValueFromDB("SELECT count(*) FROM player WHERE player_research_points < $playerResearchPoints"));
             $bonus = count($playersIds) == 2 ? 2 : 1;
-            $this->incPlayerScience($playerId, $bonus * $playersBehind, '${player_name} gains ${inc} science point(s) with ${number} player(s) behind', ['number' => $playersBehind]);
+            $gainedSciencePoints = $bonus * $playersBehind;
+            $this->incPlayerScience($playerId, $gainedSciencePoints, '${player_name} gains ${inc} science point(s) with ${number} player(s) behind', ['number' => $playersBehind]);
         }
 
         $this->DbQuery("UPDATE player SET `player_research_points` = 0");   
@@ -306,7 +308,6 @@ trait StateTrait {
             ]);
         }
 
-        $year = $this->getYear();
         // don't go further if last year
         if ($year >= 3) {
             $this->gamestate->nextState('endScore');
@@ -393,13 +394,6 @@ trait StateTrait {
             $scoreAux = 10000 * $scoreAux1 + 100 * $scoreAux2 + $scoreAux3;
             $this->DbQuery("UPDATE player SET player_score = player_vp + player_science, player_score_aux = $scoreAux WHERE player_id = $playerId");
 
-            $player = $this->getPlayer($playerId);
-            self::notifyAllPlayers('score', clienttranslate('${player_name} gains ${inc} points from with ${inc} science points'), [
-                'playerId' => $playerId,
-                'player_name' => $this->getPlayerName($playerId),
-                'new' => $player->score,
-                'inc' => $player->science,
-            ]);
 
             $playerExperiments = $this->getExperimentsByLocation('player', $playerId);
             $playerExperimentsLines = array_map(fn($experiment) => $experiment->line, $playerExperiments);
@@ -418,6 +412,15 @@ trait StateTrait {
 
             $playerMissions = $this->getMissionsByLocation('player', $playerId);
             $this->setStat(count($playerMissions), 'endMissions', $playerId);
+
+            $player = $this->getPlayer($playerId);
+            self::notifyAllPlayers('score', clienttranslate('${player_name} gains ${inc} points from with ${inc} science points'), [
+                'playerId' => $playerId,
+                'player_name' => $this->getPlayerName($playerId),
+                'new' => $player->score,
+                'inc' => $player->science,
+                'endScoreSummary' => $this->getPlayerEndScoreSummary($playerId),
+            ]);
         }
 
         $this->gamestate->nextState('endGame');

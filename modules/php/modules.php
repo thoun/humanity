@@ -120,6 +120,7 @@ trait ModuleTrait {
         if ($module->color == GREEN) {
             $set = $this->getGreenhouseSet($playerId, $module, $module);
             $moduleVp = count($set);
+            $this->incStat($moduleVp, 'vpWithGreenhouses', $playerId);
         }
         $module->vp = $moduleVp;
 

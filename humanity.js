@@ -2934,6 +2934,9 @@ var Humanity = /** @class */ (function () {
         });
         this.setupNotifications();
         this.setupPreferences();
+        if (gamedatas.isEnd) { // score or end
+            this.onEnteringShowScore(true);
+        }
         log("Ending game setup");
     };
     ///////////////////////////////////////////////////
@@ -2965,6 +2968,9 @@ var Humanity = /** @class */ (function () {
                 break;
             case 'moveAstronaut':
                 this.onEnteringMoveAstronaut(args.args);
+                break;
+            case 'endScore':
+                this.onEnteringShowScore();
                 break;
         }
     };
@@ -3002,6 +3008,36 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.onEnteringMoveAstronaut = function (args) {
         var _a;
         (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableModuleSpots(args.possibleCoordinates);
+    };
+    Humanity.prototype.onEnteringShowScore = function (fromReload) {
+        var _this = this;
+        if (fromReload === void 0) { fromReload = false; }
+        document.getElementById('score').style.display = 'flex';
+        document.getElementById('score-table-body').innerHTML = [
+            _("Remaining resources points"),
+            _("Squares points"),
+            _("Greenhouses points"),
+            _("Experiments points"),
+            _("Missions points"),
+            _("Science points"),
+            _("Total"),
+        ].map(function (label) { return "<tr><th>".concat(label, "</th></tr>"); }).join('');
+        if (fromReload) {
+            var players = Object.values(this.gamedatas.players);
+            players.forEach(function (player) { return _this.addPlayerSummaryColumn(Number(player.id), player.endScoreSummary); });
+        }
+    };
+    Humanity.prototype.addPlayerSummaryColumn = function (playerId, endScoreSummary) {
+        var player = this.getPlayer(playerId);
+        document.getElementById('scoretr').insertAdjacentHTML('beforeend', "<th class=\"player_name\" style=\"color: #".concat(player.color, "\">").concat(player.name, "</th>"));
+        var lines = Array.from(document.getElementById('score-table-body').getElementsByTagName('tr'));
+        lines[0].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.remainingResources, "</td>"));
+        lines[1].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.squares, "</td>"));
+        lines[2].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.greenhouses, "</td>"));
+        lines[3].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.experiments, "</td>"));
+        lines[4].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.missions, "</td>"));
+        lines[5].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.scienceByYear.map(function (points, index) { return "<div>".concat(points, " <span class=\"score-year\">(").concat(_('Year'), " ").concat(index + 1, ")</span></div>"); }).join(''), "</td>"));
+        lines[6].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.total, "</td>"));
     };
     Humanity.prototype.onLeavingState = function (stateName) {
         log('Leaving state: ' + stateName);
@@ -3503,6 +3539,7 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.notif_score = function (args) {
         this.setScore(args.playerId, args.new);
         this.setScience(args.playerId, Number(args.inc));
+        this.addPlayerSummaryColumn(args.playerId, args.endScoreSummary);
     };
     Humanity.prototype.notif_researchPoints = function (args) {
         this.setResearchPoints(args.playerId, args.new);
