@@ -76,6 +76,7 @@ interface PlayerEndScoreSummary {
     greenhouses: number;
     experiments: number;
     missions: number;
+    modules: number;
     scienceByYear: number[];
     total: number;
 }

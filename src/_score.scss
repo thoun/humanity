@@ -4,31 +4,33 @@
 
     #table-wrapper {
         padding: 10px;
-        background: #FFFFFF66;
-        background-size: 100% 100%;
+
+        .top-corner {
+            border-top-width: 0;
+            border-left-width: 0;
+        }
 
         table {
-
-            tbody {
-                tr {
-                    border-top: 1px solid white;
-                }
-            }
-
-            td, th {
-                &:not(:first-child) {
-                    border-left: 1px solid white;
-                }
-            }
-
             tr {
                 height: 40px;
 
+                th, td {
+                    border: 4px inset #be3c1d;
+                }
+
                 th {
                     text-align: center;
-                    color: white;
-                    text-shadow: 0px 0px 1px black, 0px 0px 2px black, 0px 0px 3px black;
+                    color: black;
+                    text-shadow: 0px 0px 1px white, 0px 0px 2px white, 0px 0px 3px white;
                     padding: 8px;
+
+                    &.player-name {
+                        width: 181px;
+                        font-weight: bold;
+                        text-shadow: 0px 0px 1px black, 0px 0px 2px black, 0px 0px 3px black;
+                        word-break: break-all;
+                        font-size: 120%;
+                    }
                 }
 
                 td {
@@ -37,16 +39,8 @@
 
                     &:not(:first-child) {
                         font-size: 150%;
-                        color: white;
-                        text-shadow: 0px 0px 1px black, 0px 0px 2px black, 0px 0px 3px black;
-                    }
-
-                    &.player-name {
-                        width: 181px;
-                        font-weight: bold;
+                        color: black;
                         text-shadow: 0px 0px 1px white, 0px 0px 2px white, 0px 0px 3px white;
-                        word-break: break-all;
-                        font-size: 120%;
                     }
 
                     &.total {

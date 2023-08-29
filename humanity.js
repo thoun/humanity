@@ -3019,6 +3019,7 @@ var Humanity = /** @class */ (function () {
             _("Greenhouses points"),
             _("Experiments points"),
             _("Missions points"),
+            _("Modules points"),
             _("Science points"),
             _("Total"),
         ].map(function (label) { return "<tr><th>".concat(label, "</th></tr>"); }).join('');
@@ -3036,8 +3037,9 @@ var Humanity = /** @class */ (function () {
         lines[2].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.greenhouses, "</td>"));
         lines[3].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.experiments, "</td>"));
         lines[4].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.missions, "</td>"));
-        lines[5].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.scienceByYear.map(function (points, index) { return "<div>".concat(points, " <span class=\"score-year\">(").concat(_('Year'), " ").concat(index + 1, ")</span></div>"); }).join(''), "</td>"));
-        lines[6].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.total, "</td>"));
+        lines[5].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.modules, "</td>"));
+        lines[6].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.scienceByYear.map(function (points, index) { return "<div>".concat(points, " <span class=\"score-year\">(").concat(_('Year'), " ").concat(index + 1, ")</span></div>"); }).join(''), "</td>"));
+        lines[7].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.total, "</td>"));
     };
     Humanity.prototype.onLeavingState = function (stateName) {
         log('Leaving state: ' + stateName);

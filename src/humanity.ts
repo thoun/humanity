@@ -238,6 +238,7 @@ class Humanity implements HumanityGame {
             _("Greenhouses points"),
             _("Experiments points"),
             _("Missions points"),
+            _("Modules points"),
             _("Science points"),
             _("Total"),
         ].map(label => `<tr><th>${label}</th></tr>`).join('');
@@ -258,8 +259,9 @@ class Humanity implements HumanityGame {
         lines[2].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.greenhouses}</td>`);
         lines[3].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.experiments}</td>`);
         lines[4].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.missions}</td>`);
-        lines[5].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.scienceByYear.map((points, index) => `<div>${points} <span class="score-year">(${_('Year')} ${index + 1})</span></div>`).join('')}</td>`);
-        lines[6].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.total}</td>`);
+        lines[5].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.modules}</td>`);
+        lines[6].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.scienceByYear.map((points, index) => `<div>${points} <span class="score-year">(${_('Year')} ${index + 1})</span></div>`).join('')}</td>`);
+        lines[7].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.total}</td>`);
     }
 
     public onLeavingState(stateName: string) {

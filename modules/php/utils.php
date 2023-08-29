@@ -305,19 +305,19 @@ trait UtilTrait {
 
     function getPlayerEndScoreSummary(int $playerId) {
         $player = $this->getPlayer($playerId);
-        $experiments = $this->getExperimentsByLocation('player', $playerId);
-        $experimentsPoints = array_reduce(array_map(fn($experiment) => $experiment->points, $experiments), fn($a, $b) => $a + $b, 0);
+        $modules = $this->getModulesByLocation('player', $playerId);
+        $modulesPoints = array_reduce(array_map(fn($module) => $module->points, $modules), fn($a, $b) => $a + $b, 0);
         $missionsPoints = $this->getStat('endMissions', $playerId) * 3;
 
         return [
             'remainingResources' => $this->getStat('vpWithRemainingResources', $playerId),
             'squares' => $this->getStat('vpWithSquares', $playerId), 
             'greenhouses' => $this->getStat('vpWithGreenhouses', $playerId), 
-            'experiments' => $experimentsPoints,
+            'experiments' => $this->getStat('vpWithExperiments', $playerId), 
             'missions' => $missionsPoints,
+            'modules' => $modulesPoints,
             'scienceByYear' => $player->scienceByYear,
             'total' => $player->score,
-
         ];
     }
 }

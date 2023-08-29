@@ -145,9 +145,10 @@ trait ModuleTrait {
             $this->incStat($points, 'vpWithModules', $playerId);
         }
 
-        if (count($squareResult['squares']) > 0) {
-            $this->incPlayerVP($playerId, count($squareResult['squares']), clienttranslate('${player_name} gains ${inc} point(s) with completed square(s)'));
-            $this->incStat($points, 'vpWithSquares', $playerId);
+        $squaresCount = count($squareResult['squares']);
+        if ($squaresCount > 0) {
+            $this->incPlayerVP($playerId, $squaresCount, clienttranslate('${player_name} gains ${inc} point(s) with completed square(s)'));
+            $this->incStat($squaresCount, 'vpWithSquares', $playerId);
 
             $sql = "INSERT INTO square (`player_id`, `x`, `y`) VALUES ";
             $values = [];

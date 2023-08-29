@@ -5,7 +5,7 @@
         <table>
             <thead>
                 <tr id="scoretr">
-                    <th></th>
+                    <th class="top-corner"></th>
                 </tr>
             </thead>
             <tbody id="score-table-body">
