@@ -303,7 +303,7 @@ $gameGameStates = [
 
     ST_END_SCORE => [
         "name" => "endScore",
-        "description" => "",
+        "description" => clienttranslate('Final score...'),
         "type" => "game",
         "action" => "stEndScore",
         "transitions" => [

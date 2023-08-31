@@ -237,6 +237,13 @@ interface NotifScoreArgs {
     private?: boolean;
 }
 
+// endScore
+interface NotifEndScoreArgs {
+    playerId: number;
+    field: string;
+    endScoreSummary: PlayerEndScoreSummary;
+}
+
 // newFirstPlayer
 interface NotifNewFirstPlayerArgs {
     playerId: number;

@@ -2826,6 +2826,7 @@ var PlayerTable = /** @class */ (function () {
     return PlayerTable;
 }());
 var ANIMATION_MS = 500;
+var SCORE_MS = 1500;
 var ACTION_TIMER_DURATION = 5;
 var LOCAL_STORAGE_ZOOM_KEY = 'Humanity-zoom';
 var LOCAL_STORAGE_JUMP_TO_FOLDED_KEY = 'Humanity-jump-to-folded';
@@ -3023,23 +3024,22 @@ var Humanity = /** @class */ (function () {
             _("Science points"),
             _("Total"),
         ].map(function (label) { return "<tr><th>".concat(label, "</th></tr>"); }).join('');
-        if (fromReload) {
-            var players = Object.values(this.gamedatas.players);
-            players.forEach(function (player) { return _this.addPlayerSummaryColumn(Number(player.id), player.endScoreSummary); });
-        }
+        var players = Object.values(this.gamedatas.players);
+        players.forEach(function (player) { return _this.addPlayerSummaryColumn(Number(player.id), player.endScoreSummary); });
     };
     Humanity.prototype.addPlayerSummaryColumn = function (playerId, endScoreSummary) {
+        var _a, _b, _c, _d, _e, _f, _g, _h;
         var player = this.getPlayer(playerId);
         document.getElementById('scoretr').insertAdjacentHTML('beforeend', "<th class=\"player_name\" style=\"color: #".concat(player.color, "\">").concat(player.name, "</th>"));
         var lines = Array.from(document.getElementById('score-table-body').getElementsByTagName('tr'));
-        lines[0].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.remainingResources, "</td>"));
-        lines[1].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.squares, "</td>"));
-        lines[2].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.greenhouses, "</td>"));
-        lines[3].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.experiments, "</td>"));
-        lines[4].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.missions, "</td>"));
-        lines[5].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.modules, "</td>"));
-        lines[6].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.scienceByYear.map(function (points, index) { return "<div>".concat(points, " <span class=\"score-year\">(").concat(_('Year'), " ").concat(index + 1, ")</span></div>"); }).join(''), "</td>"));
-        lines[7].insertAdjacentHTML("beforeend", "<td>".concat(endScoreSummary.total, "</td>"));
+        lines[0].insertAdjacentHTML("beforeend", "<td id=\"score-remainingResources-".concat(playerId, "\">").concat((_a = endScoreSummary === null || endScoreSummary === void 0 ? void 0 : endScoreSummary.remainingResources) !== null && _a !== void 0 ? _a : '', "</td>"));
+        lines[1].insertAdjacentHTML("beforeend", "<td id=\"score-squares-".concat(playerId, "\">").concat((_b = endScoreSummary === null || endScoreSummary === void 0 ? void 0 : endScoreSummary.squares) !== null && _b !== void 0 ? _b : '', "</td>"));
+        lines[2].insertAdjacentHTML("beforeend", "<td id=\"score-greenhouses-".concat(playerId, "\">").concat((_c = endScoreSummary === null || endScoreSummary === void 0 ? void 0 : endScoreSummary.greenhouses) !== null && _c !== void 0 ? _c : '', "</td>"));
+        lines[3].insertAdjacentHTML("beforeend", "<td id=\"score-experiments-".concat(playerId, "\">").concat((_d = endScoreSummary === null || endScoreSummary === void 0 ? void 0 : endScoreSummary.experiments) !== null && _d !== void 0 ? _d : '', "</td>"));
+        lines[4].insertAdjacentHTML("beforeend", "<td id=\"score-missions-".concat(playerId, "\">").concat((_e = endScoreSummary === null || endScoreSummary === void 0 ? void 0 : endScoreSummary.missions) !== null && _e !== void 0 ? _e : '', "</td>"));
+        lines[5].insertAdjacentHTML("beforeend", "<td id=\"score-modules-".concat(playerId, "\">").concat((_f = endScoreSummary === null || endScoreSummary === void 0 ? void 0 : endScoreSummary.modules) !== null && _f !== void 0 ? _f : '', "</td>"));
+        lines[6].insertAdjacentHTML("beforeend", "<td id=\"score-scienceByYear-".concat(playerId, "\">").concat((_g = endScoreSummary === null || endScoreSummary === void 0 ? void 0 : endScoreSummary.scienceByYear.map(function (points, index) { return "<div>".concat(points, " <span class=\"score-year\">(").concat(_('Year'), " ").concat(index + 1, ")</span></div>"); }).join('')) !== null && _g !== void 0 ? _g : '', "</td>"));
+        lines[7].insertAdjacentHTML("beforeend", "<td id=\"score-total-".concat(playerId, "\">").concat((_h = endScoreSummary === null || endScoreSummary === void 0 ? void 0 : endScoreSummary.total) !== null && _h !== void 0 ? _h : '', "</td>"));
     };
     Humanity.prototype.onLeavingState = function (stateName) {
         log('Leaving state: ' + stateName);
@@ -3451,7 +3451,6 @@ var Humanity = /** @class */ (function () {
             ['moveAstronautToTable', ANIMATION_MS],
             ['deployModule', undefined],
             ['deployExperiment', undefined],
-            ['score', 1],
             ['researchPoints', 1],
             ['vp', 1],
             ['science', 1],
@@ -3469,6 +3468,8 @@ var Humanity = /** @class */ (function () {
             ['moveAstronaut', ANIMATION_MS],
             ['confirmMoveAstronauts', 1],
             ['restartTurn', 1],
+            ['score', 1],
+            ['endScore', SCORE_MS],
         ];
         notifs.forEach(function (notif) {
             dojo.subscribe(notif[0], _this, function (notifDetails) {
@@ -3538,10 +3539,16 @@ var Humanity = /** @class */ (function () {
         var playerId = args.playerId, experiment = args.experiment;
         return this.getPlayerTable(playerId).addExperiment(experiment);
     };
+    Humanity.prototype.notif_endScore = function (args) {
+        var _a;
+        var field = args.field, playerId = args.playerId, endScoreSummary = args.endScoreSummary;
+        document.getElementById("score-".concat(field, "-").concat(playerId)).innerHTML = field == 'scienceByYear' ?
+            "".concat((_a = endScoreSummary.scienceByYear.map(function (points, index) { return "<div>".concat(points, " <span class=\"score-year\">(").concat(_('Year'), " ").concat(index + 1, ")</span></div>"); }).join('')) !== null && _a !== void 0 ? _a : '', "</td>") :
+            "".concat(endScoreSummary[field]);
+    };
     Humanity.prototype.notif_score = function (args) {
         this.setScore(args.playerId, args.new);
         this.setScience(args.playerId, Number(args.inc));
-        this.addPlayerSummaryColumn(args.playerId, args.endScoreSummary);
     };
     Humanity.prototype.notif_researchPoints = function (args) {
         this.setResearchPoints(args.playerId, args.new);

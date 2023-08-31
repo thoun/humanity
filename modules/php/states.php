@@ -360,6 +360,7 @@ trait StateTrait {
 
     function stEndScore() {
         $playersIds = $this->getPlayersIds();
+        $playerEndScoreSummary = [];
 
         foreach($playersIds as $playerId) {
             $player = $this->getPlayer($playerId);
@@ -413,14 +414,37 @@ trait StateTrait {
             $playerMissions = $this->getMissionsByLocation('player', $playerId);
             $this->setStat(count($playerMissions), 'endMissions', $playerId);
 
-            $player = $this->getPlayer($playerId);
-            self::notifyAllPlayers('score', clienttranslate('${player_name} gains ${inc} points from with ${inc} science points'), [
-                'playerId' => $playerId,
-                'player_name' => $this->getPlayerName($playerId),
-                'new' => $player->score,
-                'inc' => $player->science,
-                'endScoreSummary' => $this->getPlayerEndScoreSummary($playerId),
-            ]);
+            $playerEndScoreSummary[$playerId] = $this->getPlayerEndScoreSummary($playerId);
+        }
+        
+        foreach([
+            'remainingResources',
+            'squares', 
+            'greenhouses',
+            'experiments',
+            'missions',
+            'modules',
+            'scienceByYear',
+            'total',
+        ] as $field) {
+            foreach($playersIds as $playerId) {
+                if ($field == 'total') {
+                    $player = $this->getPlayer($playerId);
+                    self::notifyAllPlayers('score', clienttranslate('${player_name} gains ${inc} points from with ${inc} science points'), [
+                        'playerId' => $playerId,
+                        'player_name' => $this->getPlayerName($playerId),
+                        'new' => $player->score,
+                        'inc' => $player->science,
+                        'endScoreSummary' => $playerEndScoreSummary[$playerId],
+                    ]);
+                }
+
+                self::notifyAllPlayers('endScore', '', [
+                    'playerId' => $playerId,
+                    'field' => $field,
+                    'endScoreSummary' => $playerEndScoreSummary[$playerId],
+                ]);
+            }
         }
 
         $this->gamestate->nextState('endGame');

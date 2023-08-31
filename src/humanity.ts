@@ -6,6 +6,7 @@ declare const _;
 declare const g_gamethemeurl;
 
 const ANIMATION_MS = 500;
+const SCORE_MS = 1500;
 const ACTION_TIMER_DURATION = 5;
 
 const LOCAL_STORAGE_ZOOM_KEY = 'Humanity-zoom';
@@ -243,25 +244,23 @@ class Humanity implements HumanityGame {
             _("Total"),
         ].map(label => `<tr><th>${label}</th></tr>`).join('');
 
-        if (fromReload) {
-            const players = Object.values(this.gamedatas.players);
-            players.forEach(player => this.addPlayerSummaryColumn(Number(player.id), player.endScoreSummary));            
-        }
+        const players = Object.values(this.gamedatas.players);
+        players.forEach(player => this.addPlayerSummaryColumn(Number(player.id), player.endScoreSummary)); 
     }
     
-    private addPlayerSummaryColumn(playerId: number, endScoreSummary: PlayerEndScoreSummary): void {
+    private addPlayerSummaryColumn(playerId: number, endScoreSummary?: PlayerEndScoreSummary): void {
         const player = this.getPlayer(playerId);
         document.getElementById('scoretr').insertAdjacentHTML('beforeend', `<th class="player_name" style="color: #${player.color}">${player.name}</th>`);
 
         const lines = Array.from(document.getElementById('score-table-body').getElementsByTagName('tr'));
-        lines[0].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.remainingResources}</td>`);
-        lines[1].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.squares}</td>`);
-        lines[2].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.greenhouses}</td>`);
-        lines[3].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.experiments}</td>`);
-        lines[4].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.missions}</td>`);
-        lines[5].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.modules}</td>`);
-        lines[6].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.scienceByYear.map((points, index) => `<div>${points} <span class="score-year">(${_('Year')} ${index + 1})</span></div>`).join('')}</td>`);
-        lines[7].insertAdjacentHTML(`beforeend`, `<td>${endScoreSummary.total}</td>`);
+        lines[0].insertAdjacentHTML(`beforeend`, `<td id="score-remainingResources-${playerId}">${endScoreSummary?.remainingResources ?? ''}</td>`);
+        lines[1].insertAdjacentHTML(`beforeend`, `<td id="score-squares-${playerId}">${endScoreSummary?.squares ?? ''}</td>`);
+        lines[2].insertAdjacentHTML(`beforeend`, `<td id="score-greenhouses-${playerId}">${endScoreSummary?.greenhouses ?? ''}</td>`);
+        lines[3].insertAdjacentHTML(`beforeend`, `<td id="score-experiments-${playerId}">${endScoreSummary?.experiments ?? ''}</td>`);
+        lines[4].insertAdjacentHTML(`beforeend`, `<td id="score-missions-${playerId}">${endScoreSummary?.missions ?? ''}</td>`);
+        lines[5].insertAdjacentHTML(`beforeend`, `<td id="score-modules-${playerId}">${endScoreSummary?.modules ?? ''}</td>`);
+        lines[6].insertAdjacentHTML(`beforeend`, `<td id="score-scienceByYear-${playerId}">${endScoreSummary?.scienceByYear.map((points, index) => `<div>${points} <span class="score-year">(${_('Year')} ${index + 1})</span></div>`).join('') ?? ''}</td>`);
+        lines[7].insertAdjacentHTML(`beforeend`, `<td id="score-total-${playerId}">${endScoreSummary?.total ?? ''}</td>`);
     }
 
     public onLeavingState(stateName: string) {
@@ -1001,7 +1000,6 @@ class Humanity implements HumanityGame {
             ['moveAstronautToTable', ANIMATION_MS],
             ['deployModule', undefined],
             ['deployExperiment', undefined],
-            ['score', 1],
             ['researchPoints', 1],
             ['vp', 1],
             ['science', 1],
@@ -1019,6 +1017,8 @@ class Humanity implements HumanityGame {
             ['moveAstronaut', ANIMATION_MS],
             ['confirmMoveAstronauts', 1],
             ['restartTurn', 1],
+            ['score', 1],
+            ['endScore', SCORE_MS],
         ];
     
         notifs.forEach((notif) => {
@@ -1107,10 +1107,16 @@ class Humanity implements HumanityGame {
         return this.getPlayerTable(playerId).addExperiment(experiment);
     }
 
+    notif_endScore(args: NotifEndScoreArgs) {
+        const {field, playerId, endScoreSummary} = args;
+        document.getElementById(`score-${field}-${playerId}`).innerHTML = field == 'scienceByYear' ?
+        `${endScoreSummary.scienceByYear.map((points, index) => `<div>${points} <span class="score-year">(${_('Year')} ${index + 1})</span></div>`).join('') ?? ''}</td>` : 
+        `${endScoreSummary[field]}`;
+    }
+
     notif_score(args: NotifScoreArgs) {
         this.setScore(args.playerId, args.new);
         this.setScience(args.playerId, Number(args.inc));
-        this.addPlayerSummaryColumn(args.playerId, (args as any).endScoreSummary);
     }
 
     notif_researchPoints(args: NotifScoreArgs) {
