@@ -63,6 +63,32 @@ trait UtilTrait {
         return true;
     }
 
+    function computePermutations(array $array) {
+        $result = [];
+    
+        $recurse = function($array, $start_i = 0) use (&$result, &$recurse) {
+            if ($start_i === count($array)-1) {
+                array_push($result, $array);
+            }
+    
+            for ($i = $start_i; $i < count($array); $i++) {
+                //Swap array value at $i and $start_i
+                $t = $array[$i]; $array[$i] = $array[$start_i]; $array[$start_i] = $t;
+    
+                //Recurse
+                $recurse($array, $start_i + 1);
+    
+                //Restore old order
+                $t = $array[$i]; $array[$i] = $array[$start_i]; $array[$start_i] = $t;
+            }
+        };
+    
+        $recurse($array);
+    
+        return $result;
+    }
+    
+
     function setGlobalVariable(string $name, /*object|array*/ $obj) {
         /*if ($obj == null) {
             throw new \Error('Global Variable null');
@@ -176,6 +202,26 @@ trait UtilTrait {
         $playerModules = $this->getModulesByLocation('player', $playerId);
         $modules = array_values(array_filter($playerModules, fn($t) => $t->production !== null && $t->r > 0));
 
+        $singleProductionModules = array_values(array_filter($modules, fn($module) => count($module->production) == 1));
+        $doubleProductionModules = array_values(array_filter($modules, fn($module) => count($module->production) > 1));
+
+        $doubleProductionModulePermutations = $this->computePermutations($doubleProductionModules);
+        if (count($doubleProductionModulePermutations) == 0) {
+            $doubleProductionModulePermutations = [[]]; // make sure we test if there is only single production modules !
+        }
+        // clone modules before testing, to not share rotation with other performed permutations !!!
+        $paymentCombinations = array_map(fn($doubleModulePermutation) => $this->canPayWithModules($cost, json_decode(json_encode(array_merge($singleProductionModules, $doubleModulePermutation)))), $doubleProductionModulePermutations);
+        $paymentCombinations = array_values(array_filter($paymentCombinations, fn($pc) => $pc != null));
+        if (count($paymentCombinations) == 0) {
+            return null;
+        }
+        // make sure we keep the combination using the less electricity
+        usort($paymentCombinations, fn($a, $b) => $a['payWith'][ELECTRICITY] - $b['payWith'][ELECTRICITY]);
+        return $paymentCombinations[0];
+    }
+
+        
+    function canPayWithModules(array $cost, array $modules) { // payment if can pay, null if cannot pay
         $payWith = [
             ELECTRICITY => 0,
             1 => 0, 2 => 0, 3 => 0,
