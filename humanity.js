@@ -2395,7 +2395,9 @@ var ResearchBoard = /** @class */ (function () {
             _this.moduleDecks[year] = new Deck(_this.game.modulesManager, document.getElementById("module-deck-".concat(year)), {
                 cardNumber: gamedatas.moduleDeckCounts[year],
                 topCard: gamedatas.moduleDeckTopCard[year],
-                counter: {},
+                counter: {
+                    hideWhenEmpty: true,
+                },
             });
         });
     }

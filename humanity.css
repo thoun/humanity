@@ -1316,6 +1316,11 @@ body > .card {
 #research-board #module-decks .module-deck.card-stock.deck > .card:first-child {
   box-shadow: none;
 }
+#research-board #module-decks .module-deck[data-empty=true] {
+  -webkit-mask: url("img/modules-starting.png") no-repeat left/cover;
+  mask: url("img/modules-starting.png") no-repeat left/cover;
+  background-color: rgba(170, 170, 170, 0.4);
+}
 
 .player-board {
   background-color: white;

@@ -155,6 +155,12 @@
       &.card-stock.deck > .card:first-child {
         box-shadow: none;
       }
+
+      &[data-empty="true"] {
+        -webkit-mask: url('img/modules-starting.png') no-repeat left / cover;  
+        mask: url('img/modules-starting.png') no-repeat left / cover;  
+        background-color: #AAAAAA66;
+      }
     }
   }
 }

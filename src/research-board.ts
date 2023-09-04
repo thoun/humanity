@@ -56,7 +56,9 @@ class ResearchBoard {
             this.moduleDecks[year] = new Deck<Module>(this.game.modulesManager, document.getElementById(`module-deck-${year}`), {
                 cardNumber: gamedatas.moduleDeckCounts[year],
                 topCard: gamedatas.moduleDeckTopCard[year],
-                counter: {},
+                counter: {
+                    hideWhenEmpty: true,
+                },
             });
         })
     }
