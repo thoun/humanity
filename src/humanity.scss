@@ -38,13 +38,59 @@ html, .mode_3d #game_play_area_background {
   background-position: top;
 }
 
+.year-wrapper {
+  margin: 8px;
+}
+
+#years-progress {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.year-progress {
+  height: 8px;
+
+  &.finished {
+    background: #335593;
+
+    .in-year-progress {
+      display: none;
+    }
+  }
+
+  .in-year-progress {
+    background: #dc9026;
+    width: 0%;
+    height: 100%;
+  }
+}
+
 .year {
   background: white;
-  margin: 8px;
   padding: 5px;
   font-size: 16pt;
   font-family: 'conthrax-sb';
   text-align: center;
+}
+
+.year-text {
+  display: inline-block;
+
+  &.animate {
+      animation: year-text-animation 2s 1 forwards ease-in-out;
+  }
+}
+
+@keyframes year-text-animation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(3);
+  }
+  100% { 
+    transform: scale(1);
+  }
 }
 
 .icon {

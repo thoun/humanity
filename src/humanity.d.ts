@@ -118,6 +118,7 @@ interface HumanityGamedatas {
     moduleDeckTopCard: { [year: number]: Module };
     arm: number;
     year: number;
+    inYearProgress: number;
     firstPlayerId: number;
     isEnd: boolean;
 
@@ -257,6 +258,7 @@ interface NotifTableModuleArgs {
 //  newTableModule
 interface NotifNewTableModuleArgs extends NotifTableModuleArgs {
     year: number;
+    inYearProgress: number;
     moduleDeckCount: number;
     moduleDeckTopCard: Module;
 }
@@ -280,6 +282,7 @@ interface NotifReactivateAstronautsArgs {
 // year
 interface NotifYearArgs {
     year: number | string;
+    inYearProgress: number;
 }
 
 // gainMission

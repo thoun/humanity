@@ -15,7 +15,14 @@
 </div>
 
 <div id="table">
-    <div class="year"><span id="year"></span> / 3</div>
+    <div class="year-wrapper">
+        <div id="years-progress"></div>
+        <div class="year">
+            <span class="year-text">
+                <span id="year"></span> / 3
+            </span>
+        </div>
+    </div>
     <div id="tables-and-center">
         <div id="table-center-wrapper">
             <div id="board-1">

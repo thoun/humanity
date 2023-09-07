@@ -2937,10 +2937,20 @@ var Humanity = /** @class */ (function () {
         });
         this.setupNotifications();
         this.setupPreferences();
+        [1, 2, 3].forEach(function (year) {
+            document.getElementById("years-progress").insertAdjacentHTML("beforeend", "\n                <div id=\"year-progress-".concat(year, "\" class=\"year-progress\">\n                    <div id=\"in-year-progress-").concat(year, "\" class=\"in-year-progress\"></div>\n                </div>\n            "));
+        });
+        this.setProgress(gamedatas.year, gamedatas.isEnd ? 101 : gamedatas.inYearProgress);
         if (gamedatas.isEnd) { // score or end
             this.onEnteringShowScore(true);
         }
         log("Ending game setup");
+    };
+    Humanity.prototype.setProgress = function (currentYear, inYearProgress) {
+        [1, 2, 3].forEach(function (year) {
+            document.getElementById("year-progress-".concat(year)).classList.toggle('finished', currentYear > year || (currentYear == 3 && inYearProgress > 100));
+        });
+        document.getElementById("in-year-progress-".concat(currentYear)).style.width = "".concat(Math.min(100, inYearProgress), "%");
     };
     ///////////////////////////////////////////////////
     //// Game & client states
@@ -3465,7 +3475,7 @@ var Humanity = /** @class */ (function () {
             ['reactivateAstronauts', ANIMATION_MS],
             ['upgradeAstronaut', 50],
             ['addSquares', 1],
-            ['year', ANIMATION_MS],
+            ['year', 2000],
             ['gainMission', undefined],
             ['moveAstronaut', ANIMATION_MS],
             ['confirmMoveAstronauts', 1],
@@ -3576,6 +3586,7 @@ var Humanity = /** @class */ (function () {
         var module = args.module, year = args.year, moduleDeckCount = args.moduleDeckCount, moduleDeckTopCard = args.moduleDeckTopCard;
         this.tableCenter.newModule(module);
         this.researchBoard.moduleDecks[year].setCardNumber(moduleDeckCount, moduleDeckTopCard);
+        this.setProgress(args.year, args.inYearProgress);
     };
     Humanity.prototype.notif_moveArm = function (args) {
         this.tableCenter.moveArm(Number(args.diff));
@@ -3595,7 +3606,15 @@ var Humanity = /** @class */ (function () {
         this.astronautsManager.updateAstronaut(args.astronaut);
     };
     Humanity.prototype.notif_year = function (args) {
-        this.yearCounter.toValue(+args.year);
+        var year = +args.year;
+        this.setProgress(year, args.inYearProgress);
+        if (year != this.yearCounter.getValue()) {
+            this.yearCounter.toValue(year);
+            var label = document.querySelector('.year-text');
+            label.classList.remove('animate');
+            label.clientWidth;
+            label.classList.add('animate');
+        }
     };
     Humanity.prototype.notif_gainMission = function (args) {
         var _a;

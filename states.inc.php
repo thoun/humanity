@@ -269,6 +269,7 @@ $gameGameStates = [
         "description" => clienttranslate('Update and refill board...'),
         "type" => "game",
         "action" => "stEndRound",
+        "updateGameProgression" => true,
         "transitions" => [
             "moveAstronauts" => ST_MULTIPLAYER_MOVE_ASTRONAUTS,
             "afterEndRound" => ST_AFTER_END_ROUND,

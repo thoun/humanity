@@ -227,6 +227,7 @@ trait StateTrait {
                         'preserve' => ['module'],
                         
                         'year' => $year,
+                        'inYearProgress' => $this->getInYearProgress($year),
                         'moduleDeckCount' => intval($this->modules->countCardInLocation("deck$year")),
                         'moduleDeckTopCard' => Module::onlyId($this->getModuleFromDb($this->modules->getCardOnTop("deck$year"))),
                     ]);
@@ -310,6 +311,11 @@ trait StateTrait {
 
         // don't go further if last year
         if ($year >= 3) {
+            $this->notifyAllPlayers('year', '', [
+                'year' => 3,
+                'inYearProgress' => 101,
+            ]);
+
             $this->gamestate->nextState('endScore');
             return;
         }
@@ -318,6 +324,7 @@ trait StateTrait {
         $this->setGlobalVariable(YEAR, $year);
         $this->notifyAllPlayers('year', clienttranslate('Year ${year} begins'), [
             'year' => $year,
+            'inYearProgress' => $this->getInYearProgress($year),
         ]);
 
         // replace all experiment tiles
@@ -343,6 +350,7 @@ trait StateTrait {
                     'preserve' => ['module'],
                     
                     'year' => $year,
+                    'inYearProgress' => $this->getInYearProgress($year),
                     'moduleDeckCount' => intval($this->modules->countCardInLocation("deck$year")),
                     'moduleDeckTopCard' => Module::onlyId($this->getModuleFromDb($this->modules->getCardOnTop("deck$year"))),
                 ]);

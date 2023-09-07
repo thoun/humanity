@@ -202,6 +202,7 @@ class Humanity extends Table {
 
         $result['arm'] = $this->getArm();
         $result['year'] = $this->getYear();
+        $result['inYearProgress'] = $this->getInYearProgress($result['year']);
         $result['firstPlayerId'] = $this->getGlobalVariable(FIRST_PLAYER);
         $result['isEnd'] = $isEndScore;
 
@@ -230,7 +231,10 @@ class Humanity extends Table {
         (see states.inc.php)
     */
     function getGameProgression() {
-        return ($this->getGlobalVariable(YEAR) - 1) * 100 / 3;
+        $year = $this->getYear();
+        $yearProgress = ($year - 1) * 100 / 3;
+        $inYearProgress = $this->getInYearProgress($year);
+        return $yearProgress + ($inYearProgress / 3);
     }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -146,11 +146,27 @@ class Humanity implements HumanityGame {
         this.setupNotifications();
         this.setupPreferences();
 
+        [1, 2, 3].forEach(year => {
+            document.getElementById(`years-progress`).insertAdjacentHTML(`beforeend`, `
+                <div id="year-progress-${year}" class="year-progress">
+                    <div id="in-year-progress-${year}" class="in-year-progress"></div>
+                </div>
+            `);
+        });
+        this.setProgress(gamedatas.year, gamedatas.isEnd ? 101 : gamedatas.inYearProgress);
+
         if (gamedatas.isEnd) { // score or end
             this.onEnteringShowScore(true);
         }
 
         log( "Ending game setup" );
+    }
+
+    private setProgress(currentYear: number, inYearProgress: number) {
+        [1, 2, 3].forEach(year => {
+            document.getElementById(`year-progress-${year}`).classList.toggle('finished', currentYear > year || (currentYear == 3 && inYearProgress > 100));
+        });
+        document.getElementById(`in-year-progress-${currentYear}`).style.width = `${Math.min(100, inYearProgress)}%`;
     }
 
     ///////////////////////////////////////////////////
@@ -1012,7 +1028,7 @@ class Humanity implements HumanityGame {
             ['reactivateAstronauts', ANIMATION_MS],
             ['upgradeAstronaut', 50],
             ['addSquares', 1],
-            ['year', ANIMATION_MS],
+            ['year', 2000],
             ['gainMission', undefined],
             ['moveAstronaut', ANIMATION_MS],
             ['confirmMoveAstronauts', 1],
@@ -1149,6 +1165,7 @@ class Humanity implements HumanityGame {
         const { module, year, moduleDeckCount, moduleDeckTopCard } = args;
         this.tableCenter.newModule(module);
         this.researchBoard.moduleDecks[year].setCardNumber(moduleDeckCount, moduleDeckTopCard);
+        this.setProgress(args.year, args.inYearProgress);
     }  
 
     notif_moveArm(args: NotifMoveArmArgs) {
@@ -1172,7 +1189,15 @@ class Humanity implements HumanityGame {
     }
 
     notif_year(args: NotifYearArgs) {
-        this.yearCounter.toValue(+args.year);
+        const year = +args.year;
+        this.setProgress(year, args.inYearProgress);
+        if (year != this.yearCounter.getValue()) {
+            this.yearCounter.toValue(year);
+            const label = document.querySelector('.year-text');
+            label.classList.remove('animate');
+            label.clientWidth;
+            label.classList.add('animate');
+        }
     }
 
     notif_gainMission(args: NotifGainMissionArgs) {

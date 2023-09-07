@@ -38,8 +38,8 @@ trait DebugUtilTrait {
         //$this->DbQuery("UPDATE module SET `r` = 3, `card_location` = 'player', card_location_arg = 2343492, x = -1, y = 3 WHERE `card_type` = 1 AND `card_type_arg` = 6");
         //$this->DbQuery("UPDATE experiment SET card_location ='table', card_location_arg = 0 WHERE `card_type` = 3 AND `card_type_arg` = 1");
 
-        $this->setGlobalVariable(YEAR, 3);
-        $this->debugEndYear(3);
+        //$this->setGlobalVariable(YEAR, 3);
+        //$this->debugEndYear(3);
     }
 
     function debugR($r) {

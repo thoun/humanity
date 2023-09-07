@@ -366,4 +366,12 @@ trait UtilTrait {
             'total' => $player->score,
         ];
     }
+
+    function getInYearProgress(?int $year = null) {
+        if ($year === null) {
+            $year = $this->getYear();
+        }
+
+        return (15 - intval($this->modules->countCardInLocation("deck$year"))) * 100 / 15;
+    }
 }
