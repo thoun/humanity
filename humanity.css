@@ -1631,6 +1631,7 @@ html, .mode_3d #game_play_area_background {
 #years-progress {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
 }
 
 .year-progress {
