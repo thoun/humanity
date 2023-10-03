@@ -126,6 +126,7 @@ interface HumanityGamedatas {
 }
 
 interface HumanityGame extends Game {
+    animationManager: AnimationManager;
     astronautsManager: AstronautsManager;
     modulesManager: ModulesManager;
     experimentsManager: ExperimentsManager;
@@ -206,6 +207,7 @@ interface NotifAstronautArgs {
 interface NotifGainTimeUnitArgs {
     playerId: number;
     astronauts: Astronaut[];
+    timeUnits: number;
 }
 
 // moveAstronautToTable

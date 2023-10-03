@@ -2292,6 +2292,22 @@ var TableCenter = /** @class */ (function () {
         }); });
         this.setArm(gamedatas.arm);
     }
+    TableCenter.prototype.moveAstronautTimeUnit = function (astronaut, timeUnits) {
+        return __awaiter(this, void 0, void 0, function () {
+            var astronautDiv;
+            return __generator(this, function (_a) {
+                astronautDiv = document.getElementById("astronaut-".concat(astronaut.id));
+                astronautDiv.classList.remove('selectable', 'selected');
+                this.moveAstronaut(astronaut);
+                if (this.game.animationManager.animationsActive()) {
+                    astronautDiv.style.setProperty('--time-units', '' + timeUnits);
+                    astronautDiv.classList.add('animate');
+                    setTimeout(function () { return astronautDiv.classList.remove('animate'); }, 2000);
+                }
+                return [2 /*return*/];
+            });
+        });
+    };
     TableCenter.prototype.moveAstronaut = function (astronaut) {
         var astronautDiv = document.getElementById("astronaut-".concat(astronaut.id));
         astronautDiv.classList.remove('selectable', 'selected');
@@ -3473,7 +3489,7 @@ var Humanity = /** @class */ (function () {
             ['pay', 50],
             ['removeModule', ANIMATION_MS],
             ['disableAstronaut', ANIMATION_MS],
-            ['gainTimeUnit', ANIMATION_MS],
+            ['gainTimeUnit', ANIMATION_MS * 3],
             ['moveAstronautToTable', ANIMATION_MS],
             ['deployModule', undefined],
             ['deployExperiment', undefined],
@@ -3544,9 +3560,14 @@ var Humanity = /** @class */ (function () {
         this.astronautsManager.updateAstronaut(args.astronaut);
     };
     Humanity.prototype.notif_gainTimeUnit = function (args) {
-        var _this = this;
-        var astronauts = args.astronauts;
-        astronauts.forEach(function (astronaut) { return _this.tableCenter.moveAstronaut(astronaut); });
+        return __awaiter(this, void 0, void 0, function () {
+            var astronauts, timeUnits;
+            var _this = this;
+            return __generator(this, function (_a) {
+                astronauts = args.astronauts, timeUnits = args.timeUnits;
+                return [2 /*return*/, Promise.all(astronauts.map(function (astronaut) { return _this.tableCenter.moveAstronautTimeUnit(astronaut, timeUnits); }))];
+            });
+        });
     };
     Humanity.prototype.notif_moveAstronautToTable = function (args) {
         var astronaut = args.astronaut;

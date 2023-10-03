@@ -1175,7 +1175,20 @@ body > .card {
 #board-1 #table-astronauts .slot[data-slot-id="7"] {
   transform: rotate(315deg) translateY(540px) rotate(180deg);
 }
+#board-1 #table-astronauts .slot .astronaut.animate {
+  --time-units: 0;
+  animation: astronaut-time-unit-animation 1.5s 1 forwards ease-in-out;
+  z-index: 1;
+}
 
+@keyframes astronaut-time-unit-animation {
+  0% {
+    transform: translate(0px, 530px) rotate(calc(45deg * var(--time-units))) translate(0px, -530px);
+  }
+  100% {
+    transform: translate(0px, 530px) rotate(0deg) translate(0px, -530px);
+  }
+}
 #research-board {
   position: relative;
   width: 682px;

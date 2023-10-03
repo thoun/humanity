@@ -36,7 +36,19 @@ class TableCenter {
         this.setArm(gamedatas.arm);
     }
     
-    public moveAstronaut(astronaut: Astronaut): void {
+    public async moveAstronautTimeUnit(astronaut: Astronaut, timeUnits: number): Promise<any> {
+        const astronautDiv = document.getElementById(`astronaut-${astronaut.id}`);
+        astronautDiv.classList.remove('selectable', 'selected');
+
+        this.moveAstronaut(astronaut);
+        if (this.game.animationManager.animationsActive()) {
+            astronautDiv.style.setProperty('--time-units', ''+timeUnits);
+            astronautDiv.classList.add('animate');
+            setTimeout(() => astronautDiv.classList.remove('animate'), 2000);
+        }
+    }
+    
+    public moveAstronaut(astronaut: Astronaut) {
         const astronautDiv = document.getElementById(`astronaut-${astronaut.id}`);
         astronautDiv.classList.remove('selectable', 'selected');
 

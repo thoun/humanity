@@ -79,6 +79,7 @@ trait AstronautTrait {
             'playerId' => $playerId,
             'player_name' => $this->getPlayerName($playerId),
             'astronauts' => $movedAstronauts,
+            'timeUnits' => $amount, // for logs
             'amount' => $amount, // for logs
         ]);
 

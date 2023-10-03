@@ -27,13 +27,13 @@ function getCostStr(cost: Icons) {
 }
 
 class Humanity implements HumanityGame {
+    public animationManager: AnimationManager;
     public astronautsManager: AstronautsManager;
     public modulesManager: ModulesManager;
     public experimentsManager: ExperimentsManager;
     public missionsManager: MissionsManager;
 
     private zoomManager: ZoomManager;
-    private animationManager: AnimationManager;
     private gamedatas: HumanityGamedatas;
     private tableCenter: TableCenter;
     private researchBoard: ResearchBoard;
@@ -1022,7 +1022,7 @@ class Humanity implements HumanityGame {
             ['pay', 50],
             ['removeModule', ANIMATION_MS],
             ['disableAstronaut', ANIMATION_MS],
-            ['gainTimeUnit', ANIMATION_MS],
+            ['gainTimeUnit', ANIMATION_MS * 3],
             ['moveAstronautToTable', ANIMATION_MS],
             ['deployModule', undefined],
             ['deployExperiment', undefined],
@@ -1107,9 +1107,9 @@ class Humanity implements HumanityGame {
         this.astronautsManager.updateAstronaut(args.astronaut);
     }
 
-    notif_gainTimeUnit(args: NotifGainTimeUnitArgs) {
-        const { astronauts } = args;
-        astronauts.forEach(astronaut => this.tableCenter.moveAstronaut(astronaut));
+    async notif_gainTimeUnit(args: NotifGainTimeUnitArgs) {
+        const { astronauts, timeUnits } = args;
+        return Promise.all(astronauts.map(astronaut => this.tableCenter.moveAstronautTimeUnit(astronaut, timeUnits)));
     }
 
     notif_moveAstronautToTable(args: NotifMoveAstronautToTableArgs) {
