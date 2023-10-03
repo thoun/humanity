@@ -21,6 +21,12 @@ trait ArgsTrait {
             'astronauts' => $astronauts,
         ];
     }
+
+    function getTimeUnitUseful(int $playerId) {
+        $tableAstronauts = $this->getPlayerAstronauts($playerId, 'table');
+        $arm = $this->getArm();
+        return count(array_filter($tableAstronauts, fn($astronaut) => $astronaut->spot != $arm)) > 0;
+    }
    
     function argChooseAction() {
         $playerId = intval($this->getActivePlayerId());
@@ -39,11 +45,16 @@ trait ArgsTrait {
         $playerModules = $this->getModulesByLocation('player', $playerId);
         $activatableModules = array_values(array_filter($playerModules, fn($module) => $module->workforce != null && $module->r < 3 && $module->workforce <= $astronaut->remainingWorkforce));
 
+        $astronauts = $this->getPlayerAstronauts($playerId, 'player', false);
+        $reactivatableAstronauts = $this->array_some($astronauts, fn($a) => $a->remainingWorkforce <= 0);
+
         return [
             'astronaut' => $astronaut,
             'activatableModules' => $activatableModules,
+            'timeUnitUseful' => $this->getTimeUnitUseful($playerId),
             'selectableModules' => $selectableModules,
             'selectableExperiments' => $selectableExperiments,
+            'reactivatableAstronauts' => $reactivatableAstronauts,
         ];
     }
 
@@ -59,6 +70,7 @@ trait ArgsTrait {
             'astronaut' => $astronaut,
             'remaining' => $astronaut->remainingWorkforce, // for title
             'activatableModules' => $activatableModules,
+            'timeUnitUseful' => $this->getTimeUnitUseful($playerId),
         ];
     }
 

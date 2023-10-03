@@ -3304,13 +3304,27 @@ var Humanity = /** @class */ (function () {
         return html;
     };
     Humanity.prototype.onTableExperimentClick = function (experiment) {
+        var _this = this;
         if (this.gamedatas.gamestate.name == 'chooseAction') {
-            this.chooseNewExperiment(experiment.id);
+            var args = this.gamedatas.gamestate.args;
+            if (experiment.effect == 1 && !args.reactivatableAstronauts) {
+                this.confirmationDialog(_("There are no astronaut to reactivate."), function () { return _this.chooseNewExperiment(experiment.id); });
+            }
+            else {
+                this.chooseNewExperiment(experiment.id);
+            }
         }
     };
     Humanity.prototype.onPlayerModuleClick = function (card) {
+        var _this = this;
         if (['activateModule', 'chooseAction'].includes(this.gamedatas.gamestate.name)) {
-            this.activateModule(card.id);
+            var args = this.gamedatas.gamestate.args;
+            if (!args.timeUnitUseful) {
+                this.confirmationDialog(_("There are no astronaut to move."), function () { return _this.activateModule(card.id); });
+            }
+            else {
+                this.activateModule(card.id);
+            }
         }
     };
     Humanity.prototype.onPlayerModuleSpotClick = function (x, y) {

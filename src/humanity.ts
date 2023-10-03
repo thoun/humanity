@@ -826,13 +826,23 @@ class Humanity implements HumanityGame {
     
     public onTableExperimentClick(experiment: Experiment): void {
         if (this.gamedatas.gamestate.name == 'chooseAction') {
-            this.chooseNewExperiment(experiment.id);
+            const args = this.gamedatas.gamestate.args as EnteringActivateModuleArgs;
+            if (experiment.effect == 1 && !args.reactivatableAstronauts) {
+                (this as any).confirmationDialog(_("There are no astronaut to reactivate."), () => this.chooseNewExperiment(experiment.id));
+            } else {
+                this.chooseNewExperiment(experiment.id);
+            }
         }
     }
 
     public onPlayerModuleClick(card: Module): void {
         if (['activateModule', 'chooseAction'].includes(this.gamedatas.gamestate.name)) {
-            this.activateModule(card.id);
+            const args = this.gamedatas.gamestate.args as EnteringActivateModuleArgs;
+            if (!args.timeUnitUseful) {
+                (this as any).confirmationDialog(_("There are no astronaut to move."), () => this.activateModule(card.id));
+            } else {
+                this.activateModule(card.id);
+            }
         }
     }
     

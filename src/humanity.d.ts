@@ -170,6 +170,8 @@ interface EnteringPayArgs extends EnteringAstronautArgs {
 
 interface EnteringActivateModuleArgs extends EnteringAstronautArgs {
     activatableModules: Module[];
+    timeUnitUseful: boolean;
+    reactivatableAstronauts: boolean;
 }
 
 interface EnteringMoveAstronautArgs extends EnteringAstronautArgs {
