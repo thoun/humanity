@@ -835,13 +835,13 @@ class Humanity implements HumanityGame {
         }
     }
 
-    public onPlayerModuleClick(card: Module): void {
+    public onPlayerModuleClick(module: Module): void {
         if (['activateModule', 'chooseAction'].includes(this.gamedatas.gamestate.name)) {
             const args = this.gamedatas.gamestate.args as EnteringActivateModuleArgs;
-            if (!args.timeUnitUseful) {
-                (this as any).confirmationDialog(_("There are no astronaut to move."), () => this.activateModule(card.id));
+            if (module.matchType == 2 && !args.timeUnitUseful) {
+                (this as any).confirmationDialog(_("There are no astronaut to move."), () => this.activateModule(module.id));
             } else {
-                this.activateModule(card.id);
+                this.activateModule(module.id);
             }
         }
     }

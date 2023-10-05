@@ -3331,15 +3331,15 @@ var Humanity = /** @class */ (function () {
             }
         }
     };
-    Humanity.prototype.onPlayerModuleClick = function (card) {
+    Humanity.prototype.onPlayerModuleClick = function (module) {
         var _this = this;
         if (['activateModule', 'chooseAction'].includes(this.gamedatas.gamestate.name)) {
             var args = this.gamedatas.gamestate.args;
-            if (!args.timeUnitUseful) {
-                this.confirmationDialog(_("There are no astronaut to move."), function () { return _this.activateModule(card.id); });
+            if (module.matchType == 2 && !args.timeUnitUseful) {
+                this.confirmationDialog(_("There are no astronaut to move."), function () { return _this.activateModule(module.id); });
             }
             else {
-                this.activateModule(card.id);
+                this.activateModule(module.id);
             }
         }
     };
