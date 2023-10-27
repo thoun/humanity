@@ -123,10 +123,14 @@ $playerActionsGameStates = [
         "name" => "pay",
         "description" => clienttranslate('${actplayer} must spend ${cost}'),
         "descriptionmyturn" => clienttranslate('Click on your modules to spend ${cost} or '),
+        "descriptionmyturnConvert" => clienttranslate('Click on your modules to spend 3 basic resources to generate ${resource}'),
         "type" => "activeplayer",    
         "args" => "argPay",
         "possibleactions" => [ 
-            "pay", "autoPay",
+            "pay", 
+            "autoPay", 
+            "convertBasicResources",
+            "cancelConvertBasicResources",
         ],
         "transitions" => [
             "stay" => ST_PLAYER_SPEND_RESOURCES,

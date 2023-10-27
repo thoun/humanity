@@ -111,6 +111,23 @@
         self::ajaxResponse();
     }
 
+    public function convertBasicResources() {
+        self::setAjaxMode();     
+
+        $resource = self::getArg("resource", AT_posint, true);
+        $this->game->convertBasicResources($resource);
+
+        self::ajaxResponse();
+    }
+
+    public function cancelConvertBasicResources() {
+        self::setAjaxMode();     
+
+        $this->game->cancelConvertBasicResources();
+
+        self::ajaxResponse();
+    }
+
     public function endTurn() {
         self::setAjaxMode();     
 

@@ -9,6 +9,8 @@ class CurrentAction {
     public ?int $experiment;
     public ?array $remainingCost;
     public ?int $upgrade;
+    public ?int $manualAdvancedResource;
+    public ?array $usedForManualAdvancedResource;
 
     public function __construct(int $selectedAstronaut) {
         $this->selectedAstronaut = $selectedAstronaut;

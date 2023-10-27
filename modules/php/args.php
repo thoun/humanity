@@ -87,11 +87,14 @@ trait ArgsTrait {
         
         $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
         $astronaut = $this->getAstronautById($currentAction->selectedAstronaut);
-        
+        $manualAdvancedResource = property_exists($currentAction, 'manualAdvancedResource') ? $currentAction->manualAdvancedResource : null;
+        $usedForManualAdvancedResource = property_exists($currentAction, 'usedForManualAdvancedResource') ? $currentAction->usedForManualAdvancedResource : null;
 
-        $pay = $this->canPay((array)$currentAction->remainingCost, $playerId);
+        $remainingCost = $manualAdvancedResource ? [$manualAdvancedResource - 10 => 3] : (array)$currentAction->remainingCost;
+
+        $pay = $this->canPay($remainingCost, $playerId);
         
-        $remainingNeededResourceTypes = array_keys((array)$currentAction->remainingCost);
+        $remainingNeededResourceTypes = array_keys($remainingCost);
         $playerModules = $this->getModulesByLocation('player', $playerId);
 
         $payButtons = [];
@@ -116,6 +119,8 @@ trait ArgsTrait {
             'cost' => $currentAction->remainingCost,
             'autoPay' => $pay ? $pay['payWith'] : null,
             'payButtons' => $payButtons,
+            'manualAdvancedResource' => $manualAdvancedResource,
+            'usedForManualAdvancedResource' => $usedForManualAdvancedResource,
         ];
     }
 

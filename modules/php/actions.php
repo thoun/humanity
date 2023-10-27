@@ -209,7 +209,9 @@ trait ActionTrait {
 
         $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
 
-        $payButtons = $this->argPay()['payButtons'];
+        $args = $this->argPay();
+        $payButtons = $args['payButtons'];
+        $manualAdvancedResource = $args['manualAdvancedResource'];
 
         if (!array_key_exists($id, $payButtons)) {
             throw new BgaUserException("You cannot spend this module");
@@ -239,10 +241,27 @@ trait ActionTrait {
         ]);
 
         $remainingCost = (array)$currentAction->remainingCost;
-        if ($remainingCost[$resource] == 1) {
-            unset($remainingCost[$resource]);
+        if ($manualAdvancedResource) {
+            $usedForManualAdvancedResource = (array)$currentAction->usedForManualAdvancedResource;
+            $usedForManualAdvancedResource[] = $id;
+            $currentAction->usedForManualAdvancedResource = $usedForManualAdvancedResource;
+
+            if (count($usedForManualAdvancedResource) >= 3) {
+                if ($remainingCost[$manualAdvancedResource] == 1) {
+                    unset($remainingCost[$manualAdvancedResource]);
+                } else {
+                    $remainingCost[$manualAdvancedResource]--;
+                }
+    
+                $currentAction->manualAdvancedResource = null;
+                $currentAction->usedForManualAdvancedResource = null;
+            }
         } else {
-            $remainingCost[$resource]--;
+            if ($remainingCost[$resource] == 1) {
+                unset($remainingCost[$resource]);
+            } else {
+                $remainingCost[$resource]--;
+            }
         }
 
         if (count($remainingCost) > 0) {
@@ -291,6 +310,57 @@ trait ActionTrait {
         ]);
 
         $this->gamestate->nextState('next');
+    }
+
+    public function convertBasicResources(int $resource) {
+        self::checkAction('convertBasicResources');
+
+        $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
+        if (property_exists($currentAction, 'manualAdvancedResource') && $currentAction->manualAdvancedResource) {
+            throw new BgaUserException("Already converting basic resources");
+        }
+
+        $currentAction->manualAdvancedResource = $resource;
+        $currentAction->usedForManualAdvancedResource = [];
+
+        $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
+
+        $this->gamestate->nextState('stay');
+    }
+
+    public function cancelConvertBasicResources() {
+        self::checkAction('cancelConvertBasicResources');
+
+        $currentAction = $this->getGlobalVariable(CURRENT_ACTION);
+        if (!property_exists($currentAction, 'manualAdvancedResource') || !$currentAction->manualAdvancedResource) {
+            throw new BgaUserException("Not converting basic resources");
+        }
+
+        $playerId = intval($this->getActivePlayerId());
+
+        foreach((array)$currentAction->usedForManualAdvancedResource as $id) {
+            $module = $this->getModuleById($id);
+
+            $module->r += 1;
+            $this->DbQuery("UPDATE module SET `r` = $module->r WHERE `card_id` = $module->id");
+
+            self::notifyAllPlayers('activateModule', clienttranslate('${player_name} cancels manual activation of module for conversion ${module_image}'), [
+                'playerId' => $playerId,
+                'player_name' => $this->getPlayerName($playerId),
+                'number' => $module->r,
+                'module' => $module,
+                'icons' => $this->getPlayerIcons($playerId),
+                'module_image' => '',
+                'preserve' => ['module'],
+            ]);
+        }
+
+        $currentAction->manualAdvancedResource = null;
+        $currentAction->usedForManualAdvancedResource = null;
+
+        $this->setGlobalVariable(CURRENT_ACTION, $currentAction);
+
+        $this->gamestate->nextState('stay');
     }
 
     public function endTurn() {

@@ -3141,8 +3141,16 @@ var Humanity = /** @class */ (function () {
                     this.addActionButton("orange_button", _("Orange"), function () { return _this.chooseCommunicationColor(1); });
                     break;
                 case 'pay':
-                    if (args.autoPay) {
-                        this.addActionButton("autoPay_button", _("Automatically spend ${cost}").replace('${cost}', getCostStr(args.autoPay)), function () { return _this.autoPay(); });
+                    if (args.manualAdvancedResource) {
+                        document.getElementById('pagemaintitletext').innerHTML = this.gamedatas.gamestate.descriptionmyturnConvert.replace('${resource}', "<div class=\"resource-icon\" data-type=\"".concat(args.manualAdvancedResource, "\"></div>")) + " (".concat(args.usedForManualAdvancedResource.length + 1, "/3)");
+                        this.addActionButton("cancelConvertBasicResources-button", _("Cancel manual conversion"), function () { return _this.cancelConvertBasicResources(); }, null, null, 'gray');
+                    }
+                    else {
+                        if (args.autoPay) {
+                            this.addActionButton("autoPay_button", _("Automatically spend ${cost}").replace('${cost}', getCostStr(args.autoPay)), function () { return _this.autoPay(); });
+                        }
+                        var advancedResourcesToPay = Object.keys(args.cost).map(Number).filter(function (resource) { return [11, 12, 13].includes(resource); });
+                        advancedResourcesToPay.forEach(function (resource) { return _this.addActionButton("convertBasicResources".concat(resource, "_button"), _("Manually spend basic resources for ${resource}").replace('${resource}', "<div class=\"resource-icon\" data-type=\"".concat(resource, "\"></div>")), function () { return _this.convertBasicResources(resource); }, null, null, 'gray'); });
                     }
                     break;
                 case 'confirmTurn':
@@ -3424,6 +3432,20 @@ var Humanity = /** @class */ (function () {
             return;
         }
         this.takeAction('autoPay');
+    };
+    Humanity.prototype.convertBasicResources = function (resource) {
+        if (!this.checkAction('convertBasicResources')) {
+            return;
+        }
+        this.takeAction('convertBasicResources', {
+            resource: resource
+        });
+    };
+    Humanity.prototype.cancelConvertBasicResources = function () {
+        if (!this.checkAction('cancelConvertBasicResources')) {
+            return;
+        }
+        this.takeAction('cancelConvertBasicResources');
     };
     Humanity.prototype.endTurn = function () {
         if (!this.checkAction('endTurn')) {

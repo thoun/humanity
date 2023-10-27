@@ -357,8 +357,15 @@ class Humanity implements HumanityGame {
                     (this as any).addActionButton(`orange_button`, _("Orange"), () => this.chooseCommunicationColor(1));
                     break;
                 case 'pay':
-                    if (args.autoPay) {
-                        (this as any).addActionButton(`autoPay_button`, _("Automatically spend ${cost}").replace('${cost}', getCostStr(args.autoPay)), () => this.autoPay());
+                    if (args.manualAdvancedResource) {
+                        document.getElementById('pagemaintitletext').innerHTML = (this.gamedatas.gamestate as any).descriptionmyturnConvert.replace('${resource}',`<div class="resource-icon" data-type="${args.manualAdvancedResource}"></div>`) + ` (${args.usedForManualAdvancedResource.length + 1}/3)`;
+                        (this as any).addActionButton(`cancelConvertBasicResources-button`, _("Cancel manual conversion"), () => this.cancelConvertBasicResources(), null, null, 'gray');
+                    } else {
+                        if (args.autoPay) {
+                            (this as any).addActionButton(`autoPay_button`, _("Automatically spend ${cost}").replace('${cost}', getCostStr(args.autoPay)), () => this.autoPay());
+                        }
+                        const advancedResourcesToPay = Object.keys(args.cost).map(Number).filter(resource => [11, 12, 13].includes(resource));
+                        advancedResourcesToPay.forEach(resource => (this as any).addActionButton(`convertBasicResources${resource}_button`, _("Manually spend basic resources for ${resource}").replace('${resource}',`<div class="resource-icon" data-type="${resource}"></div>`), () => this.convertBasicResources(resource), null, null, 'gray'));
                     }
                     break;
                 case 'confirmTurn':
@@ -942,6 +949,24 @@ class Humanity implements HumanityGame {
         }
 
         this.takeAction('autoPay');
+    }
+  	
+    public convertBasicResources(resource: number) {
+        if(!(this as any).checkAction('convertBasicResources')) {
+            return;
+        }
+
+        this.takeAction('convertBasicResources', {
+            resource
+        });
+    }
+  	
+    public cancelConvertBasicResources() {
+        if(!(this as any).checkAction('cancelConvertBasicResources')) {
+            return;
+        }
+
+        this.takeAction('cancelConvertBasicResources');
     }
   	
     public endTurn() {
