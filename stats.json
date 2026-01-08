@@ -1,0 +1,201 @@
+{
+    "table": {
+        "roundNumber": {
+            "id": 10,
+            "name": "Number of rounds",
+            "type": "int"
+        }
+    },
+    "player": {
+        "removedObstacles": {
+            "id": 18,
+            "name": "Removed obstacles",
+            "type": "int"
+        },
+        "deployedModules": {
+            "id": 20,
+            "name": "Deployed modules",
+            "type": "int"
+        },
+        "deployedModules1": {
+            "id": 21,
+            "name": "Deployed orange modules",
+            "type": "int"
+        },
+        "deployedModules2": {
+            "id": 22,
+            "name": "Deployed blue modules",
+            "type": "int"
+        },
+        "deployedModules3": {
+            "id": 23,
+            "name": "Deployed purple modules",
+            "type": "int"
+        },
+        "deployedModules4": {
+            "id": 24,
+            "name": "Deployed green modules",
+            "type": "int"
+        },
+        "deployedModulesYear1": {
+            "id": 25,
+            "name": "Deployed modules of year 1",
+            "type": "int"
+        },
+        "deployedModulesYear2": {
+            "id": 26,
+            "name": "Deployed modules of year 2",
+            "type": "int"
+        },
+        "deployedModulesYear3": {
+            "id": 27,
+            "name": "Deployed modules of year 3",
+            "type": "int"
+        },
+        "activatedModules": {
+            "id": 28,
+            "name": "Activated modules",
+            "type": "int"
+        },
+        "spentModules": {
+            "id": 29,
+            "name": "Spent modules",
+            "type": "int"
+        },
+        "deployedExperiments": {
+            "id": 30,
+            "name": "Deployed experiments",
+            "type": "int"
+        },
+        "deployedExperiments1": {
+            "id": 31,
+            "name": "Deployed left side experiments",
+            "type": "int"
+        },
+        "deployedExperiments2": {
+            "id": 32,
+            "name": "Deployed center experiments",
+            "type": "int"
+        },
+        "deployedExperiments3": {
+            "id": 33,
+            "name": "Deployed right side experiments",
+            "type": "int"
+        },
+        "completeExperimentLines": {
+            "id": 34,
+            "name": "Complete experiment lines",
+            "type": "int"
+        },
+        "uncompleteExperimentLines2": {
+            "id": 35,
+            "name": "Uncomplete experiment lines (2 tiles)",
+            "type": "int"
+        },
+        "uncompleteExperimentLines1": {
+            "id": 36,
+            "name": "Uncomplete experiment lines (1 tile)",
+            "type": "int"
+        },
+        "gainedMissions": {
+            "id": 40,
+            "name": "Gained missions",
+            "type": "int"
+        },
+        "gainedMissionsFromDeck": {
+            "id": 41,
+            "name": "Gained missions (from research board)",
+            "type": "int"
+        },
+        "gainedMissionsFromPlayer": {
+            "id": 42,
+            "name": "Gained missions (from another player)",
+            "type": "int"
+        },
+        "lostMissions": {
+            "id": 43,
+            "name": "Lost missions",
+            "type": "int"
+        },
+        "endMissions": {
+            "id": 44,
+            "name": "Missions at the end of the game",
+            "type": "int"
+        },
+        "upgradedAstronauts": {
+            "id": 50,
+            "name": "Upgraded astronauts",
+            "type": "int"
+        },
+        "power1": {
+            "id": 51,
+            "name": "Use of reactivate astronauts effect",
+            "type": "int"
+        },
+        "power1result": {
+            "id": 52,
+            "name": "Reactivated astronauts with effect",
+            "type": "int"
+        },
+        "power2": {
+            "id": 53,
+            "name": "Use of time units effect",
+            "type": "int"
+        },
+        "power2result": {
+            "id": 54,
+            "name": "Moved astronauts with time units effect",
+            "type": "int"
+        },
+        "skippedAstronaut": {
+            "id": 55,
+            "name": "Astronaut skipped with remaining work value",
+            "type": "int"
+        },
+        "sciencePoints": {
+            "id": 60,
+            "name": "Points gained with science",
+            "type": "int"
+        },
+        "researchPoints": {
+            "id": 61,
+            "name": "Gained research points",
+            "type": "int"
+        },
+        "researchPointsByScience": {
+            "id": 62,
+            "name": "Research points cost per science",
+            "type": "float"
+        },
+        "vpWithModules": {
+            "id": 63,
+            "name": "VP gained with modules",
+            "type": "int"
+        },
+        "vpWithSquares": {
+            "id": 67,
+            "name": "VP gained with completed squares",
+            "type": "int"
+        },
+        "vpWithExperiments": {
+            "id": 64,
+            "name": "VP gained with experiments",
+            "type": "int"
+        },
+        "vpWithMissions": {
+            "id": 65,
+            "name": "VP gained with missions",
+            "type": "int"
+        },
+        "vpWithRemainingResources": {
+            "id": 66,
+            "name": "VP gained with remaining resources",
+            "type": "int"
+        },
+        "vpWithGreenhouses": {
+            "id": 68,
+            "name": "VP gained with greenhouses",
+            "type": "int"
+        }
+    }
+}

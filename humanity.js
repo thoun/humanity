@@ -2961,6 +2961,7 @@ var Humanity = /** @class */ (function () {
         var _this = this;
         var _a, _b;
         log("Starting game setup");
+        this.bga.gameArea.getElement().insertAdjacentHTML('beforeend', "\n            <div id=\"score\">\n                <div id=\"table-wrapper\">\n                    <table>\n                        <thead>\n                            <tr id=\"scoretr\">\n                                <th class=\"top-corner\"></th>\n                            </tr>\n                        </thead>\n                        <tbody id=\"score-table-body\">\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n\n            <div id=\"table\">\n                <div class=\"year-wrapper\">\n                    <div id=\"years-progress\"></div>\n                    <div class=\"year\">\n                        <span class=\"year-text\">\n                            <span id=\"year\"></span> / 3\n                        </span>\n                    </div>\n                </div>\n                <div id=\"tables-and-center\">\n                    <div id=\"table-center-wrapper\">\n                        <div id=\"board-1\">\n                            <div id=\"board-2\">\n                                <div id=\"table-experiments\"></div>\n                            </div>\n                            <div id=\"table-modules\"></div>\n                            <div id=\"table-astronauts\"></div>\n                        </div>\n                        <div id=\"research-board\">\n                            <div id=\"module-decks\"></div>\n                            <div id=\"missions\"></div>\n                        </div>\n                    </div>\n                    <div id=\"tables\"></div>\n                </div>\n            </div>\n        ");
         this.gamedatas = gamedatas;
         log('gamedatas', gamedatas);
         this.astronautsManager = new AstronautsManager(this);
@@ -3030,7 +3031,6 @@ var Humanity = /** @class */ (function () {
             buttons: helpButtons
         });
         this.setupNotifications();
-        this.setupPreferences();
         [1, 2, 3].forEach(function (year) {
             document.getElementById("years-progress").insertAdjacentHTML("beforeend", "\n                <div id=\"year-progress-".concat(year, "\" class=\"year-progress\">\n                    <div id=\"in-year-progress-").concat(year, "\" class=\"in-year-progress\"></div>\n                </div>\n            "));
         });
@@ -3054,7 +3054,7 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.onEnteringState = function (stateName, args) {
         var _a;
         log('Entering state: ' + stateName, args.args);
-        if (((_a = args.args) === null || _a === void 0 ? void 0 : _a.astronaut) && this.isCurrentPlayerActive()) {
+        if (((_a = args.args) === null || _a === void 0 ? void 0 : _a.astronaut) && this.bga.players.isCurrentPlayerActive()) {
             this.astronautsManager.setSelectedAstronaut(args.args.astronaut);
         }
         switch (stateName) {
@@ -3082,7 +3082,7 @@ var Humanity = /** @class */ (function () {
         }
     };
     Humanity.prototype.onEnteringChooseAction = function (args) {
-        if (this.isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             var table = this.getCurrentPlayerTable();
             table.setSelectableModules(args.activatableModules);
             this.tableCenter.setSelectableModules(args.selectableModules);
@@ -3090,25 +3090,25 @@ var Humanity = /** @class */ (function () {
         }
     };
     Humanity.prototype.onEnteringActivateModule = function (args) {
-        if (this.isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             var table = this.getCurrentPlayerTable();
             table.setSelectableModules(args.activatableModules);
         }
     };
     Humanity.prototype.onEnteringPay = function (args) {
-        if (this.isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             var table = this.getCurrentPlayerTable();
             table.setPayButtons(args.payButtons);
         }
     };
     Humanity.prototype.onEnteringChooseAstronaut = function (args) {
         var _a;
-        if (this.isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             (_a = this.getCurrentPlayerTable()) === null || _a === void 0 ? void 0 : _a.setSelectableAstronauts(args.astronauts);
         }
     };
     Humanity.prototype.onEnteringUpgradeAstronaut = function (args) {
-        if (this.isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             args.astronauts.forEach(function (astronaut) { return document.getElementById("astronaut-".concat(astronaut.id)).classList.add('selectable'); });
         }
     };
@@ -3173,7 +3173,7 @@ var Humanity = /** @class */ (function () {
         }
     };
     Humanity.prototype.onLeavingChooseAction = function () {
-        if (this.isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             var table = this.getCurrentPlayerTable();
             table.setSelectableModules(null);
             this.tableCenter.setSelectableModules(null);
@@ -3181,13 +3181,13 @@ var Humanity = /** @class */ (function () {
         }
     };
     Humanity.prototype.onLeavingActivateModule = function () {
-        if (this.isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             var table = this.getCurrentPlayerTable();
             table.setSelectableModules(null);
         }
     };
     Humanity.prototype.onLeavingPay = function () {
-        if (this.isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             var table = this.getCurrentPlayerTable();
             table.removePayButtons();
         }
@@ -3209,7 +3209,7 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.onUpdateActionButtons = function (stateName, args) {
         var _this = this;
         var _a;
-        if (this.isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             switch (stateName) {
                 case 'activateModule':
                     this.addActionButton("endTurn_button", _("End turn"), function () { return _this.endTurn(); });
@@ -3278,23 +3278,6 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.getGameStateName = function () {
         return this.gamedatas.gamestate.name;
-    };
-    Humanity.prototype.setupPreferences = function () {
-        var _this = this;
-        // Extract the ID and value from the UI control
-        var onchange = function (e) {
-            var match = e.target.id.match(/^preference_[cf]ontrol_(\d+)$/);
-            if (!match) {
-                return;
-            }
-            var prefId = +match[1];
-            var prefValue = +e.target.value;
-            _this.prefs[prefId].value = prefValue;
-        };
-        // Call onPreferenceChange() when any value changes
-        dojo.query(".preference_control").connect("onchange", onchange);
-        // Call onPreferenceChange() now
-        dojo.forEach(dojo.query("#ingame_menu_content .preference_control"), function (el) { return onchange({ target: el }); });
     };
     Humanity.prototype.getOrderedPlayers = function (gamedatas) {
         var _this = this;
@@ -3566,8 +3549,7 @@ var Humanity = /** @class */ (function () {
     };
     Humanity.prototype.takeAction = function (action, data) {
         data = data || {};
-        data.lock = true;
-        this.ajaxcall("/humanity/humanity/".concat(action, ".html"), data, this, function () { });
+        this.bga.actions.performAction(action, data, { checkAction: false });
     };
     ///////////////////////////////////////////////////
     //// Reaction to cometD notifications
@@ -3806,7 +3788,7 @@ var Humanity = /** @class */ (function () {
     Humanity.prototype.getPower = function (power, timeUnits) {
         switch (power) {
             case 1: return _("All Astronauts in the player’s Base are immediately reactivated: They are turned around to face the player and can be used again to perform an action starting <strong>from their next turn</strong>. If the player has no Astronauts to reactivate, the effect is lost.");
-            case 2: return _("The player <strong>immediately</strong> gains ${number} Time unit(s): <strong>All their Astronauts</strong> around the main board are moved ${number} hangar(s) counterclockwise (including the one who just carried out this Experiment). Astronauts cannot be moved beyond the articulated arm.").replace(/\$\{number\}/g, timeUnits);
+            case 2: return _("The player <strong>immediately</strong> gains ${number} Time unit(s): <strong>All their Astronauts</strong> around the main board are moved ${number} hangar(s) counterclockwise (including the one who just carried out this Experiment). Astronauts cannot be moved beyond the articulated arm.").replace(/\$\{number\}/g, "".concat(timeUnits));
         }
     };
     Humanity.prototype.getSide = function (side) {
@@ -3828,8 +3810,7 @@ var Humanity = /** @class */ (function () {
         }
     };
     /* This enable to inject translatable styled things to logs or action bar */
-    /* @Override */
-    Humanity.prototype.format_string_recursive = function (log, args) {
+    Humanity.prototype.bgaFormatText = function (log, args) {
         try {
             if (log && args && !args.processed) {
                 ['cost', 'types'].forEach(function (argName) {
@@ -3856,7 +3837,7 @@ var Humanity = /** @class */ (function () {
         catch (e) {
             console.error(log, args, "Exception thrown", e.stack);
         }
-        return this.inherited(arguments);
+        return { log: log, args: args };
     };
     return Humanity;
 }());

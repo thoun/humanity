@@ -1,10 +1,3 @@
-declare const define;
-declare const ebg;
-declare const $;
-declare const dojo: Dojo;
-declare const _;
-declare const g_gamethemeurl;
-
 const ANIMATION_MS = 500;
 const SCORE_MS = 1500;
 const ACTION_TIMER_DURATION = 5;
@@ -45,6 +38,8 @@ class Humanity implements HumanityGame {
     
     private TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
 
+    public bga: Bga;
+
     constructor() {
     }
     
@@ -63,6 +58,49 @@ class Humanity implements HumanityGame {
 
     public setup(gamedatas: HumanityGamedatas) {
         log( "Starting game setup" );
+
+        this.bga.gameArea.getElement().insertAdjacentHTML('beforeend', `
+            <div id="score">
+                <div id="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr id="scoretr">
+                                <th class="top-corner"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="score-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="table">
+                <div class="year-wrapper">
+                    <div id="years-progress"></div>
+                    <div class="year">
+                        <span class="year-text">
+                            <span id="year"></span> / 3
+                        </span>
+                    </div>
+                </div>
+                <div id="tables-and-center">
+                    <div id="table-center-wrapper">
+                        <div id="board-1">
+                            <div id="board-2">
+                                <div id="table-experiments"></div>
+                            </div>
+                            <div id="table-modules"></div>
+                            <div id="table-astronauts"></div>
+                        </div>
+                        <div id="research-board">
+                            <div id="module-decks"></div>
+                            <div id="missions"></div>
+                        </div>
+                    </div>
+                    <div id="tables"></div>
+                </div>
+            </div>
+        `);
         
         this.gamedatas = gamedatas;
 
@@ -144,7 +182,6 @@ class Humanity implements HumanityGame {
             buttons: helpButtons
         });
         this.setupNotifications();
-        this.setupPreferences();
 
         [1, 2, 3].forEach(year => {
             document.getElementById(`years-progress`).insertAdjacentHTML(`beforeend`, `
@@ -178,7 +215,7 @@ class Humanity implements HumanityGame {
     public onEnteringState(stateName: string, args: any) {
         log('Entering state: ' + stateName, args.args);
 
-        if (args.args?.astronaut && (this as any).isCurrentPlayerActive()) {
+        if (args.args?.astronaut && this.bga.players.isCurrentPlayerActive()) {
             this.astronautsManager.setSelectedAstronaut(args.args.astronaut);
         }
 
@@ -208,7 +245,7 @@ class Humanity implements HumanityGame {
     }
 
     private onEnteringChooseAction(args: EnteringChooseActionArgs) {
-        if ((this as any).isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             const table = this.getCurrentPlayerTable();
             table.setSelectableModules(args.activatableModules);
             this.tableCenter.setSelectableModules(args.selectableModules);
@@ -217,27 +254,27 @@ class Humanity implements HumanityGame {
     }
     
     public onEnteringActivateModule(args: EnteringActivateModuleArgs) {
-        if ((this as any).isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             const table = this.getCurrentPlayerTable();
             table.setSelectableModules(args.activatableModules);
         }
     }
 
     private onEnteringPay(args: EnteringPayArgs) {
-        if ((this as any).isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             const table = this.getCurrentPlayerTable();
             table.setPayButtons(args.payButtons);
         }
     }
 
     private onEnteringChooseAstronaut(args: EnteringChooseAstronautArgs) {
-        if ((this as any).isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             this.getCurrentPlayerTable()?.setSelectableAstronauts(args.astronauts);
         }
     }
 
     private onEnteringUpgradeAstronaut(args: EnteringChooseAstronautArgs) {
-        if ((this as any).isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             args.astronauts.forEach(astronaut => document.getElementById(`astronaut-${astronaut.id}`).classList.add('selectable'));
         }
     }
@@ -308,7 +345,7 @@ class Humanity implements HumanityGame {
     }
     
     public onLeavingChooseAction() {
-        if ((this as any).isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             const table = this.getCurrentPlayerTable();
             table.setSelectableModules(null);
             this.tableCenter.setSelectableModules(null);
@@ -317,14 +354,14 @@ class Humanity implements HumanityGame {
     }
     
     public onLeavingActivateModule() {
-        if ((this as any).isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             const table = this.getCurrentPlayerTable();
             table.setSelectableModules(null);
         }
     }
     
     public onLeavingPay() {
-        if ((this as any).isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             const table = this.getCurrentPlayerTable();
             table.removePayButtons();
         }
@@ -347,7 +384,7 @@ class Humanity implements HumanityGame {
     //
     public onUpdateActionButtons(stateName: string, args: any) {
         
-        if ((this as any).isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             switch (stateName) {
                 case 'activateModule':
                     (this as any).addActionButton(`endTurn_button`, _("End turn"), () => this.endTurn());
@@ -424,28 +461,6 @@ class Humanity implements HumanityGame {
 
     public getGameStateName(): string {
         return this.gamedatas.gamestate.name;
-    }
-
-    private setupPreferences() {
-        // Extract the ID and value from the UI control
-        const onchange = (e) => {
-          var match = e.target.id.match(/^preference_[cf]ontrol_(\d+)$/);
-          if (!match) {
-            return;
-          }
-          var prefId = +match[1];
-          var prefValue = +e.target.value;
-          (this as any).prefs[prefId].value = prefValue;
-        }
-        
-        // Call onPreferenceChange() when any value changes
-        dojo.query(".preference_control").connect("onchange", onchange);
-        
-        // Call onPreferenceChange() now
-        dojo.forEach(
-          dojo.query("#ingame_menu_content .preference_control"),
-          el => onchange({ target: el })
-        );
     }
 
     private getOrderedPlayers(gamedatas: HumanityGamedatas) {
@@ -1022,8 +1037,7 @@ class Humanity implements HumanityGame {
 
     public takeAction(action: string, data?: any) {
         data = data || {};
-        data.lock = true;
-        (this as any).ajaxcall(`/humanity/humanity/${action}.html`, data, this, () => {});
+        this.bga.actions.performAction(action, data, { checkAction: false });
     }
 
     ///////////////////////////////////////////////////
@@ -1301,7 +1315,7 @@ class Humanity implements HumanityGame {
     public getPower(power: number, timeUnits: number): string {
         switch (power) {
             case 1: return _("All Astronauts in the player’s Base are immediately reactivated: They are turned around to face the player and can be used again to perform an action starting <strong>from their next turn</strong>. If the player has no Astronauts to reactivate, the effect is lost.");
-            case 2: return _("The player <strong>immediately</strong> gains ${number} Time unit(s): <strong>All their Astronauts</strong> around the main board are moved ${number} hangar(s) counterclockwise (including the one who just carried out this Experiment). Astronauts cannot be moved beyond the articulated arm.").replace(/\$\{number\}/g, timeUnits);
+            case 2: return _("The player <strong>immediately</strong> gains ${number} Time unit(s): <strong>All their Astronauts</strong> around the main board are moved ${number} hangar(s) counterclockwise (including the one who just carried out this Experiment). Astronauts cannot be moved beyond the articulated arm.").replace(/\$\{number\}/g, `${timeUnits}`);
         }
     }
 
@@ -1326,8 +1340,7 @@ class Humanity implements HumanityGame {
     }
 
     /* This enable to inject translatable styled things to logs or action bar */
-    /* @Override */
-    public format_string_recursive(log: string, args: any) {
+    public bgaFormatText(log: string, args: any) {
         try {
             if (log && args && !args.processed) {
                 ['cost', 'types'].forEach(argName => {
@@ -1357,6 +1370,6 @@ class Humanity implements HumanityGame {
         } catch (e) {
             console.error(log,args,"Exception thrown", e.stack);
         }
-        return (this as any).inherited(arguments);
+        return { log, args };
     }
 }

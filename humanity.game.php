@@ -16,8 +16,9 @@
   *
   */
 
-
-require_once(APP_GAMEMODULE_PATH.'module/table/table.game.php');
+use Bga\GameFramework\Components\Deck;
+use Bga\GameFramework\Table;
+use Bga\GameFramework\VisibleSystemException;
 
 require_once('modules/php/objects/astronaut.php');
 require_once('modules/php/objects/module.php');
@@ -47,6 +48,10 @@ class Humanity extends Table {
     use StateTrait;
     use ArgsTrait;
     use DebugUtilTrait;
+		
+    public Deck $modules;
+    public Deck $experiments;   
+	public Deck $missions;  
 
 	function __construct() {
         // Your global variables labels:
@@ -59,20 +64,12 @@ class Humanity extends Table {
         
         self::initGameStateLabels([]);   
 		
-        $this->modules = $this->getNew("module.common.deck");
-        $this->modules->init("module");
+        $this->modules = $this->deckFactory->createDeck("module");
 		
-        $this->experiments = $this->getNew("module.common.deck");
-        $this->experiments->init("experiment");   
+        $this->experiments = $this->deckFactory->createDeck("experiment");   
 		
-        $this->missions = $this->getNew("module.common.deck");
-        $this->missions->init("mission");  
+        $this->missions = $this->deckFactory->createDeck("mission");  
 	}
-	
-    protected function getGameName() {
-		// Used for translations and stuff. Please do not modify.
-        return "humanity";
-    }	
 
     /*
         setupNewGame:
@@ -113,11 +110,8 @@ class Humanity extends Table {
         $this->setGlobalVariable(FIRST_PLAYER, $firstPlayer);
         
         // Init game statistics
-        // (note: statistics used in this file must be defined in your stats.inc.php file)
-
-        $this->initStat('table', 'roundNumber', 0);
-        // Statistics existing for each player
-        foreach([
+        $this->tableStats->init('roundNumber', 0);
+        $this->playerStats->init([
             //18+ obstacles
             "removedObstacles",
             // 20+ modules
@@ -135,9 +129,7 @@ class Humanity extends Table {
             // 60+ points
             "sciencePoints", "researchPoints", "researchPointsByScience", 
             "vpWithModules", "vpWithSquares", "vpWithExperiments", "vpWithMissions", "vpWithRemainingResources", "vpWithGreenhouses",
-        ] as $name) {
-            $this->initStat('player', $name, 0);
-        }
+        ], 0);
 
         // setup the initial game situation here
         $this->setupAstronauts(array_keys($players));
@@ -148,10 +140,7 @@ class Humanity extends Table {
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
 
-        // TODO TEMP
-        $this->debugSetup();
-
-        /************ End of the game initialization *****/
+        return \ST_START_TURN;
     }
 
     /*
@@ -163,7 +152,7 @@ class Humanity extends Table {
         _ when the game starts
         _ when a player refreshes the game page (F5)
     */
-    protected function getAllDatas() {
+    protected function getAllDatas(): array {
         $result = [];
     
         $currentPlayerId = intval(self::getCurrentPlayerId());    // !! We must only return informations visible by this player !!
@@ -175,7 +164,7 @@ class Humanity extends Table {
   
         // Gather all information about current game situation (visible by player $current_player_id).
 
-        $isEndScore = intval($this->gamestate->state_id()) >= ST_END_SCORE;
+        $isEndScore = $this->gamestate->getCurrentMainStateId() >= ST_END_SCORE;
         
         foreach($result['players'] as $playerId => &$player) {
             $player['playerNo'] = intval($player['playerNo']);
@@ -275,7 +264,7 @@ class Humanity extends Table {
             return;
         }
 
-        throw new feException( "Zombie mode not supported at this game state: ".$statename );
+        throw new VisibleSystemException( "Zombie mode not supported at this game state: ".$statename );
     }
     
 ///////////////////////////////////////////////////////////////////////////////////:
