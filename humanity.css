@@ -1335,15 +1335,14 @@ body > .card {
   background-color: rgba(170, 170, 170, 0.4);
 }
 
-.player-board {
-  background-color: white;
+html[data-theme=light] .player-board {
+  --game-bga-player-panel-background: white;
 }
-.player-board.spectator-mode {
-  color: black;
+
+html[data-theme=dark] .science-counter, html[data-theme=dark] #research-positions {
+  text-shadow: 0 0 1px white, 0 0 2px white, 0 0 3px white;
 }
-.player-board.spectator-mode * {
-  background: white !important;
-}
+
 .player-board .icon {
   margin-right: 5px;
 }
@@ -1631,10 +1630,14 @@ body > .card {
   font-weight: normal;
   font-style: normal;
 }
-html, .mode_3d #game_play_area_background {
+html {
   background: url("img/background.jpg") #b5b4b4;
   background-size: 100% auto;
   background-position: top;
+}
+
+html[data-theme=dark] {
+  background-blend-mode: soft-light;
 }
 
 .year-wrapper {
@@ -1663,6 +1666,7 @@ html, .mode_3d #game_play_area_background {
 }
 
 .year {
+  color: black;
   background: white;
   padding: 5px;
   font-size: 16pt;
