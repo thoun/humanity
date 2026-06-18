@@ -152,10 +152,8 @@ class Humanity extends Table {
         _ when the game starts
         _ when a player refreshes the game page (F5)
     */
-    protected function getAllDatas(): array {
+    protected function getAllDatas(int $currentPlayerId): array {
         $result = [];
-    
-        $currentPlayerId = intval(self::getCurrentPlayerId());    // !! We must only return informations visible by this player !!
     
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.

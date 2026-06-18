@@ -3364,8 +3364,7 @@ var Humanity = /** @class */ (function () {
         }
     };
     Humanity.prototype.setScore = function (playerId, score) {
-        var _a;
-        (_a = this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.toValue(score);
+        this.bga.playerPanels.getScoreCounter(playerId).toValue(score);
     };
     Humanity.prototype.setVP = function (playerId, count) {
         this.researchBoard.setVP(playerId, count);

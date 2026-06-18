@@ -120,7 +120,7 @@ trait UtilTrait {
     }
 
     function getPlayerName(int $playerId) {
-        return self::getUniqueValueFromDB("SELECT player_name FROM player WHERE player_id = $playerId");
+        return $this->getPlayerNameById($playerId);
     }
 
     function getPlayer(int $id) {
@@ -178,7 +178,7 @@ trait UtilTrait {
             'new' => $this->getPlayer($playerId)->science,
             'inc' => $amount,
             'absInc' => abs($amount),
-            'private' => intval($this->gamestate->state_id()) < ST_END_SCORE,
+            'private' => $this->gamestate->getCurrentMainStateId() < ST_END_SCORE,
         ] + $args);
     }
 

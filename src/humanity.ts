@@ -586,7 +586,7 @@ class Humanity implements HumanityGame {
     }
 
     private setScore(playerId: number, score: number) {
-        (this as any).scoreCtrl[playerId]?.toValue(score);
+        this.bga.playerPanels.getScoreCounter(playerId).toValue(score);
     }
 
     private setVP(playerId: number, count: number) {
